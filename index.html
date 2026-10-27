@@ -440,7 +440,7 @@ footer{margin-top:70px;background:linear-gradient(135deg,#f2628f,#ff8fb1);color:
       <!-- GANTI email di bawah kalau perlu -->
       <form id="orderForm" method="POST" action="https://formsubmit.co/keikoarts22@gmail.com">
         <input type="hidden" name="_subject" id="fSubject" value="New commission request — keikoartist.com">
-        <input type="hidden" name="_next" value="https://keikoartist.com/?sent=1#queue">
+        <input type="hidden" name="_next" id="fNext" value="https://keikoartist.com/?sent=1#queue">
         <input type="hidden" name="_template" value="table">
         <input type="text" name="_honey" style="display:none">
         <input type="hidden" name="Service" id="fService">
@@ -638,6 +638,7 @@ addEventListener('scroll',()=>{let cur='home';links.forEach(l=>{const s=document
 links.forEach(l=>l.addEventListener('click',()=>$('#menu').classList.remove('open')));
 if(location.search.includes('sent=1')){const t=$('#sentToast');t.hidden=false;setTimeout(()=>t.hidden=true,6000);}
 if(location.hash==='#order')openOrder();
+if(location.protocol.startsWith('http'))$('#fNext').value=location.origin+'/?sent=1#queue';
 </script>
 </body>
 </html>
