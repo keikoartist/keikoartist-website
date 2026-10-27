@@ -89,6 +89,11 @@ section:nth-of-type(even):not(.hero){background:linear-gradient(180deg,#fff,#fff
 .img.ph::after{content:"✦";position:absolute;inset:0;display:grid;place-items:center;font-size:34px;color:#f7a8c2}
 .img.art{background-color:#fff;background-position:center 12%}
 .banners .sub.hide{display:none}
+.rig-wrap{grid-template-columns:1fr}
+.work.rig{aspect-ratio:16/9;background:#fde6ee}
+.work.rig video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+.work.rig .tag{z-index:1}
+
 .work{position:relative;aspect-ratio:3/3.3;border-radius:14px;overflow:hidden;transition:.25s}
 .work:hover{transform:translateY(-4px);box-shadow:var(--shadow)}
 .work .tag{position:absolute;left:10px;bottom:12px;background:#fff;border-radius:999px;padding:5px 14px;font-size:12px;font-family:"DM Serif Display",serif}
@@ -306,6 +311,7 @@ footer{margin-top:70px;background:linear-gradient(135deg,#f2628f,#ff8fb1);color:
       <div class="filters" id="filters">
         <button class="on" data-f="all">All</button>
         <button data-f="model">VTuber</button>
+        <button data-f="rig">Rigging</button>
         <button data-f="pet">Pet</button>
         <button data-f="banner">Banner</button>
       </div>
@@ -317,6 +323,13 @@ footer{margin-top:70px;background:linear-gradient(135deg,#f2628f,#ff8fb1);color:
       <a href="#services" class="work img art" data-c="model" style="--src:url(images/vtuber-rocker.webp)"><span class="tag">VTuber</span><span class="go">↗</span></a>
       <a href="#services" class="work img art" data-c="model" style="--src:url(images/vtuber-wolf.webp)"><span class="tag">VTuber</span><span class="go">↗</span></a>
       <a href="#services" class="work img art" data-c="pet" style="--src:url(images/mascot-pet.webp)"><span class="tag">Mascot Pet</span><span class="go">↗</span></a>
+    </div>
+    <div class="banners rig-wrap">
+      <h3 class="serif sub" data-c="rig">Live2D Rigging Showcase</h3>
+      <div class="work rig" data-c="rig">
+        <video src="images/rigging-showcase.mp4" poster="images/rigging-poster.webp" autoplay muted loop playsinline preload="metadata" aria-label="Live2D rigging showcase"></video>
+        <span class="tag">Live2D Rigging</span>
+      </div>
     </div>
     <div class="banners">
       <h3 class="serif sub" data-c="banner">Banners</h3>
