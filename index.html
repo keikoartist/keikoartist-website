@@ -418,6 +418,21 @@ body:has(.sd.show) .fab-order{display:none}
 .gal-slide,.gal-slide.wide,.gal-slide.contain{background-size:contain !important;background-position:center !important;background-color:#fff}
 .works .work{background-image:var(--src) !important;background-size:contain !important;background-position:center !important;background-color:#fff;background-repeat:no-repeat}
 .works .work .tag,.works .work .go{z-index:1}
+
+/* vtubers marquee */
+#clients .sec-head{margin-bottom:14px}
+.vt-marquee{overflow:hidden;padding:4px 0 10px;-webkit-mask-image:linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent);mask-image:linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent)}
+.vt-track{display:flex;width:max-content;animation:vtscroll var(--dur,30s) linear infinite}
+.vt-track:hover{animation-play-state:paused}
+.vt-dup{display:flex}
+.vt{display:flex;flex-direction:column;align-items:center;gap:6px;width:96px;margin-right:18px;text-align:center}
+.vt img{width:76px;height:76px;border-radius:50%;object-fit:cover;border:2px solid var(--pink);box-shadow:0 4px 10px rgba(242,98,143,.18);background:#fff}
+.vt span{font-size:12px;font-weight:600;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:96px}
+a.vt:hover img{transform:scale(1.06)}
+.vt img{transition:.2s}
+@keyframes vtscroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+@media (prefers-reduced-motion:reduce){.vt-track{animation:none;overflow-x:auto}.vt-dup{display:none}}
+@media (max-width:560px){.vt{width:76px;margin-right:12px}.vt img{width:60px;height:60px}}
 </style>
 </head>
 <body>
@@ -508,6 +523,14 @@ body:has(.sd.show) .fab-order{display:none}
       <div class="card"><div class="img art" style="--src:url(images/chibi-witch.webp);background-position:center 20%"></div><h3>Chibi VTuber</h3><p>Cute chibi version of your VTuber character.</p><div class="price"><b>From $45</b></div><button class="btn btn-pink req" data-order="Chibi VTuber">Start Request</button></div>
       <div class="card"><div class="img" style="--src:url(images/illustration-cottage.webp);background-position:center 30%"></div><h3>Custom Inquiry</h3><p>Have an idea that is not listed? Tell me and I'll send you a quote.</p><div class="price"><b>Ask a quote</b></div><button class="btn btn-pink req" data-order="Custom Inquiry">Start Inquiry</button></div>
     </div>
+  </div>
+</section>
+
+<!-- VTUBERS I'VE MADE -->
+<section id="clients">
+  <div class="wrap">
+    <div class="sec-head"><h2 class="serif">VTubers I've Brought to Life</h2></div>
+    <div class="vt-marquee" aria-label="VTubers made by KeikoArts"><div class="vt-track" id="vtTrack"></div></div>
   </div>
 </section>
 
@@ -787,6 +810,14 @@ const DETAILS = {   // deskripsi lengkap tiap service (muncul saat kartu diklik)
     includes:["Full illustrations and scenes","Stream screens, overlays and alerts","Anything else, quoted to your needs"],
     notes:"I'll reply with a quote within 1–2 days." },
 };
+const VTUBERS = [   // VTuber yang pernah kamu buat. name & link opsional (link: Twitch/YouTube/X)
+  { img:"av-vtuber-witch",  name:"", link:"" },
+  { img:"av-vtuber-dragon", name:"", link:"" },
+  { img:"av-vtuber-maid",   name:"", link:"" },
+  { img:"av-vtuber-rocker", name:"", link:"" },
+  { img:"av-vtuber-wolf",   name:"", link:"" },
+  { img:"av-chibi-witch",   name:"", link:"" },
+];
 const SERVICES = {
   "VTuber": { from: 100, eta: "25–40 days",
     packages: [ ["Bust · Art only",100,"Ready-to-rig PSD"], ["Half body · Art only",150,"Ready-to-rig PSD"], ["Full body · Art only",250,"Ready-to-rig PSD"],
@@ -1026,6 +1057,16 @@ $$('.card').forEach(card=>{
   });
 })();
 
+
+// VTubers marquee
+(function(){
+  const t=$('#vtTrack');if(!VTUBERS.length){$('#clients').hidden=true;return;}
+  const item=v=>{const inner=`<img src="images/${v.img}.webp" alt="${esc(v.name||'VTuber by KeikoArts')}" loading="lazy">${v.name?`<span>${esc(v.name)}</span>`:''}`;
+    return v.link&&/^https:\/\//.test(v.link)?`<a class="vt" href="${esc(v.link)}" target="_blank" rel="noopener">${inner}</a>`:`<div class="vt">${inner}</div>`;};
+  const one=VTUBERS.map(item).join('');
+  t.innerHTML=one+`<span aria-hidden="true" class="vt-dup">${one}</span>`;
+  t.style.setProperty('--dur',Math.max(20,VTUBERS.length*5)+'s');
+})();
 // nav
 const links=$$('.menu a');
 addEventListener('scroll',()=>{let cur='home';links.forEach(l=>{const s=document.querySelector(l.getAttribute('href'));if(s&&s.getBoundingClientRect().top<120)cur=s.id});
