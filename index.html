@@ -121,6 +121,14 @@ section:nth-of-type(even):not(.hero){background:linear-gradient(180deg,#fff,#fff
 .step p{font-size:13px;color:var(--muted)}
 .step:not(:last-child)::after{content:"→";position:absolute;right:-13px;top:50%;transform:translateY(-50%);z-index:1;width:24px;height:24px;border-radius:50%;background:#fff;border:1px solid var(--line);display:grid;place-items:center;font-size:12px;color:var(--pink)}
 
+
+/* team */
+.team{display:flex;justify-content:center;flex-wrap:wrap;gap:18px 36px}
+.member{display:flex;flex-direction:column;align-items:center;text-align:center;width:120px}
+.member .av{width:72px;height:72px;border-radius:50%;margin-bottom:8px;border:2px solid var(--pink);box-shadow:0 4px 12px rgba(242,98,143,.2);display:grid;place-items:center;color:#f7a8c2;font-size:22px;background:linear-gradient(135deg,#fff0f5,#ffd6e4);background-image:var(--src,linear-gradient(135deg,#fff0f5,#ffd6e4));background-size:cover;background-position:center}
+.member b{font-weight:600;font-size:14px}
+.member span{font-size:12px;color:var(--muted)}
+
 /* cta */
 .cta{position:relative;border-radius:22px;overflow:hidden;min-height:220px;display:flex;align-items:center;justify-content:flex-end}
 .cta .img{position:absolute;inset:0}
@@ -395,6 +403,19 @@ footer{margin-top:70px;background:linear-gradient(135deg,#f2628f,#ff8fb1);color:
           <a href="#services" class="btn btn-ghost">▦ View Services</a>
         </div>
       </div>
+    </div>
+  </div>
+</section>
+
+<!-- TEAM -->
+<section id="team">
+  <div class="wrap">
+    <div class="sec-head"><h2 class="serif">Meet Team Keiko</h2></div>
+    <div class="team">
+      <div class="member"><div class="av" style="--src:url(images/pfp.webp)"></div><b>Keiko</b><span>Artist</span></div>
+      <div class="member"><div class="av">✦</div><b>Name</b><span>Admin</span></div>
+      <div class="member"><div class="av">✦</div><b>Name</b><span>Rigger / Animator</span></div>
+      <div class="member"><div class="av">✦</div><b>Name</b><span>Project Manager</span></div>
     </div>
   </div>
 </section>
