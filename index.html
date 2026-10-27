@@ -80,24 +80,26 @@ section:nth-of-type(even):not(.hero){background:linear-gradient(180deg,#fff,#fff
 .filters{display:flex;gap:6px;flex-wrap:wrap}
 .filters button{border:0;background:none;padding:8px 16px;border-radius:8px;font:inherit;font-size:13px;cursor:pointer;color:var(--muted)}
 .filters button.on{background:var(--pink-2);color:#fff}
-.works{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
-.banners{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:22px}
+.works{display:grid;grid-template-columns:repeat(6,1fr);gap:10px}
+.banners{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:22px}
 .banners .sub{grid-column:1/-1;font-size:22px;display:flex;align-items:center;gap:10px}
 .banners .sub::before{content:"";width:22px;height:2px;background:var(--pink)}
-.work.banner-item{aspect-ratio:8/3}
+.work.banner-item{aspect-ratio:3/1}
 .img.ph{background-image:linear-gradient(135deg,#fff0f5,#ffd6e4);position:relative}
 .img.ph::after{content:"✦";position:absolute;inset:0;display:grid;place-items:center;font-size:34px;color:#f7a8c2}
 .img.art{background-color:#fff;background-position:center 12%}
-.banners .sub.hide{display:none}
-.rig-wrap{grid-template-columns:1fr}
+.banners .sub.hide,.rig-info.hide{display:none}
+.rig-wrap{grid-template-columns:1fr 1fr;align-items:center;gap:22px}
+.rig-info h4{font-family:"DM Serif Display",serif;font-weight:400;font-size:24px;margin-bottom:6px}
+.rig-info p{color:var(--muted);font-size:14px;margin-bottom:16px}
 .work.rig{aspect-ratio:16/9;background:#fde6ee}
 .work.rig video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
 .work.rig .tag{z-index:1}
 
-.work{position:relative;aspect-ratio:3/3.3;border-radius:14px;overflow:hidden;transition:.25s}
+.work{position:relative;aspect-ratio:3/4;border-radius:14px;overflow:hidden;transition:.25s}
 .work:hover{transform:translateY(-4px);box-shadow:var(--shadow)}
-.work .tag{position:absolute;left:10px;bottom:12px;background:#fff;border-radius:999px;padding:5px 14px;font-size:12px;font-family:"DM Serif Display",serif}
-.work .go{position:absolute;right:10px;bottom:10px;width:32px;height:32px;border-radius:50%;background:#fff;display:grid;place-items:center;font-size:14px}
+.work .tag{position:absolute;left:8px;bottom:8px;background:#fff;border-radius:999px;padding:3px 10px;font-size:11px;font-family:"DM Serif Display",serif}
+.work .go{position:absolute;right:8px;bottom:8px;width:26px;height:26px;border-radius:50%;background:#fff;display:grid;place-items:center;font-size:14px}
 .work.hide{display:none}
 
 /* services */
@@ -226,8 +228,8 @@ footer{margin-top:70px;background:linear-gradient(135deg,#f2628f,#ff8fb1);color:
 
 /* ===== RESPONSIVE REFINEMENTS ===== */
 @media (min-width:1600px){.wrap{width:min(1360px,100% - 64px)}.hero{min-height:680px}}
-@media (max-width:1050px){.works{grid-template-columns:repeat(2,1fr)}}
-@media (max-width:820px){.banners{grid-template-columns:1fr}}
+@media (max-width:1050px){.works{grid-template-columns:repeat(3,1fr)}.banners{grid-template-columns:repeat(2,1fr)}}
+@media (max-width:820px){.rig-wrap{grid-template-columns:1fr}}
 @media (max-width:820px){
   .perks{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
   .perks div{padding:0;border:0;text-align:center}
@@ -245,7 +247,8 @@ footer{margin-top:70px;background:linear-gradient(135deg,#f2628f,#ff8fb1);color:
   .step::after{display:none}
   .hero .btns .btn{flex:1;justify-content:center;padding:13px 12px;font-size:14px}
   .perks{grid-template-columns:repeat(2,1fr);row-gap:14px}
-  .works{grid-template-columns:repeat(2,1fr);gap:10px}
+  .works{grid-template-columns:repeat(3,1fr);gap:8px}
+  .work .tag{display:none}
   .work .tag{font-size:11px;padding:4px 10px}
   .services{gap:10px}
   .card{padding:10px 10px 12px}
@@ -261,7 +264,7 @@ footer{margin-top:70px;background:linear-gradient(135deg,#f2628f,#ff8fb1);color:
   .mnav .btn{padding:12px 18px}
   .stepbar span{font-size:10px}
 }
-@media (max-width:360px){.services,.works{grid-template-columns:1fr}.nav{height:64px}.menu.open{top:64px}}
+@media (max-width:360px){.services{grid-template-columns:1fr}.nav{height:64px}.menu.open{top:64px}}
 </style>
 </head>
 <body>
@@ -329,6 +332,11 @@ footer{margin-top:70px;background:linear-gradient(135deg,#f2628f,#ff8fb1);color:
       <div class="work rig" data-c="rig">
         <video src="images/rigging-showcase.mp4" poster="images/rigging-poster.webp" autoplay muted loop playsinline preload="metadata" aria-label="Live2D rigging showcase"></video>
         <span class="tag">Live2D Rigging</span>
+      </div>
+      <div class="rig-info" data-c="rig">
+        <h4>Smooth, expressive Live2D</h4>
+        <p>Natural head turns, hair &amp; clothing physics, blinking, lip-sync and custom expressions. Stream-ready for VTube Studio.</p>
+        <button class="btn btn-pink arrow" data-order="VTuber">Order Rigging</button>
       </div>
     </div>
     <div class="banners">
@@ -642,7 +650,7 @@ form.addEventListener('submit',e=>{if(!$('#agree').checked){e.preventDefault();e
 // portfolio filter
 $$('#filters button').forEach(b=>b.onclick=()=>{
   $$('#filters button').forEach(x=>x.classList.remove('on'));b.classList.add('on');
-  $$('.work,.banners .sub').forEach(w=>w.classList.toggle('hide',b.dataset.f!=='all'&&w.dataset.c!==b.dataset.f));
+  $$('.work,.banners .sub,.rig-info').forEach(w=>w.classList.toggle('hide',b.dataset.f!=='all'&&w.dataset.c!==b.dataset.f));
 });
 // nav
 const links=$$('.menu a');
