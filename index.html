@@ -444,6 +444,22 @@ a.vt:hover img{transform:scale(1.06)}
 @keyframes vtscroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
 @media (prefers-reduced-motion:reduce){.vt-track{animation:none;overflow-x:auto}.vt-dup{display:none}}
 @media (max-width:560px){.vt{width:76px;margin-right:12px}.vt img{width:60px;height:60px}.vt span{font-size:10px}}
+
+/* thank-you */
+.ty{z-index:130}
+.ty-box{width:min(560px,100%)}
+.ty .mbody{display:grid;gap:12px}
+.ty-lead{font-size:14.5px;color:var(--ink)}
+.ty-ref{font-size:13px;color:var(--muted);background:#fff7fa;border:1px dashed var(--pink-2);border-radius:10px;padding:8px 12px}
+.ty-ref b{color:var(--pink);letter-spacing:.04em}
+.ty-h{font-size:13px;font-weight:600;margin-top:4px}
+.ty-steps{list-style:none;counter-reset:t;display:grid;gap:8px}
+.ty-steps li{counter-increment:t;display:grid;grid-template-columns:28px 1fr;gap:2px 10px;font-size:13px}
+.ty-steps li::before{content:counter(t);grid-row:1/3;width:26px;height:26px;border-radius:50%;background:linear-gradient(135deg,#f2628f,#ff8fb1);color:#fff;display:grid;place-items:center;font-weight:600;font-size:12px}
+.ty-steps li span{color:var(--muted)}
+.ty-note{font-size:12.5px;color:var(--muted)}
+.ty-btns{display:flex;gap:8px;flex-wrap:wrap}
+.ty-btns .btn{padding:10px 18px;font-size:13px}
 </style>
 </head>
 <body>
@@ -661,6 +677,9 @@ a.vt:hover img{transform:scale(1.06)}
       <form id="orderForm" method="POST" action="https://formsubmit.co/keikoarts22@gmail.com">
         <input type="hidden" name="_subject" id="fSubject" value="New commission request — keikoartist.com">
         <input type="hidden" name="_next" id="fNext" value="https://keikoartist.com/?sent=1#queue">
+        <input type="hidden" name="_captcha" value="false">
+        <input type="hidden" name="_autoresponse" id="fAuto" value="">
+        <input type="hidden" name="Request ID" id="fReq" value="">
         <input type="hidden" name="_template" value="table">
         <input type="text" name="_honey" style="display:none">
         <input type="hidden" name="Service" id="fService">
@@ -684,7 +703,7 @@ a.vt:hover img{transform:scale(1.06)}
         </div>
 
         <div class="ostep" data-s="3">
-          <div class="row"><input name="Name" id="fName" placeholder="Your name / VTuber name" required><input name="Email" id="fEmail" type="email" placeholder="Email" required></div>
+          <div class="row"><input name="Name" id="fName" placeholder="Your name / VTuber name" required><input name="email" id="fEmail" type="email" placeholder="Email" required></div>
           <div class="row"><input name="Discord" placeholder="Discord username (optional)"><input name="Deadline" placeholder="Deadline / debut date (optional)"></div>
           <input name="References" placeholder="Reference links (Drive, Pinterest, Toyhouse, X…)">
           <textarea name="Details" id="fDetails" placeholder="Tell me about your character, personality, colors, and anything I should know ♡" required></textarea>
@@ -714,7 +733,28 @@ a.vt:hover img{transform:scale(1.06)}
   </div>
 </div>
 
-<div id="sentToast" hidden style="position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:120;background:#fff;border:1px solid var(--line);box-shadow:var(--shadow);padding:14px 22px;border-radius:999px;color:var(--pink);font-weight:500">Thank you! Your request was sent ♡ I'll reply within 1–2 days.</div>
+<div class="modal ty" id="tyModal" aria-hidden="true">
+  <div class="mbox ty-box" role="dialog" aria-modal="true" aria-labelledby="tyTitle">
+    <div class="mhead"><h3 id="tyTitle">Request sent! ♡</h3><button class="mclose" type="button" data-tyclose aria-label="Close">✕</button></div>
+    <div class="mbody">
+      <p class="ty-lead">Thank you for choosing KeikoArts! Your request has been received. A confirmation email is on its way to you.</p>
+      <div class="ty-ref" id="tyRef" hidden>Request ID: <b id="tyRefId"></b></div>
+      <div class="summary" id="tySummary" hidden></div>
+      <h4 class="ty-h">What happens next</h4>
+      <ol class="ty-steps">
+        <li><b>Review</b><span>I check your request and references within 1–2 days.</span></li>
+        <li><b>Confirm &amp; pay</b><span>You get the final price and a PayPal / Ko-fi payment link by email or Discord.</span></li>
+        <li><b>Your slot is secured</b><span>You receive an order code to track progress in the Commission Queue.</span></li>
+      </ol>
+      <p class="ty-note">Didn't get an email? Check your Spam folder, or reach me directly:</p>
+      <div class="ty-btns">
+        <a class="btn btn-pink" href="https://discord.com/users/1053527069528707072" target="_blank" rel="noopener">Discord</a>
+        <a class="btn btn-ghost" href="https://wa.me/6289502127488" target="_blank" rel="noopener">WhatsApp</a>
+        <button class="btn btn-ghost" type="button" data-tyclose>Back to site</button>
+      </div>
+    </div>
+  </div>
+</div>
 
 <footer>
   <div class="wrap">
@@ -948,7 +988,31 @@ function go(n){
 }
 $('#nextBtn').onclick=()=>{if(valid(step))go(step+1)};
 $('#prevBtn').onclick=()=>go(step-1);
-form.addEventListener('submit',e=>{if(!$('#agree').checked){e.preventDefault();err('Please agree to the Terms of Service first.');}});
+form.addEventListener('submit',e=>{
+  if(!$('#agree').checked){e.preventDefault();err('Please agree to the Terms of Service first.');return;}
+  const d=new Date(),pad=n=>String(n).padStart(2,'0');
+  const id='REQ-'+pad(d.getMonth()+1)+pad(d.getDate())+'-'+Math.floor(1000+Math.random()*9000);
+  $('#fReq').value=id;
+  $('#fSubject').value=$('#fSubject').value+' ['+id+']';
+  const name=$('#fName').value.trim(), total=$('#fTotal').value;
+  $('#fAuto').value=`Hi ${name}, thank you for your commission request at KeikoArts! ♡
+
+Request ID: ${id}
+Service: ${$('#fService').value} (${$('#fPackage').value})
+Add-ons: ${$('#fAddons').value}
+Estimated total: ${total}
+Payment plan: ${$('input[name="Payment plan"]:checked').value}
+
+What happens next:
+1. I'll review your request and references within 1–2 days.
+2. You'll get the final price and a PayPal / Ko-fi payment link.
+3. Once paid, your slot is secured and you'll get an order code to track progress at keikoartist.com.
+
+Questions? Just reply to this email, or reach me on Discord / WhatsApp.
+
+— Keiko, KeikoArts`;
+  try{sessionStorage.setItem('ka_last',JSON.stringify({id,rows:[...$$('#summary div')].map(r=>[r.children[0].textContent,r.children[1].textContent])}));}catch(_){}
+});
 
 
 
@@ -1060,7 +1124,15 @@ const links=$$('.menu a');
 addEventListener('scroll',()=>{let cur='home';links.forEach(l=>{const s=document.querySelector(l.getAttribute('href'));if(s&&s.getBoundingClientRect().top<120)cur=s.id});
   links.forEach(l=>l.classList.toggle('active',l.getAttribute('href')==='#'+cur))},{passive:true});
 links.forEach(l=>l.addEventListener('click',()=>$('#menu').classList.remove('open')));
-if(location.search.includes('sent=1')){const t=$('#sentToast');t.hidden=false;setTimeout(()=>t.hidden=true,6000);}
+if(location.search.includes('sent=1')){
+  const ty=$('#tyModal');let last=null;try{last=JSON.parse(sessionStorage.getItem('ka_last')||'null');sessionStorage.removeItem('ka_last');}catch(_){}
+  if(last){$('#tyRefId').textContent=last.id;$('#tyRef').hidden=false;
+    $('#tySummary').innerHTML=last.rows.filter(r=>r[0]!=='Email').map(([a,b])=>`<div><span>${esc(a)}</span><b>${esc(b)}</b></div>`).join('');$('#tySummary').hidden=false;}
+  ty.classList.add('show');ty.setAttribute('aria-hidden','false');document.body.style.overflow='hidden';
+  const closeTy=()=>{ty.classList.remove('show');ty.setAttribute('aria-hidden','true');document.body.style.overflow='';history.replaceState(null,'',location.pathname+'#queue');};
+  $$('[data-tyclose]').forEach(b=>b.onclick=closeTy);ty.addEventListener('click',e=>{if(e.target===ty)closeTy();});
+  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&ty.classList.contains('show'))closeTy();});
+}
 if(location.hash==='#order')openOrder();
 if(location.protocol.startsWith('http'))$('#fNext').value=location.origin+'/?sent=1#queue';
 </script>
