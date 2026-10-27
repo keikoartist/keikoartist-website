@@ -349,7 +349,7 @@ section{padding:44px 0 0}
 
 /* lightbox */
 .gal-slide,.works .work{cursor:zoom-in}
-.lb{position:fixed;inset:0;z-index:110;display:none;align-items:center;justify-content:center;background:rgba(40,12,24,.88);backdrop-filter:blur(6px);padding:56px 64px 84px}
+.lb{position:fixed;inset:0;z-index:120;display:none;align-items:center;justify-content:center;background:rgba(40,12,24,.88);backdrop-filter:blur(6px);padding:56px 64px 84px}
 .lb.show{display:flex}
 .lb-fig{margin:0;display:flex;flex-direction:column;align-items:center;gap:10px;max-width:100%;max-height:100%}
 .lb-fig img{max-width:min(1100px,100%);max-height:calc(100vh - 170px);object-fit:contain;border-radius:12px;background:#fff;box-shadow:0 20px 50px rgba(0,0,0,.4);user-select:none;-webkit-user-drag:none}
@@ -385,6 +385,34 @@ body:has(.lb.show) .fab-order{display:none}
 @media (max-width:560px){.tiers .addons ul{font-size:11px}}
 .card .price{margin-top:auto}
 @media (max-width:560px){.tiers{font-size:11px}.tiers table{font-size:10.5px}}
+
+/* service detail */
+.card{cursor:pointer}
+.card .more{font-size:11.5px;color:var(--pink);font-weight:600;margin:-4px 0 8px}
+.sd{position:fixed;inset:0;z-index:100;display:none;align-items:flex-start;justify-content:center;background:rgba(122,40,70,.35);backdrop-filter:blur(4px);padding:24px 16px;overflow-y:auto}
+.sd.show{display:flex}
+.sd-box{position:relative;background:#fff;border-radius:22px;width:min(920px,100%);display:grid;grid-template-columns:1.05fr 1fr;overflow:hidden;box-shadow:0 30px 60px rgba(122,40,70,.25)}
+.sd-x{position:absolute;top:12px;right:12px;z-index:3;width:36px;height:36px;border-radius:50%;border:0;background:rgba(255,255,255,.95);font-size:16px;cursor:pointer;color:var(--ink);box-shadow:0 2px 8px rgba(0,0,0,.1)}
+.sd-media{position:relative;background:#fff7fa;min-height:100%}
+.sd-track{display:flex;height:100%;min-height:420px;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none}
+.sd-track::-webkit-scrollbar{display:none}
+.sd-track div{flex:0 0 100%;scroll-snap-align:start;background:center/contain no-repeat;cursor:zoom-in}
+.sd-media .gal-btn{opacity:.9}
+.sd-prev{left:10px}.sd-next{right:10px}
+.sd-body{padding:26px 26px 24px;display:flex;flex-direction:column;gap:10px;max-height:calc(100vh - 48px);overflow-y:auto}
+.sd-body h3{font-size:28px;padding-right:36px}
+.sd-about{color:var(--muted);font-size:14px}
+.sd-body h4{font-size:13px;font-weight:600;margin-top:4px}
+.sd-inc{padding-left:18px;font-size:13px;color:var(--ink);display:grid;gap:3px}
+.sd-inc li::marker{color:var(--pink)}
+.sd-note{font-size:12.5px;color:var(--muted);background:#fff7fa;border-radius:10px;padding:8px 12px}
+.sd-meta{display:flex;gap:16px;font-size:12.5px;color:var(--muted)}
+.sd-meta b{color:var(--ink);font-weight:600}
+.sd-body .tiers{font-size:13px}.sd-body .tiers table{font-size:13px}
+.sd-order{align-self:flex-start;margin-top:6px}
+.sd .sd-big{font-family:"DM Serif Display",serif;color:var(--pink);font-size:22px}
+@media (max-width:820px){.sd-box{grid-template-columns:1fr}.sd-track{min-height:0;aspect-ratio:1/1}.sd-body{max-height:none;padding:20px}}
+body:has(.sd.show) .fab-order{display:none}
 </style>
 </head>
 <body>
@@ -580,6 +608,23 @@ body:has(.lb.show) .fab-order{display:none}
 
 <a href="#order" data-order class="btn btn-pink fab-order">Order now ♡</a>
 
+<!-- SERVICE DETAIL -->
+<div class="sd" id="sd" aria-hidden="true">
+  <div class="sd-box" role="dialog" aria-modal="true" aria-labelledby="sdTitle">
+    <button class="sd-x" type="button" aria-label="Close">✕</button>
+    <div class="sd-media"><div class="sd-track" id="sdTrack"></div><button class="gal-btn sd-prev" type="button" aria-label="Previous">‹</button><button class="gal-btn sd-next" type="button" aria-label="Next">›</button><div class="gal-dots" id="sdDots"></div></div>
+    <div class="sd-body">
+      <h3 class="serif" id="sdTitle"></h3>
+      <p class="sd-about" id="sdAbout"></p>
+      <div id="sdPrice"></div>
+      <h4>What's included</h4><ul class="sd-inc" id="sdInc"></ul>
+      <p class="sd-note" id="sdNote"></p>
+      <div class="sd-meta" id="sdMeta"></div>
+      <button class="btn btn-pink arrow sd-order" type="button" id="sdOrder">Start Request</button>
+    </div>
+  </div>
+</div>
+
 <!-- LIGHTBOX -->
 <div class="lb" id="lb" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Portfolio viewer">
   <button class="lb-x" type="button" aria-label="Close">✕</button>
@@ -702,6 +747,41 @@ const GALLERY = {   // contoh karya per service (geser di kartu Services). Tamba
 };
 const WIDE = ["bg-stream-room","emotes-witch","eye-banner-fire","eye-banner-sakura","eye-banner-silver-animated","mouth-banner","illustration-cottage"];
 const CONTAIN = ["logo-mosswing"];
+const DETAILS = {   // deskripsi lengkap tiap service (muncul saat kartu diklik). Edit bebas.
+  "VTuber": { about:"A fully original Live2D VTuber model designed around your character, personality and stream style.",
+    includes:["Character art split into layers, ready to rig (PSD)","Rigging: head turn, blinking, lip-sync, hair & clothing physics (Art + Rig / Rig only)","VTube Studio file, ready to stream","Progress updates at every stage"],
+    notes:"Choose bust, half or full body. Complex designs (wings, many accessories) may cost a bit more." },
+  "VTuber Packages": { about:"All-in-one debut bundle so you can go live with a complete, matching set.",
+    includes:["Live2D model art + rig","Emotes, background and overlay (Debut and up)","PFP, VTuber logo and stream screens (Full Debut)","One consistent style across all assets"],
+    notes:"Best value if you're preparing a debut." },
+  "Background": { about:"Original stream background drawn to match your character and channel vibe.",
+    includes:["1 scene, 1920×1080 PNG","Blurred & clean versions on request","Animated loop option (MP4/WebM)"],
+    notes:"Send references of the mood, colors and props you want." },
+  "Custom PFP": { about:"A profile picture of your character for socials, Discord and streaming platforms.",
+    includes:["Headshot, bust or half-body crop","High-resolution PNG","Simple background (detailed background as add-on)"],
+    notes:"Great for avatars, banners and channel icons." },
+  "Emotes": { about:"Expressive emotes tailored to your character, readable even at small sizes.",
+    includes:["Static or animated emotes","Twitch/Discord-ready sizes (112, 56, 28 px)","Transparent PNG / GIF"],
+    notes:"Price is per emote. Bundles and sub badges available." },
+  "Banner": { about:"Eye or mouth banner focused on your character's most striking feature.",
+    includes:["Wide 3:1 banner, high-resolution PNG","Optional night/day lighting","Optional simple or advanced animation"],
+    notes:"Perfect for headers, panels and stream overlays." },
+  "VTuber Logo": { about:"A custom name logo that matches your character and brand.",
+    includes:["Stylized name lettering","Transparent PNG","Optional icon / emblem and animation"],
+    notes:"Tell me your theme, colors and any symbols you like." },
+  "PNGTuber": { about:"A simple, expressive avatar for streaming without full Live2D rigging.",
+    includes:["Idle + talking states with blinking","Transparent PNGs ready for PNGTuber Plus / Veadotube","Props and accessories included"],
+    notes:"A quick, budget-friendly way to start streaming." },
+  "VTuber Pet": { about:"A cute companion mascot for your VTuber, stream or community.",
+    includes:["Layered pet art, ready to rig","Optional Live2D rig for VTube Studio","Transparent PNG"],
+    notes:"Animals, creatures, plushies or anything in between." },
+  "Chibi VTuber": { about:"A cute chibi version of your VTuber character.",
+    includes:["Full-body chibi art","3 expressions","Layered, ready to rig"],
+    notes:"Add toggles, hairstyles or outfits as needed." },
+  "Custom Inquiry": { about:"Have an idea that isn't listed? Illustrations, stream assets or something new: just describe it.",
+    includes:["Full illustrations and scenes","Stream screens, overlays and alerts","Anything else, quoted to your needs"],
+    notes:"I'll reply with a quote within 1–2 days." },
+};
 const SERVICES = {
   "VTuber": { from: 100, eta: "25–40 days",
     packages: [ ["Bust · Art only",100,"Ready-to-rig PSD"], ["Half body · Art only",150,"Ready-to-rig PSD"], ["Full body · Art only",250,"Ready-to-rig PSD"],
@@ -881,12 +961,12 @@ $$('.card').forEach(card=>{
 (function(){
   const lb=$('#lb'),img=$('#lbImg');let list=[],i=0,svc=null,lastFocus=null;
   const show=()=>{const it=list[i];img.src=it.src;img.alt=it.cap;$('#lbCap').textContent=it.cap;$('#lbCount').textContent=list.length>1?`${i+1} / ${list.length}`:'';};
-  const open=(items,idx,service)=>{list=items;i=idx||0;svc=service;lastFocus=document.activeElement;lb.classList.toggle('single',list.length<2);show();lb.classList.add('show');lb.setAttribute('aria-hidden','false');document.body.style.overflow='hidden';$('.lb-x').focus();};
+  const open=window.openLB=(items,idx,service)=>{list=items;i=idx||0;svc=service;lastFocus=document.activeElement;lb.classList.toggle('single',list.length<2);show();lb.classList.add('show');lb.setAttribute('aria-hidden','false');document.body.style.overflow='hidden';$('.lb-x').focus();};
   const close=()=>{lb.classList.remove('show');lb.setAttribute('aria-hidden','true');document.body.style.overflow='';img.removeAttribute('src');lastFocus&&lastFocus.focus();};
   const step=d=>{if(list.length<2)return;i=(i+d+list.length)%list.length;show();};
   $('.lb-prev').onclick=()=>step(-1);$('.lb-next').onclick=()=>step(1);$('.lb-x').onclick=close;
   lb.addEventListener('click',e=>{if(e.target===lb)close();});
-  document.addEventListener('keydown',e=>{if(!lb.classList.contains('show'))return;if(e.key==='Escape')close();if(e.key==='ArrowRight')step(1);if(e.key==='ArrowLeft')step(-1);});
+  document.addEventListener('keydown',e=>{if(!lb.classList.contains('show'))return;if(e.key==='Escape'){e.stopImmediatePropagation();close();}if(e.key==='ArrowRight')step(1);if(e.key==='ArrowLeft')step(-1);});
   let x0=null;lb.addEventListener('touchstart',e=>{x0=e.touches[0].clientX},{passive:true});
   lb.addEventListener('touchend',e=>{if(x0===null)return;const dx=e.changedTouches[0].clientX-x0;if(Math.abs(dx)>40)step(dx<0?1:-1);x0=null;},{passive:true});
   $('#lbOrder').onclick=()=>{close();openOrder(svc||undefined);};
@@ -895,12 +975,52 @@ $$('.card').forEach(card=>{
   $$('.card').forEach(card=>{
     const name=card.querySelector('h3')?.textContent.trim();
     const slides=[...card.querySelectorAll('.gal-slide')];if(!slides.length)return;
-    slides.forEach((sl,k)=>sl.addEventListener('click',()=>open(slides.map(x=>({src:urlOf(x),cap:name})),k,name)));
+    // slides open the service detail (handled by card click)
   });
   // featured works
   const works=[...$$('.works .work')];
   works.forEach((w,k)=>w.addEventListener('click',e=>{e.preventDefault();open(works.map(x=>({src:urlOf(x),cap:x.querySelector('.tag')?.textContent||''})),k,null);}));
 })();
+
+// service detail modal
+(function(){
+  const sd=$('#sd');let cur=null,last=null;
+  const close=()=>{sd.classList.remove('show');sd.setAttribute('aria-hidden','true');document.body.style.overflow='';last&&last.focus();};
+  const openSD=name=>{
+    const card=[...$$('.card')].find(c=>c.querySelector('h3')?.textContent.trim()===name);if(!card)return;
+    cur=name;last=document.activeElement;const d=DETAILS[name]||{},sv=SERVICES[name];
+    const imgs=(GALLERY[name]||[]).map(f=>`images/${f}.webp`);
+    $('#sdTrack').innerHTML=imgs.map((u,i)=>`<div style="background-image:url(${u})" data-i="${i}" role="img" aria-label="${esc(name)} example ${i+1}"></div>`).join('');
+    $('#sdDots').innerHTML=imgs.length>1?imgs.map((_,i)=>`<i class="${i?'':'on'}"></i>`).join(''):'';
+    $$('.sd-prev,.sd-next').forEach(b=>b.style.display=imgs.length>1?'':'none');
+    $('#sdTitle').textContent=name;
+    $('#sdAbout').textContent=d.about||card.querySelector('p')?.textContent||'';
+    const t=card.querySelector('.tiers');
+    $('#sdPrice').innerHTML=t?t.outerHTML.replace('<details class="addons">','<details class="addons" open>'):`<div class="sd-big">${card.querySelector('.price b').textContent}</div>`;
+    $('#sdInc').innerHTML=(d.includes||[]).map(x=>`<li>${esc(x)}</li>`).join('');
+    $('#sdNote').textContent=d.notes||'';$('#sdNote').hidden=!d.notes;
+    $('#sdMeta').innerHTML=`<span>Price: <b>${card.querySelector('.price b').textContent}</b></span>${sv&&sv.eta?`<span>Estimated time: <b>${sv.eta}</b></span>`:''}`;
+    $('#sdOrder').textContent=name==='Custom Inquiry'?'Start Inquiry':'Start Request';
+    sd.classList.add('show');sd.setAttribute('aria-hidden','false');document.body.style.overflow='hidden';
+    $('#sdTrack').scrollLeft=0;$('.sd-x').focus();
+  };
+  window.openSD=openSD;
+  $('.sd-x').onclick=close;sd.addEventListener('click',e=>{if(e.target===sd)close();});
+  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&sd.classList.contains('show')&&!$('#lb').classList.contains('show'))close();});
+  const tr=$('#sdTrack');
+  const go=d=>{const n=tr.children.length;if(n<2)return;let i=Math.round(tr.scrollLeft/tr.clientWidth)+d;i=(i+n)%n;tr.scrollTo({left:i*tr.clientWidth,behavior:'smooth'});};
+  $('.sd-prev').onclick=()=>go(-1);$('.sd-next').onclick=()=>go(1);
+  tr.addEventListener('scroll',()=>{const i=Math.round(tr.scrollLeft/tr.clientWidth);$$('#sdDots i').forEach((d,k)=>d.classList.toggle('on',k===i));},{passive:true});
+  tr.addEventListener('click',e=>{const el=e.target.closest('[data-i]');if(!el)return;const imgs=[...tr.children].map(x=>({src:x.style.backgroundImage.slice(5,-2),cap:cur}));window.openLB(imgs,+el.dataset.i,cur);});
+  $('#sdOrder').onclick=()=>{const n=cur;close();openOrder(n);};
+  $$('.card').forEach(card=>{
+    const name=card.querySelector('h3')?.textContent.trim();
+    const m=document.createElement('div');m.className='more';m.textContent='View details →';card.querySelector('.price').before(m);
+    card.addEventListener('click',e=>{if(e.target.closest('.req,.gal-btn,summary,.addons'))return;openSD(name);});
+    card.tabIndex=0;card.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target===card)openSD(name);});
+  });
+})();
+
 // nav
 const links=$$('.menu a');
 addEventListener('scroll',()=>{let cur='home';links.forEach(l=>{const s=document.querySelector(l.getAttribute('href'));if(s&&s.getBoundingClientRect().top<120)cur=s.id});
