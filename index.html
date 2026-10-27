@@ -1069,7 +1069,7 @@ function summary(){
 function err(m){const e=$('#err');e.textContent=m;e.style.display=m?'block':'none';}
 function valid(n){
   if(n===1&&!$('input[name=svc]:checked'))return err('Please choose a service.'),false;
-  if(n===3){for(const f of [$('#fName'),$('#fEmail'),$('#fDiscord'),$('#fDetails')])if(!f.checkValidity()){f.reportValidity();return false;}
+  if(n===3){for(const f of [$('#fName'),$('#fEmail'),$('#fDiscord'),$('#fDeadline'),$('#fDetails')])if(!f.checkValidity()){f.reportValidity();return false;}
     if($('#pp3').checked&&!svc.quote&&calc()<150)return err('Installments are available for orders above $150.'),false;}
   err('');return true;
 }
@@ -1082,8 +1082,16 @@ function go(n){
 }
 $('#nextBtn').onclick=()=>{if(valid(step))go(step+1)};
 $('#prevBtn').onclick=()=>go(step-1);
+form.setAttribute('novalidate','');
 form.addEventListener('submit',e=>{
   if(!$('#agree').checked){e.preventDefault();err('Please agree to the Terms of Service first.');return;}
+  const bad=[...form.elements].find(el=>el.willValidate&&!el.checkValidity());
+  if(bad){e.preventDefault();const st=bad.closest('.ostep');if(st)go(+st.dataset.s);
+    setTimeout(()=>{bad.reportValidity();bad.focus();},50);
+    err(bad.id==='fDeadline'?'Please pick a deadline that is today or later.':'Please check the highlighted field.');return;}
+  const sb=$('#sendBtn');if(sb.dataset.busy){e.preventDefault();return;}
+  sb.dataset.busy='1';sb.disabled=false;sb.textContent=refFiles.length?'Uploading references…':'Sending…';sb.style.opacity='.75';$('#prevBtn').style.visibility='hidden';
+  setTimeout(()=>{if(document.visibilityState==='visible'&&sb.dataset.busy)err('Still sending… slow connection or large files. Please wait, do not close this page.');},12000);
   attachRefsToForm();
   const d=new Date(),pad=n=>String(n).padStart(2,'0');
   const id='REQ-'+pad(d.getMonth()+1)+pad(d.getDate())+'-'+Math.floor(1000+Math.random()*9000);
@@ -1234,6 +1242,7 @@ if(location.search.includes('sent=1')){
   document.addEventListener('keydown',e=>{if(e.key==='Escape'&&ty.classList.contains('show'))closeTy();});
 }
 if(location.hash==='#order')openOrder();
+addEventListener('pageshow',()=>{const sb=$('#sendBtn');delete sb.dataset.busy;sb.textContent='Send Request ♡';sb.style.opacity='';});
 {const d=new Date(),z=n=>String(n).padStart(2,'0');$('#fDeadline').min=d.getFullYear()+'-'+z(d.getMonth()+1)+'-'+z(d.getDate());}
 if(location.protocol.startsWith('http'))$('#fNext').value=location.origin+'/?sent=1#queue';
 </script>
