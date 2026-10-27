@@ -49,7 +49,7 @@ a{color:inherit;text-decoration:none}
 .arrow::after{content:"→"}
 
 /* header */
-header{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.9);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+header{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.97);border-bottom:1px solid var(--line)}
 .nav{display:flex;align-items:center;justify-content:space-between;height:76px;gap:20px}
 .logo{display:flex;align-items:center;gap:8px}
 .logo b{font-family:"DM Serif Display",serif;font-size:30px;font-weight:400;line-height:1}
@@ -215,7 +215,7 @@ footer{margin-top:70px;background:linear-gradient(135deg,#f2628f,#ff8fb1);color:
 .tos p,.tos li{font-size:13.5px;color:var(--muted)}
 .tos ul{padding-left:18px}
 
-.modal{position:fixed;inset:0;z-index:100;display:none;align-items:flex-start;justify-content:center;background:rgba(122,40,70,.35);backdrop-filter:blur(4px);padding:24px 16px;overflow-y:auto}
+.modal{position:fixed;inset:0;z-index:100;display:none;align-items:flex-start;justify-content:center;background:rgba(122,40,70,.45);padding:24px 16px;overflow-y:auto}
 .modal.show{display:flex}
 body:has(.modal.show) .fab-order{display:none}
 .mbox{background:#fff;border-radius:22px;width:min(760px,100%);box-shadow:0 30px 60px rgba(122,40,70,.25);overflow:hidden}
@@ -360,7 +360,7 @@ section{padding:44px 0 0}
 
 /* lightbox */
 .gal-slide,.works .work{cursor:zoom-in}
-.lb{position:fixed;inset:0;z-index:120;display:none;align-items:center;justify-content:center;background:rgba(40,12,24,.88);backdrop-filter:blur(6px);padding:56px 64px 84px}
+.lb{position:fixed;inset:0;z-index:120;display:none;align-items:center;justify-content:center;background:rgba(40,12,24,.88);padding:56px 64px 84px}
 .lb.show{display:flex}
 .lb-fig{margin:0;display:flex;flex-direction:column;align-items:center;gap:10px;max-width:100%;max-height:100%}
 .lb-fig img{max-width:min(1100px,100%);max-height:calc(100vh - 170px);object-fit:contain;border-radius:12px;background:#fff;box-shadow:0 20px 50px rgba(0,0,0,.4);user-select:none;-webkit-user-drag:none}
@@ -400,7 +400,7 @@ body:has(.lb.show) .fab-order{display:none}
 /* service detail */
 .card{cursor:pointer}
 .card .more{font-size:11.5px;color:var(--pink);font-weight:600;margin:-4px 0 8px}
-.sd{position:fixed;inset:0;z-index:100;display:none;align-items:flex-start;justify-content:center;background:rgba(122,40,70,.35);backdrop-filter:blur(4px);padding:24px 16px;overflow-y:auto}
+.sd{position:fixed;inset:0;z-index:100;display:none;align-items:flex-start;justify-content:center;background:rgba(122,40,70,.35);padding:24px 16px;overflow-y:auto}
 .sd.show{display:flex}
 .sd-box{position:relative;background:#fff;border-radius:22px;width:min(920px,100%);display:grid;grid-template-columns:1.05fr 1fr;overflow:hidden;box-shadow:0 30px 60px rgba(122,40,70,.25)}
 .sd-x{position:absolute;top:12px;right:12px;z-index:3;width:36px;height:36px;border-radius:50%;border:0;background:rgba(255,255,255,.95);font-size:16px;cursor:pointer;color:var(--ink);box-shadow:0 2px 8px rgba(0,0,0,.1)}
@@ -433,7 +433,7 @@ body:has(.sd.show) .fab-order{display:none}
 /* vtubers marquee */
 #clients .sec-head{margin-bottom:14px}
 .vt-marquee{overflow:hidden;padding:4px 0 10px;-webkit-mask-image:linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent);mask-image:linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent)}
-.vt-track{display:flex;width:max-content;animation:vtscroll var(--dur,30s) linear infinite}
+.vt-track{display:flex;width:max-content;will-change:transform;animation:vtscroll var(--dur,30s) linear infinite}
 .vt-track:hover{animation-play-state:paused}
 .vt-dup{display:flex}
 .vt{display:flex;flex-direction:column;align-items:center;gap:6px;width:96px;margin-right:18px;text-align:center}
@@ -554,7 +554,7 @@ a.vt:hover img{transform:scale(1.06)}
     <div class="banners rig-wrap">
       <h3 class="serif sub" data-c="rig">Live2D Rigging Showcase</h3>
       <div class="work rig" data-c="rig">
-        <video src="images/rigging-showcase.mp4" poster="images/rigging-poster.webp" autoplay muted loop playsinline preload="metadata" aria-label="Live2D rigging showcase"></video>
+        <video id="rigVid" src="images/rigging-showcase.mp4" poster="images/rigging-poster.webp" muted loop playsinline preload="none" aria-label="Live2D rigging showcase"></video>
         <span class="tag">Live2D Rigging</span>
       </div>
     </div>
@@ -1142,7 +1142,7 @@ $$('.card').forEach(card=>{
   const name=card.querySelector('h3')?.textContent.trim(), list=GALLERY[name]; if(!list||!list.length)return;
   const old=card.querySelector('.img');
   const g=document.createElement('div'); g.className='gal';
-  g.innerHTML=`<div class="gal-track">${list.map(f=>`<div class="gal-slide${WIDE.includes(f)?' wide':''}${CONTAIN.includes(f)?' contain':''}" style="background-image:url(images/${f}.webp)" role="img" aria-label="${name} example"></div>`).join('')}</div>`+
+  g.innerHTML=`<div class="gal-track">${list.map(f=>`<div class="gal-slide${WIDE.includes(f)?' wide':''}${CONTAIN.includes(f)?' contain':''}" data-bg="images/${f}.webp" role="img" aria-label="${name} example"></div>`).join('')}</div>`+
     (list.length>1?`<button class="gal-btn prev" type="button" aria-label="Previous">‹</button><button class="gal-btn next" type="button" aria-label="Next">›</button><div class="gal-dots">${list.map((_,i)=>`<i class="${i?'':'on'}"></i>`).join('')}</div>`:'');
   old.replaceWith(g);
   if(list.length<2)return;
@@ -1225,6 +1225,23 @@ $$('.card').forEach(card=>{
   const one=VTUBERS.map(item).join('');
   t.innerHTML=one+`<span aria-hidden="true" class="vt-dup">${one}</span>`;
   t.style.setProperty('--dur',Math.max(20,VTUBERS.length*5)+'s');
+})();
+
+// performance: lazy-load gallery images, play video only when visible
+(function(){
+  const loadSlide=el=>{if(el.dataset.bg){el.style.backgroundImage=`url(${el.dataset.bg})`;delete el.dataset.bg;}};
+  const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){const t=e.target;
+    const first=t.querySelector('.gal-slide[data-bg]');if(first)loadSlide(first);
+    // load the rest after first is shown
+    setTimeout(()=>t.querySelectorAll('.gal-slide[data-bg]').forEach(loadSlide),400);io.unobserve(t);}}),{rootMargin:'200px'});
+  $$('.gal').forEach(g=>io.observe(g));
+  const v=$('#rigVid');if(!v)return;
+  const anyModal=()=>!!document.querySelector('.modal.show,.sd.show,.lb.show');
+  let vis=false;
+  const sync=()=>{if(vis&&!anyModal()&&document.visibilityState==='visible'){v.play().catch(()=>{});}else v.pause();};
+  new IntersectionObserver(es=>{vis=es[0].isIntersecting;sync();},{threshold:.25}).observe(v);
+  new MutationObserver(sync).observe(document.body,{subtree:true,attributes:true,attributeFilter:['class']});
+  document.addEventListener('visibilitychange',sync);
 })();
 // nav
 const links=$$('.menu a');
