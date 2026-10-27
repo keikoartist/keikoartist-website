@@ -80,7 +80,7 @@ section:nth-of-type(even):not(.hero){background:linear-gradient(180deg,#fff,#fff
 .filters{display:flex;gap:6px;flex-wrap:wrap}
 .filters button{border:0;background:none;padding:8px 16px;border-radius:8px;font:inherit;font-size:13px;cursor:pointer;color:var(--muted)}
 .filters button.on{background:var(--pink-2);color:#fff}
-.works{display:grid;grid-template-columns:repeat(6,1fr);gap:10px}
+.works{display:grid;grid-template-columns:repeat(7,1fr);gap:10px}
 .work.logo{background:#fff var(--src) no-repeat center 42%/90% auto}
 .banners{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:22px}
 .banners .sub{grid-column:1/-1;font-size:22px;display:flex;align-items:center;gap:10px}
@@ -378,6 +378,7 @@ section{padding:44px 0 0}
         <button class="on" data-f="all">All</button>
         <button data-f="model">VTuber</button>
         <button data-f="rig">Rigging</button>
+        <button data-f="pfp">PFP</button>
         <button data-f="png">PNGTuber</button>
         <button data-f="pet">Pet</button>
         <button data-f="bg">Background</button>
@@ -393,6 +394,7 @@ section{padding:44px 0 0}
       <a href="#services" class="work img art" data-c="model" style="--src:url(images/vtuber-rocker.webp)"><span class="tag">VTuber</span><span class="go">↗</span></a>
       <a href="#services" class="work img art" data-c="model" style="--src:url(images/vtuber-wolf.webp)"><span class="tag">VTuber</span><span class="go">↗</span></a>
       <a href="#services" class="work img art" data-c="model" style="--src:url(images/chibi-witch.webp)"><span class="tag">Chibi VTuber</span><span class="go">↗</span></a>
+      <a href="#services" class="work img art" data-c="pfp" style="--src:url(images/pfp-glasses.webp);background-position:center 30%"><span class="tag">Custom PFP</span><span class="go">↗</span></a>
       <a href="#services" class="work img art" data-c="pet" style="--src:url(images/mascot-pet.webp)"><span class="tag">Mascot Pet</span><span class="go">↗</span></a>
       <a href="#services" class="work img art" data-c="pet" style="--src:url(images/mascot-tiger.webp)"><span class="tag">Mascot Pet</span><span class="go">↗</span></a>
       <a href="#services" class="work img" data-c="bg" style="--src:url(images/bg-stream-room.webp);background-position:center"><span class="tag">Background</span><span class="go">↗</span></a>
@@ -433,7 +435,7 @@ section{padding:44px 0 0}
       <div class="card"><div class="img art" style="--src:url(images/vtuber-witch.webp)"></div><h3>VTuber</h3><p>Custom VTuber model. Pick art only, ready to rig, or art + rig.</p><div class="price"><b>From $70</b></div><button class="btn btn-pink req" data-order="VTuber">Start Request</button></div>
       <div class="card"><div class="img art" style="--src:url(images/vtuber-dragon.webp)"></div><h3>VTuber Packages</h3><p>All-in-one debut bundle: model, rig, emotes and stream assets.</p><div class="price"><b>From $250</b></div><button class="btn btn-pink req" data-order="VTuber Packages">Start Request</button></div>
       <div class="card"><div class="img" style="--src:url(images/bg-stream-room.webp)"></div><h3>Background</h3><p>Original background for your stream layout.</p><div class="price"><b>From $100</b></div><button class="btn btn-pink req" data-order="Background">Start Request</button></div>
-      <div class="card"><div class="img ph"></div><h3>Custom PFP</h3><p>Profile picture of your character for socials.</p><div class="price"><b>From $36</b></div><button class="btn btn-pink req" data-order="Custom PFP">Start Request</button></div>
+      <div class="card"><div class="img art" style="--src:url(images/pfp-glasses.webp);background-position:center 35%"></div><h3>Custom PFP</h3><p>Profile picture of your character for socials.</p><div class="price"><b>From $36</b></div><button class="btn btn-pink req" data-order="Custom PFP">Start Request</button></div>
       <div class="card"><div class="img art" style="--src:url(images/emotes-witch.webp);background-color:#f7f7f7;background-position:center"></div><h3>Emotes</h3><p>Static or animated emotes tailored to your character.</p><div class="price"><b>From $5</b></div><button class="btn btn-pink req" data-order="Emotes">Start Request</button></div>
       <div class="card"><div class="img art" style="--src:url(images/mascot-pet.webp);background-position:center 30%"></div><h3>VTuber Pet</h3><p>A cute companion pet for your VTuber.</p><div class="price"><b>From $62.60</b></div><button class="btn btn-pink req" data-order="VTuber Pet">Start Request</button></div>
       <div class="card"><div class="img art" style="--src:url(images/chibi-witch.webp);background-position:center 20%"></div><h3>Vtuber Children</h3><p>Little chibi “kids” of your VTuber character.</p><div class="price"><b>Ask a quote</b></div><button class="btn btn-pink req" data-order="Vtuber Children">Start Request</button></div>
