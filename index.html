@@ -427,12 +427,12 @@ body:has(.sd.show) .fab-order{display:none}
 .vt-dup{display:flex}
 .vt{display:flex;flex-direction:column;align-items:center;gap:6px;width:96px;margin-right:18px;text-align:center}
 .vt img{width:76px;height:76px;border-radius:50%;object-fit:cover;border:2px solid var(--pink);box-shadow:0 4px 10px rgba(242,98,143,.18);background:#fff}
-.vt span{font-size:12px;font-weight:600;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:96px}
+.vt span{font-size:10.5px;font-weight:500;letter-spacing:.02em;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:96px}
 a.vt:hover img{transform:scale(1.06)}
 .vt img{transition:.2s}
 @keyframes vtscroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
 @media (prefers-reduced-motion:reduce){.vt-track{animation:none;overflow-x:auto}.vt-dup{display:none}}
-@media (max-width:560px){.vt{width:76px;margin-right:12px}.vt img{width:60px;height:60px}}
+@media (max-width:560px){.vt{width:76px;margin-right:12px}.vt img{width:60px;height:60px}.vt span{font-size:10px}}
 </style>
 </head>
 <body>
@@ -811,10 +811,10 @@ const DETAILS = {   // deskripsi lengkap tiap service (muncul saat kartu diklik)
     notes:"I'll reply with a quote within 1–2 days." },
 };
 const VTUBERS = [   // VTuber yang pernah kamu buat. name & link opsional (link: Twitch/YouTube/X)
-  { img:"av-vtuber-witch",  name:"Pink Witch", link:"" },
-  { img:"av-vtuber-dragon", name:"Dragon Princess", link:"" },
-  { img:"av-vtuber-maid",   name:"Card Maid", link:"" },
-  { img:"av-vtuber-rocker", name:"Rock Star", link:"" },
+  { img:"av-vtuber-witch",  name:"Mirabelle", link:"" },
+  { img:"av-vtuber-dragon", name:"Seraphine", link:"" },
+  { img:"av-vtuber-maid",   name:"Lucie", link:"" },
+  { img:"av-vtuber-rocker", name:"Raven", link:"" },
 ];
 const SERVICES = {
   "VTuber": { from: 100, eta: "25–40 days",
