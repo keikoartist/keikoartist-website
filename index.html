@@ -460,6 +460,16 @@ a.vt:hover img{transform:scale(1.06)}
 .ty-note{font-size:12.5px;color:var(--muted)}
 .ty-btns{display:flex;gap:8px;flex-wrap:wrap}
 .ty-btns .btn{padding:10px 18px;font-size:13px}
+
+/* live queue */
+.q-status{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.q-live{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;color:var(--muted)}
+.q-live i{width:8px;height:8px;border-radius:50%;background:#c9b3bc}
+.q-live.on i{background:#22b35e;box-shadow:0 0 0 0 rgba(34,179,94,.6);animation:qpulse 1.8s infinite}
+@keyframes qpulse{70%{box-shadow:0 0 0 7px rgba(34,179,94,0)}100%{box-shadow:0 0 0 0 rgba(34,179,94,0)}}
+.queue-one.flash{animation:qflash 1.2s}
+@keyframes qflash{0%{box-shadow:0 0 0 3px var(--pink-2)}100%{box-shadow:none}}
+@media (prefers-reduced-motion:reduce){.q-live.on i,.queue-one.flash{animation:none}}
 </style>
 </head>
 <body>
@@ -602,7 +612,7 @@ a.vt:hover img{transform:scale(1.06)}
 <!-- QUEUE -->
 <section id="queue">
   <div class="wrap">
-    <div class="sec-head"><h2 class="serif">Commission Queue</h2><span class="slot-badge" id="slotBadge">Open</span></div>
+    <div class="sec-head"><h2 class="serif">Commission Queue</h2><div class="q-status"><span class="q-live" id="qLive"><i></i><span>Connecting…</span></span><span class="slot-badge" id="slotBadge">Open</span></div></div>
     <div class="panel queue-one">
       <div class="q-left">
         <div class="slots" id="slotBar"></div>
@@ -921,12 +931,26 @@ function trackOrder(code){
   out.innerHTML=`<div class="trk"><div class="trk-head"><b>${esc(q.code)}</b> · ${esc(q.service)}${q.eta?` · ETA ${esc(q.eta)}`:''}</div>
     <ol class="trk-steps">${STAGES.map((s,i)=>`<li class="${i<cur?'ok':i===cur?'now':''}">${s}</li>`).join('')}</ol>${q.note?`<p class="trk-note">${esc(q.note)}</p>`:''}</div>`;
 }
-(async function(){
-  let data=DEMO_QUEUE;
-  if(SHEET_CSV){data=null;try{const r=await fetch(SHEET_CSV+(SHEET_CSV.includes('?')?'&':'?')+'t='+Date.now(),{cache:'no-store'});if(r.ok)data=rowsToQueue(parseCSV(await r.text()))}catch(e){}}
-  if(data)renderQueue(data);else{$('#slotBadge').textContent='Queue';$('#slotText').textContent='Queue is loading slowly. Please refresh in a moment.';$('#qList').innerHTML='';}
-  const f=$('#trackForm');f.addEventListener('submit',e=>{e.preventDefault();trackOrder($('#trackCode').value)});
-  const m=location.search.match(/[?&]order=([\w-]+)/);if(m){$('#trackCode').value=m[1];trackOrder(m[1]);}
+(function(){
+  const REFRESH_MS=30000; let lastOk=0, lastSig='', tracked='';
+  const live=$('#qLive');
+  const ago=()=>{if(!lastOk){live.querySelector('span').textContent=SHEET_CSV?'Connecting…':'Demo data';return;}
+    const s=Math.round((Date.now()-lastOk)/1000);live.querySelector('span').textContent='Live · updated '+(s<10?'just now':s<60?s+'s ago':Math.round(s/60)+'m ago');};
+  async function load(){
+    let data=DEMO_QUEUE;
+    if(SHEET_CSV){data=null;try{const r=await fetch(SHEET_CSV+(SHEET_CSV.includes('?')?'&':'?')+'t='+Date.now(),{cache:'no-store'});if(r.ok)data=rowsToQueue(parseCSV(await r.text()))}catch(e){}}
+    if(data){const sig=JSON.stringify(data);
+      if(sig!==lastSig){const first=!lastSig;lastSig=sig;renderQueue(data);if(tracked)trackOrder(tracked);if(!first)$('#queue .queue-one').classList.add('flash'),setTimeout(()=>$('#queue .queue-one').classList.remove('flash'),1200);}
+      if(SHEET_CSV){lastOk=Date.now();live.classList.add('on');}
+    }else if(!lastSig){$('#slotBadge').textContent='Queue';$('#slotText').textContent='Queue is loading slowly. Please refresh in a moment.';$('#qList').innerHTML='';live.classList.remove('on');}
+    ago();
+  }
+  load();
+  if(SHEET_CSV){setInterval(()=>{if(document.visibilityState==='visible')load();},REFRESH_MS);
+    document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')load();});}
+  setInterval(ago,5000);
+  const f=$('#trackForm');f.addEventListener('submit',e=>{e.preventDefault();tracked=$('#trackCode').value;trackOrder(tracked)});
+  const m=location.search.match(/[?&]order=([\w-]+)/);if(m){tracked=m[1];$('#trackCode').value=m[1];trackOrder(m[1]);}
 })();
 
 // modal + steps
