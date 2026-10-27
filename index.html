@@ -470,6 +470,12 @@ a.vt:hover img{transform:scale(1.06)}
 .queue-one.flash{animation:qflash 1.2s}
 @keyframes qflash{0%{box-shadow:0 0 0 3px var(--pink-2)}100%{box-shadow:none}}
 @media (prefers-reduced-motion:reduce){.q-live.on i,.queue-one.flash{animation:none}}
+
+.ty-dc{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;background:linear-gradient(135deg,#5865f2,#7b86ff);color:#fff;border-radius:14px;padding:14px 16px}
+.ty-dc b{display:block;font-size:14px}
+.ty-dc span{font-size:12.5px;opacity:.92}
+.ty-dc .btn{background:#fff;color:#5865f2;box-shadow:none}
+.ty-dc .btn:hover{background:#eef0ff;transform:none}
 </style>
 </head>
 <body>
@@ -714,7 +720,7 @@ a.vt:hover img{transform:scale(1.06)}
 
         <div class="ostep" data-s="3">
           <div class="row"><input name="Name" id="fName" placeholder="Your name / VTuber name" required><input name="email" id="fEmail" type="email" placeholder="Email" required></div>
-          <div class="row"><input name="Discord" placeholder="Discord username (optional)"><input name="Deadline" placeholder="Deadline / debut date (optional)"></div>
+          <div class="row"><input name="Discord" id="fDiscord" placeholder="Discord username (required)" required autocomplete="off"><input name="Deadline" placeholder="Deadline / debut date (optional)"></div>
           <input name="References" placeholder="Reference links (Drive, Pinterest, Toyhouse, X…)">
           <textarea name="Details" id="fDetails" placeholder="Tell me about your character, personality, colors, and anything I should know ♡" required></textarea>
           <div class="lbl">Payment plan</div>
@@ -747,18 +753,21 @@ a.vt:hover img{transform:scale(1.06)}
   <div class="mbox ty-box" role="dialog" aria-modal="true" aria-labelledby="tyTitle">
     <div class="mhead"><h3 id="tyTitle">Request sent! ♡</h3><button class="mclose" type="button" data-tyclose aria-label="Close">✕</button></div>
     <div class="mbody">
-      <p class="ty-lead">Thank you for choosing KeikoArts! Your request has been received. A confirmation email is on its way to you.</p>
+      <p class="ty-lead">Thank you for choosing KeikoArts! Your request has been received ♡</p>
       <div class="ty-ref" id="tyRef" hidden>Request ID: <b id="tyRefId"></b></div>
       <div class="summary" id="tySummary" hidden></div>
+      <div class="ty-dc">
+        <div><b>Next step: message me on Discord</b><span>Send me your Request ID so we can discuss details and payment.</span></div>
+        <button class="btn btn-pink" type="button" id="tyDiscord">Copy ID &amp; open Discord</button>
+      </div>
       <h4 class="ty-h">What happens next</h4>
       <ol class="ty-steps">
-        <li><b>Review</b><span>I check your request and references within 1–2 days.</span></li>
-        <li><b>Confirm &amp; pay</b><span>You get the final price and a PayPal / Ko-fi payment link by email or Discord.</span></li>
-        <li><b>Your slot is secured</b><span>You receive an order code to track progress in the Commission Queue.</span></li>
+        <li><b>Chat on Discord</b><span>Add me / send a message with your Request ID. I reply within 1–2 days.</span></li>
+        <li><b>Confirm &amp; pay</b><span>We finalize details and I send a PayPal / Ko-fi payment link.</span></li>
+        <li><b>Your slot is secured</b><span>You get an order code to track progress in the Commission Queue.</span></li>
       </ol>
-      <p class="ty-note">Didn't get an email? Check your Spam folder, or reach me directly:</p>
+      <p class="ty-note">A confirmation email is also on its way (check Spam). Can't use Discord? Reach me here:</p>
       <div class="ty-btns">
-        <a class="btn btn-pink" href="https://discord.com/users/1053527069528707072" target="_blank" rel="noopener">Discord</a>
         <a class="btn btn-ghost" href="https://wa.me/6289502127488" target="_blank" rel="noopener">WhatsApp</a>
         <button class="btn btn-ghost" type="button" data-tyclose>Back to site</button>
       </div>
@@ -993,13 +1002,13 @@ function calc(){
   return t;
 }
 function summary(){
-  const rows=[['Service',$('#fService').value],['Package',$('#fPackage').value],svc.qty?['Quantity',$('#fQty').value]:null,['Add-ons',$('#fAddons').value],['Payment plan',$('input[name="Payment plan"]:checked').value],['Name',$('#fName').value],['Email',$('#fEmail').value],['Estimated total',$('#fTotal').value]].filter(Boolean);
+  const rows=[['Service',$('#fService').value],['Package',$('#fPackage').value],svc.qty?['Quantity',$('#fQty').value]:null,['Add-ons',$('#fAddons').value],['Payment plan',$('input[name="Payment plan"]:checked').value],['Name',$('#fName').value],['Discord',$('#fDiscord').value],['Email',$('#fEmail').value],['Estimated total',$('#fTotal').value]].filter(Boolean);
   $('#summary').innerHTML=rows.map(([a,b])=>`<div><span>${a}</span><b>${String(b).replace(/</g,'&lt;')}</b></div>`).join('');
 }
 function err(m){const e=$('#err');e.textContent=m;e.style.display=m?'block':'none';}
 function valid(n){
   if(n===1&&!$('input[name=svc]:checked'))return err('Please choose a service.'),false;
-  if(n===3){for(const f of [$('#fName'),$('#fEmail'),$('#fDetails')])if(!f.checkValidity()){f.reportValidity();return false;}
+  if(n===3){for(const f of [$('#fName'),$('#fEmail'),$('#fDiscord'),$('#fDetails')])if(!f.checkValidity()){f.reportValidity();return false;}
     if($('#pp3').checked&&!svc.quote&&calc()<150)return err('Installments are available for orders above $150.'),false;}
   err('');return true;
 }
@@ -1027,14 +1036,18 @@ Add-ons: ${$('#fAddons').value}
 Estimated total: ${total}
 Payment plan: ${$('input[name="Payment plan"]:checked').value}
 
+NEXT STEP: please message me on Discord with your Request ID:
+https://discord.com/users/1053527069528707072
+
 What happens next:
-1. I'll review your request and references within 1–2 days.
-2. You'll get the final price and a PayPal / Ko-fi payment link.
+1. We chat on Discord about details. I reply within 1–2 days.
+2. You get the final price and a PayPal / Ko-fi payment link.
 3. Once paid, your slot is secured and you'll get an order code to track progress at keikoartist.com.
 
-Questions? Just reply to this email, or reach me on Discord / WhatsApp.
+Can't use Discord? Just reply to this email or reach me on WhatsApp.
 
 — Keiko, KeikoArts`;
+  if(location.protocol.startsWith('http')){try{fetch('notify-discord.php',{method:'POST',keepalive:true,headers:{'Content-Type':'application/json'},body:JSON.stringify({id,service:$('#fService').value,package:$('#fPackage').value,addons:$('#fAddons').value,total,plan:$('input[name="Payment plan"]:checked').value,name,email:$('#fEmail').value,discord:$('#fDiscord').value,deadline:form.Deadline.value,refs:form.References.value,details:$('#fDetails').value,_honey:form._honey.value})}).catch(()=>{});}catch(_){}}
   try{sessionStorage.setItem('ka_last',JSON.stringify({id,rows:[...$$('#summary div')].map(r=>[r.children[0].textContent,r.children[1].textContent])}));}catch(_){}
 });
 
@@ -1154,7 +1167,8 @@ if(location.search.includes('sent=1')){
     $('#tySummary').innerHTML=last.rows.filter(r=>r[0]!=='Email').map(([a,b])=>`<div><span>${esc(a)}</span><b>${esc(b)}</b></div>`).join('');$('#tySummary').hidden=false;}
   ty.classList.add('show');ty.setAttribute('aria-hidden','false');document.body.style.overflow='hidden';
   const closeTy=()=>{ty.classList.remove('show');ty.setAttribute('aria-hidden','true');document.body.style.overflow='';history.replaceState(null,'',location.pathname+'#queue');};
-  $$('[data-tyclose]').forEach(b=>b.onclick=closeTy);ty.addEventListener('click',e=>{if(e.target===ty)closeTy();});
+  $$('[data-tyclose]').forEach(b=>b.onclick=closeTy);
+  $('#tyDiscord').onclick=async()=>{const id=last&&last.id;if(id){try{await navigator.clipboard.writeText(id);$('#tyDiscord').textContent='Copied '+id+' ✓ Opening…';}catch(_){}}window.open('https://discord.com/users/1053527069528707072','_blank','noopener');};ty.addEventListener('click',e=>{if(e.target===ty)closeTy();});
   document.addEventListener('keydown',e=>{if(e.key==='Escape'&&ty.classList.contains('show'))closeTy();});
 }
 if(location.hash==='#order')openOrder();
