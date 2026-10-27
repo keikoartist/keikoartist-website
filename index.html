@@ -442,6 +442,7 @@ section{padding:44px 0 0}
       <div class="card"><div class="img art" style="--src:url(images/emotes-witch.webp);background-color:#f7f7f7;background-position:center"></div><h3>Emotes</h3><p>Static or animated emotes tailored to your character.</p><div class="price"><b>From $5</b></div><button class="btn btn-pink req" data-order="Emotes">Start Request</button></div>
       <div class="card"><div class="img art" style="--src:url(images/mascot-pet.webp);background-position:center 30%"></div><h3>VTuber Pet</h3><p>A cute companion pet for your VTuber.</p><div class="price"><b>From $62.60</b></div><button class="btn btn-pink req" data-order="VTuber Pet">Start Request</button></div>
       <div class="card"><div class="img art" style="--src:url(images/chibi-witch.webp);background-position:center 20%"></div><h3>Vtuber Children</h3><p>Little chibi “kids” of your VTuber character.</p><div class="price"><b>Ask a quote</b></div><button class="btn btn-pink req" data-order="Vtuber Children">Start Request</button></div>
+      <div class="card"><div class="img" style="--src:url(images/illustration-cottage.webp);background-position:center 30%"></div><h3>Custom Inquiry</h3><p>Have an idea that is not listed? Tell me and I'll send you a quote.</p><div class="price"><b>Ask a quote</b></div><button class="btn btn-pink req" data-order="Custom Inquiry">Start Inquiry</button></div>
     </div>
   </div>
 </section>
@@ -669,6 +670,9 @@ const SERVICES = {
     addons:   [ ["Extra expression", 10], ["Accessory", 15] ] },
   "Vtuber Children": { from: 0, eta: "Ask", quote: true,
     packages: [ ["1 chibi child", 0, "Price on quote"], ["Set of 3", 0, "Price on quote"] ],
+    addons:   [] },
+  "Custom Inquiry": { from: 0, eta: "Ask", quote: true,
+    packages: [ ["Illustration", 0, "Full illustration / scene"], ["Stream assets", 0, "Overlay, screens, alerts"], ["Something else", 0, "Describe it in the next step"] ],
     addons:   [] },
 };
 /* ========================================================== */
