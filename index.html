@@ -483,6 +483,19 @@ a.vt:hover img{transform:scale(1.06)}
 .date-f input{color:var(--ink);min-height:46px}
 .date-f input:invalid,.date-f input[value=""]{color:var(--muted)}
 .row:has(.date-f){align-items:end}
+
+/* reference attachments */
+.refs{display:grid;gap:8px}
+.drop{display:flex;flex-direction:column;align-items:center;gap:2px;border:1.5px dashed var(--pink-2);border-radius:14px;padding:16px;background:#fff7fa;cursor:pointer;text-align:center;transition:.15s}
+.drop:hover,.drop.over,.drop:focus{background:#ffeef4;border-color:var(--pink);outline:none}
+.drop input{display:none}
+.drop b{font-size:13.5px;color:var(--pink)}
+.drop span{font-size:12px;color:var(--muted)}
+.ref-list{list-style:none;display:flex;flex-wrap:wrap;gap:8px}
+.ref-list li{position:relative;width:72px;height:72px;border-radius:10px;overflow:hidden;border:1px solid var(--line);background:#fff;display:grid;place-items:center;font-size:10px;color:var(--muted);text-align:center;padding:2px}
+.ref-list img{width:100%;height:100%;object-fit:cover}
+.ref-list button{position:absolute;top:2px;right:2px;width:20px;height:20px;border-radius:50%;border:0;background:rgba(0,0,0,.55);color:#fff;font-size:11px;cursor:pointer;line-height:1}
+.ref-size{font-size:11.5px;color:var(--muted)}
 </style>
 </head>
 <body>
@@ -697,7 +710,7 @@ a.vt:hover img{transform:scale(1.06)}
     <div class="mbody">
       <div class="stepbar"><span class="on">1. Service</span><span>2. Options</span><span>3. Your details</span><span>4. Review</span></div>
       <!-- GANTI email di bawah kalau perlu -->
-      <form id="orderForm" method="POST" action="https://formsubmit.co/keikoarts22@gmail.com">
+      <form id="orderForm" method="POST" enctype="multipart/form-data" action="https://formsubmit.co/keikoarts22@gmail.com">
         <input type="hidden" name="_subject" id="fSubject" value="New commission request — keikoartist.com">
         <input type="hidden" name="_next" id="fNext" value="https://keikoartist.com/?sent=1#queue">
         <input type="hidden" name="_captcha" value="false">
@@ -728,7 +741,16 @@ a.vt:hover img{transform:scale(1.06)}
         <div class="ostep" data-s="3">
           <div class="row"><input name="Name" id="fName" placeholder="Your name / VTuber name" required><input name="email" id="fEmail" type="email" placeholder="Email" required></div>
           <div class="row"><input name="Discord" id="fDiscord" placeholder="Discord username (required)" required autocomplete="off"><label class="date-f"><span>Deadline / debut date <small>(optional)</small></span><input type="date" name="Deadline" id="fDeadline"></label></div>
-          <input name="References" placeholder="Reference links (Drive, Pinterest, Toyhouse, X…)">
+          <div class="refs">
+            <label class="drop" id="refDrop" tabindex="0">
+              <input type="file" id="refFiles" accept="image/*,.pdf,.psd,.clip" multiple>
+              <b>📎 Attach reference images</b>
+              <span>Click or drag files here · up to 5 files · 10 MB total</span>
+            </label>
+            <ul class="ref-list" id="refList"></ul>
+            <div id="refSlots" hidden></div>
+            <input name="Reference links" placeholder="Or paste links (Drive, Pinterest, Toyhouse…) for bigger files">
+          </div>
           <textarea name="Details" id="fDetails" placeholder="Tell me about your character, personality, colors, and anything I should know ♡" required></textarea>
           <div class="lbl">Payment plan</div>
           <div class="opts">
@@ -969,6 +991,38 @@ function trackOrder(code){
   const m=location.search.match(/[?&]order=([\w-]+)/);if(m){tracked=m[1];$('#trackCode').value=m[1];trackOrder(m[1]);}
 })();
 
+
+// reference attachments
+const REF_MAX_FILES=5, REF_MAX_BYTES=10*1024*1024; let refFiles=[];
+function renderRefs(){
+  const ul=$('#refList');ul.innerHTML='';
+  refFiles.forEach((f,i)=>{const li=document.createElement('li');
+    if(f.type.startsWith('image/')){const im=document.createElement('img');im.src=URL.createObjectURL(f);im.alt=f.name;li.appendChild(im);}else li.textContent=f.name;
+    const x=document.createElement('button');x.type='button';x.textContent='✕';x.setAttribute('aria-label','Remove '+f.name);x.onclick=()=>{refFiles.splice(i,1);renderRefs();};li.appendChild(x);ul.appendChild(li);});
+  const tot=refFiles.reduce((a,f)=>a+f.size,0);
+  let info=$('#refInfo');if(!info){info=document.createElement('p');info.id='refInfo';info.className='ref-size';ul.after(info);}
+  info.textContent=refFiles.length?`${refFiles.length} file(s) · ${(tot/1048576).toFixed(1)} MB of 10 MB`:'';
+}
+function addRefs(list){
+  for(const f of list){
+    if(refFiles.length>=REF_MAX_FILES){err('Max 5 reference files. Use the link field for more.');break;}
+    if(refFiles.reduce((a,x)=>a+x.size,0)+f.size>REF_MAX_BYTES){err('Attachments are limited to 10 MB total. Use the link field for bigger files.');continue;}
+    refFiles.push(f);
+  }
+  renderRefs();
+}
+$('#refFiles').addEventListener('change',e=>{err('');addRefs([...e.target.files]);e.target.value='';});
+const drop=$('#refDrop');
+['dragenter','dragover'].forEach(t=>drop.addEventListener(t,e=>{e.preventDefault();drop.classList.add('over');}));
+['dragleave','drop'].forEach(t=>drop.addEventListener(t,e=>{e.preventDefault();drop.classList.remove('over');}));
+drop.addEventListener('drop',e=>{err('');addRefs([...e.dataTransfer.files]);});
+drop.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();$('#refFiles').click();}});
+function attachRefsToForm(){
+  const slots=$('#refSlots');slots.innerHTML='';
+  refFiles.forEach((f,i)=>{const inp=document.createElement('input');inp.type='file';inp.name='attachment'+(i+1);
+    const dt=new DataTransfer();dt.items.add(f);inp.files=dt.files;slots.appendChild(inp);});
+}
+
 // modal + steps
 const modal=$('#orderModal'), form=$('#orderForm'); let step=1, svc=null;
 $('#svcOpts').innerHTML=Object.entries(SERVICES).map(([k,v],i)=>`<div class="opt"><input type="radio" name="svc" id="s${i}" value="${k}"><label for="s${i}">${k}<small>${v.quote?'Ask a quote':'From '+money(v.from)}</small></label></div>`).join('');
@@ -1009,7 +1063,7 @@ function calc(){
   return t;
 }
 function summary(){
-  const rows=[['Service',$('#fService').value],['Package',$('#fPackage').value],svc.qty?['Quantity',$('#fQty').value]:null,['Add-ons',$('#fAddons').value],['Payment plan',$('input[name="Payment plan"]:checked').value],['Name',$('#fName').value],['Discord',$('#fDiscord').value],['Email',$('#fEmail').value],['Estimated total',$('#fTotal').value]].filter(Boolean);
+  const rows=[['Service',$('#fService').value],['Package',$('#fPackage').value],svc.qty?['Quantity',$('#fQty').value]:null,['Add-ons',$('#fAddons').value],['Payment plan',$('input[name="Payment plan"]:checked').value],['Name',$('#fName').value],['Discord',$('#fDiscord').value],['Email',$('#fEmail').value],['References',(refFiles.length?refFiles.length+' file(s)':'')+(form['Reference links'].value?(refFiles.length?' + links':'Links'):'')||'-'],['Estimated total',$('#fTotal').value]].filter(Boolean);
   $('#summary').innerHTML=rows.map(([a,b])=>`<div><span>${a}</span><b>${String(b).replace(/</g,'&lt;')}</b></div>`).join('');
 }
 function err(m){const e=$('#err');e.textContent=m;e.style.display=m?'block':'none';}
@@ -1030,6 +1084,7 @@ $('#nextBtn').onclick=()=>{if(valid(step))go(step+1)};
 $('#prevBtn').onclick=()=>go(step-1);
 form.addEventListener('submit',e=>{
   if(!$('#agree').checked){e.preventDefault();err('Please agree to the Terms of Service first.');return;}
+  attachRefsToForm();
   const d=new Date(),pad=n=>String(n).padStart(2,'0');
   const id='REQ-'+pad(d.getMonth()+1)+pad(d.getDate())+'-'+Math.floor(1000+Math.random()*9000);
   $('#fReq').value=id;
@@ -1054,7 +1109,7 @@ What happens next:
 Can't use Discord? Just reply to this email or reach me on WhatsApp.
 
 — Keiko, KeikoArts`;
-  if(location.protocol.startsWith('http')){try{fetch('notify-discord.php',{method:'POST',keepalive:true,headers:{'Content-Type':'application/json'},body:JSON.stringify({id,service:$('#fService').value,package:$('#fPackage').value,addons:$('#fAddons').value,total,plan:$('input[name="Payment plan"]:checked').value,name,email:$('#fEmail').value,discord:$('#fDiscord').value,deadline:$('#fDeadline').value,refs:form.References.value,details:$('#fDetails').value,_honey:form._honey.value})}).catch(()=>{});}catch(_){}}
+  if(location.protocol.startsWith('http')){try{fetch('notify-discord.php',{method:'POST',keepalive:true,headers:{'Content-Type':'application/json'},body:JSON.stringify({id,service:$('#fService').value,package:$('#fPackage').value,addons:$('#fAddons').value,total,plan:$('input[name="Payment plan"]:checked').value,name,email:$('#fEmail').value,discord:$('#fDiscord').value,deadline:$('#fDeadline').value,refs:[refFiles.length?refFiles.length+' file(s) attached (see email)':'',form['Reference links'].value].filter(Boolean).join(' · '),details:$('#fDetails').value,_honey:form._honey.value})}).catch(()=>{});}catch(_){}}
   try{sessionStorage.setItem('ka_last',JSON.stringify({id,rows:[...$$('#summary div')].map(r=>[r.children[0].textContent,r.children[1].textContent])}));}catch(_){}
 });
 
