@@ -80,7 +80,7 @@ section:nth-of-type(even):not(.hero){background:linear-gradient(180deg,#fff,#fff
 .filters{display:flex;gap:6px;flex-wrap:wrap}
 .filters button{border:0;background:none;padding:8px 16px;border-radius:8px;font:inherit;font-size:13px;cursor:pointer;color:var(--muted)}
 .filters button.on{background:var(--pink-2);color:#fff}
-.works{display:grid;grid-template-columns:repeat(10,1fr);gap:10px}
+.works{display:grid;grid-template-columns:repeat(6,1fr);gap:10px}
 .work.logo{background:#fff var(--src) no-repeat center 42%/90% auto}
 .banners{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:22px}
 .banners .sub{grid-column:1/-1;font-size:22px;display:flex;align-items:center;gap:10px}
@@ -97,7 +97,7 @@ section:nth-of-type(even):not(.hero){background:linear-gradient(180deg,#fff,#fff
 .work.rig video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
 .work.rig .tag{z-index:1}
 
-.work{position:relative;aspect-ratio:3/4;border-radius:14px;overflow:hidden;transition:.25s}
+.work{position:relative;aspect-ratio:4/5;border-radius:14px;overflow:hidden;transition:.25s}
 .work:hover{transform:translateY(-4px);box-shadow:var(--shadow)}
 .work .tag{position:absolute;left:8px;bottom:8px;background:#fff;border-radius:999px;padding:3px 10px;font-size:11px;font-family:"DM Serif Display",serif}
 .work .go{position:absolute;right:8px;bottom:8px;width:26px;height:26px;border-radius:50%;background:#fff;display:grid;place-items:center;font-size:14px}
@@ -238,7 +238,7 @@ footer{margin-top:70px;background:linear-gradient(135deg,#f2628f,#ff8fb1);color:
 
 /* ===== RESPONSIVE REFINEMENTS ===== */
 @media (min-width:1600px){.wrap{width:min(1360px,100% - 64px)}.hero{min-height:680px}}
-@media (max-width:1050px){.works{grid-template-columns:repeat(5,1fr)}.banners{grid-template-columns:repeat(2,1fr)}}
+@media (max-width:1050px){.works{display:flex;gap:8px;overflow-x:auto;scroll-snap-type:x mandatory;padding-bottom:6px}.works .work{flex:0 0 18%;scroll-snap-align:start}.works .work.hide{display:none}.banners{grid-template-columns:repeat(2,1fr)}}
 @media (max-width:820px){.rig-wrap{grid-template-columns:1fr}}
 @media (max-width:820px){
   .perks{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
@@ -331,6 +331,7 @@ footer{margin-top:70px;background:linear-gradient(135deg,#f2628f,#ff8fb1);color:
         <button data-f="rig">Rigging</button>
         <button data-f="png">PNGTuber</button>
         <button data-f="pet">Pet</button>
+        <button data-f="bg">Background</button>
         <button data-f="emote">Emotes</button>
         <button data-f="logo">Logo</button>
         <button data-f="banner">Banner</button>
@@ -342,8 +343,10 @@ footer{margin-top:70px;background:linear-gradient(135deg,#f2628f,#ff8fb1);color:
       <a href="#services" class="work img art" data-c="model" style="--src:url(images/vtuber-maid.webp)"><span class="tag">VTuber</span><span class="go">↗</span></a>
       <a href="#services" class="work img art" data-c="model" style="--src:url(images/vtuber-rocker.webp)"><span class="tag">VTuber</span><span class="go">↗</span></a>
       <a href="#services" class="work img art" data-c="model" style="--src:url(images/vtuber-wolf.webp)"><span class="tag">VTuber</span><span class="go">↗</span></a>
+      <a href="#services" class="work img art" data-c="model" style="--src:url(images/chibi-witch.webp)"><span class="tag">Chibi VTuber</span><span class="go">↗</span></a>
       <a href="#services" class="work img art" data-c="pet" style="--src:url(images/mascot-pet.webp)"><span class="tag">Mascot Pet</span><span class="go">↗</span></a>
       <a href="#services" class="work img art" data-c="pet" style="--src:url(images/mascot-tiger.webp)"><span class="tag">Mascot Pet</span><span class="go">↗</span></a>
+      <a href="#services" class="work img" data-c="bg" style="--src:url(images/bg-stream-room.webp);background-position:center"><span class="tag">Background</span><span class="go">↗</span></a>
       <a href="#services" class="work img art" data-c="png" style="--src:url(images/pngtuber-catmask.webp)"><span class="tag">PNGTuber</span><span class="go">↗</span></a>
       <a href="#services" class="work img art" data-c="emote" style="--src:url(images/emote-witch-1.webp);background-position:center" ><span class="tag">Emotes</span><span class="go">↗</span></a>
       <a href="#services" class="work img art logo" data-c="logo" style="--src:url(images/logo-mosswing.webp)"><span class="tag">VTuber Logo</span><span class="go">↗</span></a>
@@ -380,11 +383,11 @@ footer{margin-top:70px;background:linear-gradient(135deg,#f2628f,#ff8fb1);color:
     <div class="services">
       <div class="card"><div class="img art" style="--src:url(images/vtuber-witch.webp)"></div><h3>VTuber</h3><p>Custom VTuber model. Pick art only, ready to rig, or art + rig.</p><div class="price"><b>From $70</b></div><button class="btn btn-pink req" data-order="VTuber">Start Request</button></div>
       <div class="card"><div class="img art" style="--src:url(images/vtuber-dragon.webp)"></div><h3>VTuber Packages</h3><p>All-in-one debut bundle: model, rig, emotes and stream assets.</p><div class="price"><b>From $250</b></div><button class="btn btn-pink req" data-order="VTuber Packages">Start Request</button></div>
-      <div class="card"><div class="img ph"></div><h3>Background</h3><p>Original background for your stream layout.</p><div class="price"><b>From $100</b></div><button class="btn btn-pink req" data-order="Background">Start Request</button></div>
+      <div class="card"><div class="img" style="--src:url(images/bg-stream-room.webp)"></div><h3>Background</h3><p>Original background for your stream layout.</p><div class="price"><b>From $100</b></div><button class="btn btn-pink req" data-order="Background">Start Request</button></div>
       <div class="card"><div class="img ph"></div><h3>Custom PFP</h3><p>Profile picture of your character for socials.</p><div class="price"><b>From $36</b></div><button class="btn btn-pink req" data-order="Custom PFP">Start Request</button></div>
       <div class="card"><div class="img art" style="--src:url(images/emotes-witch.webp);background-color:#f7f7f7;background-position:center"></div><h3>Emotes</h3><p>Static or animated emotes tailored to your character.</p><div class="price"><b>From $5</b></div><button class="btn btn-pink req" data-order="Emotes">Start Request</button></div>
       <div class="card"><div class="img art" style="--src:url(images/mascot-pet.webp);background-position:center 30%"></div><h3>VTuber Pet</h3><p>A cute companion pet for your VTuber.</p><div class="price"><b>From $62.60</b></div><button class="btn btn-pink req" data-order="VTuber Pet">Start Request</button></div>
-      <div class="card"><div class="img ph"></div><h3>Vtuber Children</h3><p>Little chibi “kids” of your VTuber character.</p><div class="price"><b>Ask a quote</b></div><button class="btn btn-pink req" data-order="Vtuber Children">Start Request</button></div>
+      <div class="card"><div class="img art" style="--src:url(images/chibi-witch.webp);background-position:center 20%"></div><h3>Vtuber Children</h3><p>Little chibi “kids” of your VTuber character.</p><div class="price"><b>Ask a quote</b></div><button class="btn btn-pink req" data-order="Vtuber Children">Start Request</button></div>
     </div>
   </div>
 </section>
