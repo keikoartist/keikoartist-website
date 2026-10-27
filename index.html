@@ -445,10 +445,10 @@ body:has(.lb.show) .fab-order{display:none}
       <div class="card"><div class="img art" style="--src:url(images/pfp-glasses.webp);background-position:center 35%"></div><h3>Custom PFP</h3><p>Profile picture of your character for socials.</p><div class="price"><b>From $36</b></div><button class="btn btn-pink req" data-order="Custom PFP">Start Request</button></div>
       <div class="card"><div class="img art" style="--src:url(images/emotes-witch.webp);background-color:#f7f7f7;background-position:center"></div><h3>Emotes</h3><p>Static or animated emotes tailored to your character.</p><div class="price"><b>From $5</b></div><button class="btn btn-pink req" data-order="Emotes">Start Request</button></div>
       <div class="card"><div class="img"></div><h3>Banner</h3><p>Eye or mouth banner for your stream, static or animated.</p><div class="price"><b>From $45</b></div><button class="btn btn-pink req" data-order="Banner">Start Request</button></div>
-      <div class="card"><div class="img"></div><h3>VTuber Logo</h3><p>Custom name logo that matches your character and brand.</p><div class="price"><b>Ask a quote</b></div><button class="btn btn-pink req" data-order="VTuber Logo">Start Request</button></div>
-      <div class="card"><div class="img"></div><h3>PNGTuber</h3><p>Simple avatar with talking and idle states, ready for streaming.</p><div class="price"><b>Ask a quote</b></div><button class="btn btn-pink req" data-order="PNGTuber">Start Request</button></div>
+      <div class="card"><div class="img"></div><h3>VTuber Logo</h3><p>Custom name logo that matches your character and brand.</p><div class="price"><b>From $30</b></div><button class="btn btn-pink req" data-order="VTuber Logo">Start Request</button></div>
+      <div class="card"><div class="img"></div><h3>PNGTuber</h3><p>Simple avatar with talking and idle states, ready for streaming.</p><div class="price"><b>From $60</b></div><button class="btn btn-pink req" data-order="PNGTuber">Start Request</button></div>
       <div class="card"><div class="img art" style="--src:url(images/mascot-pet.webp);background-position:center 30%"></div><h3>VTuber Pet</h3><p>A cute companion pet for your VTuber.</p><div class="price"><b>From $62.60</b></div><button class="btn btn-pink req" data-order="VTuber Pet">Start Request</button></div>
-      <div class="card"><div class="img art" style="--src:url(images/chibi-witch.webp);background-position:center 20%"></div><h3>Chibi VTuber</h3><p>Cute chibi version of your VTuber character.</p><div class="price"><b>Ask a quote</b></div><button class="btn btn-pink req" data-order="Chibi VTuber">Start Request</button></div>
+      <div class="card"><div class="img art" style="--src:url(images/chibi-witch.webp);background-position:center 20%"></div><h3>Chibi VTuber</h3><p>Cute chibi version of your VTuber character.</p><div class="price"><b>From $45</b></div><button class="btn btn-pink req" data-order="Chibi VTuber">Start Request</button></div>
       <div class="card"><div class="img" style="--src:url(images/illustration-cottage.webp);background-position:center 30%"></div><h3>Custom Inquiry</h3><p>Have an idea that is not listed? Tell me and I'll send you a quote.</p><div class="price"><b>Ask a quote</b></div><button class="btn btn-pink req" data-order="Custom Inquiry">Start Inquiry</button></div>
     </div>
   </div>
@@ -696,21 +696,21 @@ const SERVICES = {
   "Banner": { from: 45, eta: "5–7 days",
     packages: [ ["Eye banner", 45, "Static, 3:1"], ["Mouth banner", 45, "Static, 3:1"] ],
     addons:   [ ["Asymmetry banner", 15], ["Night lighting", 20], ["Day + night versions", 40], ["Simple animation", 30], ["Advanced animation", 50], ["PSD file", 50] ] },
-  "VTuber Logo": { from: 0, eta: "Ask", quote: true,
-    packages: [ ["Text logo", 0, "Stylized name lettering"], ["Logo + decoration", 0, "With ornaments, icons or props"] ],
-    addons:   [ ["Animated logo", 0], ["Transparent PNG + PSD", 0] ] },
-  "PNGTuber": { from: 0, eta: "Ask", quote: true,
-    packages: [ ["Basic", 0, "Idle + talking"], ["Expressive", 0, "Extra expressions / blinking"] ],
-    addons:   [ ["Extra expression", 0], ["Extra outfit", 0] ] },
+  "VTuber Logo": { from: 30, eta: "5–7 days",
+    packages: [ ["Custom logo", 30, "Stylized name lettering, PNG"], ["Logo + icon", 40, "Logo plus small icon / emblem"] ],
+    addons:   [ ["Logo animation", 20], ["Commercial use", 20] ] },
+  "PNGTuber": { from: 60, eta: "7–10 days",
+    packages: [ ["Bust-up", 60, "Idle + talking, blinking"], ["Thigh-up / full body", 100, "Idle + talking, blinking"] ],
+    addons:   [ ["Extra expression", 20], ["Props / accessories", 0] ] },
   "Emotes": { from: 5, eta: "5–7 days", qty: true,
     packages: [ ["Static emote", 5, "Price per emote"], ["Animated emote", 15, "Price per emote"] ],
     addons:   [ ["Sub badge set (3)", 15], ["Twitch-ready resizing", 0] ] },
   "VTuber Pet": { from: 62.60, eta: "10–14 days",
     packages: [ ["Pet art", 62.60, "Layered, ready to rig"], ["Pet art + rig", 110, "Rigged for VTS"] ],
     addons:   [ ["Extra expression", 10], ["Accessory", 15] ] },
-  "Chibi VTuber": { from: 0, eta: "Ask", quote: true,
-    packages: [ ["1 chibi", 0, "Price on quote"], ["Set of 3", 0, "Price on quote"] ],
-    addons:   [] },
+  "Chibi VTuber": { from: 45, eta: "10–14 days",
+    packages: [ ["Chibi model art", 45, "Full body + 3 expressions, ready to rig"] ],
+    addons:   [ ["Extra toggle", 5], ["Extra hairstyle", 10], ["Extra outfit", 20] ] },
   "Custom Inquiry": { from: 0, eta: "Ask", quote: true,
     packages: [ ["Illustration", 0, "Full illustration / scene"], ["Stream assets", 0, "Overlay, screens, alerts"], ["Something else", 0, "Describe it in the next step"] ],
     addons:   [] },
