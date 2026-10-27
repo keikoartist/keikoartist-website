@@ -104,7 +104,7 @@ section:nth-of-type(even):not(.hero){background:linear-gradient(180deg,#fff,#fff
 .work.hide{display:none}
 
 /* services */
-.services{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
+.services{display:grid;grid-template-columns:repeat(6,1fr);gap:12px}
 .card{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:12px 12px 16px;display:flex;flex-direction:column;transition:.25s}
 .card:hover{box-shadow:var(--shadow);transform:translateY(-3px)}
 .card .img{aspect-ratio:16/11;border-radius:10px;margin-bottom:14px}
@@ -445,6 +445,8 @@ body:has(.lb.show) .fab-order{display:none}
       <div class="card"><div class="img art" style="--src:url(images/pfp-glasses.webp);background-position:center 35%"></div><h3>Custom PFP</h3><p>Profile picture of your character for socials.</p><div class="price"><b>From $36</b></div><button class="btn btn-pink req" data-order="Custom PFP">Start Request</button></div>
       <div class="card"><div class="img art" style="--src:url(images/emotes-witch.webp);background-color:#f7f7f7;background-position:center"></div><h3>Emotes</h3><p>Static or animated emotes tailored to your character.</p><div class="price"><b>From $5</b></div><button class="btn btn-pink req" data-order="Emotes">Start Request</button></div>
       <div class="card"><div class="img"></div><h3>Banner</h3><p>Eye or mouth banner for your stream, static or animated.</p><div class="price"><b>From $45</b></div><button class="btn btn-pink req" data-order="Banner">Start Request</button></div>
+      <div class="card"><div class="img"></div><h3>VTuber Logo</h3><p>Custom name logo that matches your character and brand.</p><div class="price"><b>Ask a quote</b></div><button class="btn btn-pink req" data-order="VTuber Logo">Start Request</button></div>
+      <div class="card"><div class="img"></div><h3>PNGTuber</h3><p>Simple avatar with talking and idle states, ready for streaming.</p><div class="price"><b>Ask a quote</b></div><button class="btn btn-pink req" data-order="PNGTuber">Start Request</button></div>
       <div class="card"><div class="img art" style="--src:url(images/mascot-pet.webp);background-position:center 30%"></div><h3>VTuber Pet</h3><p>A cute companion pet for your VTuber.</p><div class="price"><b>From $62.60</b></div><button class="btn btn-pink req" data-order="VTuber Pet">Start Request</button></div>
       <div class="card"><div class="img art" style="--src:url(images/chibi-witch.webp);background-position:center 20%"></div><h3>Vtuber Children</h3><p>Little chibi “kids” of your VTuber character.</p><div class="price"><b>Ask a quote</b></div><button class="btn btn-pink req" data-order="Vtuber Children">Start Request</button></div>
       <div class="card"><div class="img" style="--src:url(images/illustration-cottage.webp);background-position:center 30%"></div><h3>Custom Inquiry</h3><p>Have an idea that is not listed? Tell me and I'll send you a quote.</p><div class="price"><b>Ask a quote</b></div><button class="btn btn-pink req" data-order="Custom Inquiry">Start Inquiry</button></div>
@@ -670,7 +672,9 @@ const GALLERY = {   // contoh karya per service (geser di kartu Services). Tamba
   "Banner":          ["eye-banner-silver-animated","mouth-banner","eye-banner-fire","eye-banner-sakura"],
   "VTuber Pet":      ["mascot-pet","mascot-tiger","mascot-anglercat","mascot-snowleopard","mascot-peach","mascot-bear"],
   "Vtuber Children": ["chibi-witch"],
-  "Custom Inquiry":  ["illustration-cottage","pngtuber-catmask","logo-mosswing"],
+  "VTuber Logo":     ["logo-mosswing"],
+  "PNGTuber":        ["pngtuber-catmask"],
+  "Custom Inquiry":  ["illustration-cottage"],
 };
 const WIDE = ["bg-stream-room","emotes-witch","eye-banner-fire","eye-banner-sakura","eye-banner-silver-animated","mouth-banner","illustration-cottage"];
 const CONTAIN = ["logo-mosswing"];
@@ -692,6 +696,12 @@ const SERVICES = {
   "Banner": { from: 45, eta: "5–7 days",
     packages: [ ["Eye banner", 45, "Static, 3:1"], ["Mouth banner", 45, "Static, 3:1"] ],
     addons:   [ ["Asymmetry banner", 15], ["Night lighting", 20], ["Day + night versions", 40], ["Simple animation", 30], ["Advanced animation", 50], ["PSD file", 50] ] },
+  "VTuber Logo": { from: 0, eta: "Ask", quote: true,
+    packages: [ ["Text logo", 0, "Stylized name lettering"], ["Logo + decoration", 0, "With ornaments, icons or props"] ],
+    addons:   [ ["Animated logo", 0], ["Transparent PNG + PSD", 0] ] },
+  "PNGTuber": { from: 0, eta: "Ask", quote: true,
+    packages: [ ["Basic", 0, "Idle + talking"], ["Expressive", 0, "Extra expressions / blinking"] ],
+    addons:   [ ["Extra expression", 0], ["Extra outfit", 0] ] },
   "Emotes": { from: 5, eta: "5–7 days", qty: true,
     packages: [ ["Static emote", 5, "Price per emote"], ["Animated emote", 15, "Price per emote"] ],
     addons:   [ ["Sub badge set (3)", 15], ["Twitch-ready resizing", 0] ] },
@@ -765,7 +775,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape')closeOrder()});
 function pickService(k){
   svc=SERVICES[k];
   $('#pkgOpts').innerHTML=svc.packages.map(([n,p,d],i)=>`<div class="opt"><input type="radio" name="pkg" id="p${i}" value="${i}" ${i===0?'checked':''}><label for="p${i}">${n} <em>${svc.quote?'':money(p)+(svc.qty?' each':'')}</em><small>${d}</small></label></div>`).join('');
-  $('#addOpts').innerHTML=svc.addons.map(([n,p],i)=>`<div class="opt"><input type="checkbox" name="add" id="a${i}" value="${i}"><label for="a${i}">${n} <em>${p?'+'+money(p):'Free'}</em></label></div>`).join('');
+  $('#addOpts').innerHTML=svc.addons.map(([n,p],i)=>`<div class="opt"><input type="checkbox" name="add" id="a${i}" value="${i}"><label for="a${i}">${n} <em>${p?'+'+money(p):svc.quote?'Quote':'Free'}</em></label></div>`).join('');
   $('#addLbl').hidden=!svc.addons.length; $('#qtyWrap').hidden=!svc.qty; $('#qty').value=1;
   calc();
 }
