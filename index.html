@@ -80,11 +80,13 @@ section:nth-of-type(even):not(.hero){background:linear-gradient(180deg,#fff,#fff
 .filters{display:flex;gap:6px;flex-wrap:wrap}
 .filters button{border:0;background:none;padding:8px 16px;border-radius:8px;font:inherit;font-size:13px;cursor:pointer;color:var(--muted)}
 .filters button.on{background:var(--pink-2);color:#fff}
-.works{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.works{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
 .banners{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:22px}
 .banners .sub{grid-column:1/-1;font-size:22px;display:flex;align-items:center;gap:10px}
 .banners .sub::before{content:"";width:22px;height:2px;background:var(--pink)}
 .work.banner-item{aspect-ratio:8/3}
+.img.ph{background-image:linear-gradient(135deg,#fff0f5,#ffd6e4);position:relative}
+.img.ph::after{content:"✦";position:absolute;inset:0;display:grid;place-items:center;font-size:34px;color:#f7a8c2}
 .img.art{background-color:#fff;background-position:center 12%}
 .banners .sub.hide{display:none}
 .work{position:relative;aspect-ratio:3/3.3;border-radius:14px;overflow:hidden;transition:.25s}
@@ -304,8 +306,6 @@ footer{margin-top:70px;background:linear-gradient(135deg,#f2628f,#ff8fb1);color:
       <div class="filters" id="filters">
         <button class="on" data-f="all">All</button>
         <button data-f="model">VTuber</button>
-        <button data-f="illu">PFP</button>
-        <button data-f="assets">Logo &amp; Emotes</button>
         <button data-f="pet">Pet</button>
         <button data-f="banner">Banner</button>
       </div>
@@ -317,8 +317,6 @@ footer{margin-top:70px;background:linear-gradient(135deg,#f2628f,#ff8fb1);color:
       <a href="#services" class="work img art" data-c="model" style="--src:url(images/vtuber-rocker.webp)"><span class="tag">VTuber</span><span class="go">↗</span></a>
       <a href="#services" class="work img art" data-c="model" style="--src:url(images/vtuber-wolf.webp)"><span class="tag">VTuber</span><span class="go">↗</span></a>
       <a href="#services" class="work img art" data-c="pet" style="--src:url(images/mascot-pet.webp)"><span class="tag">Mascot Pet</span><span class="go">↗</span></a>
-      <a href="#services" class="work img" data-c="illu" style="--src:url(https://keikoartist.com/wp-content/uploads/2025/10/PFP-Xena-Send-scaled.png)"><span class="tag">Custom PFP</span><span class="go">↗</span></a>
-      <a href="#services" class="work img" data-c="assets" style="--src:url(https://keikoartist.com/wp-content/uploads/2026/09/trixky_logo.png)"><span class="tag">VTuber Logo</span><span class="go">↗</span></a>
     </div>
     <div class="banners">
       <h3 class="serif sub" data-c="banner">Banners</h3>
@@ -340,11 +338,11 @@ footer{margin-top:70px;background:linear-gradient(135deg,#f2628f,#ff8fb1);color:
     <div class="services">
       <div class="card"><div class="img art" style="--src:url(images/vtuber-witch.webp)"></div><h3>VTuber</h3><p>Custom VTuber model. Pick art only, ready to rig, or art + rig.</p><div class="price"><b>From $70</b></div><button class="btn btn-pink req" data-order="VTuber">Start Request</button></div>
       <div class="card"><div class="img art" style="--src:url(images/vtuber-dragon.webp)"></div><h3>VTuber Packages</h3><p>All-in-one debut bundle: model, rig, emotes and stream assets.</p><div class="price"><b>From $250</b></div><button class="btn btn-pink req" data-order="VTuber Packages">Start Request</button></div>
-      <div class="card"><div class="img" style="--src:url(https://keikoartist.com/wp-content/uploads/2026/09/image-2-1024x587.png)"></div><h3>Background</h3><p>Original background for your stream layout.</p><div class="price"><b>From $66.60</b></div><button class="btn btn-pink req" data-order="Background">Start Request</button></div>
-      <div class="card"><div class="img" style="--src:url(https://keikoartist.com/wp-content/uploads/2026/09/Liliana_PFP1-300x300.png)"></div><h3>Custom PFP</h3><p>Profile picture of your character for socials.</p><div class="price"><b>From $20</b></div><button class="btn btn-pink req" data-order="Custom PFP">Start Request</button></div>
-      <div class="card"><div class="img" style="--src:url(https://keikoartist.com/wp-content/uploads/2026/10/image-14-150x150.png)"></div><h3>Emotes</h3><p>Static or animated emotes tailored to your character.</p><div class="price"><b>From $5</b></div><button class="btn btn-pink req" data-order="Emotes">Start Request</button></div>
+      <div class="card"><div class="img ph"></div><h3>Background</h3><p>Original background for your stream layout.</p><div class="price"><b>From $66.60</b></div><button class="btn btn-pink req" data-order="Background">Start Request</button></div>
+      <div class="card"><div class="img ph"></div><h3>Custom PFP</h3><p>Profile picture of your character for socials.</p><div class="price"><b>From $20</b></div><button class="btn btn-pink req" data-order="Custom PFP">Start Request</button></div>
+      <div class="card"><div class="img ph"></div><h3>Emotes</h3><p>Static or animated emotes tailored to your character.</p><div class="price"><b>From $5</b></div><button class="btn btn-pink req" data-order="Emotes">Start Request</button></div>
       <div class="card"><div class="img art" style="--src:url(images/mascot-pet.webp);background-position:center 30%"></div><h3>VTuber Pet</h3><p>A cute companion pet for your VTuber.</p><div class="price"><b>From $62.60</b></div><button class="btn btn-pink req" data-order="VTuber Pet">Start Request</button></div>
-      <div class="card"><div class="img" style="--src:url(https://keikoartist.com/wp-content/uploads/2025/10/3-300x300.webp)"></div><h3>Vtuber Children</h3><p>Little chibi “kids” of your VTuber character.</p><div class="price"><b>Ask a quote</b></div><button class="btn btn-pink req" data-order="Vtuber Children">Start Request</button></div>
+      <div class="card"><div class="img ph"></div><h3>Vtuber Children</h3><p>Little chibi “kids” of your VTuber character.</p><div class="price"><b>Ask a quote</b></div><button class="btn btn-pink req" data-order="Vtuber Children">Start Request</button></div>
     </div>
   </div>
 </section>
@@ -365,7 +363,7 @@ footer{margin-top:70px;background:linear-gradient(135deg,#f2628f,#ff8fb1);color:
 <section>
   <div class="wrap">
     <div class="cta">
-      <div class="img" style="--src:url(https://keikoartist.com/wp-content/uploads/2025/10/pfp-fanart-3.png)"></div>
+      <div class="img ph"></div>
       <div class="cta-body">
         <h2 class="serif">Let's create your <em>dream VTuber!</em></h2>
         <p>Feel free to reach out if you have any questions or custom requests. I'd love to work with you <span style="color:var(--pink)">♡</span></p>
