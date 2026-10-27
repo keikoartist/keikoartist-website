@@ -206,6 +206,7 @@ footer{margin-top:70px;background:linear-gradient(135deg,#f2628f,#ff8fb1);color:
 
 .modal{position:fixed;inset:0;z-index:100;display:none;align-items:flex-start;justify-content:center;background:rgba(122,40,70,.35);backdrop-filter:blur(4px);padding:24px 16px;overflow-y:auto}
 .modal.show{display:flex}
+body:has(.modal.show) .fab-order{display:none}
 .mbox{background:#fff;border-radius:22px;width:min(760px,100%);box-shadow:0 30px 60px rgba(122,40,70,.25);overflow:hidden}
 .mhead{display:flex;justify-content:space-between;align-items:center;padding:20px 24px;background:linear-gradient(135deg,#ffe3ec,#fff);border-bottom:1px solid var(--line)}
 .mhead h3{font-family:"DM Serif Display",serif;font-weight:400;font-size:26px}
@@ -279,6 +280,39 @@ footer{margin-top:70px;background:linear-gradient(135deg,#f2628f,#ff8fb1);color:
   .stepbar span{font-size:10px}
 }
 @media (max-width:360px){.services{grid-template-columns:1fr}.nav{height:64px}.menu.open{top:64px}}
+
+/* ===== COMPACT ===== */
+section{padding:44px 0 0}
+.tos-box{padding:0}
+.tos-box summary{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:18px 22px;flex-wrap:wrap}
+.tos-box summary::-webkit-details-marker{display:none}
+.tos-box summary .serif{font-size:22px}
+.tos-box summary small{color:var(--muted);font-size:12.5px;flex:1}
+.tos-box summary::after{content:"+";color:var(--pink);font-size:22px}
+.tos-box[open] summary::after{content:"–"}
+.tos-box .tos{padding:0 22px 18px}
+.queue-one{display:grid;grid-template-columns:300px 1fr;gap:24px;align-items:start}
+.queue-one .slots{margin:0 0 8px}
+.queue-one .btn{margin-top:12px}
+.q-ask{margin-top:10px;font-size:12.5px}.q-ask a{color:var(--pink);font-weight:600}
+.qlist{gap:6px}.qlist li{padding:8px 12px;font-size:13px}
+.qlist li b{font-size:15px}
+.card .img{aspect-ratio:16/9 !important}
+.card{padding:10px 10px 12px}
+.card p{margin:2px 0 10px;font-size:12px}
+.card .req{margin-top:10px;padding:9px 12px}
+.fab-order{display:none}
+@media (max-width:820px){
+  .queue-one{grid-template-columns:1fr}
+  .fab-order{display:inline-flex;position:fixed;right:14px;bottom:14px;z-index:90;padding:10px 18px;font-size:13px;box-shadow:0 8px 20px rgba(242,98,143,.4)}
+  .tos-box summary small{display:none}
+  footer{padding-bottom:70px}
+}
+@media (max-width:560px){
+  .card p{display:none}
+  .card h3{font-size:16px}
+  .services{gap:8px}
+}
 </style>
 </head>
 <body>
@@ -456,18 +490,14 @@ footer{margin-top:70px;background:linear-gradient(135deg,#f2628f,#ff8fb1);color:
 <section id="queue">
   <div class="wrap">
     <div class="sec-head"><h2 class="serif">Commission Queue</h2><span class="slot-badge" id="slotBadge">Open</span></div>
-    <div class="queue-wrap">
-      <div class="panel">
-        <h3 class="serif" style="font-size:22px">Slots this month</h3>
+    <div class="panel queue-one">
+      <div class="q-left">
         <div class="slots" id="slotBar"></div>
         <p id="slotText"></p>
-        <a href="#order" data-order class="btn btn-pink arrow" style="margin-top:16px">Start a Request</a>
-        <p style="margin-top:14px;font-size:13px">Questions first? <a href="https://discord.com/users/1053527069528707072" target="_blank" rel="noopener" style="color:var(--pink);font-weight:600">Discord</a> · <a href="https://wa.me/6289502127488" target="_blank" rel="noopener" style="color:var(--pink);font-weight:600">WhatsApp</a></p>
+        <a href="#order" data-order class="btn btn-pink arrow">Start a Request</a>
+        <p class="q-ask">Questions first? <a href="https://discord.com/users/1053527069528707072" target="_blank" rel="noopener">Discord</a> · <a href="https://wa.me/6289502127488" target="_blank" rel="noopener">WhatsApp</a></p>
       </div>
-      <div class="panel">
-        <h3 class="serif" style="font-size:22px;margin-bottom:12px">Current queue</h3>
-        <ul class="qlist" id="qList"></ul>
-      </div>
+      <ul class="qlist" id="qList"></ul>
     </div>
   </div>
 </section>
@@ -475,8 +505,9 @@ footer{margin-top:70px;background:linear-gradient(135deg,#f2628f,#ff8fb1);color:
 <!-- TOS -->
 <section id="tos">
   <div class="wrap">
-    <div class="sec-head"><h2 class="serif">Terms of Service</h2></div>
-    <div class="panel tos">
+    <details class="panel tos-box">
+      <summary><span class="serif">Terms of Service</span><small>By ordering you agree to these terms. Tap to read.</small></summary>
+      <div class="tos">
       <div><h4>1. Ordering</h4><p>Submit a request form. I'll reply within 1–2 days by email or Discord to confirm details and the final price. Your slot is secured once payment is received.</p></div>
       <div><h4>2. Payment</h4><p>PayPal invoice in USD. Choose full payment, 50/50 (50% upfront, 50% before final files), or 3× installments for orders above $150.</p></div>
       <div><h4>3. Process &amp; timeline</h4><p>Sketch → lineart → coloring → (rigging) → delivery. You get progress updates at every stage. Estimated time is shown in the form; rush delivery is available.</p></div>
@@ -486,8 +517,11 @@ footer{margin-top:70px;background:linear-gradient(135deg,#f2628f,#ff8fb1);color:
       <div><h4>7. Portfolio</h4><p>I may share finished work on my portfolio and socials unless you request a private or delayed reveal.</p></div>
       <div><h4>8. Agreement</h4><p>By placing an order, you agree to these terms.</p></div>
     </div>
+    </details>
   </div>
 </section>
+
+<a href="#order" data-order class="btn btn-pink fab-order">Order now ♡</a>
 
 <!-- ORDER MODAL -->
 <div class="modal" id="orderModal" aria-hidden="true">
