@@ -476,6 +476,13 @@ a.vt:hover img{transform:scale(1.06)}
 .ty-dc span{font-size:12.5px;opacity:.92}
 .ty-dc .btn{background:#fff;color:#5865f2;box-shadow:none}
 .ty-dc .btn:hover{background:#eef0ff;transform:none}
+
+.date-f{display:flex;flex-direction:column;gap:4px;position:relative}
+.date-f span{font-size:11.5px;color:var(--muted);font-weight:500;margin:-2px 0 0 4px}
+.date-f small{font-weight:400}
+.date-f input{color:var(--ink);min-height:46px}
+.date-f input:invalid,.date-f input[value=""]{color:var(--muted)}
+.row:has(.date-f){align-items:end}
 </style>
 </head>
 <body>
@@ -720,7 +727,7 @@ a.vt:hover img{transform:scale(1.06)}
 
         <div class="ostep" data-s="3">
           <div class="row"><input name="Name" id="fName" placeholder="Your name / VTuber name" required><input name="email" id="fEmail" type="email" placeholder="Email" required></div>
-          <div class="row"><input name="Discord" id="fDiscord" placeholder="Discord username (required)" required autocomplete="off"><input name="Deadline" placeholder="Deadline / debut date (optional)"></div>
+          <div class="row"><input name="Discord" id="fDiscord" placeholder="Discord username (required)" required autocomplete="off"><label class="date-f"><span>Deadline / debut date <small>(optional)</small></span><input type="date" name="Deadline" id="fDeadline"></label></div>
           <input name="References" placeholder="Reference links (Drive, Pinterest, Toyhouse, X…)">
           <textarea name="Details" id="fDetails" placeholder="Tell me about your character, personality, colors, and anything I should know ♡" required></textarea>
           <div class="lbl">Payment plan</div>
@@ -1047,7 +1054,7 @@ What happens next:
 Can't use Discord? Just reply to this email or reach me on WhatsApp.
 
 — Keiko, KeikoArts`;
-  if(location.protocol.startsWith('http')){try{fetch('notify-discord.php',{method:'POST',keepalive:true,headers:{'Content-Type':'application/json'},body:JSON.stringify({id,service:$('#fService').value,package:$('#fPackage').value,addons:$('#fAddons').value,total,plan:$('input[name="Payment plan"]:checked').value,name,email:$('#fEmail').value,discord:$('#fDiscord').value,deadline:form.Deadline.value,refs:form.References.value,details:$('#fDetails').value,_honey:form._honey.value})}).catch(()=>{});}catch(_){}}
+  if(location.protocol.startsWith('http')){try{fetch('notify-discord.php',{method:'POST',keepalive:true,headers:{'Content-Type':'application/json'},body:JSON.stringify({id,service:$('#fService').value,package:$('#fPackage').value,addons:$('#fAddons').value,total,plan:$('input[name="Payment plan"]:checked').value,name,email:$('#fEmail').value,discord:$('#fDiscord').value,deadline:$('#fDeadline').value,refs:form.References.value,details:$('#fDetails').value,_honey:form._honey.value})}).catch(()=>{});}catch(_){}}
   try{sessionStorage.setItem('ka_last',JSON.stringify({id,rows:[...$$('#summary div')].map(r=>[r.children[0].textContent,r.children[1].textContent])}));}catch(_){}
 });
 
@@ -1172,6 +1179,7 @@ if(location.search.includes('sent=1')){
   document.addEventListener('keydown',e=>{if(e.key==='Escape'&&ty.classList.contains('show'))closeTy();});
 }
 if(location.hash==='#order')openOrder();
+{const d=new Date(),z=n=>String(n).padStart(2,'0');$('#fDeadline').min=d.getFullYear()+'-'+z(d.getMonth()+1)+'-'+z(d.getDate());}
 if(location.protocol.startsWith('http'))$('#fNext').value=location.origin+'/?sent=1#queue';
 </script>
 </body>
