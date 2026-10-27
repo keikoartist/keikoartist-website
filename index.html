@@ -328,6 +328,12 @@ section{padding:44px 0 0}
 .trk-steps li.now{border-color:var(--pink);color:var(--pink);font-weight:700}
 .trk-note{font-size:12.5px;margin-top:8px}
 .trk-err{font-size:12.5px;color:#c22b52;margin-top:8px}
+
+.see-all-wrap{display:none;justify-content:center;margin-top:14px}
+@media (min-width:1051px){
+  .works:not(.all) .work:nth-child(n+19){display:none}
+  .see-all-wrap.show{display:flex}
+}
 </style>
 </head>
 <body>
@@ -403,11 +409,13 @@ section{padding:44px 0 0}
       <a href="#services" class="work img art" data-c="pet" style="--src:url(images/mascot-anglercat.webp)"><span class="tag">Mascot Pet</span><span class="go">↗</span></a>
       <a href="#services" class="work img art" data-c="pet" style="--src:url(images/mascot-snowleopard.webp)"><span class="tag">Mascot Pet</span><span class="go">↗</span></a>
       <a href="#services" class="work img art" data-c="pet" style="--src:url(images/mascot-peach.webp)"><span class="tag">Mascot Pet</span><span class="go">↗</span></a>
+      <a href="#services" class="work img art" data-c="pet" style="--src:url(images/mascot-bear.webp)"><span class="tag">Mascot Pet</span><span class="go">↗</span></a>
       <a href="#services" class="work img" data-c="bg" style="--src:url(images/bg-stream-room.webp);background-position:center"><span class="tag">Background</span><span class="go">↗</span></a>
       <a href="#services" class="work img art" data-c="png" style="--src:url(images/pngtuber-catmask.webp)"><span class="tag">PNGTuber</span><span class="go">↗</span></a>
       <a href="#services" class="work img art" data-c="emote" style="--src:url(images/emote-witch-1.webp);background-position:center" ><span class="tag">Emotes</span><span class="go">↗</span></a>
       <a href="#services" class="work img art logo" data-c="logo" style="--src:url(images/logo-mosswing.webp)"><span class="tag">VTuber Logo</span><span class="go">↗</span></a>
     </div>
+    <div class="see-all-wrap"><button type="button" class="btn btn-ghost" id="seeAll">See all works</button></div>
     <div class="banners rig-wrap">
       <h3 class="serif sub" data-c="rig">Live2D Rigging Showcase</h3>
       <div class="work rig" data-c="rig">
@@ -786,7 +794,12 @@ form.addEventListener('submit',e=>{if(!$('#agree').checked){e.preventDefault();e
 $$('#filters button').forEach(b=>b.onclick=()=>{
   $$('#filters button').forEach(x=>x.classList.remove('on'));b.classList.add('on');
   $$('.work,.banners .sub,.rig-info').forEach(w=>w.classList.toggle('hide',b.dataset.f!=='all'&&w.dataset.c!==b.dataset.f));
+  $('.works').classList.toggle('all',b.dataset.f!=='all');updSeeAll();
 });
+// see all works
+function updSeeAll(){const w=$('.works'),n=w.querySelectorAll('.work').length;$('.see-all-wrap').classList.toggle('show',n>18&&!w.classList.contains('all'));$('#seeAll').textContent=`See all works (${n})`;}
+$('#seeAll').onclick=()=>{$('.works').classList.add('all');updSeeAll();};
+updSeeAll();
 // nav
 const links=$$('.menu a');
 addEventListener('scroll',()=>{let cur='home';links.forEach(l=>{const s=document.querySelector(l.getAttribute('href'));if(s&&s.getBoundingClientRect().top<120)cur=s.id});
