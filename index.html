@@ -90,7 +90,8 @@ section:nth-of-type(even):not(.hero){background:linear-gradient(180deg,#fff,#fff
 .img.ph::after{content:"✦";position:absolute;inset:0;display:grid;place-items:center;font-size:34px;color:#f7a8c2}
 .img.art{background-color:#fff;background-position:center 12%}
 .banners .sub.hide,.rig-info.hide{display:none}
-.rig-wrap{grid-template-columns:1fr 1fr;align-items:center;gap:22px}
+.rig-wrap{grid-template-columns:1fr;justify-items:center}
+.rig-wrap .work.rig{width:min(720px,100%)}
 .rig-info h4{font-family:"DM Serif Display",serif;font-weight:400;font-size:24px;margin-bottom:6px}
 .rig-info p{color:var(--muted);font-size:14px;margin-bottom:16px}
 .work.rig{aspect-ratio:16/9;background:#fde6ee}
@@ -493,11 +494,6 @@ a.vt:hover img{transform:scale(1.06)}
       <div class="work rig" data-c="rig">
         <video src="images/rigging-showcase.mp4" poster="images/rigging-poster.webp" autoplay muted loop playsinline preload="metadata" aria-label="Live2D rigging showcase"></video>
         <span class="tag">Live2D Rigging</span>
-      </div>
-      <div class="rig-info" data-c="rig">
-        <h4>Smooth, expressive Live2D</h4>
-        <p>Natural head turns, hair &amp; clothing physics, blinking, lip-sync and custom expressions. Stream-ready for VTube Studio.</p>
-        <button class="btn btn-pink arrow" data-order="VTuber">Order Rigging</button>
       </div>
     </div>
   </div>
