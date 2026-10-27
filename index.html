@@ -124,6 +124,7 @@ section:nth-of-type(even):not(.hero){background:linear-gradient(180deg,#fff,#fff
 /* cta */
 .cta{position:relative;border-radius:22px;overflow:hidden;min-height:220px;display:flex;align-items:center;justify-content:flex-end}
 .cta .img{position:absolute;inset:0}
+.cta .cta-art{background-color:#fff;background-size:auto 100%;background-position:left center;background-repeat:no-repeat;right:35%}
 .cta::before{content:"";position:absolute;inset:0;z-index:1;background:linear-gradient(90deg,rgba(255,255,255,0) 30%,rgba(255,255,255,.94) 50%)}
 .cta-body{position:relative;z-index:2;width:min(520px,100%);padding:36px 30px}
 .cta h2{font-size:clamp(26px,3vw,34px)}
@@ -235,6 +236,7 @@ footer{margin-top:70px;background:linear-gradient(135deg,#f2628f,#ff8fb1);color:
   .perks div{padding:0;border:0;text-align:center}
   .cta{flex-direction:column;align-items:stretch}
   .cta .img{position:relative;inset:auto;aspect-ratio:16/9}
+  .cta .cta-art{right:auto;background-size:cover;background-position:center top;aspect-ratio:18/7}
   .cta-body{width:100%;padding:24px 20px 28px}
   .cta::before{display:none}
   .foot{flex-direction:column}
@@ -384,7 +386,7 @@ footer{margin-top:70px;background:linear-gradient(135deg,#f2628f,#ff8fb1);color:
 <section>
   <div class="wrap">
     <div class="cta">
-      <div class="img ph"></div>
+      <div class="img cta-art" style="--src:url(images/cta-lineup.webp)"></div>
       <div class="cta-body">
         <h2 class="serif">Let's create your <em>dream VTuber!</em></h2>
         <p>Feel free to reach out if you have any questions or custom requests. I'd love to work with you <span style="color:var(--pink)">♡</span></p>
