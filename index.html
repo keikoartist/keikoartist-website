@@ -80,7 +80,8 @@ section:nth-of-type(even):not(.hero){background:linear-gradient(180deg,#fff,#fff
 .filters{display:flex;gap:6px;flex-wrap:wrap}
 .filters button{border:0;background:none;padding:8px 16px;border-radius:8px;font:inherit;font-size:13px;cursor:pointer;color:var(--muted)}
 .filters button.on{background:var(--pink-2);color:#fff}
-.works{display:grid;grid-template-columns:repeat(7,1fr);gap:10px}
+.works{display:grid;grid-template-columns:repeat(8,1fr);gap:10px}
+.work.logo{background:#fff var(--src) no-repeat center 42%/90% auto}
 .banners{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:22px}
 .banners .sub{grid-column:1/-1;font-size:22px;display:flex;align-items:center;gap:10px}
 .banners .sub::before{content:"";width:22px;height:2px;background:var(--pink)}
@@ -327,6 +328,7 @@ footer{margin-top:70px;background:linear-gradient(135deg,#f2628f,#ff8fb1);color:
         <button data-f="model">VTuber</button>
         <button data-f="rig">Rigging</button>
         <button data-f="pet">Pet</button>
+        <button data-f="logo">Logo</button>
         <button data-f="banner">Banner</button>
       </div>
     </div>
@@ -338,6 +340,7 @@ footer{margin-top:70px;background:linear-gradient(135deg,#f2628f,#ff8fb1);color:
       <a href="#services" class="work img art" data-c="model" style="--src:url(images/vtuber-wolf.webp)"><span class="tag">VTuber</span><span class="go">↗</span></a>
       <a href="#services" class="work img art" data-c="pet" style="--src:url(images/mascot-pet.webp)"><span class="tag">Mascot Pet</span><span class="go">↗</span></a>
       <a href="#services" class="work img art" data-c="pet" style="--src:url(images/mascot-tiger.webp)"><span class="tag">Mascot Pet</span><span class="go">↗</span></a>
+      <a href="#services" class="work img art logo" data-c="logo" style="--src:url(images/logo-mosswing.webp)"><span class="tag">VTuber Logo</span><span class="go">↗</span></a>
     </div>
     <div class="banners rig-wrap">
       <h3 class="serif sub" data-c="rig">Live2D Rigging Showcase</h3>
