@@ -79,7 +79,8 @@ function visitor_conv(array $in): array {
 }
 function msgs(string $conv, int $since): array {
   $st = db()->prepare('SELECT id, sender, agent, body, created FROM messages WHERE conv_id = ? AND id > ? ORDER BY id LIMIT 300');
-  $st->execute([$conv, $since]); return $st->fetchAll();
+  $st->execute([$conv, $since]);
+  return array_map(function ($m) { $m['id'] = (int)$m['id']; $m['created'] = (int)$m['created']; return $m; }, $st->fetchAll());
 }
 function discord_ping(array $cfg, array $c, string $text, bool $isNew): void {
   $hook = $cfg['discord_webhook'] ?? '';
@@ -183,7 +184,8 @@ switch ($action) {
       FROM conversations c WHERE c.status = ? ORDER BY c.updated DESC LIMIT 200');
     $st->execute([$status]);
     $tot = (int)db()->query('SELECT COALESCE(SUM(unread_admin),0) FROM conversations WHERE status = \'open\'')->fetchColumn();
-    out(200, ['conversations' => $st->fetchAll(), 'unread_total' => $tot]);
+    $rows = array_map(function ($r) { $r['unread_admin'] = (int)$r['unread_admin']; $r['created'] = (int)$r['created']; $r['updated'] = (int)$r['updated']; return $r; }, $st->fetchAll());
+    out(200, ['conversations' => $rows, 'unread_total' => $tot]);
   }
   case 'thread': {
     require_admin($cfg);

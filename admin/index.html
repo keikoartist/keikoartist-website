@@ -158,17 +158,18 @@ function beep(){try{const a=new (window.AudioContext||window.webkitAudioContext)
 
 async function loadList(){
   let j;try{j=await api({action:'list',status})}catch(_){return}
-  const tot=j.unread_total;$('#unreadTot').textContent=tot?`· ${tot} unread`:'';
+  const tot=Number(j.unread_total)||0;$('#unreadTot').textContent=tot?`· ${tot} unread`:'';
   document.title=(tot?`(${tot}) `:'')+'KeikoArts Inbox';
   if(lastUnread>=0&&tot>lastUnread){beep();if('Notification' in window&&Notification.permission==='granted'&&document.visibilityState!=='visible'){try{new Notification('New chat message',{body:'Someone messaged KeikoArts',icon:'../images/pfp.webp'})}catch(_){}}}
   lastUnread=tot;
   const box=$('#items');box.innerHTML='';
   if(!j.conversations.length){box.appendChild(el('div','empty',status==='open'?'No open chats yet ♡':'No closed chats'));return;}
   j.conversations.forEach(c=>{
-    const b=el('button','item'+(c.unread_admin?' unread':'')+(cur===c.id?' on':''));b.type='button';
+    const un=Number(c.unread_admin)||0;
+    const b=el('button','item'+(un?' unread':'')+(cur===c.id?' on':''));b.type='button';
     b.appendChild(el('b',null,c.name||'Visitor'));b.appendChild(el('time',null,fmt(c.updated)));
     b.appendChild(el('span',null,(c.last_sender==='admin'?'You: ':'')+(c.last||'')));
-    if(c.unread_admin){const d=el('i','dot',String(c.unread_admin));b.appendChild(d);}
+    if(un){const d=el('i','dot',String(un));b.appendChild(d);}
     b.onclick=()=>openThread(c.id);box.appendChild(b);
   });
 }
