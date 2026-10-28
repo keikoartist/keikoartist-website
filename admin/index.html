@@ -19,7 +19,7 @@ button,input,textarea{font:inherit;color:inherit}
 .serif{font-family:"DM Serif Display",serif;font-weight:400}
 .btn{border:0;border-radius:999px;padding:10px 18px;font-weight:600;font-size:13.5px;cursor:pointer;background:var(--pink);color:#fff}
 .btn.ghost{background:#fff;color:var(--pink);border:1.5px solid var(--pink)}
-.btn.small{padding:6px 12px;font-size:12px}
+.btn.small{padding:6px 12px;font-size:12px;text-decoration:none;display:inline-flex;align-items:center}
 input,textarea{width:100%;padding:11px 13px;border:1px solid var(--line);border-radius:12px;background:#fff;outline:none}
 input:focus,textarea:focus{border-color:var(--pink-2);box-shadow:0 0 0 3px rgba(242,98,143,.12)}
 /* login */
@@ -100,6 +100,7 @@ input:focus,textarea:focus{border-color:var(--pink-2);box-shadow:0 0 0 3px rgba(
     <h1 class="serif">Inbox <small id="unreadTot"></small></h1>
     <label class="agent"><span>Reply as</span><input id="agent" maxlength="30" placeholder="Keiko"></label>
     <button class="btn ghost small notify" id="notifyBtn" type="button" hidden>🔔 Enable alerts</button>
+    <a class="btn ghost small" href="../" id="toSite">🌐 Website</a>
     <button class="btn ghost small" id="logout" type="button">Log out</button>
   </div>
   <div class="main" id="main">

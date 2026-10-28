@@ -541,6 +541,12 @@ body:has(.modal.show,.sd.show,.lb.show) .kc-bubble,body:has(.modal.show,.sd.show
   .kc-panel{right:0;bottom:0;left:0;width:100%;height:100%;max-height:100dvh;border-radius:0;border:0}
   body:has(.kc-panel:not([hidden])) .fab-order{display:none}
 }
+
+/* admin shortcut (only visible when logged in as admin) */
+.admin-pill{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:999px;border:1.5px solid var(--pink);color:var(--pink);font-weight:600;font-size:13px;background:#fff;white-space:nowrap}
+.admin-pill:hover{background:#fff4f8}
+.admin-pill b{min-width:20px;height:20px;padding:0 6px;border-radius:999px;background:var(--pink);color:#fff;font-size:11px;display:grid;place-items:center}
+@media (max-width:820px){.admin-pill{padding:6px 10px;font-size:12px;margin-left:auto;margin-right:8px}}
 </style>
 </head>
 <body>
@@ -557,6 +563,7 @@ body:has(.modal.show,.sd.show,.lb.show) .kc-bubble,body:has(.modal.show,.sd.show
       <a href="#tos">TOS</a>
       <a href="#faq">FAQ</a>
     </nav>
+    <a href="admin/" class="admin-pill" id="adminPill" hidden>💬 Inbox <b id="adminCount" hidden></b></a>
     <a href="#order" data-order class="btn btn-pink nav-cta arrow">Start a Project</a>
     <button class="burger" aria-label="Menu" onclick="document.getElementById('menu').classList.toggle('open')">☰</button>
   </div>
@@ -615,8 +622,9 @@ body:has(.modal.show,.sd.show,.lb.show) .kc-bubble,body:has(.modal.show,.sd.show
     </div>
     <div class="services">
       <div class="card"><div class="img art" style="--src:url(images/vtuber-witch.webp)"></div><h3>VTuber</h3><p>Live2D VTuber model: bust, half or full body.</p><div class="price"><b>From $100</b></div><button class="btn btn-pink req" data-order="VTuber">Start Request</button></div>
-      <div class="card"><div class="img art" style="--src:url(images/vtuber-dragon.webp)"></div><h3>VTuber Packages</h3><p>All-in-one debut bundle: model, rig, emotes and stream assets.</p><div class="price"><b>From $250</b></div><button class="btn btn-pink req" data-order="VTuber Packages">Start Request</button></div>
+      <div class="card"><div class="img" style="--src:url(images/pkg-keikomi.webp)"></div><h3>VTuber Packages</h3><p>All-in-one debut bundle: model, rig, emotes and stream assets.</p><div class="price"><b>From $250</b></div><button class="btn btn-pink req" data-order="VTuber Packages">Start Request</button></div>
       <div class="card"><div class="img" style="--src:url(images/bg-stream-room.webp)"></div><h3>Background</h3><p>Original background for your stream layout.</p><div class="price"><b>From $100</b></div><button class="btn btn-pink req" data-order="Background">Start Request</button></div>
+      <div class="card"><div class="img" style="--src:url(images/overlay-keikomi.webp)"></div><h3>Stream Overlay</h3><p>Matching stream screens, layouts and panels for your channel.</p><div class="price"><b>From $45</b></div><button class="btn btn-pink req" data-order="Stream Overlay">Start Request</button></div>
       <div class="card"><div class="img art" style="--src:url(images/pfp-glasses.webp);background-position:center 35%"></div><h3>Custom PFP</h3><p>Profile picture of your character for socials.</p><div class="price"><b>From $36</b></div><button class="btn btn-pink req" data-order="Custom PFP">Start Request</button></div>
       <div class="card"><div class="img art" style="--src:url(images/emotes-witch.webp);background-color:#f7f7f7;background-position:center"></div><h3>Emotes</h3><p>Static or animated emotes tailored to your character.</p><div class="price"><b>From $5</b></div><button class="btn btn-pink req" data-order="Emotes">Start Request</button></div>
       <div class="card"><div class="img"></div><h3>Banner</h3><p>Eye or mouth banner for your stream, static or animated.</p><div class="price"><b>From $45</b></div><button class="btn btn-pink req" data-order="Banner">Start Request</button></div>
@@ -908,10 +916,11 @@ const DEMO_QUEUE = [   // dipakai selama SHEET_CSV masih kosong
 ];
 const GALLERY = {   // contoh karya per service (geser di kartu Services). Tambah/ubah nama file di sini.
   "VTuber":          ["vtuber-witch","vtuber-maid","vtuber-rocker","vtuber-wolf","vtuber-dragon"],
-  "VTuber Packages": ["vtuber-dragon","vtuber-witch","chibi-witch","emotes-witch","bg-stream-room"],
+  "VTuber Packages": ["pkg-keikomi","vtuber-dragon","vtuber-witch","chibi-witch","emotes-witch","bg-stream-room"],
   "Background":      ["bg-stream-room"],
   "Custom PFP":      ["pfp-glasses","pfp-leaf"],
   "Emotes":          ["emotes-witch","emote-witch-1"],
+  "Stream Overlay":  ["overlay-keikomi","bg-stream-room"],
   "Banner":          ["eye-banner-silver-animated","mouth-banner","eye-banner-fire","eye-banner-sakura"],
   "VTuber Pet":      ["mascot-pet","mascot-tiger","mascot-anglercat","mascot-snowleopard","mascot-peach","mascot-bear"],
   "Chibi VTuber":    ["chibi-witch"],
@@ -919,7 +928,7 @@ const GALLERY = {   // contoh karya per service (geser di kartu Services). Tamba
   "PNGTuber":        ["pngtuber-catmask","pngtuber-violet"],
   "Custom Inquiry":  ["illustration-cottage"],
 };
-const WIDE = ["bg-stream-room","emotes-witch","eye-banner-fire","eye-banner-sakura","eye-banner-silver-animated","mouth-banner","illustration-cottage"];
+const WIDE = ["pkg-keikomi","overlay-keikomi","bg-stream-room","emotes-witch","eye-banner-fire","eye-banner-sakura","eye-banner-silver-animated","mouth-banner","illustration-cottage"];
 const CONTAIN = ["logo-mosswing"];
 const DETAILS = {   // deskripsi lengkap tiap service (muncul saat kartu diklik). Edit bebas.
   "VTuber": { about:"A fully original Live2D VTuber model designed around your character, personality and stream style.",
@@ -931,6 +940,9 @@ const DETAILS = {   // deskripsi lengkap tiap service (muncul saat kartu diklik)
   "Background": { about:"Original stream background drawn to match your character and channel vibe.",
     includes:["1 scene, 1920×1080 PNG","Blurred & clean versions on request","Animated loop option (MP4/WebM)"],
     notes:"Send references of the mood, colors and props you want." },
+  "Stream Overlay": { about:"A complete, matching stream look themed around your character.",
+    includes:["Starting Soon, Be Right Back and Ending Soon screens","Game screen and Talking / Chatting screen layouts (Full pack)","6 profile panels (Full pack)","PNG files ready for OBS / Streamlabs"],
+    notes:"Animated loops available as add-ons." },
   "Custom PFP": { about:"A profile picture of your character for socials, Discord and streaming platforms.",
     includes:["Headshot, bust or half-body crop","High-resolution PNG","Simple background (detailed background as add-on)"],
     notes:"Great for avatars, banners and channel icons." },
@@ -977,6 +989,10 @@ const SERVICES = {
   "Background": { from: 100, eta: "7–10 days",
     packages: [ ["Static", 100, "1 scene, 1920×1080"], ["Animated", 130, "Looping MP4/WebM"] ],
     addons:   [ ["Day / night variant", 40], ["Blurred & clean versions", 10] ] },
+  "Stream Overlay": { from: 45, eta: "10–14 days",
+    packages: [ ["Screens set", 45, "Starting Soon, BRB and Ending screens"],
+                ["Full overlay pack", 150, "Screens + game screen + talking/chatting screen + 6 panels"] ],
+    addons:   [ ["Simple loop animation", 30], ["Advanced loop animation", 50], ["Extra text screen", 20], ["Custom chibi doll", 15], ["Pet", 20], ["PSD file", 50] ] },
   "Custom PFP": { from: 36, eta: "3–5 days",
     packages: [ ["Headshot", 36, "Simple background"], ["Bust", 41, "Up to chest"], ["Half body", 46, "Up to waist"] ],
     addons:   [ ["Extra character", 20], ["Detailed background", 30] ] },
@@ -1388,6 +1404,20 @@ $$('.card').forEach(card=>{
   sess=load();mode();
   if(sess){poll();schedule();}
   window.openChat=openChat;
+})();
+
+// admin shortcut on the website
+(function(){
+  let tok='';try{tok=localStorage.getItem('ka_auth')||''}catch(_){}
+  if(!tok||!location.protocol.startsWith('http'))return;
+  const pill=$('#adminPill'),cnt=$('#adminCount');
+  async function check(){
+    try{const r=await fetch('chat-api.php',{method:'POST',headers:{'Content-Type':'application/json','X-Auth':tok},body:JSON.stringify({action:'list',status:'open',_auth:tok}),cache:'no-store'});
+      if(r.status===401){pill.hidden=true;try{localStorage.removeItem('ka_auth')}catch(_){}return false;}
+      if(!r.ok)return true;const j=await r.json();pill.hidden=false;cnt.hidden=!j.unread_total;cnt.textContent=j.unread_total>9?'9+':j.unread_total;
+    }catch(_){}return true;
+  }
+  check().then(ok=>{if(ok)setInterval(()=>{if(document.visibilityState==='visible')check();},30000);});
 })();
 // nav
 const links=$$('.menu a');
