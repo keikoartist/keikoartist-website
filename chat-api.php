@@ -100,18 +100,15 @@ function discord_ping(array $cfg, array $c, string $text, bool $isNew): void {
   curl_exec($ch); curl_close($ch);
 }
 
-/* ---------- admin session ---------- */
-function start_session(): void {
-  if (session_status() === PHP_SESSION_ACTIVE) return;
-  session_name('ka_admin');
-  session_set_cookie_params(['lifetime' => 0, 'path' => '/', 'secure' => !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off', 'httponly' => true, 'samesite' => 'Strict']);
-  session_start();
-}
-function require_admin(): void {
-  start_session();
-  if (empty($_SESSION['ka_admin']) || ($_SESSION['ka_exp'] ?? 0) < time()) fail(401, 'login required');
-  if (!hash_equals($_SESSION['ka_csrf'] ?? '', $_SERVER['HTTP_X_CSRF'] ?? '')) fail(403, 'bad csrf');
-  $_SESSION['ka_exp'] = time() + 60 * 60 * 24 * 7;
+/* ---------- admin auth (stateless signed token, no PHP sessions needed) ---------- */
+function admin_pw(array $cfg): string { return trim((string)($cfg['chat_admin_password'] ?? '')); }
+function admin_key(array $cfg): string { return hash_hmac('sha256', 'keikoarts-admin-v1', admin_pw($cfg)); }
+function make_token(array $cfg): string { $exp = time() + 60 * 60 * 24 * 14; return $exp . '.' . hash_hmac('sha256', (string)$exp, admin_key($cfg)); }
+function require_admin(array $cfg): void {
+  if (strlen(admin_pw($cfg)) < 8) fail(401, 'login required');
+  $t = (string)($_SERVER['HTTP_X_AUTH'] ?? '');
+  if (!preg_match('/^(\d{10})\.([a-f0-9]{64})$/', $t, $m)) fail(401, 'login required');
+  if ((int)$m[1] < time() || !hash_equals(hash_hmac('sha256', $m[1], admin_key($cfg)), $m[2])) fail(401, 'login required');
 }
 
 /* ---------- router ---------- */
@@ -162,23 +159,22 @@ switch ($action) {
 
   /* ===== admin ===== */
   case 'login': {
-    $pw = (string)($cfg['chat_admin_password'] ?? '');
+    $pw = admin_pw($cfg);
     if (strlen($pw) < 8) fail(503, 'Admin password not set. Add chat_admin_password (8+ characters) to keikoarts-config.php.');
-    rate_limit('login:' . client_ip(), 8, 900);
+    $k = 'login:' . client_ip(); $db = db(); $now = time();
+    $st = $db->prepare('SELECT COUNT(*) FROM hits WHERE k = ? AND t > ?'); $st->execute([hash('sha256', $k), $now - 600]);
+    if ((int)$st->fetchColumn() >= 10) fail(429, 'Too many wrong attempts. Please wait 10 minutes and try again.');
     usleep(300000);
-    if (!hash_equals(hash('sha256', $pw), hash('sha256', (string)($in['password'] ?? '')))) fail(401, 'Wrong password.');
-    start_session(); session_regenerate_id(true);
-    $_SESSION['ka_admin'] = 1; $_SESSION['ka_exp'] = time() + 60 * 60 * 24 * 7; $_SESSION['ka_csrf'] = bin2hex(random_bytes(16));
-    out(200, ['csrf' => $_SESSION['ka_csrf']]);
+    if (!hash_equals(hash('sha256', $pw), hash('sha256', trim((string)($in['password'] ?? ''))))) {
+      $db->prepare('INSERT INTO hits(k,t) VALUES(?,?)')->execute([hash('sha256', $k), $now]);
+      fail(401, 'Wrong password.');
+    }
+    out(200, ['token' => make_token($cfg)]);
   }
-  case 'me': {
-    start_session();
-    if (empty($_SESSION['ka_admin']) || ($_SESSION['ka_exp'] ?? 0) < time()) fail(401, 'login required');
-    out(200, ['csrf' => $_SESSION['ka_csrf']]);
-  }
-  case 'logout': { start_session(); $_SESSION = []; session_destroy(); out(200); }
+  case 'me': { require_admin($cfg); out(200); }
+  case 'logout': { out(200); }
   case 'list': {
-    require_admin();
+    require_admin($cfg);
     $status = ($in['status'] ?? 'open') === 'closed' ? 'closed' : 'open';
     $st = db()->prepare('SELECT c.id, c.name, c.email, c.page, c.status, c.created, c.updated, c.unread_admin,
         (SELECT body FROM messages m WHERE m.conv_id = c.id ORDER BY m.id DESC LIMIT 1) AS last,
@@ -189,7 +185,7 @@ switch ($action) {
     out(200, ['conversations' => $st->fetchAll(), 'unread_total' => $tot]);
   }
   case 'thread': {
-    require_admin();
+    require_admin($cfg);
     $id = (string)($in['id'] ?? ''); if (!preg_match('/^[a-f0-9]{24}$/', $id)) fail(400, 'bad id');
     db()->prepare('UPDATE conversations SET unread_admin = 0 WHERE id = ?')->execute([$id]);
     $st = db()->prepare('SELECT id, name, email, page, status, created FROM conversations WHERE id = ?'); $st->execute([$id]);
@@ -197,7 +193,7 @@ switch ($action) {
     out(200, ['conversation' => $c, 'messages' => msgs($id, (int)($in['since'] ?? 0))]);
   }
   case 'reply': {
-    require_admin();
+    require_admin($cfg);
     $id = (string)($in['id'] ?? ''); if (!preg_match('/^[a-f0-9]{24}$/', $id)) fail(400, 'bad id');
     $text = clean((string)($in['message'] ?? ''), MAX_MSG); if ($text === '') fail(400, 'empty');
     $agent = clean((string)($in['agent'] ?? ''), 30) ?: 'Keiko';
@@ -207,13 +203,13 @@ switch ($action) {
     out(200, ['messages' => msgs($id, (int)($in['since'] ?? 0))]);
   }
   case 'close': case 'reopen': {
-    require_admin();
+    require_admin($cfg);
     $id = (string)($in['id'] ?? ''); if (!preg_match('/^[a-f0-9]{24}$/', $id)) fail(400, 'bad id');
     db()->prepare('UPDATE conversations SET status = ?, unread_admin = 0 WHERE id = ?')->execute([$action === 'close' ? 'closed' : 'open', $id]);
     out(200);
   }
   case 'delete': {
-    require_admin();
+    require_admin($cfg);
     $id = (string)($in['id'] ?? ''); if (!preg_match('/^[a-f0-9]{24}$/', $id)) fail(400, 'bad id');
     db()->prepare('DELETE FROM conversations WHERE id = ?')->execute([$id]);
     out(200);

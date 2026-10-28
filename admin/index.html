@@ -112,7 +112,7 @@ input:focus,textarea:focus{border-color:var(--pink-2);box-shadow:0 0 0 3px rgba(
 
 <script>
 const $=q=>document.querySelector(q), API='../chat-api.php';
-let csrf='', status='open', cur=null, last=0, lastUnread=-1, listTimer, thTimer;
+let auth='', status='open', cur=null, last=0, lastUnread=-1, listTimer, thTimer;
 const store={get(k,d){try{return localStorage.getItem(k)??d}catch(_){return d}},set(k,v){try{localStorage.setItem(k,v)}catch(_){}}};
 const CANNED=[
   "Hi! Thank you for reaching out ♡ How can I help?",
@@ -122,9 +122,9 @@ const CANNED=[
   "Thank you! I'll get back to you within 6 hours."
 ];
 async function api(data){
-  const r=await fetch(API,{method:'POST',headers:{'Content-Type':'application/json','X-CSRF':csrf},body:JSON.stringify(data),credentials:'same-origin',cache:'no-store'});
+  const r=await fetch(API,{method:'POST',headers:{'Content-Type':'application/json','X-Auth':auth},body:JSON.stringify(data),cache:'no-store'});
   let j={};try{j=await r.json()}catch(_){}
-  if(r.status===401&&data.action!=='login'&&data.action!=='me'){showLogin();throw new Error('login');}
+  if(r.status===401&&data.action!=='login'&&data.action!=='me'){auth='';store.set('ka_auth','');showLogin();$('#loginErr').textContent='Session expired, please log in again.';throw new Error('login');}
   if(!r.ok)throw new Error(j.error||'Connection problem');
   return j;
 }
@@ -143,10 +143,10 @@ $('#notifyBtn').onclick=async()=>{try{await Notification.requestPermission()}cat
 
 $('#loginForm').addEventListener('submit',async e=>{
   e.preventDefault();$('#loginErr').textContent='';
-  try{const j=await api({action:'login',password:$('#pw').value});csrf=j.csrf;$('#pw').value='';showApp();}
+  try{const j=await api({action:'login',password:$('#pw').value});auth=j.token;store.set('ka_auth',auth);$('#pw').value='';showApp();}
   catch(err){$('#loginErr').textContent=err.message;}
 });
-$('#logout').onclick=async()=>{try{await api({action:'logout'})}catch(_){} csrf='';cur=null;showLogin();};
+$('#logout').onclick=()=>{auth='';store.set('ka_auth','');cur=null;showLogin();};
 
 document.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>{document.querySelectorAll('.tabs button').forEach(x=>x.classList.toggle('on',x===b));status=b.dataset.s;loadList();});
 
@@ -209,7 +209,7 @@ async function openThread(id){
 }
 function alertBox(t){const p=el('div','err',t);$('#thread').appendChild(p);setTimeout(()=>p.remove(),4000);}
 
-(async()=>{try{const j=await api({action:'me'});csrf=j.csrf;showApp();}catch(_){showLogin();}})();
+(async()=>{auth=store.get('ka_auth','')||'';if(!auth){showLogin();return;}try{await api({action:'me'});showApp();}catch(_){showLogin();}})();
 </script>
 </body>
 </html>
