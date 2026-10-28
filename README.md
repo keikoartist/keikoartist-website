@@ -14,3 +14,8 @@ Secrets: FTP_SERVER, FTP_USERNAME, FTP_PASSWORD, FTP_DIR.
 ## Catatan hosting
 - `index.php` WordPress di-rename jadi `index-wp.php`; `.htaccess` diawali `DirectoryIndex index.html index.php index-wp.php` dan `CacheLookup off`.
 - Kembali ke WordPress: rename `index-wp.php` → `index.php` dan hapus baris DirectoryIndex.
+
+## Live chat
+- Widget di website → `chat-api.php` (PHP + SQLite). Data tersimpan di `/home/<user>/keikoarts-data/chat.sqlite` (di luar public_html).
+- Inbox admin: `keikoartist.com/admin/` (password di `keikoarts-config.php` → `chat_admin_password`).
+- Notifikasi chat baru ke Discord memakai `discord_webhook` di config yang sama (opsional).

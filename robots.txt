@@ -2,5 +2,6 @@ User-agent: *
 Allow: /
 Disallow: /wp-admin/
 Disallow: /wp-includes/
+Disallow: /admin/
 
 Sitemap: https://keikoartist.com/sitemap.xml

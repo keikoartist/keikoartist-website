@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>KeikoArts Inbox</title>
+<link rel="icon" href="../images/pfp.webp">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--pink:#f2628f;--pink-2:#ff8fb1;--soft:#fff4f8;--line:#fbd3e0;--ink:#7a2846;--muted:#a8607a;--bg:#fff}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{font-family:Poppins,system-ui,sans-serif;color:var(--ink);background:var(--soft)}
+button,input,textarea{font:inherit;color:inherit}
+.serif{font-family:"DM Serif Display",serif;font-weight:400}
+.btn{border:0;border-radius:999px;padding:10px 18px;font-weight:600;font-size:13.5px;cursor:pointer;background:var(--pink);color:#fff}
+.btn.ghost{background:#fff;color:var(--pink);border:1.5px solid var(--pink)}
+.btn.small{padding:6px 12px;font-size:12px}
+input,textarea{width:100%;padding:11px 13px;border:1px solid var(--line);border-radius:12px;background:#fff;outline:none}
+input:focus,textarea:focus{border-color:var(--pink-2);box-shadow:0 0 0 3px rgba(242,98,143,.12)}
+/* login */
+.login{min-height:100%;display:grid;place-items:center;padding:20px}
+.login form{width:min(360px,100%);background:#fff;border:1px solid var(--line);border-radius:20px;padding:28px;display:grid;gap:12px;box-shadow:0 20px 50px rgba(122,40,70,.12)}
+.login img{width:56px;height:56px;border-radius:50%;border:2px solid var(--pink);justify-self:center}
+.login h1{font-size:26px;text-align:center}
+.login p{font-size:12.5px;color:var(--muted);text-align:center}
+.err{color:#c22b52;font-size:12.5px;min-height:1em}
+/* app */
+.app{height:100%;display:grid;grid-template-rows:auto 1fr}
+.top{display:flex;align-items:center;gap:12px;padding:10px 16px;background:#fff;border-bottom:1px solid var(--line)}
+.top img{width:34px;height:34px;border-radius:50%;border:2px solid var(--pink)}
+.top h1{font-size:20px;flex:1}
+.top h1 small{font:500 11px Poppins;color:var(--muted);margin-left:6px}
+.agent{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted)}
+.agent input{width:110px;padding:6px 10px;font-size:12.5px}
+.main{display:grid;grid-template-columns:340px 1fr;min-height:0}
+.list{background:#fff;border-right:1px solid var(--line);display:flex;flex-direction:column;min-height:0}
+.tabs{display:flex;gap:6px;padding:10px 12px;border-bottom:1px solid var(--line)}
+.tabs button{border:0;background:none;padding:6px 12px;border-radius:8px;font-size:13px;color:var(--muted);cursor:pointer}
+.tabs button.on{background:var(--pink-2);color:#fff}
+.items{flex:1;overflow-y:auto}
+.item{display:grid;grid-template-columns:1fr auto;gap:2px 8px;padding:12px 14px;border-bottom:1px solid #fde9f0;cursor:pointer;background:none;border-left:3px solid transparent;width:100%;text-align:left}
+.item:hover{background:var(--soft)}
+.item.on{background:var(--soft);border-left-color:var(--pink)}
+.item b{font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.item time{font-size:11px;color:var(--muted)}
+.item span{grid-column:1/-1;font-size:12.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.item .dot{justify-self:end;min-width:20px;height:20px;border-radius:999px;background:var(--pink);color:#fff;font-size:11px;display:grid;place-items:center;padding:0 6px}
+.item.unread b{color:var(--pink)}
+.empty{padding:30px 16px;text-align:center;color:var(--muted);font-size:13px}
+.thread{display:flex;flex-direction:column;min-height:0;background:var(--soft)}
+.th-head{display:flex;align-items:center;gap:10px;padding:12px 16px;background:#fff;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.th-head .who{flex:1;min-width:160px}
+.th-head .who b{display:block;font-size:15px}
+.th-head .who span{font-size:12px;color:var(--muted)}
+.back{display:none;border:0;background:none;font-size:22px;color:var(--pink);cursor:pointer;padding:0 6px}
+.msgs{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:8px}
+.m{max-width:72%;display:flex;flex-direction:column;gap:2px}
+.m p{padding:9px 13px;border-radius:16px;font-size:14px;line-height:1.45;white-space:pre-wrap;word-wrap:break-word}
+.m small{font-size:10.5px;color:var(--muted);padding:0 6px}
+.m.visitor{align-self:flex-start}.m.visitor p{background:#fff;border:1px solid var(--line);border-bottom-left-radius:4px}
+.m.admin{align-self:flex-end;align-items:flex-end}.m.admin p{background:var(--pink);color:#fff;border-bottom-right-radius:4px}
+.canned{display:flex;gap:6px;overflow-x:auto;padding:8px 12px 0;background:#fff;border-top:1px solid var(--line)}
+.canned button{flex:none;border:1px solid var(--line);background:var(--soft);border-radius:999px;padding:5px 11px;font-size:12px;cursor:pointer;color:var(--ink)}
+.compose{display:flex;gap:8px;align-items:flex-end;padding:10px 12px;background:#fff}
+.compose textarea{resize:none;max-height:140px;border-radius:14px}
+.compose .btn{flex:none}
+.placeholder{flex:1;display:grid;place-items:center;color:var(--muted);font-size:14px;text-align:center;padding:20px}
+.notify{font-size:11.5px}
+@media (max-width:820px){
+  .main{grid-template-columns:1fr}
+  .main.reading .list{display:none}
+  .main:not(.reading) .thread{display:none}
+  .back{display:block}
+  .agent span{display:none}
+  .m{max-width:86%}
+  .top h1 small{display:none}
+}
+</style>
+</head>
+<body>
+<div class="login" id="loginView" hidden>
+  <form id="loginForm">
+    <img src="../images/pfp.webp" alt="">
+    <h1 class="serif">KeikoArts Inbox</h1>
+    <p>Reply to website chats</p>
+    <input type="password" id="pw" placeholder="Admin password" autocomplete="current-password" required>
+    <button class="btn" type="submit">Log in</button>
+    <div class="err" id="loginErr" role="alert"></div>
+  </form>
+</div>
+
+<div class="app" id="appView" hidden>
+  <div class="top">
+    <img src="../images/pfp.webp" alt="">
+    <h1 class="serif">Inbox <small id="unreadTot"></small></h1>
+    <label class="agent"><span>Reply as</span><input id="agent" maxlength="30" placeholder="Keiko"></label>
+    <button class="btn ghost small notify" id="notifyBtn" type="button" hidden>🔔 Enable alerts</button>
+    <button class="btn ghost small" id="logout" type="button">Log out</button>
+  </div>
+  <div class="main" id="main">
+    <aside class="list">
+      <div class="tabs"><button class="on" data-s="open" type="button">Open</button><button data-s="closed" type="button">Closed</button></div>
+      <div class="items" id="items"><div class="empty">Loading…</div></div>
+    </aside>
+    <section class="thread" id="thread">
+      <div class="placeholder" id="ph">Select a conversation ♡</div>
+    </section>
+  </div>
+</div>
+
+<script>
+const $=q=>document.querySelector(q), API='../chat-api.php';
+let csrf='', status='open', cur=null, last=0, lastUnread=-1, listTimer, thTimer;
+const store={get(k,d){try{return localStorage.getItem(k)??d}catch(_){return d}},set(k,v){try{localStorage.setItem(k,v)}catch(_){}}};
+const CANNED=[
+  "Hi! Thank you for reaching out ♡ How can I help?",
+  "You can see all prices and examples in Our Services on the website. Which one are you interested in?",
+  "Could you share your character references (images or links)?",
+  "Please send a request through the order form so I can review your brief ♡",
+  "Thank you! I'll get back to you within 6 hours."
+];
+async function api(data){
+  const r=await fetch(API,{method:'POST',headers:{'Content-Type':'application/json','X-CSRF':csrf},body:JSON.stringify(data),credentials:'same-origin',cache:'no-store'});
+  let j={};try{j=await r.json()}catch(_){}
+  if(r.status===401&&data.action!=='login'&&data.action!=='me'){showLogin();throw new Error('login');}
+  if(!r.ok)throw new Error(j.error||'Connection problem');
+  return j;
+}
+const fmt=ts=>{const d=new Date(ts*1000),n=new Date();return d.toDateString()===n.toDateString()?d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}):d.toLocaleDateString([],{day:'numeric',month:'short'})+' '+d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})};
+const el=(tag,cls,text)=>{const e=document.createElement(tag);if(cls)e.className=cls;if(text!=null)e.textContent=text;return e};
+
+function showLogin(){clearInterval(listTimer);clearInterval(thTimer);$('#appView').hidden=true;$('#loginView').hidden=false;$('#pw').focus();}
+async function showApp(){
+  $('#loginView').hidden=true;$('#appView').hidden=false;
+  $('#agent').value=store.get('ka_agent','Keiko');
+  if('Notification' in window&&Notification.permission==='default')$('#notifyBtn').hidden=false;
+  await loadList();listTimer=setInterval(()=>loadList(),5000);
+}
+$('#agent').addEventListener('change',e=>store.set('ka_agent',e.target.value.trim()||'Keiko'));
+$('#notifyBtn').onclick=async()=>{try{await Notification.requestPermission()}catch(_){} $('#notifyBtn').hidden=true;};
+
+$('#loginForm').addEventListener('submit',async e=>{
+  e.preventDefault();$('#loginErr').textContent='';
+  try{const j=await api({action:'login',password:$('#pw').value});csrf=j.csrf;$('#pw').value='';showApp();}
+  catch(err){$('#loginErr').textContent=err.message;}
+});
+$('#logout').onclick=async()=>{try{await api({action:'logout'})}catch(_){} csrf='';cur=null;showLogin();};
+
+document.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>{document.querySelectorAll('.tabs button').forEach(x=>x.classList.toggle('on',x===b));status=b.dataset.s;loadList();});
+
+function beep(){try{const a=new (window.AudioContext||window.webkitAudioContext)(),o=a.createOscillator(),g=a.createGain();o.frequency.value=880;g.gain.setValueAtTime(.08,a.currentTime);g.gain.exponentialRampToValueAtTime(.0001,a.currentTime+.35);o.connect(g);g.connect(a.destination);o.start();o.stop(a.currentTime+.35);}catch(_){}}
+
+async function loadList(){
+  let j;try{j=await api({action:'list',status})}catch(_){return}
+  const tot=j.unread_total;$('#unreadTot').textContent=tot?`· ${tot} unread`:'';
+  document.title=(tot?`(${tot}) `:'')+'KeikoArts Inbox';
+  if(lastUnread>=0&&tot>lastUnread){beep();if('Notification' in window&&Notification.permission==='granted'&&document.visibilityState!=='visible'){try{new Notification('New chat message',{body:'Someone messaged KeikoArts',icon:'../images/pfp.webp'})}catch(_){}}}
+  lastUnread=tot;
+  const box=$('#items');box.innerHTML='';
+  if(!j.conversations.length){box.appendChild(el('div','empty',status==='open'?'No open chats yet ♡':'No closed chats'));return;}
+  j.conversations.forEach(c=>{
+    const b=el('button','item'+(c.unread_admin?' unread':'')+(cur===c.id?' on':''));b.type='button';
+    b.appendChild(el('b',null,c.name||'Visitor'));b.appendChild(el('time',null,fmt(c.updated)));
+    b.appendChild(el('span',null,(c.last_sender==='admin'?'You: ':'')+(c.last||'')));
+    if(c.unread_admin){const d=el('i','dot',String(c.unread_admin));b.appendChild(d);}
+    b.onclick=()=>openThread(c.id);box.appendChild(b);
+  });
+}
+
+function addMsg(m){
+  if($(`.m[data-id="${m.id}"]`))return;
+  const d=el('div','m '+m.sender);d.dataset.id=m.id;d.appendChild(el('p',null,m.body));
+  d.appendChild(el('small',null,(m.sender==='admin'?(m.agent||'Keiko')+' · ':'')+fmt(m.created)));
+  $('#msgs').appendChild(d);last=Math.max(last,m.id);
+}
+async function openThread(id){
+  cur=id;last=0;clearInterval(thTimer);$('#main').classList.add('reading');
+  const th=$('#thread');th.innerHTML='';
+  const head=el('div','th-head');
+  const back=el('button','back','‹');back.type='button';back.setAttribute('aria-label','Back');back.onclick=()=>{cur=null;clearInterval(thTimer);$('#main').classList.remove('reading');loadList();};
+  const who=el('div','who');who.appendChild(el('b',null,'…'));who.appendChild(el('span',null,''));
+  const closeB=el('button','btn ghost small','Close chat');closeB.type='button';
+  const delB=el('button','btn ghost small','Delete');delB.type='button';
+  head.append(back,who,closeB,delB);
+  const msgs=el('div','msgs');msgs.id='msgs';
+  const canned=el('div','canned');CANNED.forEach(t=>{const b=el('button',null,t.length>34?t.slice(0,32)+'…':t);b.type='button';b.title=t;b.onclick=()=>{const ta=$('#reply');ta.value=t;ta.focus();};canned.appendChild(b);});
+  const form=el('form','compose');const ta=el('textarea');ta.id='reply';ta.rows=1;ta.placeholder='Write a reply… (Enter to send, Shift+Enter for new line)';ta.maxLength=2000;
+  const send=el('button','btn','Send');send.type='submit';form.append(ta,send);
+  th.append(head,msgs,canned,form);
+  ta.addEventListener('input',()=>{ta.style.height='auto';ta.style.height=Math.min(ta.scrollHeight,140)+'px';});
+  ta.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey&&!e.isComposing){e.preventDefault();form.requestSubmit();}});
+  form.addEventListener('submit',async e=>{e.preventDefault();const text=ta.value.trim();if(!text)return;send.disabled=true;
+    try{const j=await api({action:'reply',id,message:text,agent:$('#agent').value.trim()||'Keiko',since:last});ta.value='';ta.style.height='auto';j.messages.forEach(addMsg);msgs.scrollTop=msgs.scrollHeight;loadList();}
+    catch(err){if(err.message!=='login')alertBox(err.message);}
+    send.disabled=false;ta.focus();});
+  let delArmed=false;
+  delB.onclick=async()=>{if(!delArmed){delArmed=true;delB.textContent='Tap again to delete';setTimeout(()=>{delArmed=false;delB.textContent='Delete'},3000);return;}
+    await api({action:'delete',id});back.onclick();};
+  const j=await api({action:'thread',id,since:0});
+  const c=j.conversation;who.firstChild.textContent=c.name||'Visitor';
+  who.lastChild.textContent=[c.email,'started '+fmt(c.created)].filter(Boolean).join(' · ');
+  closeB.textContent=c.status==='open'?'Close chat':'Reopen';
+  closeB.onclick=async()=>{await api({action:c.status==='open'?'close':'reopen',id});back.onclick();};
+  j.messages.forEach(addMsg);msgs.scrollTop=msgs.scrollHeight;ta.focus();loadList();
+  thTimer=setInterval(async()=>{if(cur!==id||document.visibilityState!=='visible')return;
+    try{const k=await api({action:'thread',id,since:last});if(k.messages.length){const atEnd=msgs.scrollHeight-msgs.scrollTop-msgs.clientHeight<60;k.messages.forEach(addMsg);if(atEnd)msgs.scrollTop=msgs.scrollHeight;}}catch(_){}},3000);
+}
+function alertBox(t){const p=el('div','err',t);$('#thread').appendChild(p);setTimeout(()=>p.remove(),4000);}
+
+(async()=>{try{const j=await api({action:'me'});csrf=j.csrf;showApp();}catch(_){showLogin();}})();
+</script>
+</body>
+</html>
