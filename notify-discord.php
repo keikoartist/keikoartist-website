@@ -14,10 +14,10 @@ $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
 if ($origin && strtolower((string)parse_url($origin, PHP_URL_HOST)) !== $host) out(403, 'bad origin');
 
 $cfgFile = __DIR__ . '/keikoarts-config.php';
-if (!is_file($cfgFile)) out(503, 'not configured');
+if (!is_file($cfgFile)) out(200, 'not configured');
 $cfg = include $cfgFile;
 $hook = $cfg['discord_webhook'] ?? '';
-if (!preg_match('#^https://(discord|discordapp)\.com/api/webhooks/\d+/[\w-]+$#', $hook)) out(503, 'bad webhook');
+if (!preg_match('#^https://(discord|discordapp)\.com/api/webhooks/\d+/[\w-]+$#', $hook)) out(200, 'webhook not set');
 
 // simple rate limit: 5 requests / 10 min per IP
 $ip = $_SERVER['REMOTE_ADDR'] ?? '0';

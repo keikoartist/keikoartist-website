@@ -125,7 +125,7 @@ switch ($action) {
   /* ===== visitor ===== */
   case 'start': {
     if (!empty($in['_honey'])) out(200, ['id' => str_repeat('0', 24), 'token' => str_repeat('0', 40)]);
-    rate_limit('start:' . client_ip(), 5, 3600);
+    rate_limit('start:' . client_ip(), 15, 3600);
     $name = clean((string)($in['name'] ?? ''), MAX_NAME);
     $email = clean((string)($in['email'] ?? ''), 120);
     $text = clean((string)($in['message'] ?? ''), MAX_MSG);
