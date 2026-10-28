@@ -666,7 +666,7 @@ a.vt:hover img{transform:scale(1.06)}
     <details class="panel tos-box">
       <summary><span class="serif">Terms of Service</span><small>By ordering you agree to these terms. Tap to read.</small></summary>
       <div class="tos">
-      <div><h4>1. Ordering</h4><p>Submit a request form. I'll reply within 1–2 days by email or Discord to confirm details and the final price. Your slot is secured once payment is received.</p></div>
+      <div><h4>1. Ordering</h4><p>Submit a request form. I'll reply within 6 hours by email or Discord to confirm details and the final price. Your slot is secured once payment is received.</p></div>
       <div><h4>2. Payment</h4><p>PayPal invoice or <a href="https://ko-fi.com/keikoarts" target="_blank" rel="noopener" style="color:var(--pink);font-weight:600">Ko-fi</a>, in USD. Choose full payment, 50/50 (50% upfront, 50% before final files), or 3× installments for orders above $150.</p></div>
       <div><h4>3. Process &amp; timeline</h4><p>Sketch → lineart → coloring → (rigging) → delivery. You get progress updates at every stage. Estimated time is shown in the form; rush delivery is available.</p></div>
       <div><h4>4. Revisions</h4><p>Unlimited small revisions during sketch. Up to 2 minor revisions after coloring; major changes after approval may have extra fees.</p></div>
@@ -768,7 +768,7 @@ a.vt:hover img{transform:scale(1.06)}
         <div class="ostep" data-s="4">
           <div class="summary" id="summary"></div>
           <label class="check"><input type="checkbox" id="agree"> I have read and agree to the <a href="#tos" data-close style="color:var(--pink);font-weight:600">Terms of Service</a>.</label>
-          <p class="small" style="font-size:12.5px;color:var(--muted)">This is an estimate. I'll confirm the final price and send a PayPal invoice or Ko-fi payment link by email or Discord within 1–2 days.</p>
+          <p class="small" style="font-size:12.5px;color:var(--muted)">This is a request, not a booked slot yet. I'll review your brief first, then confirm whether I can take it, the final price and a PayPal / Ko-fi payment link within 6 hours. You join the queue only after we agree and payment is received.</p>
         </div>
 
         <div class="total"><div><small>Estimated total</small><b id="totalOut">$0</b></div><div style="text-align:right;font-size:12px" id="etaOut"></div></div>
@@ -787,7 +787,7 @@ a.vt:hover img{transform:scale(1.06)}
   <div class="mbox ty-box" role="dialog" aria-modal="true" aria-labelledby="tyTitle">
     <div class="mhead"><h3 id="tyTitle">Request sent! ♡</h3><button class="mclose" type="button" data-tyclose aria-label="Close">✕</button></div>
     <div class="mbody">
-      <p class="ty-lead">Thank you for choosing KeikoArts! Your request has been received ♡</p>
+      <p class="ty-lead">Thank you for choosing KeikoArts! Your request has been received ♡ I'll review your brief first. You'll be added to the queue once we've agreed on the details and payment is received.</p>
       <div class="ty-ref" id="tyRef" hidden>Request ID: <b id="tyRefId"></b></div>
       <div class="summary" id="tySummary" hidden></div>
       <div class="ty-dc">
@@ -796,7 +796,7 @@ a.vt:hover img{transform:scale(1.06)}
       </div>
       <h4 class="ty-h">What happens next</h4>
       <ol class="ty-steps">
-        <li><b>Chat on Discord</b><span>Add me / send a message with your Request ID. I reply within 1–2 days.</span></li>
+        <li><b>Chat on Discord</b><span>Add me / send a message with your Request ID. I reply within 6 hours.</span></li>
         <li><b>Confirm &amp; pay</b><span>We finalize details and I send a PayPal / Ko-fi payment link.</span></li>
         <li><b>Your slot is secured</b><span>You get an order code to track progress in the Commission Queue.</span></li>
       </ol>
@@ -891,7 +891,7 @@ const DETAILS = {   // deskripsi lengkap tiap service (muncul saat kartu diklik)
     notes:"Add toggles, hairstyles or outfits as needed." },
   "Custom Inquiry": { about:"Have an idea that isn't listed? Illustrations, stream assets or something new: just describe it.",
     includes:["Full illustrations and scenes","Stream screens, overlays and alerts","Anything else, quoted to your needs"],
-    notes:"I'll reply with a quote within 1–2 days." },
+    notes:"I'll reply with a quote within 6 hours." },
 };
 const VTUBERS = [   // VTuber yang pernah kamu buat. name & link opsional (link: Twitch/YouTube/X)
   { img:"av-vtuber-witch",  name:"Mirabelle", link:"" },
@@ -1132,7 +1132,7 @@ NEXT STEP: please message me on Discord with your Request ID:
 https://discord.com/users/1053527069528707072
 
 What happens next:
-1. We chat on Discord about details. I reply within 1–2 days.
+1. We chat on Discord about details. I reply within 6 hours.
 2. You get the final price and a PayPal / Ko-fi payment link.
 3. Once paid, your slot is secured and you'll get an order code to track progress at keikoartist.com.
 
