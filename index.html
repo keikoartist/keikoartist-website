@@ -736,15 +736,9 @@ body:has(.modal.show,.sd.show,.lb.show) .kc-bubble,body:has(.modal.show,.sd.show
   <div class="kc-body" id="kcBody" aria-live="polite">
     <div class="kc-msg admin kc-welcome"><p>Hi there! 👋 Ask me anything about commissions, prices or slots. I'll reply here as soon as I can.</p></div>
   </div>
-  <form class="kc-start" id="kcStart" autocomplete="on">
-    <input name="name" id="kcName" placeholder="Your name / VTuber name" maxlength="60" required>
-    <input name="email" id="kcEmail" type="email" placeholder="Email (optional, in case you leave)" maxlength="120">
+  <form class="kc-send" id="kcSend">
     <input type="text" name="_honey" tabindex="-1" autocomplete="off" style="display:none">
-    <textarea id="kcFirst" placeholder="Type your question…" maxlength="2000" required></textarea>
-    <button class="btn btn-pink" type="submit">Start chat</button>
-  </form>
-  <form class="kc-send" id="kcSend" hidden>
-    <textarea id="kcInput" placeholder="Write a message…" maxlength="2000" rows="1" aria-label="Message"></textarea>
+    <textarea id="kcInput" placeholder="Type your question…" maxlength="2000" rows="1" aria-label="Message"></textarea>
     <button type="submit" aria-label="Send"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M3 20.5 21 12 3 3.5 3 10l12 2-12 2z"/></svg></button>
   </form>
   <p class="kc-err" id="kcErr" role="alert"></p>
@@ -1359,7 +1353,7 @@ $$('.card').forEach(card=>{
     body.appendChild(d);if(m.id)last=Math.max(last,m.id);
   }
   const scroll=()=>{body.scrollTop=body.scrollHeight};
-  function mode(){const has=!!sess;$('#kcStart').hidden=has;$('#kcSend').hidden=!has;}
+  function mode(){}
   function setBadge(n){badge.hidden=!n;badge.textContent=n>9?'9+':n;}
   async function poll(){
     if(!sess||busy)return;
@@ -1369,20 +1363,11 @@ $$('.card').forEach(card=>{
     }catch(e){if(e.status===401){save(null);sess=null;mode();}}
   }
   function schedule(){clearInterval(timer);if(!sess)return;timer=setInterval(()=>{if(document.visibilityState==='visible')poll();},isOpen()?4000:30000);}
-  function openChat(){panel.hidden=false;bubble.setAttribute('aria-expanded','true');setBadge(0);poll().then(scroll);schedule();setTimeout(()=>(sess?$('#kcInput'):$('#kcName')).focus(),50);}
+  function openChat(){panel.hidden=false;bubble.setAttribute('aria-expanded','true');setBadge(0);poll().then(scroll);schedule();setTimeout(()=>$('#kcInput').focus(),50);}
   function closeChat(){panel.hidden=true;bubble.setAttribute('aria-expanded','false');schedule();bubble.focus();}
   bubble.onclick=()=>isOpen()?closeChat():openChat();
   $('#kcClose').onclick=closeChat;
   document.addEventListener('keydown',e=>{if(e.key==='Escape'&&isOpen())closeChat();});
-  $('#kcStart').addEventListener('submit',async e=>{
-    e.preventDefault();errEl.textContent='';const btn=e.target.querySelector('button');btn.disabled=true;btn.textContent='Sending…';
-    try{const j=await api({action:'start',name:$('#kcName').value,email:$('#kcEmail').value,message:$('#kcFirst').value,page:location.pathname,_honey:e.target._honey.value});
-      sess={id:j.id,token:j.token};save(sess);j.messages.forEach(add);
-      const sys=document.createElement('div');sys.className='kc-sys';sys.textContent='Message sent ♡ You can close this. Your chat is saved on this device.';body.appendChild(sys);
-      mode();scroll();schedule();
-    }catch(err){errEl.textContent=err.message;}
-    btn.disabled=false;btn.textContent='Start chat';
-  });
   const input=$('#kcInput');
   input.addEventListener('input',()=>{input.style.height='auto';input.style.height=Math.min(input.scrollHeight,110)+'px';});
   input.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey&&!e.isComposing){e.preventDefault();$('#kcSend').requestSubmit();}});
@@ -1390,8 +1375,13 @@ $$('.card').forEach(card=>{
     e.preventDefault();const text=input.value.trim();if(!text||busy)return;errEl.textContent='';busy=true;
     const tmp=document.createElement('div');tmp.className='kc-msg visitor pending';const p=document.createElement('p');p.textContent=text;tmp.appendChild(p);body.appendChild(tmp);scroll();
     input.value='';input.style.height='auto';
-    try{const j=await api({action:'send',id:sess.id,token:sess.token,message:text,since:last});tmp.remove();j.messages.forEach(add);scroll();}
-    catch(err){tmp.remove();input.value=text;errEl.textContent=err.message;if(err.status===401){save(null);sess=null;mode();}}
+    try{
+      if(!sess){const j=await api({action:'start',message:text,page:location.pathname,_honey:e.target._honey.value});
+        sess={id:j.id,token:j.token};save(sess);tmp.remove();j.messages.forEach(add);
+        const sys=document.createElement('div');sys.className='kc-sys';sys.textContent='Sent ♡ I\'ll reply here. Your chat is saved on this device.';body.appendChild(sys);scroll();schedule();}
+      else{const j=await api({action:'send',id:sess.id,token:sess.token,message:text,since:last});tmp.remove();j.messages.forEach(add);scroll();}
+    }
+    catch(err){tmp.remove();input.value=text;errEl.textContent=err.message;if(err.status===401){save(null);sess=null;}}
     busy=false;
   });
   // restore an existing chat on this device

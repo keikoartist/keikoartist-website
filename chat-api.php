@@ -130,7 +130,8 @@ switch ($action) {
     $name = clean((string)($in['name'] ?? ''), MAX_NAME);
     $email = clean((string)($in['email'] ?? ''), 120);
     $text = clean((string)($in['message'] ?? ''), MAX_MSG);
-    if ($name === '' || $text === '') fail(400, 'Please fill in your name and message.');
+    if ($text === '') fail(400, 'Please type a message.');
+    if ($name === '') $name = 'Visitor ' . strtoupper(substr(bin2hex(random_bytes(2)), 0, 4));
     if ($email !== '' && !filter_var($email, FILTER_VALIDATE_EMAIL)) fail(400, 'Please check your email address.');
     $id = bin2hex(random_bytes(12)); $tok = bin2hex(random_bytes(24)); $now = time();
     $db = db(); $db->beginTransaction();
