@@ -488,7 +488,11 @@ a.vt:hover img{transform:scale(1.06)}
 .refs{display:grid;gap:8px}
 .drop{display:flex;flex-direction:column;align-items:center;gap:2px;border:1.5px dashed var(--pink-2);border-radius:14px;padding:16px;background:#fff7fa;cursor:pointer;text-align:center;transition:.15s}
 .drop:hover,.drop.over,.drop:focus{background:#ffeef4;border-color:var(--pink);outline:none}
-.drop input{display:none}
+.drop input{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
+.drop{position:relative}
+.ref-msg{font-size:12px;color:#c22b52;display:none}
+.ref-msg.show{display:block}
+.ref-msg.ok{color:var(--muted)}
 .drop b{font-size:13.5px;color:var(--pink)}
 .drop span{font-size:12px;color:var(--muted)}
 .ref-list{list-style:none;display:flex;flex-wrap:wrap;gap:8px}
@@ -745,8 +749,9 @@ a.vt:hover img{transform:scale(1.06)}
             <label class="drop" id="refDrop" tabindex="0">
               <input type="file" id="refFiles" accept="image/*,.pdf,.psd,.clip" multiple>
               <b>📎 Attach reference images</b>
-              <span>Click or drag files here · up to 5 files · 10 MB total</span>
+              <span>Click or drag files here · up to 5 files · big images are compressed automatically</span>
             </label>
+            <p class="ref-msg" id="refMsg" role="status"></p>
             <ul class="ref-list" id="refList"></ul>
             <div id="refSlots" hidden></div>
             <input name="Reference links" placeholder="Or paste links (Drive, Pinterest, Toyhouse…) for bigger files">
@@ -1003,13 +1008,30 @@ function renderRefs(){
   let info=$('#refInfo');if(!info){info=document.createElement('p');info.id='refInfo';info.className='ref-size';ul.after(info);}
   info.textContent=refFiles.length?`${refFiles.length} file(s) · ${(tot/1048576).toFixed(1)} MB of 10 MB`:'';
 }
-function addRefs(list){
-  for(const f of list){
-    if(refFiles.length>=REF_MAX_FILES){err('Max 5 reference files. Use the link field for more.');break;}
-    if(refFiles.reduce((a,x)=>a+x.size,0)+f.size>REF_MAX_BYTES){err('Attachments are limited to 10 MB total. Use the link field for bigger files.');continue;}
+function refMsg(t,ok){const m=$('#refMsg');m.textContent=t||'';m.classList.toggle('show',!!t);m.classList.toggle('ok',!!ok);}
+async function shrink(f){
+  // compress big images so they fit the 10 MB email limit
+  if(!f.type.startsWith('image/')||f.type==='image/gif'||f.size<1.5*1024*1024)return f;
+  try{
+    const bmp=await createImageBitmap(f);const k=Math.min(1,2400/Math.max(bmp.width,bmp.height));
+    const c=document.createElement('canvas');c.width=Math.round(bmp.width*k);c.height=Math.round(bmp.height*k);
+    const x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,c.width,c.height);x.drawImage(bmp,0,0,c.width,c.height);
+    const blob=await new Promise(r=>c.toBlob(r,'image/jpeg',.85));if(!blob||blob.size>=f.size)return f;
+    return new File([blob],f.name.replace(/\.\w+$/,'')+'.jpg',{type:'image/jpeg'});
+  }catch(_){return f;}
+}
+async function addRefs(list){
+  refMsg('');const skipped=[];
+  if(list.length)refMsg('Adding '+list.length+' file(s)…',true);
+  for(const raw of list){
+    if(refFiles.length>=REF_MAX_FILES){skipped.push(raw.name+' (max 5 files)');continue;}
+    const f=await shrink(raw);
+    const used=refFiles.reduce((a,x)=>a+x.size,0);
+    if(used+f.size>REF_MAX_BYTES){skipped.push(`${raw.name} (${(f.size/1048576).toFixed(1)} MB, too big)`);continue;}
     refFiles.push(f);
   }
   renderRefs();
+  refMsg(skipped.length?'Not added: '+skipped.join(', ')+'. Please paste a Drive/Pinterest link for these instead.':'');
 }
 $('#refFiles').addEventListener('change',e=>{err('');addRefs([...e.target.files]);e.target.value='';});
 const drop=$('#refDrop');
