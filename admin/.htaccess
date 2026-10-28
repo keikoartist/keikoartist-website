@@ -1,0 +1,7 @@
+<IfModule mod_headers.c>
+  Header set Cache-Control "no-store, no-cache, must-revalidate, max-age=0"
+  Header set X-Robots-Tag "noindex, nofollow"
+</IfModule>
+<IfModule LiteSpeed>
+  CacheDisable public /
+</IfModule>

@@ -106,7 +106,8 @@ function admin_key(array $cfg): string { return hash_hmac('sha256', 'keikoarts-a
 function make_token(array $cfg): string { $exp = time() + 60 * 60 * 24 * 14; return $exp . '.' . hash_hmac('sha256', (string)$exp, admin_key($cfg)); }
 function require_admin(array $cfg): void {
   if (strlen(admin_pw($cfg)) < 8) fail(401, 'login required');
-  $t = (string)($_SERVER['HTTP_X_AUTH'] ?? '');
+  global $in;
+  $t = (string)($_SERVER['HTTP_X_AUTH'] ?? ($in['_auth'] ?? ''));
   if (!preg_match('/^(\d{10})\.([a-f0-9]{64})$/', $t, $m)) fail(401, 'login required');
   if ((int)$m[1] < time() || !hash_equals(hash_hmac('sha256', $m[1], admin_key($cfg)), $m[2])) fail(401, 'login required');
 }

@@ -4,6 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
+<meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
 <title>KeikoArts Inbox</title>
 <link rel="icon" href="../images/pfp.webp">
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
@@ -81,10 +83,10 @@ input:focus,textarea:focus{border-color:var(--pink-2);box-shadow:0 0 0 3px rgba(
 </head>
 <body>
 <div class="login" id="loginView" hidden>
-  <form id="loginForm">
+  <form id="loginForm" action="javascript:void(0)">
     <img src="../images/pfp.webp" alt="">
     <h1 class="serif">KeikoArts Inbox</h1>
-    <p>Reply to website chats</p>
+    <p>Reply to website chats <small style="opacity:.6">v2</small></p>
     <input type="password" id="pw" placeholder="Admin password" autocomplete="current-password" required>
     <button class="btn" type="submit">Log in</button>
     <div class="err" id="loginErr" role="alert"></div>
@@ -122,7 +124,7 @@ const CANNED=[
   "Thank you! I'll get back to you within 6 hours."
 ];
 async function api(data){
-  const r=await fetch(API,{method:'POST',headers:{'Content-Type':'application/json','X-Auth':auth},body:JSON.stringify(data),cache:'no-store'});
+  const r=await fetch(API,{method:'POST',headers:{'Content-Type':'application/json','X-Auth':auth},body:JSON.stringify(Object.assign({_auth:auth},data)),cache:'no-store'});
   let j={};try{j=await r.json()}catch(_){}
   if(r.status===401&&data.action!=='login'&&data.action!=='me'){auth='';store.set('ka_auth','');showLogin();$('#loginErr').textContent='Session expired, please log in again.';throw new Error('login');}
   if(!r.ok)throw new Error(j.error||'Connection problem');
