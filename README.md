@@ -4,7 +4,6 @@ Website commission KeikoArts (single page, static HTML).
 
 - `index.html` — seluruh website. Harga & layanan: cari `const SERVICES`, contoh karya: `GALLERY`, deskripsi: `DETAILS`, VTuber Children: `VTUBERS`.
 - `images/` — semua gambar & video.
-- Antrian: Google Sheets (isi `SHEET_CSV` di index.html setelah sheet di-publish ke web).
 - Form order → keikoarts22@gmail.com via FormSubmit.
 
 ## Deploy

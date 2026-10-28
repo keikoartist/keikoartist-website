@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>KeikoArts — Custom VTuber Model, Live2D Rigging &amp; Commissions</title>
-<meta name="description" content="Commission custom VTuber models, Live2D rigging, PNGTuber, emotes, banners and logos from KeikoArts. Clear prices, live queue and easy online ordering.">
+<meta name="description" content="Commission custom VTuber models, Live2D rigging, PNGTuber, emotes, banners and logos from KeikoArts. Clear prices and easy online ordering.">
 <meta property="og:title" content="KeikoArts — Your dream VTuber starts here">
 <meta property="og:description" content="Custom VTuber art, Live2D rigging, emotes and stream assets.">
 <meta property="og:image" content="https://keikoartist.com/images/hero.webp">
@@ -563,7 +563,6 @@ body:has(.modal.show,.sd.show,.lb.show) .kc-bubble,body:has(.modal.show,.sd.show
       <a href="#home" class="active">Home</a>
       <a href="#services">Services</a>
       <a href="#portfolio">Portfolio</a>
-      <a href="#queue">Queue</a>
       <a href="#process">Process</a>
       <a href="#tos">TOS</a>
       <a href="#faq">FAQ</a>
@@ -694,27 +693,6 @@ body:has(.modal.show,.sd.show,.lb.show) .kc-bubble,body:has(.modal.show,.sd.show
   </div>
 </section>
 
-<!-- QUEUE -->
-<section id="queue">
-  <div class="wrap">
-    <div class="sec-head"><h2 class="serif">Commission Queue</h2><div class="q-status"><span class="q-live" id="qLive"><i></i><span>Connecting…</span></span><span class="slot-badge" id="slotBadge">Open</span></div></div>
-    <div class="panel queue-one">
-      <div class="q-left">
-        <div class="slots" id="slotBar"></div>
-        <p id="slotText"></p>
-        <a href="#order" data-order class="btn btn-pink arrow">Start a Request</a>
-        <form class="track" id="trackForm" autocomplete="off">
-          <label for="trackCode">Track my order</label>
-          <div><input id="trackCode" placeholder="e.g. KA-001" maxlength="20"><button class="btn btn-pink" type="submit">Track</button></div>
-        </form>
-        <div id="trackOut"></div>
-        <p class="q-ask">Questions first? <a href="https://discord.com/users/1053527069528707072" target="_blank" rel="noopener">Discord</a> · <a href="https://wa.me/6289502127488" target="_blank" rel="noopener">WhatsApp</a></p>
-      </div>
-      <ul class="qlist" id="qList"></ul>
-    </div>
-  </div>
-</section>
-
 <!-- TOS -->
 <section id="tos">
   <div class="wrap">
@@ -793,7 +771,7 @@ body:has(.modal.show,.sd.show,.lb.show) .kc-bubble,body:has(.modal.show,.sd.show
       <!-- GANTI email di bawah kalau perlu -->
       <form id="orderForm" method="POST" enctype="multipart/form-data" action="https://formsubmit.co/keikoarts22@gmail.com">
         <input type="hidden" name="_subject" id="fSubject" value="New commission request — keikoartist.com">
-        <input type="hidden" name="_next" id="fNext" value="https://keikoartist.com/?sent=1#queue">
+        <input type="hidden" name="_next" id="fNext" value="https://keikoartist.com/?sent=1">
         <input type="hidden" name="_captcha" value="false">
         <input type="hidden" name="_autoresponse" id="fAuto" value="">
         <input type="hidden" name="Request ID" id="fReq" value="">
@@ -875,7 +853,7 @@ body:has(.modal.show,.sd.show,.lb.show) .kc-bubble,body:has(.modal.show,.sd.show
       <ol class="ty-steps">
         <li><b>Chat on Discord</b><span>Add me / send a message with your Request ID. I reply within 6 hours.</span></li>
         <li><b>Confirm &amp; pay</b><span>We finalize details and I send a PayPal / Ko-fi payment link.</span></li>
-        <li><b>Your slot is secured</b><span>You get an order code to track progress in the Commission Queue.</span></li>
+        <li><b>Your slot is secured</b><span>I start working on it and send progress updates on Discord.</span></li>
       </ol>
       <p class="ty-note">A confirmation email is also on its way (check Spam). Can't use Discord? Reach me here:</p>
       <div class="ty-btns">
@@ -907,19 +885,6 @@ body:has(.modal.show,.sd.show,.lb.show) .kc-bubble,body:has(.modal.show,.sd.show
 /* ==========================================================
    EDIT DI SINI — slot, antrian, harga & add-on
    ========================================================== */
-/* Antrian diambil otomatis dari Google Sheets (File → Share → Publish to web → CSV).
-   Tempel link CSV-nya di SHEET_CSV. Kolom: Code | Service | Status | ETA | Note
-   Status: Waiting, Sketch, Lineart, Coloring, Rigging, Done
-   Baris khusus: Code = SLOTS, Service = jumlah slot (mis. 6), Status = Open / Closed
-   JANGAN isi nama, email, atau data pribadi client — sheet ini bisa dibaca publik. */
-const SHEET_CSV = "";
-const DEMO_QUEUE = [   // dipakai selama SHEET_CSV masih kosong
-  { code:"SLOTS",  service:"6", status:"Open" },
-  { code:"KA-001", service:"VTuber Model", status:"Rigging",  eta:"Nov 20" },
-  { code:"KA-002", service:"Emotes ×6",    status:"Coloring", eta:"Nov 5" },
-  { code:"KA-003", service:"Custom PFP",   status:"Sketch",   eta:"Nov 8" },
-  { code:"KA-004", service:"Background",   status:"Waiting",  eta:"" },
-];
 const GALLERY = {   // contoh karya per service (geser di kartu Services). Tambah/ubah nama file di sini.
   "VTuber":          ["vtuber-witch","vtuber-maid","vtuber-rocker","vtuber-wolf","vtuber-dragon"],
   "VTuber Packages": ["pkg-keikomi","vtuber-dragon","vtuber-witch","chibi-witch","emotes-witch","bg-stream-room"],
@@ -1027,59 +992,11 @@ const SERVICES = {
 /* ========================================================== */
 
 const $=q=>document.querySelector(q), $$=q=>[...document.querySelectorAll(q)];
+const esc=t=>String(t??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const money=n=>'$'+(Math.round(n*100)/100).toLocaleString('en-US',{minimumFractionDigits:n%1?2:0,maximumFractionDigits:2});
 document.getElementById('yr').textContent=new Date().getFullYear();
 
-// queue (dynamic from Google Sheets)
-const STAGES=["Waiting","Sketch","Lineart","Coloring","Rigging","Done"];
-const esc=t=>String(t??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-function parseCSV(t){const rows=[];let r=[],f='',q=false;for(let i=0;i<t.length;i++){const c=t[i];
-  if(q){if(c=='"'){if(t[i+1]=='"'){f+='"';i++}else q=false}else f+=c}
-  else if(c=='"')q=true;else if(c==','){r.push(f);f=''}else if(c=='\n'||c=='\r'){if(c=='\r'&&t[i+1]=='\n')i++;r.push(f);rows.push(r);r=[];f=''}else f+=c}
-  if(f||r.length){r.push(f);rows.push(r)}return rows}
-function rowsToQueue(rows){const h=rows.shift().map(x=>x.trim().toLowerCase());const ix=k=>h.indexOf(k);
-  return rows.filter(r=>r.some(x=>x.trim())).map(r=>({code:(r[ix('code')]||'').trim(),service:(r[ix('service')]||'').trim(),status:(r[ix('status')]||'').trim(),eta:(r[ix('eta')]||'').trim(),note:(r[ix('note')]||'').trim()}))}
-const stCls=s=>{s=s.toLowerCase();return s==='waiting'?'waiting':s==='done'?'done':'wip'};
-let QUEUE_DATA=[];
-function renderQueue(all){
-  const cfg=all.find(q=>q.code.toUpperCase()==='SLOTS')||{service:'6',status:'Open'};
-  const list=all.filter(q=>q.code&&q.code.toUpperCase()!=='SLOTS');QUEUE_DATA=list;
-  const total=Math.max(1,parseInt(cfg.service)||6), active=list.filter(q=>stCls(q.status)!=='done');
-  const taken=Math.min(total,active.length), left=total-taken, open=cfg.status.toLowerCase()!=='closed'&&left>0;
-  const b=$('#slotBadge');b.textContent=open?'Commissions Open':'Commissions Closed';b.className='slot-badge '+(open?'open':'closed');
-  $('#slotBar').innerHTML=Array.from({length:total},(_,i)=>`<i class="${i<taken?'full':''}"></i>`).join('');
-  $('#slotText').textContent=open?`${left} of ${total} slots left`:'Slots are full. Send a request to join the waitlist.';
-  $('#qList').innerHTML=active.length?active.map((q,i)=>`<li><b>${i+1}</b><span>${esc(q.code)}<br><small style="color:var(--muted)">${esc(q.service)}</small></span><span class="st ${stCls(q.status)}">${esc(q.status||'Waiting')}</span></li>`).join(''):'<li><span></span><span>Queue is empty, you could be first!</span><span></span></li>';
-}
-function trackOrder(code){
-  const out=$('#trackOut'),c=code.trim().toUpperCase();if(!c){out.innerHTML='';return}
-  const q=QUEUE_DATA.find(x=>x.code.toUpperCase()===c);
-  if(!q){out.innerHTML='<p class="trk-err">Order code not found. Check the code from your confirmation message.</p>';return}
-  const cur=Math.max(0,STAGES.findIndex(s=>s.toLowerCase()===q.status.toLowerCase()));
-  out.innerHTML=`<div class="trk"><div class="trk-head"><b>${esc(q.code)}</b> · ${esc(q.service)}${q.eta?` · ETA ${esc(q.eta)}`:''}</div>
-    <ol class="trk-steps">${STAGES.map((s,i)=>`<li class="${i<cur?'ok':i===cur?'now':''}">${s}</li>`).join('')}</ol>${q.note?`<p class="trk-note">${esc(q.note)}</p>`:''}</div>`;
-}
-(function(){
-  const REFRESH_MS=30000; let lastOk=0, lastSig='', tracked='';
-  const live=$('#qLive');
-  const ago=()=>{if(!lastOk){live.querySelector('span').textContent=SHEET_CSV?'Connecting…':'Demo data';return;}
-    const s=Math.round((Date.now()-lastOk)/1000);live.querySelector('span').textContent='Live · updated '+(s<10?'just now':s<60?s+'s ago':Math.round(s/60)+'m ago');};
-  async function load(){
-    let data=DEMO_QUEUE;
-    if(SHEET_CSV){data=null;try{const r=await fetch(SHEET_CSV+(SHEET_CSV.includes('?')?'&':'?')+'t='+Date.now(),{cache:'no-store'});if(r.ok)data=rowsToQueue(parseCSV(await r.text()))}catch(e){}}
-    if(data){const sig=JSON.stringify(data);
-      if(sig!==lastSig){const first=!lastSig;lastSig=sig;renderQueue(data);if(tracked)trackOrder(tracked);if(!first)$('#queue .queue-one').classList.add('flash'),setTimeout(()=>$('#queue .queue-one').classList.remove('flash'),1200);}
-      if(SHEET_CSV){lastOk=Date.now();live.classList.add('on');}
-    }else if(!lastSig){$('#slotBadge').textContent='Queue';$('#slotText').textContent='Queue is loading slowly. Please refresh in a moment.';$('#qList').innerHTML='';live.classList.remove('on');}
-    ago();
-  }
-  load();
-  if(SHEET_CSV){setInterval(()=>{if(document.visibilityState==='visible')load();},REFRESH_MS);
-    document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')load();});}
-  setInterval(ago,5000);
-  const f=$('#trackForm');f.addEventListener('submit',e=>{e.preventDefault();tracked=$('#trackCode').value;trackOrder(tracked)});
-  const m=location.search.match(/[?&]order=([\w-]+)/);if(m){tracked=m[1];$('#trackCode').value=m[1];trackOrder(m[1]);}
-})();
+
 
 
 // reference attachments
@@ -1219,7 +1136,7 @@ https://discord.com/users/1053527069528707072
 What happens next:
 1. We chat on Discord about details. I reply within 6 hours.
 2. You get the final price and a PayPal / Ko-fi payment link.
-3. Once paid, your slot is secured and you'll get an order code to track progress at keikoartist.com.
+3. Once paid, your slot is secured and I'll send progress updates on Discord.
 
 Can't use Discord? Just reply to this email or reach me on WhatsApp.
 
@@ -1435,7 +1352,7 @@ if(location.search.includes('sent=1')){
   if(last){$('#tyRefId').textContent=last.id;$('#tyRef').hidden=false;
     $('#tySummary').innerHTML=last.rows.filter(r=>r[0]!=='Email').map(([a,b])=>`<div><span>${esc(a)}</span><b>${esc(b)}</b></div>`).join('');$('#tySummary').hidden=false;}
   ty.classList.add('show');ty.setAttribute('aria-hidden','false');document.body.style.overflow='hidden';
-  const closeTy=()=>{ty.classList.remove('show');ty.setAttribute('aria-hidden','true');document.body.style.overflow='';history.replaceState(null,'',location.pathname+'#queue');};
+  const closeTy=()=>{ty.classList.remove('show');ty.setAttribute('aria-hidden','true');document.body.style.overflow='';history.replaceState(null,'',location.pathname);};
   $$('[data-tyclose]').forEach(b=>b.onclick=closeTy);
   $('#tyDiscord').onclick=async()=>{const id=last&&last.id;if(id){try{await navigator.clipboard.writeText(id);$('#tyDiscord').textContent='Copied '+id+' ✓ Opening…';}catch(_){}}window.open('https://discord.com/users/1053527069528707072','_blank','noopener');};ty.addEventListener('click',e=>{if(e.target===ty)closeTy();});
   document.addEventListener('keydown',e=>{if(e.key==='Escape'&&ty.classList.contains('show'))closeTy();});
@@ -1443,7 +1360,7 @@ if(location.search.includes('sent=1')){
 if(location.hash==='#order')openOrder();
 addEventListener('pageshow',()=>{const sb=$('#sendBtn');delete sb.dataset.busy;sb.textContent='Send Request ♡';sb.style.opacity='';});
 {const d=new Date(),z=n=>String(n).padStart(2,'0');$('#fDeadline').min=d.getFullYear()+'-'+z(d.getMonth()+1)+'-'+z(d.getDate());}
-if(location.protocol.startsWith('http'))$('#fNext').value=location.origin+'/?sent=1#queue';
+if(location.protocol.startsWith('http'))$('#fNext').value=location.origin+'/?sent=1';
 </script>
 </body>
 </html>
