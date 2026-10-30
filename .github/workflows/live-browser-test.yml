@@ -1,0 +1,84 @@
+name: Live browser test (test mode, saves nothing)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  api:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Server limits + text payloads
+        run: |
+          B="https://keikoartist.com/order-api.php?a=submit"
+          UA="Mozilla/5.0 (iPhone; CPU iPhone OS 17_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.5 Mobile/15E148 Safari/604.1"
+          echo "::notice::PING $(curl -s -m 30 -X POST -H 'Origin: https://keikoartist.com' 'https://keikoartist.com/order-api.php?a=ping')"
+          t(){ n=$1; shift; c=$(curl -s -o r.json -w "%{http_code}" -m 120 -A "$UA" -H "Origin: https://keikoartist.com" -H "Referer: https://keikoartist.com/" -F "_dryrun=1" -F "Service=Custom Inquiry" -F "Name=Test" -F "_price=100" "$@" "$B"); echo "::notice::$n -> HTTP $c $(jq -c '{ok,id,total,files,skipped_files,error}' r.json 2>/dev/null || head -c 150 r.json)"; }
+          t plain -F "Details=Simple request"
+          t links -F "Details=see refs" -F "Reference links=https://pin.it/3xYz https://drive.google.com/file/d/1AbC/view?usp=sharing https://www.pinterest.com/pin/123/ https://toyhou.se/123.oc"
+          t quotes -F "Details=She's a \"cute\" fox <3 <b>bold</b> & more 😊🦊 ~ 100% #1"
+          t risky -F "Details=select union of colors; drop shadow; insert stars; ../../etc/passwd; <script>alert(1)</script> OR 1=1"
+      - name: File uploads
+        run: |
+          B="https://keikoartist.com/order-api.php?a=submit"
+          for s in 1 3 7 12; do head -c $((s*1024*1024)) /dev/urandom > f$s.bin; done
+          t(){ n=$1; shift; c=$(curl -s -o r.json -w "%{http_code}" -m 300 -H "Origin: https://keikoartist.com" -H "Referer: https://keikoartist.com/" -F "_dryrun=1" -F "Service=Custom Inquiry" -F "Name=Test" -F "_price=100" -F "Details=file test" "$@" "$B"); echo "::notice::$n -> HTTP $c $(jq -c '{ok,files,skipped_files,file_report,error}' r.json 2>/dev/null || head -c 150 r.json)"; }
+          t jpg1MB -F "attachment1=@f1.bin;type=image/jpeg;filename=a.jpg"
+          t jpg3MB -F "attachment1=@f3.bin;type=image/jpeg;filename=b.jpg"
+          t pdf7MB -F "attachment1=@f7.bin;type=application/pdf;filename=c.pdf"
+          t two3MB -F "attachment1=@f3.bin;type=image/jpeg;filename=d.jpg" -F "attachment2=@f3.bin;type=image/jpeg;filename=e.jpg"
+          t psd12MB -F "attachment1=@f12.bin;type=application/octet-stream;filename=f.psd"
+
+  browsers:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.12' }
+      - name: Install Playwright
+        run: pip install -q playwright==1.47.0 && python -m playwright install --with-deps chromium webkit firefox > /dev/null
+      - name: Order flows on keikoartist.com
+        run: |
+          cat > t.py <<'PY'
+          import asyncio, time, urllib.parse, base64
+          from playwright.async_api import async_playwright
+          PNG=base64.b64decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==')
+          URL='https://keikoartist.com/?dryrun=1&t='+str(int(time.time()))
+          async def run(p,label,engine,device=None):
+              br=await getattr(p,engine).launch()
+              ctx=await br.new_context(**(p.devices[device] if device else {'viewport':{'width':1280,'height':900}}))
+              pg=await ctx.new_page(); errs=[]; last={}
+              pg.on('pageerror',lambda e:errs.append(str(e)[:120]))
+              pg.on('response',lambda r:last.__setitem__('api',r.status) if 'order-api.php' in r.url else None)
+              out=[]
+              try:
+                  await pg.goto(URL,wait_until='load',timeout=90000); await pg.wait_for_timeout(1000)
+                  b=pg.locator('.card:has(h3:text-is("Custom Inquiry")) [data-order]')
+                  await b.scroll_into_view_if_needed(); await b.click()
+                  await pg.fill('#fDetails','Automated cross-browser test (test mode, nothing saved)')
+                  await pg.fill('#budget','100'); await pg.fill('#fName','Test'); await pg.fill('#fDiscord','tester')
+                  await pg.set_input_files('#refFiles',files=[{'name':'ref.png','mimeType':'image/png','buffer':PNG}]); await pg.wait_for_timeout(1000)
+                  await pg.check('#agree'); await pg.click('#sendBtn')
+                  await pg.wait_for_selector('#tyModal.show',timeout=90000)
+                  st=await pg.evaluate("({t:$('#tyTitle').textContent,w:$('#tyWarn').textContent,p:$('#tyPayLabel').textContent,h:$('#tyPayBtn').href,tot:(document.querySelector('.inv-t .grand td:last-child')||{}).textContent})")
+                  q=dict(urllib.parse.parse_qsl(urllib.parse.urlparse(st['h']).query))
+                  out.append(f"CUSTOM OK {st['t']} total {st['tot']} / {st['p']} amount={q.get('amount')} to={q.get('business')} [{st['w']}]")
+                  await pg.locator('#tyModal [data-tyclose]').first.click()
+                  await pg.evaluate("openOrder('VTuber')"); await pg.click('label[for=p4]'); await pg.click('#nextBtn')
+                  await pg.fill('#fName','Test'); await pg.fill('#fEmail','test@example.com'); await pg.fill('#fDiscord','tester'); await pg.fill('#fDetails','Automated test')
+                  await pg.click('label[for=pp2]'); await pg.click('#nextBtn'); await pg.check('#agree'); await pg.click('#sendBtn')
+                  await pg.wait_for_selector('#tyModal.show',timeout=90000)
+                  st=await pg.evaluate("({t:$('#tyTitle').textContent,p:$('#tyPayLabel').textContent})")
+                  out.append(f"REQUEST OK {st['t']} {st['p']}")
+              except Exception as e:
+                  et=''
+                  try: et=await pg.evaluate("($('#err')||{}).textContent")
+                  except Exception: pass
+                  out.append('FAILED: '+str(e).split('\n')[0][:140]+f" | api status {last.get('api')} | form msg: {et}")
+              print(f"::notice::[{label}] "+' || '.join(out)+(f" | JS errors: {errs[:3]}" if errs else ' | no JS errors'), flush=True)
+              await br.close()
+          async def main():
+              async with async_playwright() as p:
+                  for a in [('Chrome desktop','chromium',None),('Android Chrome','chromium','Pixel 7'),('iPhone Safari','webkit','iPhone 13'),('Mac Safari','webkit',None),('Firefox','firefox',None)]:
+                      await run(p,*a)
+          asyncio.run(main())
+          PY
+          python t.py
