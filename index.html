@@ -600,6 +600,13 @@ a.vt:hover img{transform:scale(1.06)}
 .ref-list{list-style:none;display:flex;flex-wrap:wrap;gap:8px}
 .ref-list li{position:relative;width:72px;height:72px;border-radius:10px;overflow:hidden;border:1px solid var(--line);background:#fff;display:grid;place-items:center;font-size:10px;color:var(--muted);text-align:center;padding:2px}
 .ref-list img{width:100%;height:100%;object-fit:cover}
+.ref-list .up{position:absolute;left:3px;bottom:3px;min-width:22px;height:18px;padding:0 5px;border-radius:999px;background:rgba(122,40,70,.78);color:#fff;font-size:10px;font-weight:600;display:grid;place-items:center;line-height:1}
+.ref-list .up.done{background:#1d9a55}.ref-list .up.fail{background:#c22b52}
+.draft-note{display:flex;gap:10px;align-items:center;justify-content:space-between;font-size:12.5px;background:#eefaf2;border:1px solid #bfe8cf;color:#1d6b40;border-radius:12px;padding:8px 12px}
+.draft-note button{border:0;background:none;color:inherit;font:inherit;font-weight:600;text-decoration:underline;cursor:pointer;white-space:nowrap}
+.resume{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);z-index:90;display:flex;gap:10px;align-items:center;background:#fff;border:1px solid var(--line);border-radius:999px;padding:8px 8px 8px 16px;box-shadow:0 14px 34px rgba(122,40,70,.22);font-size:13px;max-width:calc(100% - 24px)}
+.resume b{color:var(--pink)}.resume .btn{padding:8px 14px;font-size:12.5px}
+.resume .x{border:0;background:none;color:var(--muted);font-size:16px;cursor:pointer;padding:0 6px}
 .ref-list button{position:absolute;top:2px;right:2px;width:20px;height:20px;border-radius:50%;border:0;background:rgba(0,0,0,.55);color:#fff;font-size:11px;cursor:pointer;line-height:1}
 .ref-size{font-size:11.5px;color:var(--muted)}
 
@@ -934,6 +941,7 @@ body:has(.modal.show,.sd.show,.lb.show) .kc-bubble,body:has(.modal.show,.sd.show
             <button type="button" class="sh-change" id="shChange">Change</button>
           </div>
           <p class="c-intro" id="shIntro"></p>
+          <div class="draft-note" id="draftNote" hidden><span>✓ I kept what you typed before. Please re-attach your reference images.</span><button type="button" id="draftClear">Start fresh</button></div>
 
           <div class="sec" id="secPkg">
             <h4>Choose your package</h4>
@@ -964,7 +972,7 @@ body:has(.modal.show,.sd.show,.lb.show) .kc-bubble,body:has(.modal.show,.sd.show
               <label class="drop" id="refDrop" tabindex="0">
                 <input type="file" id="refFiles" accept="image/*,.pdf,.psd,.clip" multiple>
                 <b>📎 Attach reference images</b>
-                <span>Click or drag files here · up to 5 files · big images are compressed automatically</span>
+                <span>Click or drag files here · up to 8 files, 60 MB total · they start uploading right away</span>
               </label>
               <p class="ref-msg" id="refMsg" role="status"></p>
               <ul class="ref-list" id="refList"></ul>
@@ -1179,18 +1187,68 @@ document.getElementById('yr').textContent=new Date().getFullYear();
 
 
 
-// reference attachments
-const REF_MAX_FILES=5, REF_MAX_BYTES=9*1024*1024; let refFiles=[];
+// reference attachments: each file starts uploading in small pieces as soon as it is added
+const REF_MAX_FILES=8, REF_MAX_BYTES=60*1024*1024, REF_MAX_FILE=40*1024*1024, CHUNK=2*1024*1024;
+let refFiles=[]; const upState=new Map();
+const hex=n=>{const a=new Uint8Array(n/2);crypto.getRandomValues(a);return [...a].map(x=>x.toString(16).padStart(2,'0')).join('');};
+let upToken=hex(32), pumping=false;
+const CAN_UPLOAD=()=>/(^|\.)keikoartist\.com$/i.test(location.hostname)||/^(localhost|127\.0\.0\.1)$/.test(location.hostname);
+function upBadge(f){const s=upState.get(f);if(!s||!CAN_UPLOAD())return '';
+  if(s.status==='done')return '✓';if(s.status==='fail')return '!';if(s.status==='queued')return '…';
+  return Math.min(99,Math.floor((s.sent||0)/Math.max(1,f.size)*100))+'%';}
+function refProgress(f){const i=refFiles.indexOf(f),li=$('#refList').children[i];if(!li)return;const b=li.querySelector('.up');if(b){b.textContent=upBadge(f);b.className='up '+((upState.get(f)||{}).status||'');}refInfo();}
+function refInfo(){
+  const tot=refFiles.reduce((a,f)=>a+f.size,0);
+  let info=$('#refInfo');if(!info){info=document.createElement('p');info.id='refInfo';info.className='ref-size';$('#refList').after(info);}
+  const busy=refFiles.some(f=>{const s=upState.get(f);return s&&(s.status==='queued'||s.status==='up');}), bad=refFiles.filter(f=>(upState.get(f)||{}).status==='fail');
+  info.textContent=refFiles.length?`${refFiles.length} file(s) · ${(tot/1048576).toFixed(1)} MB of 60 MB`+(CAN_UPLOAD()?(busy?' · uploading…':bad.length?` · ${bad.length} failed`:' · uploaded ✓'):''):'';
+}
 function renderRefs(){
   const ul=$('#refList');ul.innerHTML='';
-  refFiles.forEach((f,i)=>{const li=document.createElement('li');
-    if(f.type.startsWith('image/')){const im=document.createElement('img');im.src=URL.createObjectURL(f);im.alt=f.name;li.appendChild(im);}else li.textContent=f.name;
-    const x=document.createElement('button');x.type='button';x.textContent='✕';x.setAttribute('aria-label','Remove '+f.name);x.onclick=()=>{refFiles.splice(i,1);renderRefs();};li.appendChild(x);ul.appendChild(li);});
-  const tot=refFiles.reduce((a,f)=>a+f.size,0);
-  let info=$('#refInfo');if(!info){info=document.createElement('p');info.id='refInfo';info.className='ref-size';ul.after(info);}
-  info.textContent=refFiles.length?`${refFiles.length} file(s) · ${(tot/1048576).toFixed(1)} MB of 9 MB`:'';
+  refFiles.forEach((f,i)=>{const li=document.createElement('li'),s=upState.get(f)||{};
+    if(/^image\/(png|jpe?g|webp|gif|avif|bmp)$/i.test(f.type)){const im=document.createElement('img');im.src=s.url||(s.url=URL.createObjectURL(f));im.alt=f.name;li.appendChild(im);}else li.textContent=f.name;
+    const x=document.createElement('button');x.type='button';x.textContent='✕';x.setAttribute('aria-label','Remove '+f.name);
+    x.onclick=()=>{const st=upState.get(f);if(st&&st.url)URL.revokeObjectURL(st.url);if(st&&st.status!=='queued'&&CAN_UPLOAD()){const fd=new FormData();fd.append('token',upToken);fd.append('fid',st.fid);xhr('order-api.php?a=unupload',fd,null,20000);}upState.delete(f);refFiles.splice(refFiles.indexOf(f),1);renderRefs();};li.appendChild(x);
+    if(CAN_UPLOAD()){const b=document.createElement('span');b.className='up '+(s.status||'');b.textContent=upBadge(f);if(s.err)b.title=s.err;li.appendChild(b);}
+    ul.appendChild(li);});
+  refInfo();
+}
+function xhr(url,fd,onProgress,timeout){
+  return new Promise(res=>{
+    try{
+      const x=new XMLHttpRequest();x.open('POST',url);x.timeout=timeout||300000;
+      if(x.upload&&onProgress)x.upload.onprogress=e=>{if(e.lengthComputable)onProgress(e.loaded/e.total);};
+      x.onload=()=>{let j=null;try{j=JSON.parse(String(x.responseText||'').replace(/^﻿/,'').trim());}catch(_){}res({status:x.status,j});};
+      x.onerror=()=>res({status:0,j:null});x.ontimeout=()=>res({status:-1,j:null});
+      x.send(fd);
+    }catch(_){res({status:0,j:null});}
+  });
+}
+async function uploadFile(f,s){
+  if(!f.size){s.err='Empty file';return false;}
+  let off=0, fails=0;
+  while(off<f.size){
+    if(upState.get(f)!==s)return false;          // removed by the client
+    const blob=f.slice(off,Math.min(f.size,off+CHUNK)), fd=new FormData(), base=off;
+    fd.append('token',upToken);fd.append('fid',s.fid);fd.append('name',f.name||'reference.jpg');fd.append('size',String(f.size));fd.append('offset',String(off));fd.append('chunk',blob,'chunk');
+    const r=await xhr('order-api.php?a=upload',fd,p=>{s.sent=base+blob.size*p;refProgress(f);},120000);
+    if(r.status===200&&r.j&&r.j.ok){off=+r.j.received||off+blob.size;s.sent=off;fails=0;refProgress(f);continue;}
+    if(r.status===409&&r.j&&r.j.received!=null){off=+r.j.received;continue;}
+    if(r.status===400&&r.j&&r.j.error){s.err=r.j.error;refMsg(`${f.name}: ${r.j.error}`);return false;}
+    if(++fails>6){s.err='Upload failed (connection)';return false;}
+    await new Promise(z=>setTimeout(z,Math.min(10000,1200*fails)));
+  }
+  return true;
+}
+async function pump(){
+  if(pumping||!CAN_UPLOAD()||!location.protocol.startsWith('http'))return;pumping=true;
+  try{for(;;){const f=refFiles.find(x=>(upState.get(x)||{}).status==='queued');if(!f)break;
+    const s=upState.get(f);s.status='up';refProgress(f);
+    const ok=await uploadFile(f,s);if(upState.get(f)===s){s.status=ok?'done':'fail';refProgress(f);if(!ok){const li=$('#refList').children[refFiles.indexOf(f)];const b=li&&li.querySelector('.up');if(b&&s.err)b.title=s.err;}}}}
+  finally{pumping=false;}
 }
 function refMsg(t,ok){const m=$('#refMsg');m.textContent=t||'';m.classList.toggle('show',!!t);m.classList.toggle('ok',!!ok);}
+const uploadsBusy=()=>refFiles.some(f=>{const s=upState.get(f);return s&&(s.status==='queued'||s.status==='up');});
 async function shrink(f){
   // compress big images so they fit the 10 MB email limit
   if(!f.type.startsWith('image/')||f.type==='image/gif'||f.size<1.5*1024*1024)return f;
@@ -1206,13 +1264,14 @@ async function addRefs(list){
   refMsg('');const skipped=[];
   if(list.length)refMsg('Adding '+list.length+' file(s)…',true);
   for(const raw of list){
-    if(refFiles.length>=REF_MAX_FILES){skipped.push(raw.name+' (max 5 files)');continue;}
+    if(refFiles.length>=REF_MAX_FILES){skipped.push(raw.name+' (max '+REF_MAX_FILES+' files)');continue;}
     const f=await shrink(raw);
+    if(f.size>REF_MAX_FILE){skipped.push(`${raw.name} (${(f.size/1048576).toFixed(1)} MB, max 40 MB per file)`);continue;}
     const used=refFiles.reduce((a,x)=>a+x.size,0);
-    if(used+f.size>REF_MAX_BYTES){skipped.push(`${raw.name} (${(f.size/1048576).toFixed(1)} MB, too big)`);continue;}
-    refFiles.push(f);
+    if(used+f.size>REF_MAX_BYTES){skipped.push(`${raw.name} (over 60 MB in total)`);continue;}
+    refFiles.push(f);upState.set(f,{fid:hex(16),status:'queued',sent:0});
   }
-  renderRefs();
+  renderRefs();pump();
   refMsg(skipped.length?'Not added: '+skipped.join(', ')+'. Please paste a Drive/Pinterest link for these instead.':'');
 }
 $('#refFiles').addEventListener('change',e=>{err('');addRefs([...e.target.files]);e.target.value='';});
@@ -1275,6 +1334,7 @@ function pickService(k){
   $$('input[name=Usage]').forEach(x=>x.disabled=!cmOn);
   $('#budget').required=cmOn; $('#budget').value=''; $('#rush').checked=false; $('#pp1').checked=true;
   $('#fDetails').placeholder=cmOn?"What would you like? Character(s), pose, mood, colors, where you'll use it…":(DETAILS_PH[k]||"Tell me your idea: character, colors, vibe, and anything I should know ♡");
+  $('#draftNote').hidden=!restoreDraft(k);
   calc();
 }
 ['click','change'].forEach(ev=>$('#svcOpts').addEventListener(ev,e=>{if(e.target.name==='svc'&&e.target.checked){if(step===2&&svcName===e.target.value)return;pickService(e.target.value);go(2);}}));
@@ -1283,6 +1343,32 @@ $('#qtyMinus').onclick=()=>{$('#qty').value=Math.max(1,(parseInt($('#qty').value
 $('#qtyPlus').onclick=()=>{$('#qty').value=Math.min(50,(parseInt($('#qty').value,10)||1)+1);calc();};
 form.addEventListener('input',()=>{if(svc)calc();if(step===2)err('');});
 form.addEventListener('change',()=>{if(svc)calc();});
+
+// ===== draft autosave (so a slow or interrupted client doesn't lose what they typed) =====
+const DRAFT_KEY='ka_draft', DRAFT_IDS=['fDetails','fName','fDiscord','fDeadline','budget'];
+let draftTimer=0;
+function saveDraft(){
+  if(step!==2||!svc)return;
+  try{const d={t:Date.now(),svc:svcName,v:{},sel:[],qty:$('#qty').value,links:form['Reference links'].value};
+    DRAFT_IDS.forEach(id=>d.v[id]=$('#'+id).value);
+    d.sel=[...$$('#sheet input[type=radio]:checked'),...$$('#sheet input[type=checkbox]:checked')].map(x=>x.id).filter(id=>id&&id!=='agree');
+    if(Object.values(d.v).some(Boolean)||d.links)localStorage.setItem(DRAFT_KEY,JSON.stringify(d));}catch(_){}
+}
+function readDraft(){try{const d=JSON.parse(localStorage.getItem(DRAFT_KEY)||'null');return d&&Date.now()-d.t<3*864e5&&SERVICES[d.svc]?d:null;}catch(_){return null;}}
+function clearDraft(){try{localStorage.removeItem(DRAFT_KEY);}catch(_){}}
+function restoreDraft(k){
+  const d=readDraft();if(!d||d.svc!==k)return false;
+  DRAFT_IDS.forEach(id=>{if(d.v[id])$('#'+id).value=d.v[id];});
+  if(d.links)form['Reference links'].value=d.links;
+  (d.sel||[]).forEach(id=>{const el=document.getElementById(id);if(el&&!el.disabled)el.checked=true;});
+  if(d.qty)$('#qty').value=d.qty;
+  return !!(d.v.fDetails||d.v.fName||d.links);
+}
+form.addEventListener('input',()=>{clearTimeout(draftTimer);draftTimer=setTimeout(saveDraft,400);});
+form.addEventListener('change',()=>{clearTimeout(draftTimer);draftTimer=setTimeout(saveDraft,400);});
+$('#draftClear').onclick=()=>{clearDraft();['fDetails','fDeadline','budget'].forEach(id=>$('#'+id).value='');form['Reference links'].value='';$('#draftNote').hidden=true;pickService(svcName);};
+addEventListener('pagehide',saveDraft);
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden')saveDraft();});
 
 function budget(){if(!svc||!svc.quote)return 0;const v=parseFloat($('#budget').value);return v>=5&&v<=10000?Math.round(v*100)/100:0;}
 const radioVal=n=>+(($(`input[name="${n}"]:checked`)||{}).value||0);
@@ -1367,7 +1453,7 @@ $('#prevBtn').onclick=()=>go(1);
 form.setAttribute('novalidate','');
 function setBusy(on,label){const sb=$('#sendBtn');if(on){sb.dataset.busy='1';sb.textContent=label;sb.style.opacity='.75';$('#prevBtn').style.visibility='hidden';}
   else{delete sb.dataset.busy;sb.textContent='Get Invoice ♡';sb.style.opacity='';$('#prevBtn').style.visibility='visible';}}
-function resetOrderForm(){form.reset();$('#fEmail').disabled=false;$('#fAuto').disabled=false;refFiles=[];renderRefs();$('#refSlots').innerHTML='';const m=$('#refMsg');if(m)m.textContent='';setBusy(false);err('');}
+function resetOrderForm(){form.reset();$('#fEmail').disabled=false;$('#fAuto').disabled=false;upState.forEach(s=>{if(s.url)URL.revokeObjectURL(s.url);});upState.clear();upToken=hex(32);refFiles=[];renderRefs();clearDraft();$('#draftNote').hidden=true;$('#refSlots').innerHTML='';const m=$('#refMsg');if(m)m.textContent='';setBusy(false);err('');}
 const LIVE_SITE=/(^|\.)keikoartist\.com$/i.test(location.hostname)||/^(localhost|127\.0\.0\.1)$/.test(location.hostname);
 function postOrder(fd,onProgress){
   return new Promise(res=>{
@@ -1396,6 +1482,16 @@ form.addEventListener('submit',async e=>{
   {const c=$('#fDiscord').value.trim();
     if(/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(c)){$('#fEmail').value=c;$('#fDiscord').value='';contactWasEmail=true;}
     if(!$('#fEmail').value){$('#fEmail').disabled=true;$('#fAuto').disabled=true;}}
+  if(refFiles.length&&CAN_UPLOAD()&&location.protocol.startsWith('http')){   // let the background uploads finish first
+    pump();
+    while(uploadsBusy()){
+      const tot=refFiles.reduce((a,f)=>a+f.size,0)||1, sent=refFiles.reduce((a,f)=>{const st=upState.get(f)||{};return a+(st.status==='done'?f.size:Math.min(f.size,st.sent||0));},0);
+      $('#sendBtn').textContent=`Uploading references… ${Math.min(99,Math.round(sent/tot*100))}%`;
+      await new Promise(z=>setTimeout(z,300));
+    }
+    $('#sendBtn').textContent='Creating invoice…';
+  }
+  const upOk=refFiles.filter(f=>(upState.get(f)||{}).status==='done'), upBad=refFiles.filter(f=>(upState.get(f)||{}).status!=='done');
   const totalNum=calc(), plan=cmOn?'Full payment':$('input[name="Payment plan"]:checked').value, iv=cmOn?invoice():null, due=cmOn?iv.total:dueNow(totalNum,plan);
   const lines=ORDER.lines.map(x=>x.slice()), invTotal=cmOn?iv.total:totalNum;
   const name=$('#fName').value.trim(), total=$('#fTotal').value;
@@ -1446,7 +1542,7 @@ https://discord.com/users/1053527069528707072
     const fd=new FormData(form);
     ['_next','_autoresponse','_subject','_captcha','_template','mxType','mxSize'].forEach(k=>fd.delete(k));
     [...fd.keys()].filter(k=>/^attachment\d+$/.test(k)).forEach(k=>fd.delete(k));
-    refFiles.forEach((f,i)=>fd.append('attachment'+(i+1),f,f.name||`reference-${i+1}.jpg`));
+    fd.set('_up_token',upToken);fd.set('_up_files',upOk.map(f=>upState.get(f).fid).join(','));
     fd.set('_price',cmOn?String(iv.sub):'0');fd.set('_total',String(totalNum||0));
     if(/[?&]dryrun=1/.test(location.search))fd.set('_dryrun','1');
     const prog=p=>{if(refFiles.length&&$('#sendBtn').dataset.busy)$('#sendBtn').textContent=p<.995?`Uploading… ${Math.round(p*100)}%`:'Creating invoice…';};
@@ -1454,8 +1550,9 @@ https://discord.com/users/1053527069528707072
     if(res.status<=0||(res.status>=500&&!res.j)){await new Promise(r=>setTimeout(r,1500));res=await postOrder(fd,prog);}
     const j=res.j;
     if(res.status===200&&j&&j.ok&&j.id){
+      const missing=[...upBad.map(f=>f.name),...(j.skipped_names||[])];
       const warn=[j.dry_run?'TEST MODE: nothing was saved or sent.':'',
-        j.skipped_files?`${j.skipped_files} reference file(s) couldn't be uploaded${(j.skipped_names||[]).length?' ('+j.skipped_names.join(', ')+')':''}. Please send them to me on Discord.`:''].filter(Boolean).join(' ');
+        missing.length?`${missing.length} reference file(s) couldn't be uploaded (${missing.join(', ')}). Please send them to me on Discord.`:''].filter(Boolean).join(' ');
       const copy=(!j.dry_run&&!j.notified)?buildCopy(j.id,j.pay_url||'',j.date,j.files?j.files+' file(s) uploaded: see admin → Orders':''):null;
       if(copy&&j.emailed)delete copy._autoresponse;
       done({id:j.id,due:j.due,plan:j.plan,payUrl:j.pay_url||'',rows,emailed:!!j.emailed,warn,inv:mkInv(j.date,!!j.emailed,j.total,j.due)});
@@ -1777,6 +1874,11 @@ if(/[?&]paid=1/.test(location.search)){
   $('#tyDiscord').onclick=async()=>{if(rid){try{await navigator.clipboard.writeText(rid)}catch(_){}}window.open('https://discord.com/users/1053527069528707072','_blank','noopener');};
 }
 if(location.hash==='#order')openOrder();
+{const d=!/[?&](sent|paid)=1/.test(location.search)&&readDraft();
+  if(d&&Date.now()-d.t<864e5){const bar=document.createElement('div');bar.className='resume';bar.setAttribute('role','status');
+    bar.innerHTML=`<span>You have an unfinished order: <b>${esc(d.svc)}</b></span><button type="button" class="btn btn-pink">Continue</button><button type="button" class="x" aria-label="Dismiss">✕</button>`;
+    bar.querySelector('.btn').onclick=()=>{bar.remove();openOrder(d.svc);};bar.querySelector('.x').onclick=()=>bar.remove();
+    document.body.appendChild(bar);}}
 addEventListener('pageshow',()=>setBusy(false));
 {const d=new Date(),z=n=>String(n).padStart(2,'0');$('#fDeadline').min=d.getFullYear()+'-'+z(d.getMonth()+1)+'-'+z(d.getDate());}
 if(location.protocol.startsWith('http'))$('#fNext').value=location.origin+'/?sent=1';

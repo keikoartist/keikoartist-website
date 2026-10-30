@@ -18,8 +18,12 @@ const OWNER_EMAIL    = 'keikoarts22@gmail.com';        // where new orders are e
 const PAYPAL_EMAIL   = 'theresa.oktavia10@gmail.com';  // PayPal account that receives payments
 const MAIL_FROM      = 'orders@keikoartist.com';
 const TAX_RATE       = 0.13;                           // custom orders: tax added on the invoice
-const MAX_FILES      = 5;
-const MAX_FILE_BYTES = 12 * 1024 * 1024;
+const MAX_FILES      = 8;
+const MAX_FILE_BYTES = 12 * 1024 * 1024;              // files sent directly with the order (old way)
+const MAX_UPLOAD_FILE  = 40 * 1024 * 1024;            // files uploaded in pieces in the background
+const MAX_ORDER_UPLOAD = 60 * 1024 * 1024;            // all references of one order together
+const UPLOAD_CHUNK_MAX = 4 * 1024 * 1024;
+const ALLOWED_EXT = ['jpg', 'jpeg', 'png', 'webp', 'gif', 'pdf', 'psd', 'clip', 'heic'];
 const MAIL_ATTACH_MAX = 15 * 1024 * 1024;              // bigger uploads stay in the admin inbox only
 const DISCORD_USER   = 'https://discord.com/users/1053527069528707072';
 const STATUSES       = ['new', 'paid', 'in_progress', 'done', 'cancelled'];
@@ -89,6 +93,14 @@ function rate_limit(string $key, int $max, int $window): void {
   $st = $db->prepare('SELECT COUNT(*) FROM hits WHERE k = ? AND t > ?'); $st->execute([$k, $now - $window]);
   if ((int)$st->fetchColumn() >= $max) fail(429, 'Too many orders from your connection. Please wait a little or message me on Discord.');
   $db->prepare('INSERT INTO hits(k,t) VALUES(?,?)')->execute([$k, $now]);
+}
+function rrmdir(string $d): void { if (!is_dir($d)) return; foreach (glob("$d/*") ?: [] as $f) is_dir($f) ? rrmdir($f) : @unlink($f); @rmdir($d); }
+function cleanup_tmp(): void {   // unfinished background uploads older than a day
+  foreach (glob(data_dir() . '/tmp-uploads/*', GLOB_ONLYDIR) ?: [] as $d) if (@filemtime($d) < time() - 86400) rrmdir($d);
+}
+function safe_file(string $nm, int $n, string $ext): string {
+  $base = substr(preg_replace('/[^A-Za-z0-9\-]+/', '_', pathinfo($nm, PATHINFO_FILENAME)) ?: 'file', 0, 40);
+  return $n . '-' . (trim($base, '_') ?: 'file') . '.' . $ext;
 }
 function money2(float $n): string { return '$' . number_format($n, 2); }
 function h(string $s): string { return htmlspecialchars($s, ENT_QUOTES, 'UTF-8'); }
@@ -191,6 +203,45 @@ if (($_GET['a'] ?? '') === 'cleanup_tests') {
   jout(200, ['deleted' => $ids, 'orders_left' => $left]);
 }
 
+/* =================== public: background upload of reference files, in pieces =================== */
+if (($_GET['a'] ?? '') === 'upload') {
+  rate_limit('up:' . client_ip(), 900, 3600);
+  $tok = (string)($_POST['token'] ?? ''); $fid = (string)($_POST['fid'] ?? '');
+  if (!preg_match('/^[a-f0-9]{32}$/', $tok) || !preg_match('/^[a-f0-9]{16}$/', $fid)) fail(400, 'Upload failed (bad request).');
+  $name = clean((string)($_POST['name'] ?? 'file'), 80); $ext = strtolower(pathinfo($name, PATHINFO_EXTENSION));
+  if (!in_array($ext, ALLOWED_EXT, true)) fail(400, 'This file type is not allowed. Please use images, PDF, PSD or CLIP files.');
+  $size = (int)($_POST['size'] ?? 0); $offset = (int)($_POST['offset'] ?? -1);
+  if ($size < 1 || $size > MAX_UPLOAD_FILE) fail(400, 'This file is too big (max ' . (MAX_UPLOAD_FILE >> 20) . ' MB). Please paste a link to it instead.');
+  $c = $_FILES['chunk'] ?? null;
+  if (!is_array($c) || !isset($c['error']) || is_array($c['error']) || $c['error'] !== UPLOAD_ERR_OK || (int)$c['size'] > UPLOAD_CHUNK_MAX) jout(422, ['error' => 'chunk failed, retry']);
+  if ($offset < 0 || $offset + (int)$c['size'] > $size) fail(400, 'Upload failed (bad piece).');
+  $dir = data_dir() . '/tmp-uploads/' . $tok;
+  if (!is_dir($dir) && !@mkdir($dir, 0700, true)) fail(500, 'Upload failed (storage).');
+  $used = 0;
+  foreach (glob("$dir/*") ?: [] as $p) { $bn = basename($p); if (substr($bn, -5) !== '.json' && substr($bn, -5) !== '.part' && strpos($bn, $fid) !== 0) $used += (int)@filesize($p); }
+  if ($used + $size > MAX_ORDER_UPLOAD) fail(400, 'Your reference files are over ' . (MAX_ORDER_UPLOAD >> 20) . ' MB in total. Please paste links for the rest.');
+  $part = "$dir/$fid.part"; clearstatcache();
+  if (is_file("$dir/$fid.json")) jout(200, ['received' => $size, 'done' => true]);
+  $cur = is_file($part) ? (int)filesize($part) : 0;
+  if ($offset > $cur) jout(409, ['error' => 'out of order', 'received' => $cur]);
+  $fh = @fopen($part, 'c+b'); $in = @fopen($c['tmp_name'], 'rb');
+  if (!$fh || !$in) fail(500, 'Upload failed (storage).');
+  ftruncate($fh, $offset); fseek($fh, $offset); stream_copy_to_stream($in, $fh); fclose($in); fclose($fh);
+  clearstatcache(); $now = (int)filesize($part); $done = $now >= $size;
+  if ($done) { @rename($part, "$dir/$fid.$ext"); @file_put_contents("$dir/$fid.json", json_encode(['name' => $name, 'size' => $now, 'ext' => $ext])); }
+  @touch($dir);
+  if (mt_rand(1, 40) === 1) cleanup_tmp();
+  jout(200, ['received' => $now, 'done' => $done]);
+}
+
+/* =================== public: client removed a reference file =================== */
+if (($_GET['a'] ?? '') === 'unupload') {
+  $tok = (string)($_POST['token'] ?? ''); $fid = (string)($_POST['fid'] ?? '');
+  if (!preg_match('/^[a-f0-9]{32}$/', $tok) || !preg_match('/^[a-f0-9]{16}$/', $fid)) fail(400, 'bad request');
+  foreach (glob(data_dir() . "/tmp-uploads/$tok/$fid.*") ?: [] as $p) @unlink($p);
+  jout(200);
+}
+
 /* =================== public: new order =================== */
 if (($_GET['a'] ?? '') === 'submit') {
   if (!$_POST) fail(413, 'Your reference files are too big to upload. Please attach smaller images, or paste links instead.');
@@ -231,7 +282,7 @@ if (($_GET['a'] ?? '') === 'submit') {
 
   // reference files
   $files = []; $report = []; $skippedNames = []; $dir = data_dir() . '/order-files/' . $id;
-  $allowed = ['jpg', 'jpeg', 'png', 'webp', 'gif', 'pdf', 'psd', 'clip', 'heic'];
+  $allowed = ALLOWED_EXT;
   foreach ($_FILES as $f) {
     if (!is_array($f) || !isset($f['error']) || is_array($f['error']) || $f['error'] === UPLOAD_ERR_NO_FILE) continue;
     $nm = clean((string)($f['name'] ?? 'file'), 80); $err = (int)$f['error']; $ext = strtolower(pathinfo($nm, PATHINFO_EXTENSION));
@@ -253,6 +304,32 @@ if (($_GET['a'] ?? '') === 'submit') {
     if ($why !== '') $skippedNames[] = $nm;
     $report[] = ['name' => $nm, 'size' => (int)($f['size'] ?? 0), 'ok' => $why === '', 'why' => $why];
   }
+  $upTok = (string)($_POST['_up_token'] ?? '');
+  if (preg_match('/^[a-f0-9]{32}$/', $upTok)) {
+    $tdir = data_dir() . '/tmp-uploads/' . $upTok;
+    foreach (array_slice(array_filter(explode(',', (string)($_POST['_up_files'] ?? ''))), 0, MAX_FILES) as $fid) {
+      if (!preg_match('/^[a-f0-9]{16}$/', $fid)) continue;
+      $meta = json_decode((string)@file_get_contents("$tdir/$fid.json"), true);
+      $src = is_array($meta) ? "$tdir/$fid." . ($meta['ext'] ?? '') : '';
+      $nm = is_array($meta) ? (string)$meta['name'] : 'a reference file';
+      $why = '';
+      if (!$src || !is_file($src)) $why = 'upload not finished';
+      elseif (count($files) >= MAX_FILES) $why = 'too many files';
+      if ($why === '') {
+        $safe = safe_file($nm, count($files) + 1, (string)$meta['ext']);
+        if ($dry) $files[] = ['name' => $safe, 'size' => (int)$meta['size'], 'type' => mime_of((string)$meta['ext'])];
+        else {
+          if (!is_dir($dir)) @mkdir($dir, 0700, true);
+          if (@rename($src, "$dir/$safe")) $files[] = ['name' => $safe, 'size' => (int)$meta['size'], 'type' => mime_of((string)$meta['ext'])];
+          else $why = 'could not save';
+        }
+      }
+      if ($why !== '') $skippedNames[] = $nm;
+      $report[] = ['name' => $nm, 'size' => (int)($meta['size'] ?? 0), 'ok' => $why === '', 'why' => $why, 'via' => 'background'];
+    }
+    rrmdir($tdir);
+  }
+  if (mt_rand(1, 20) === 1) cleanup_tmp();
   $skipped = count($skippedNames);
   if ($dry) {
     $label = $kind === 'custom' ? 'Custom commission, ' . ($fields['Usage'] ?? 'Personal') . ' use, incl. 13% tax' : trim($service . ' (' . ($fields['Package'] ?? '') . ')');

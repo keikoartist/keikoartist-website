@@ -40,7 +40,7 @@ jobs:
       - name: Order flows on keikoartist.com
         run: |
           cat > t.py <<'PY'
-          import asyncio, time, urllib.parse, base64
+          import asyncio, time, urllib.parse, base64, os
           from playwright.async_api import async_playwright
           PNG=base64.b64decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==')
           URL='https://keikoartist.com/?dryrun=1&t='+str(int(time.time()))
@@ -50,6 +50,12 @@ jobs:
               pg=await ctx.new_page(); errs=[]; last={}
               pg.on('pageerror',lambda e:errs.append(str(e)[:120]))
               pg.on('response',lambda r:last.__setitem__('api',r.status) if 'order-api.php' in r.url else None)
+              async def grab(r):
+                  if 'a=submit' in r.url:
+                      try:
+                          j=await r.json(); last['files']=f"{j.get('files')} ok, skipped {j.get('skipped_names')}"
+                      except Exception: pass
+              pg.on('response',lambda r:asyncio.ensure_future(grab(r)))
               out=[]
               try:
                   await pg.goto(URL,wait_until='load',timeout=90000); await pg.wait_for_timeout(1000)
@@ -57,10 +63,13 @@ jobs:
                   await b.scroll_into_view_if_needed(); await b.click()
                   await pg.fill('#fDetails','Automated cross-browser test (test mode, nothing saved)')
                   await pg.fill('#budget','100'); await pg.fill('#fName','Test'); await pg.fill('#fDiscord','tester')
-                  await pg.set_input_files('#refFiles',files=[{'name':'ref.png','mimeType':'image/png','buffer':PNG}]); await pg.wait_for_timeout(1000)
+                  refs=[{'name':'ref.png','mimeType':'image/png','buffer':PNG}]
+                  if label=='Chrome desktop': refs.append({'name':'big-ref.pdf','mimeType':'application/pdf','buffer':os.urandom(15*1024*1024)})
+                  await pg.set_input_files('#refFiles',files=refs); await pg.wait_for_timeout(1000)
                   await pg.check('#agree'); await pg.click('#sendBtn')
                   await pg.wait_for_selector('#tyModal.show',timeout=90000)
                   st=await pg.evaluate("({t:$('#tyTitle').textContent,w:$('#tyWarn').textContent,p:$('#tyPayLabel').textContent,h:$('#tyPayBtn').href,tot:(document.querySelector('.inv-t .grand td:last-child')||{}).textContent})")
+                  out.append('refs uploaded: '+str(last.get('files')))
                   q=dict(urllib.parse.parse_qsl(urllib.parse.urlparse(st['h']).query))
                   out.append(f"CUSTOM OK {st['t']} total {st['tot']} / {st['p']} amount={q.get('amount')} to={q.get('business')} [{st['w']}]")
                   await pg.locator('#tyModal [data-tyclose]').first.click()
