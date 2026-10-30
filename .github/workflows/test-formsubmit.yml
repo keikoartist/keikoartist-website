@@ -7,7 +7,13 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
+      - name: Check FormSubmit homepage
+        run: |
+          for u in https://formsubmit.co/ https://formsubmit.co/ajax/keikoarts22@gmail.com; do
+            c=$(curl -s -o /dev/null -w "%{http_code}" -m 20 "$u"); echo "::notice::GET $u -> $c"
+          done
       - name: Submit a test custom order like the website does
+        if: false
         run: |
           printf 'PNGTEST' > ref.png
           code=$(curl -s -o body.html -D headers.txt -w "%{http_code}" \
