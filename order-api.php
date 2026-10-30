@@ -154,11 +154,18 @@ function order_row(string $id): array {
 }
 
 try {
+/* =================== public: health check (upload limits) =================== */
+if (($_GET['a'] ?? '') === 'ping') {
+  jout(200, ['upload_max' => ini_get('upload_max_filesize'), 'post_max' => ini_get('post_max_size'), 'max_file_uploads' => (int)ini_get('max_file_uploads'),
+             'mail' => function_exists('mail'), 'sqlite' => in_array('sqlite', PDO::getAvailableDrivers(), true), 'data_writable' => is_writable(data_dir())]);
+}
+
 /* =================== public: new order =================== */
 if (($_GET['a'] ?? '') === 'submit') {
   if (!$_POST) fail(413, 'Your reference files are too big to upload. Please attach smaller images, or paste links instead.');
   if (!empty($_POST['_honey'])) jout(200, ['id' => 'REQ-0000-0000', 'pay_url' => '']);
-  rate_limit('order:' . client_ip(), 8, 3600);
+  $dry = !empty($_POST['_dryrun']);                               // test mode: validates everything, saves/sends nothing
+  rate_limit(($dry ? 'dry:' : 'order:') . client_ip(), $dry ? 40 : 20, 3600);
 
   $skip = ['svc', 'pkg', 'add', 'Request ID', 'Estimated total (USD)', 'Amount due now (USD)'];
   $fields = [];
@@ -191,18 +198,35 @@ if (($_GET['a'] ?? '') === 'submit') {
   do { $id = $prefix . date('md') . '-' . random_int(1000, 9999); $st = $db->prepare('SELECT 1 FROM orders WHERE id = ?'); $st->execute([$id]); } while ($st->fetchColumn());
 
   // reference files
-  $files = []; $dir = data_dir() . '/order-files/' . $id; $skipped = 0;
+  $files = []; $report = []; $skippedNames = []; $dir = data_dir() . '/order-files/' . $id;
   $allowed = ['jpg', 'jpeg', 'png', 'webp', 'gif', 'pdf', 'psd', 'clip', 'heic'];
   foreach ($_FILES as $f) {
     if (!is_array($f) || !isset($f['error']) || is_array($f['error']) || $f['error'] === UPLOAD_ERR_NO_FILE) continue;
-    if (count($files) >= MAX_FILES || $f['error'] !== UPLOAD_ERR_OK || $f['size'] > MAX_FILE_BYTES) { $skipped++; continue; }
-    $ext = strtolower(pathinfo((string)$f['name'], PATHINFO_EXTENSION));
-    if (!in_array($ext, $allowed, true)) { $skipped++; continue; }
-    $base = substr(preg_replace('/[^A-Za-z0-9\-]+/', '_', pathinfo((string)$f['name'], PATHINFO_FILENAME)) ?: 'file', 0, 40);
-    $safe = (count($files) + 1) . '-' . trim($base, '_') . '.' . $ext;
-    if (!is_dir($dir)) @mkdir($dir, 0700, true);
-    if (@move_uploaded_file($f['tmp_name'], "$dir/$safe")) $files[] = ['name' => $safe, 'size' => (int)$f['size'], 'type' => mime_of($ext)];
-    else $skipped++;
+    $nm = clean((string)($f['name'] ?? 'file'), 80); $err = (int)$f['error']; $ext = strtolower(pathinfo($nm, PATHINFO_EXTENSION));
+    $why = '';
+    if (count($files) >= MAX_FILES) $why = 'too many files';
+    elseif ($err === UPLOAD_ERR_INI_SIZE || $err === UPLOAD_ERR_FORM_SIZE || (int)$f['size'] > MAX_FILE_BYTES) $why = 'too big';
+    elseif ($err !== UPLOAD_ERR_OK) $why = 'upload error ' . $err;
+    elseif (!in_array($ext, $allowed, true)) $why = 'file type not allowed';
+    if ($why === '') {
+      $base = substr(preg_replace('/[^A-Za-z0-9\-]+/', '_', pathinfo($nm, PATHINFO_FILENAME)) ?: 'file', 0, 40);
+      $safe = (count($files) + 1) . '-' . (trim($base, '_') ?: 'file') . '.' . $ext;
+      if ($dry) $files[] = ['name' => $safe, 'size' => (int)$f['size'], 'type' => mime_of($ext)];
+      else {
+        if (!is_dir($dir)) @mkdir($dir, 0700, true);
+        if (@move_uploaded_file($f['tmp_name'], "$dir/$safe")) $files[] = ['name' => $safe, 'size' => (int)$f['size'], 'type' => mime_of($ext)];
+        else $why = 'could not save';
+      }
+    }
+    if ($why !== '') $skippedNames[] = $nm;
+    $report[] = ['name' => $nm, 'size' => (int)($f['size'] ?? 0), 'ok' => $why === '', 'why' => $why];
+  }
+  $skipped = count($skippedNames);
+  if ($dry) {
+    $label = $kind === 'custom' ? 'Custom commission, ' . ($fields['Usage'] ?? 'Personal') . ' use, incl. 13% tax' : trim($service . ' (' . ($fields['Package'] ?? '') . ')');
+    jout(200, ['id' => $id, 'kind' => $kind, 'price' => $price, 'tax' => $tax, 'total' => $total, 'due' => $due, 'plan' => $plan,
+               'pay_url' => paypal_link($due, $id, $label, $SITE), 'date' => date('M j, Y'), 'emailed' => false, 'notified' => false,
+               'files' => count($files), 'skipped_files' => $skipped, 'skipped_names' => $skippedNames, 'dry_run' => true, 'file_report' => $report]);
   }
 
   $o = ['id' => $id, 'kind' => $kind, 'name' => $name, 'email' => $email, 'discord' => $fields['Discord'] ?? '',
@@ -268,7 +292,7 @@ if (($_GET['a'] ?? '') === 'submit') {
   discord_ping($cfg, $o, $fields);
 
   jout(200, ['id' => $id, 'kind' => $kind, 'price' => $price, 'tax' => $tax, 'total' => $total, 'due' => $due, 'plan' => $plan,
-             'pay_url' => $payUrl, 'date' => $dateStr, 'emailed' => $clientMailed, 'notified' => $mailed, 'files' => count($files), 'skipped_files' => $skipped]);
+             'pay_url' => $payUrl, 'date' => $dateStr, 'emailed' => $clientMailed, 'notified' => $mailed, 'files' => count($files), 'skipped_files' => $skipped, 'skipped_names' => $skippedNames]);
 }
 
 /* =================== admin =================== */

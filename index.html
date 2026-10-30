@@ -498,6 +498,7 @@ a.vt:hover img{transform:scale(1.06)}
 .ty-box{width:min(560px,100%)}
 .ty .mbody{display:grid;gap:12px}
 .ty-lead{font-size:14.5px;color:var(--ink)}
+.ty-warn{font-size:13px;background:#fff6e0;border:1px solid #ffd77a;color:#7a4b00;border-radius:10px;padding:8px 12px}
 .ty-ref{font-size:13px;color:var(--muted);background:#fff7fa;border:1px dashed var(--pink-2);border-radius:10px;padding:8px 12px}
 .ty-ref b{color:var(--pink);letter-spacing:.04em}
 .ty-h{font-size:13px;font-weight:600;margin-top:4px}
@@ -952,6 +953,7 @@ body:has(.modal.show,.sd.show,.lb.show) .kc-bubble,body:has(.modal.show,.sd.show
   <div class="mbox ty-box" role="dialog" aria-modal="true" aria-labelledby="tyTitle">
     <div class="mhead"><h3 id="tyTitle">Request sent! ♡</h3><button class="mclose" type="button" data-tyclose aria-label="Close">✕</button></div>
     <div class="mbody">
+      <p class="ty-warn" id="tyWarn" hidden></p>
       <p class="ty-lead" id="tyLead">Thank you for choosing KeikoArts! Your request has been received ♡</p>
       <div class="ty-ref" id="tyRef" hidden><span id="tyRefLbl">Request ID</span>: <b id="tyRefId"></b></div>
       <div id="tyInv" hidden></div>
@@ -1281,6 +1283,18 @@ form.setAttribute('novalidate','');
 function setBusy(on,label){const sb=$('#sendBtn');if(on){sb.dataset.busy='1';sb.textContent=label;sb.style.opacity='.75';$('#prevBtn').style.visibility='hidden';}
   else{delete sb.dataset.busy;sb.textContent=cmOn?'Get Invoice ♡':'Send Request ♡';sb.style.opacity='';$('#prevBtn').style.visibility=step>1?'visible':'hidden';}}
 function resetOrderForm(){form.reset();$('#fEmail').disabled=false;$('#fAuto').disabled=false;refFiles=[];renderRefs();$('#refSlots').innerHTML='';const m=$('#refMsg');if(m)m.textContent='';setBusy(false);err('');}
+function postOrder(fd,onProgress){
+  return new Promise(res=>{
+    try{
+      const x=new XMLHttpRequest();x.open('POST','order-api.php?a=submit');x.timeout=300000;
+      if(x.upload&&onProgress)x.upload.onprogress=e=>{if(e.lengthComputable)onProgress(e.loaded/e.total);};
+      x.onload=()=>{let j=null;try{j=JSON.parse(String(x.responseText||'').replace(/^﻿/,'').trim());}catch(_){}res({status:x.status,j});};
+      x.onerror=()=>res({status:0,j:null});x.ontimeout=()=>res({status:-1,j:null});
+      x.send(fd);
+    }catch(_){res({status:0,j:null});}
+  });
+}
+function errHtml(h){const e=$('#err');e.innerHTML=h;e.style.display='block';}
 form.addEventListener('submit',async e=>{
   e.preventDefault();
   $('#fAuto').disabled=false;$('#fEmail').disabled=false;
@@ -1291,9 +1305,8 @@ form.addEventListener('submit',async e=>{
     setTimeout(()=>{bad.reportValidity();bad.focus();},50);
     err(bad.id==='fDeadline'?'Please pick a deadline that is today or later.':'Please check the highlighted field.');return;}
   if($('#sendBtn').dataset.busy)return;
-  setBusy(true,refFiles.length?'Uploading references…':cmOn?'Creating invoice…':'Sending…');
-  const slow=setTimeout(()=>{if($('#sendBtn').dataset.busy)err('Still sending… slow connection or large files. Please wait, do not close this page.');},12000);
-  attachRefsToForm();
+  err('');setBusy(true,refFiles.length?'Uploading references…':cmOn?'Creating invoice…':'Sending…');
+  const slow=setTimeout(()=>{if($('#sendBtn').dataset.busy)err('Still sending… slow connection or large files. Please wait, do not close this page.');},15000);
   let contactWasEmail=false;
   if(cmOn){const c=$('#fDiscord').value.trim();
     if(/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(c)){$('#fEmail').value=c;$('#fDiscord').value='';contactWasEmail=true;}
@@ -1305,26 +1318,30 @@ form.addEventListener('submit',async e=>{
   const rows=[...$$('#summary div')].map(r=>[r.children[0].textContent,r.children[1].textContent]);
   const ctx={custom:cmOn,name,usage:usageVal(),deadline:$('#fDeadline').value,brief:$('#fDetails').value.trim().slice(0,140),
     contact:$('#fDiscord').value?$('#fDiscord').value+' (Discord)':$('#fEmail').value,rows};
+  const done=last=>{clearTimeout(slow);try{sessionStorage.setItem('ka_last',JSON.stringify(last));}catch(_){}resetOrderForm();closeOrder();showThanks(last);};
   // 1) KeikoArts server: saves the order + files, emails Keiko, returns the invoice
   if(location.protocol.startsWith('http')){
-    try{
-      const fd=new FormData(form);
-      ['_next','_autoresponse','_subject','_captcha','_template'].forEach(k=>fd.delete(k));
-      fd.set('_price',cmOn?String(iv.sub):'0');fd.set('_total',String(totalNum||0));
-      const ctl=new AbortController(),to=setTimeout(()=>ctl.abort(),120000);
-      const r=await fetch('order-api.php?a=submit',{method:'POST',body:fd,signal:ctl.signal});clearTimeout(to);
-      let j=null;try{j=await r.json();}catch(_){}
-      if(r.ok&&j&&j.ok&&j.id){clearTimeout(slow);
-        const last={id:j.id,due:j.due,plan:j.plan,payUrl:j.pay_url||'',rows,emailed:!!j.emailed,
-          inv:cmOn?{date:j.date,name,contact:ctx.contact,usage:ctx.usage,deadline:ctx.deadline,brief:ctx.brief,sub:j.price,tax:j.tax,total:j.total,emailed:!!j.emailed}:null};
-        try{sessionStorage.setItem('ka_last',JSON.stringify(last));}catch(_){}
-        resetOrderForm();closeOrder();showThanks(last);return;}
-      if(j&&j.error&&r.status>=400&&r.status<500&&![404,405].includes(r.status)){clearTimeout(slow);
-        if(contactWasEmail){$('#fDiscord').value=$('#fEmail').value;}
-        setBusy(false);err(j.error);return;}
-    }catch(_){}
+    const fd=new FormData(form);
+    ['_next','_autoresponse','_subject','_captcha','_template'].forEach(k=>fd.delete(k));
+    [...fd.keys()].filter(k=>/^attachment\d+$/.test(k)).forEach(k=>fd.delete(k));
+    refFiles.forEach((f,i)=>fd.append('attachment'+(i+1),f,f.name||`reference-${i+1}.jpg`));
+    fd.set('_price',cmOn?String(iv.sub):'0');fd.set('_total',String(totalNum||0));
+    if(/[?&]dryrun=1/.test(location.search))fd.set('_dryrun','1');
+    const prog=p=>{if(refFiles.length&&$('#sendBtn').dataset.busy)$('#sendBtn').textContent=p<.995?`Uploading… ${Math.round(p*100)}%`:(cmOn?'Creating invoice…':'Sending…');};
+    let res=await postOrder(fd,prog);
+    if(res.status<=0||(res.status>=500&&!res.j)){await new Promise(r=>setTimeout(r,1500));res=await postOrder(fd,prog);}
+    const j=res.j;
+    if(res.status===200&&j&&j.ok&&j.id){
+      const warn=[j.dry_run?'TEST MODE: nothing was saved or sent.':'',
+        j.skipped_files?`${j.skipped_files} reference file(s) couldn't be uploaded${(j.skipped_names||[]).length?' ('+j.skipped_names.join(', ')+')':''}. Please send them to me on Discord.`:''].filter(Boolean).join(' ');
+      done({id:j.id,due:j.due,plan:j.plan,payUrl:j.pay_url||'',rows,emailed:!!j.emailed,warn,
+        inv:cmOn?{date:j.date,name,contact:ctx.contact,usage:ctx.usage,deadline:ctx.deadline,brief:ctx.brief,sub:j.price,tax:j.tax,total:j.total,emailed:!!j.emailed}:null});
+      return;}
+    if(j&&j.error&&res.status>=400&&res.status<500&&![404,405].includes(res.status)){clearTimeout(slow);
+      if(contactWasEmail)$('#fDiscord').value=$('#fEmail').value;
+      $('#fEmail').disabled=false;$('#fAuto').disabled=false;setBusy(false);err(j.error);return;}
   }
-  // 2) backup: FormSubmit (only if the server above is unreachable)
+  // 2) backup: FormSubmit via AJAX (stays on this page). Only used if the KeikoArts server can't be reached.
   const d=new Date(),pad=n=>String(n).padStart(2,'0'), dateStr=d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
   const id=(cmOn?'INV-':'REQ-')+pad(d.getMonth()+1)+pad(d.getDate())+'-'+Math.floor(1000+Math.random()*9000);
   const payUrl=PAY_ON()?paypalLink(due,id,label):'';
@@ -1371,10 +1388,24 @@ ${payUrl?`1. Pay with the PayPal link above (if you haven't yet).
 Can't use Discord? Just reply to this email or reach me on WhatsApp.
 
 — Keiko, KeikoArts`;
-  if(location.protocol.startsWith('http')){try{fetch('notify-discord.php',{method:'POST',keepalive:true,headers:{'Content-Type':'application/json'},body:JSON.stringify({id,due:$('#fDue').value,service:$('#fService').value,package:$('#fPackage').value,addons:$('#fAddons').value,total,plan,name,email:$('#fEmail').value,discord:$('#fDiscord').value,deadline:$('#fDeadline').value,refs:[refFiles.length?refFiles.length+' file(s) attached (see email)':'',form['Reference links'].value].filter(Boolean).join(' · '),details:(cmOn?`[${usageVal()} use] `:'')+$('#fDetails').value,_honey:form._honey.value})}).catch(()=>{});}catch(_){}}
-  const inv=cmOn?{date:dateStr,name,contact:ctx.contact,usage:ctx.usage,deadline:ctx.deadline,brief:ctx.brief,sub:iv.sub,tax:iv.tax,total:iv.total,emailed:!!$('#fEmail').value}:null;
-  try{sessionStorage.setItem('ka_last',JSON.stringify({id,due,plan,payUrl,inv,rows}));}catch(_){}
-  HTMLFormElement.prototype.submit.call(form);
+  const data={};
+  new FormData(form).forEach((v,k)=>{if(typeof v==='string'&&!['svc','pkg','add','_next','_honey'].includes(k))data[k]=v;});
+  data._captcha='false';data._template='table';
+  if(refFiles.length)data['Reference files']=refFiles.length+' file(s) could not be uploaded: ask the client to send them on Discord';
+  let ok=false;
+  try{const ctl=new AbortController(),to=setTimeout(()=>ctl.abort(),20000);
+    const r=await fetch('https://formsubmit.co/ajax/keikoarts22@gmail.com',{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify(data),signal:ctl.signal});clearTimeout(to);
+    const jj=await r.json().catch(()=>null);ok=!!(r.ok&&jj&&String(jj.success)==='true');}catch(_){}
+  if(ok){
+    if(location.protocol.startsWith('http')){try{fetch('notify-discord.php',{method:'POST',keepalive:true,headers:{'Content-Type':'application/json'},body:JSON.stringify({id,due:$('#fDue').value,service:$('#fService').value,package:$('#fPackage').value,addons:$('#fAddons').value,total,plan,name,email:$('#fEmail').value,discord:$('#fDiscord').value,deadline:$('#fDeadline').value,refs:[refFiles.length?refFiles.length+' file(s) attached (see email)':'',form['Reference links'].value].filter(Boolean).join(' · '),details:(cmOn?`[${usageVal()} use] `:'')+$('#fDetails').value,_honey:form._honey.value})}).catch(()=>{});}catch(_){}}
+    done({id,due,plan,payUrl,rows,emailed:!!$('#fEmail').value,warn:refFiles.length?'Please send your reference images to me on Discord (they could not be uploaded).':'',
+      inv:cmOn?{date:dateStr,name,contact:ctx.contact,usage:ctx.usage,deadline:ctx.deadline,brief:ctx.brief,sub:iv.sub,tax:iv.tax,total:iv.total,emailed:!!$('#fEmail').value}:null});
+    return;}
+  clearTimeout(slow);
+  if(contactWasEmail)$('#fDiscord').value=$('#fEmail').value;
+  $('#fEmail').disabled=false;$('#fAuto').disabled=false;$('#fSubject').value=$('#fSubject').value.replace(/ \[(INV|REQ)-[\d-]+\]$/,'');
+  setBusy(false);
+  errHtml(`Sorry, your order couldn't be sent right now. Please check your internet and try again in a minute, or <a href="https://discord.com/users/1053527069528707072" target="_blank" rel="noopener" style="color:inherit;font-weight:600;text-decoration:underline">message me on Discord</a> ♡`);
 });
 
 
@@ -1624,6 +1655,7 @@ function showThanks(last){
   const ty=$('#tyModal');
   Object.entries(TY0).forEach(([k,v])=>$('#'+k).textContent=v);
   ['#tyRef','#tySummary','#tyPay','#tyInv'].forEach(q=>$(q).hidden=true);
+  $('#tyWarn').textContent=(last&&last.warn)||'';$('#tyWarn').hidden=!(last&&last.warn);
   if(last&&!last.inv&&last.emailed===false)$('#tyNote').textContent="Can't use Discord? Reach me here:";
   if(last){$('#tyRefId').textContent=last.id;$('#tyRef').hidden=false;
     $('#tySummary').innerHTML=last.rows.filter(r=>r[0]!=='Email').map(([a,b])=>`<div><span>${esc(a)}</span><b>${esc(b)}</b></div>`).join('');$('#tySummary').hidden=false;}
