@@ -312,7 +312,7 @@ async function openOrder(id){
   let j;try{j=await oapi({action:'get',id})}catch(e){if(e.message!=='login')body.appendChild(el('div','err',e.message));return;}
   const o=j.order,f=o.fields||{};
   who.firstChild.textContent=`${o.name||'Client'} · ${o.id}`;
-  who.lastChild.textContent=(o.kind==='custom'?'Custom order':'Request')+' · '+fmt(o.created)+(o.mailed?'':' · email to you failed, details are only here');
+  who.lastChild.textContent=(o.kind==='custom'?'Custom order':'Request')+' · '+fmt(o.created)+(o.mailed?' · emailed':'');
   sel.value=o.status;sel.onchange=async()=>{try{await oapi({action:'status',id,status:sel.value});loadOrders();}catch(e){alert(e.message)}};
   let armed=false;delB.onclick=async()=>{if(!armed){armed=true;delB.textContent='Tap again to delete';setTimeout(()=>{armed=false;delB.textContent='Delete'},3000);return;}
     await oapi({action:'delete',id});back.onclick();};

@@ -1319,6 +1319,60 @@ form.addEventListener('submit',async e=>{
   const ctx={custom:cmOn,name,usage:usageVal(),deadline:$('#fDeadline').value,brief:$('#fDetails').value.trim().slice(0,140),
     contact:$('#fDiscord').value?$('#fDiscord').value+' (Discord)':$('#fEmail').value,rows};
   const done=last=>{clearTimeout(slow);try{sessionStorage.setItem('ka_last',JSON.stringify(last));}catch(_){}resetOrderForm();closeOrder();showThanks(last);};
+  // email copy through FormSubmit (used when the hosting can't send email, and as the backup path)
+  const buildCopy=(id,payUrl,dateStr,filesNote)=>{
+    $('#fReq').value=id;
+    $('#fSubject').value=$('#fSubject').value.replace(/ \[(INV|REQ)-[\d-]+\]$/,'')+' ['+id+']';
+    $('#fDue').value=cmOn?`${money2(due)} — full payment incl. 13% tax`+(payUrl?' (PayPal invoice shown to client)':' (PayPal not set up yet: send the client a payment link)')
+      :due?money(due)+' — '+planLabel(plan)+(payUrl?' (PayPal link shown to client)':''):'Quote';
+    $('#fAuto').value=cmOn?`Hi ${name}, thank you for your custom order at KeikoArts! ♡
+
+  INVOICE ${id} · ${dateStr}
+  Custom commission (${usageVal()} use): ${money2(iv.sub)}
+  Tax (13%): ${money2(iv.tax)}
+  TOTAL DUE: ${money2(iv.total)} USD
+
+  ${payUrl?`Pay with PayPal:
+  ${payUrl}`:`I'll send you a PayPal payment link within 6 hours.`}
+  (Full refund if I can't take your commission.)
+
+  Questions? Message me on Discord with your invoice number:
+  https://discord.com/users/1053527069528707072
+
+  — Keiko, KeikoArts`:`Hi ${name}, thank you for your commission request at KeikoArts! ♡
+
+  Request ID: ${id}
+  Service: ${$('#fService').value} (${$('#fPackage').value})
+  Add-ons: ${$('#fAddons').value}
+  Estimated total: ${total}
+  Payment plan: ${plan}
+
+  ${payUrl?`PAY NOW to secure your slot: ${money(due)} (${planLabel(plan)})
+  ${payUrl}
+  (Full refund if I can't take your request.)
+
+  `:''}NEXT STEP: message me on Discord with your Request ID:
+  https://discord.com/users/1053527069528707072
+
+  What happens next:
+  ${payUrl?`1. Pay with the PayPal link above (if you haven't yet).
+  2. We chat on Discord about details. I reply within 6 hours.
+  3. Your slot is secured and I'll send progress updates on Discord.`:`1. We chat on Discord about details. I reply within 6 hours.
+  2. You get the final price and a PayPal / Ko-fi payment link.
+  3. Once paid, your slot is secured and I'll send progress updates on Discord.`}
+
+  Can't use Discord? Just reply to this email or reach me on WhatsApp.
+
+  — Keiko, KeikoArts`;
+    const data={};
+    new FormData(form).forEach((v,k)=>{if(typeof v==='string'&&!['svc','pkg','add','_next','_honey','_dryrun','_price','_total'].includes(k))data[k]=v;});
+    data._captcha='false';data._template='table';
+    if(filesNote)data['Reference files']=filesNote;
+    return data;
+  };
+  const sendCopy=async data=>{try{const ctl=new AbortController(),to=setTimeout(()=>ctl.abort(),20000);
+    const r=await fetch('https://formsubmit.co/ajax/keikoarts22@gmail.com',{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify(data),signal:ctl.signal});clearTimeout(to);
+    const jj=await r.json().catch(()=>null);return !!(r.ok&&jj&&String(jj.success)==='true');}catch(_){return false;}};
   // 1) KeikoArts server: saves the order + files, emails Keiko, returns the invoice
   if(location.protocol.startsWith('http')){
     const fd=new FormData(form);
@@ -1334,8 +1388,11 @@ form.addEventListener('submit',async e=>{
     if(res.status===200&&j&&j.ok&&j.id){
       const warn=[j.dry_run?'TEST MODE: nothing was saved or sent.':'',
         j.skipped_files?`${j.skipped_files} reference file(s) couldn't be uploaded${(j.skipped_names||[]).length?' ('+j.skipped_names.join(', ')+')':''}. Please send them to me on Discord.`:''].filter(Boolean).join(' ');
+      const copy=(!j.dry_run&&!j.notified)?buildCopy(j.id,j.pay_url||'',j.date,j.files?j.files+' file(s) uploaded: see admin → Orders':''):null;
+      if(copy&&j.emailed)delete copy._autoresponse;
       done({id:j.id,due:j.due,plan:j.plan,payUrl:j.pay_url||'',rows,emailed:!!j.emailed,warn,
         inv:cmOn?{date:j.date,name,contact:ctx.contact,usage:ctx.usage,deadline:ctx.deadline,brief:ctx.brief,sub:j.price,tax:j.tax,total:j.total,emailed:!!j.emailed}:null});
+      if(copy)sendCopy(copy);
       return;}
     if(j&&j.ok===false&&j.error&&![404,405].includes(res.status)&&res.status<500){clearTimeout(slow);
       if(contactWasEmail)$('#fDiscord').value=$('#fEmail').value;
@@ -1345,57 +1402,7 @@ form.addEventListener('submit',async e=>{
   const d=new Date(),pad=n=>String(n).padStart(2,'0'), dateStr=d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
   const id=(cmOn?'INV-':'REQ-')+pad(d.getMonth()+1)+pad(d.getDate())+'-'+Math.floor(1000+Math.random()*9000);
   const payUrl=PAY_ON()?paypalLink(due,id,label):'';
-  $('#fReq').value=id;
-  $('#fSubject').value=$('#fSubject').value+' ['+id+']';
-  $('#fDue').value=cmOn?`${money2(due)} — full payment incl. 13% tax`+(payUrl?' (PayPal invoice shown to client)':' (PayPal not set up yet: send the client a payment link)')
-    :due?money(due)+' — '+planLabel(plan)+(payUrl?' (PayPal link shown to client)':''):'Quote';
-  $('#fAuto').value=cmOn?`Hi ${name}, thank you for your custom order at KeikoArts! ♡
-
-INVOICE ${id} · ${dateStr}
-Custom commission (${usageVal()} use): ${money2(iv.sub)}
-Tax (13%): ${money2(iv.tax)}
-TOTAL DUE: ${money2(iv.total)} USD
-
-${payUrl?`Pay with PayPal:
-${payUrl}`:`I'll send you a PayPal payment link within 6 hours.`}
-(Full refund if I can't take your commission.)
-
-Questions? Message me on Discord with your invoice number:
-https://discord.com/users/1053527069528707072
-
-— Keiko, KeikoArts`:`Hi ${name}, thank you for your commission request at KeikoArts! ♡
-
-Request ID: ${id}
-Service: ${$('#fService').value} (${$('#fPackage').value})
-Add-ons: ${$('#fAddons').value}
-Estimated total: ${total}
-Payment plan: ${plan}
-
-${payUrl?`PAY NOW to secure your slot: ${money(due)} (${planLabel(plan)})
-${payUrl}
-(Full refund if I can't take your request.)
-
-`:''}NEXT STEP: message me on Discord with your Request ID:
-https://discord.com/users/1053527069528707072
-
-What happens next:
-${payUrl?`1. Pay with the PayPal link above (if you haven't yet).
-2. We chat on Discord about details. I reply within 6 hours.
-3. Your slot is secured and I'll send progress updates on Discord.`:`1. We chat on Discord about details. I reply within 6 hours.
-2. You get the final price and a PayPal / Ko-fi payment link.
-3. Once paid, your slot is secured and I'll send progress updates on Discord.`}
-
-Can't use Discord? Just reply to this email or reach me on WhatsApp.
-
-— Keiko, KeikoArts`;
-  const data={};
-  new FormData(form).forEach((v,k)=>{if(typeof v==='string'&&!['svc','pkg','add','_next','_honey'].includes(k))data[k]=v;});
-  data._captcha='false';data._template='table';
-  if(refFiles.length)data['Reference files']=refFiles.length+' file(s) could not be uploaded: ask the client to send them on Discord';
-  let ok=false;
-  try{const ctl=new AbortController(),to=setTimeout(()=>ctl.abort(),20000);
-    const r=await fetch('https://formsubmit.co/ajax/keikoarts22@gmail.com',{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify(data),signal:ctl.signal});clearTimeout(to);
-    const jj=await r.json().catch(()=>null);ok=!!(r.ok&&jj&&String(jj.success)==='true');}catch(_){}
+  const ok=await sendCopy(buildCopy(id,payUrl,dateStr,refFiles.length?refFiles.length+' file(s) could not be uploaded: ask the client to send them on Discord':''));
   if(ok){
     if(location.protocol.startsWith('http')){try{fetch('notify-discord.php',{method:'POST',keepalive:true,headers:{'Content-Type':'application/json'},body:JSON.stringify({id,due:$('#fDue').value,service:$('#fService').value,package:$('#fPackage').value,addons:$('#fAddons').value,total,plan,name,email:$('#fEmail').value,discord:$('#fDiscord').value,deadline:$('#fDeadline').value,refs:[refFiles.length?refFiles.length+' file(s) attached (see email)':'',form['Reference links'].value].filter(Boolean).join(' · '),details:(cmOn?`[${usageVal()} use] `:'')+$('#fDetails').value,_honey:form._honey.value})}).catch(()=>{});}catch(_){}}
     done({id,due,plan,payUrl,rows,emailed:!!$('#fEmail').value,warn:refFiles.length?'Please send your reference images to me on Discord (they could not be uploaded).':'',
