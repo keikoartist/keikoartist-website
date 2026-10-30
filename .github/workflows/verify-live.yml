@@ -1,0 +1,16 @@
+name: Verify live site
+
+on:
+  workflow_dispatch:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check keikoartist.com
+        run: |
+          html=$(curl -sL -H "Cache-Control: no-cache" "https://keikoartist.com/?v=$(date +%s)")
+          for t in "Invoice preview" "Get Invoice" "name your price and pay right away" "theresa.oktavia10@gmail.com"; do
+            if grep -q "$t" <<<"$html"; then echo "::notice::FOUND $t"; else echo "::warning::MISSING $t"; fi
+          done
+          echo "::notice::bytes $(wc -c <<<"$html")"
