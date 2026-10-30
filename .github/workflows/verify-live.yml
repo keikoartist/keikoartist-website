@@ -9,8 +9,11 @@ jobs:
     steps:
       - name: Check keikoartist.com
         run: |
+          for u in "https://keikoartist.com/" "https://keikoartist.com/index.html" "https://www.keikoartist.com/" "http://keikoartist.com/"; do
+            h=$(curl -s -I -m 20 "$u" | tr -d '\r' | grep -iE '^(HTTP|cache-control|expires|last-modified|etag|x-litespeed|x-cache|location|server|age|x-proxy)' | tr '\n' ' ')
+            echo "::notice::$u => $h"
+          done
           html=$(curl -sL -H "Cache-Control: no-cache" "https://keikoartist.com/?v=$(date +%s)")
-          for t in "Invoice preview" "Get Invoice" "name your price and pay right away" "theresa.oktavia10@gmail.com"; do
+          for t in "order-api.php?a=submit" "Get Invoice" "theresa.oktavia10@gmail.com"; do
             if grep -q "$t" <<<"$html"; then echo "::notice::FOUND $t"; else echo "::warning::MISSING $t"; fi
           done
-          echo "::notice::bytes $(wc -c <<<"$html")"
