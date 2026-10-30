@@ -1,0 +1,44 @@
+name: PayPal link check (manual)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  paypal:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.12' }
+      - name: Install Playwright
+        run: |
+          pip install -q playwright > pip.log 2>&1 || { echo "::error::pip: $(tail -c 300 pip.log | tr '\n' ' ')"; exit 1; }
+          python -m playwright install --with-deps chromium webkit firefox > pw.log 2>&1 || { echo "::error::playwright: $(tail -c 300 pw.log | tr '\n' ' ')"; exit 1; }
+      - name: Open the PayPal links the website generates
+        run: |
+          cat > t.py <<'PY'
+          import asyncio, urllib.parse, subprocess
+          from playwright.async_api import async_playwright
+          q=urllib.parse.urlencode({'cmd':'_xclick','business':'theresa.oktavia10@gmail.com','item_name':'KeikoArts commission – Custom commission, Personal use, incl. 13% tax [INV-TEST-0000]','item_number':'INV-TEST-0000','amount':'5.65','currency_code':'USD','no_shipping':'1','rm':'1','return':'https://keikoartist.com/?paid=1&rid=INV-TEST-0000','cancel_return':'https://keikoartist.com/'})
+          LINKS={'webscr':'https://www.paypal.com/cgi-bin/webscr?'+q}
+          for name,u in LINKS.items():
+              r=subprocess.run(['curl','-s','-o','/dev/null','-L','-m','40','-w','%{http_code} %{num_redirects} %{url_effective}','-A','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0 Safari/537.36',u],capture_output=True,text=True)
+              print(f"::notice::curl {name}: {r.stdout[:300]}",flush=True)
+          async def run(p,engine,device=None):
+              br=await getattr(p,engine).launch()
+              ctx=await br.new_context(**(p.devices[device] if device else {}))
+              pg=await ctx.new_page()
+              for name,u in LINKS.items():
+                  try:
+                      resp=await pg.goto(u,wait_until='domcontentloaded',timeout=60000)
+                      await pg.wait_for_timeout(6000)
+                      txt=(await pg.inner_text('body'))[:260].replace('\n',' | ')
+                      print(f"::notice::[{engine}{'/'+device if device else ''}] {name}: status {resp.status if resp else '?'} -> {pg.url[:160]} | title: {await pg.title()} | text: {txt}",flush=True)
+                  except Exception as e:
+                      print(f"::notice::[{engine}] {name}: FAILED {str(e).splitlines()[0][:200]}",flush=True)
+              await br.close()
+          async def main():
+              async with async_playwright() as p:
+                  await run(p,'chromium'); await run(p,'webkit','iPhone 13'); await run(p,'firefox')
+          asyncio.run(main())
+          PY
+          python t.py
