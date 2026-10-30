@@ -18,4 +18,5 @@ jobs:
             -F "_price=5" -F "_total=5" -F "attachment1=@ref.png;type=image/png" \
             "https://keikoartist.com/order-api.php?a=submit")
           echo "::notice::HTTP $code"
-          echo "::notice::Response: $(head -c 600 body.json)"
+          echo "::notice::Start: $(head -c 200 body.json)"
+          echo "::notice::End: $(tail -c 200 body.json)"

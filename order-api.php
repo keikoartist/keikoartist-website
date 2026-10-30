@@ -12,6 +12,7 @@ header('X-Content-Type-Options: nosniff');
 header('Cache-Control: no-store');
 header('Referrer-Policy: same-origin');
 date_default_timezone_set('Asia/Jakarta');
+ini_set('serialize_precision', '-1');
 
 const OWNER_EMAIL    = 'keikoarts22@gmail.com';        // where new orders are emailed
 const PAYPAL_EMAIL   = 'theresa.oktavia10@gmail.com';  // PayPal account that receives payments
