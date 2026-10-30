@@ -28,7 +28,19 @@ function jout(int $code, array $data = []): void {
   header('Content-Type: application/json; charset=utf-8'); http_response_code($code);
   echo json_encode($data + ['ok' => $code === 200], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES); exit;
 }
-function fail(int $code, string $msg): void { jout($code, ['error' => $msg]); }
+$HTML_MODE = !empty($_GET['html']);   // plain form post (browser without working JavaScript): answer with a page, not JSON
+function page(string $title, string $body): void {
+  header('Content-Type: text/html; charset=utf-8');
+  echo '<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><title>' . htmlspecialchars($title) . ' · KeikoArts</title>'
+     . '<style>body{margin:0;font-family:Arial,sans-serif;background:#fff4f8;color:#7a2846}main{max-width:560px;margin:24px auto;background:#fff;border:1px solid #fbd3e0;border-radius:18px;padding:24px}h1{color:#f2628f;font-size:24px;margin:0 0 8px}table{width:100%;border-collapse:collapse;font-size:15px;margin:14px 0}td{padding:6px 0;border-bottom:1px solid #fde9f0}td:last-child{text-align:right}.tot td{font-weight:bold;border:0;padding-top:10px}.pp{display:block;text-align:center;background:#ffc439;color:#003087;font-weight:bold;padding:14px;border-radius:999px;text-decoration:none;margin:16px 0 8px}.muted{color:#a8607a;font-size:13px}a.back{color:#f2628f}</style></head><body><main>'
+     . $body . '<p class="muted">Questions? <a class="back" href="https://discord.com/users/1053527069528707072">Message me on Discord</a> · <a class="back" href="/">Back to keikoartist.com</a></p></main></body></html>';
+  exit;
+}
+function fail(int $code, string $msg): void {
+  global $HTML_MODE;
+  if ($HTML_MODE) { http_response_code($code); page('Order not sent', '<h1>Sorry, your order was not sent</h1><p>' . htmlspecialchars($msg) . '</p><p><a class="back" href="javascript:history.back()">← Go back and try again</a></p>'); }
+  jout($code, ['error' => $msg]);
+}
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') fail(405, 'POST only');
 $hostHdr = strtolower($_SERVER['HTTP_HOST'] ?? '');
@@ -202,12 +214,13 @@ if (($_GET['a'] ?? '') === 'submit') {
   $kind = $service === 'Custom Inquiry' ? 'custom' : 'request';
   $plan = $fields['Payment plan'] ?? 'Full payment';
   if ($kind === 'custom') {
-    $price = round((float)($_POST['_price'] ?? 0), 2);
+    $price = round((float)str_replace(',', '.', (string)($_POST['_price'] ?? 0)), 2);
     if ($price < 5 || $price > 10000) fail(400, 'Please enter your price ($5 – $10,000).');
     $tax = round($price * TAX_RATE, 2); $total = round($price + $tax, 2); $due = $total; $plan = 'Full payment';
   } else {
     $price = 0.0; $tax = 0.0;
-    $total = round(min(100000, max(0, (float)($_POST['_total'] ?? 0))), 2);
+    $tRaw = $_POST['_total'] ?? preg_replace('/[^0-9.]/', '', (string)($_POST['Estimated_total_(USD)'] ?? '0'));
+    $total = round(min(100000, max(0, (float)$tRaw)), 2);
     $k = strpos($plan, '50/50') !== false ? 0.5 : (preg_match('/3x|3×/iu', $plan) ? 1 / 3 : 1);
     $due = $total > 0 ? ceil(round($total * $k * 100, 6)) / 100 : 0.0;
   }
@@ -310,6 +323,15 @@ if (($_GET['a'] ?? '') === 'submit') {
   $db->prepare('UPDATE orders SET mailed = ? WHERE id = ?')->execute([$mailed ? 1 : 0, $id]);
   discord_ping($cfg, $o, $fields);
 
+  if ($HTML_MODE) {
+    $rowsH = $kind === 'custom'
+      ? '<tr><td>Custom commission (' . h($fields['Usage'] ?? 'Personal') . ' use)</td><td>' . money2($price) . '</td></tr><tr><td>Tax (13%)</td><td>' . money2($tax) . '</td></tr><tr class="tot"><td>Total due (USD)</td><td>' . money2($total) . '</td></tr>'
+      : '<tr><td>' . h($service . ' (' . $o['package'] . ')') . '</td><td>' . money2($total) . '</td></tr><tr class="tot"><td>Due now (' . h($plan) . ')</td><td>' . money2($due) . '</td></tr>';
+    page($kind === 'custom' ? 'Your invoice' : 'Request sent',
+      '<h1>' . ($kind === 'custom' ? 'Your invoice ♡' : 'Request sent! ♡') . '</h1><p class="muted">' . ($kind === 'custom' ? 'Invoice no.' : 'Request ID') . ' <b>' . h($id) . '</b> · ' . h($dateStr) . '</p><p>Billed to <b>' . h($name) . '</b></p>'
+      . '<table>' . $rowsH . '</table>'
+      . ($payUrl && $due > 0 ? '<a class="pp" href="' . h($payUrl) . '">Pay ' . money2($due) . ' with PayPal</a><p class="muted">Secure checkout on PayPal. Full refund if I can\'t take your ' . ($kind === 'custom' ? 'commission' : 'request') . '.</p>' : ''));
+  }
   jout(200, ['id' => $id, 'kind' => $kind, 'price' => $price, 'tax' => $tax, 'total' => $total, 'due' => $due, 'plan' => $plan,
              'pay_url' => $payUrl, 'date' => $dateStr, 'emailed' => $clientMailed, 'notified' => $mailed, 'files' => count($files), 'skipped_files' => $skipped, 'skipped_names' => $skippedNames]);
 }
