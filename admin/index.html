@@ -71,6 +71,41 @@ input:focus,textarea:focus{border-color:var(--pink-2);box-shadow:0 0 0 3px rgba(
 .compose .btn{flex:none}
 .placeholder{flex:1;display:grid;place-items:center;color:var(--muted);font-size:14px;text-align:center;padding:20px}
 .notify{font-size:11.5px}
+/* mode switch + orders */
+.modes{display:flex;gap:4px;background:var(--soft);border:1px solid var(--line);border-radius:999px;padding:3px}
+.modes button{border:0;background:none;border-radius:999px;padding:6px 12px;font-size:12.5px;font-weight:600;color:var(--muted);cursor:pointer;display:flex;align-items:center;gap:6px}
+.modes button.on{background:var(--pink);color:#fff}
+.modes i{font-style:normal;min-width:18px;height:18px;border-radius:999px;background:#fff;color:var(--pink);font-size:10.5px;display:inline-grid;place-items:center;padding:0 5px}
+.modes button:not(.on) i{background:var(--pink);color:#fff}
+.otabs{flex-wrap:wrap}
+.item .amt{font-weight:600;color:var(--ink);font-size:12.5px}
+.st{display:inline-block;font-size:10.5px;font-weight:600;border-radius:999px;padding:2px 8px;background:#eee;color:#555;margin-right:4px}
+.st.new{background:#ffe3ec;color:#d23a6b}.st.paid{background:#e3f6e9;color:#1d7a43}.st.in_progress{background:#e8ecff;color:#3f4fc4}.st.done{background:#f0f0f0;color:#666}.st.cancelled{background:#f6e3e3;color:#9b3030}
+.od{flex:1;overflow-y:auto;padding:16px;display:grid;gap:14px;align-content:start}
+.card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px 16px}
+.card h3{font-size:13px;color:var(--muted);font-weight:600;margin-bottom:8px;text-transform:uppercase;letter-spacing:.06em}
+.kv{display:grid;grid-template-columns:150px 1fr;gap:6px 12px;font-size:13.5px}
+.kv dt{color:var(--muted)}.kv dd{white-space:pre-wrap;word-break:break-word}
+.kv a{color:var(--pink)}
+.money{display:flex;gap:10px;flex-wrap:wrap}
+.money div{flex:1;min-width:120px;background:var(--soft);border-radius:12px;padding:10px 12px}
+.money small{display:block;font-size:11px;color:var(--muted)}.money b{font-size:18px}
+.files{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px}
+.files a{display:block;border:1px solid var(--line);border-radius:12px;overflow:hidden;text-decoration:none;color:var(--ink);font-size:11.5px;background:var(--soft)}
+.files img{width:100%;height:110px;object-fit:cover;display:block;background:#fff}
+.files span{display:block;padding:6px 8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+select{padding:7px 10px;border:1px solid var(--line);border-radius:999px;background:#fff;font:inherit;font-size:12.5px;color:var(--ink)}
+.main>*,.od>*{min-width:0}
+.agent.off{display:none}
+@media (max-width:820px){
+  .main{grid-template-columns:minmax(0,1fr)}
+  .top{flex-wrap:wrap;gap:8px 10px;padding:8px 12px}
+  .top h1{font-size:18px}
+  .modes{order:10;flex-basis:100%}.modes button{flex:1;justify-content:center;padding:7px 9px}
+  .agent input{width:78px}
+  .kv{grid-template-columns:1fr}.kv dt{margin-top:6px}
+  .od{padding:12px}
+}
 @media (max-width:820px){
   .main{grid-template-columns:1fr}
   .main.reading .list{display:none}
@@ -87,7 +122,7 @@ input:focus,textarea:focus{border-color:var(--pink-2);box-shadow:0 0 0 3px rgba(
   <form id="loginForm" action="javascript:void(0)">
     <img src="../images/pfp.webp" alt="">
     <h1 class="serif">KeikoArts Inbox</h1>
-    <p>Reply to website chats <small style="opacity:.6">v3</small></p>
+    <p>Website chats &amp; orders <small style="opacity:.6">v4</small></p>
     <input type="password" id="pw" placeholder="Admin password" autocomplete="current-password" required>
     <button class="btn" type="submit">Log in</button>
     <div class="err" id="loginErr" role="alert"></div>
@@ -98,6 +133,7 @@ input:focus,textarea:focus{border-color:var(--pink-2);box-shadow:0 0 0 3px rgba(
   <div class="top">
     <img src="../images/pfp.webp" alt="">
     <h1 class="serif">Inbox <small id="unreadTot"></small></h1>
+    <div class="modes" role="tablist"><button type="button" class="on" data-mode="chat">💬 Chats</button><button type="button" data-mode="orders">🧾 Orders <i id="newOrders" hidden></i></button></div>
     <label class="agent"><span>Reply as</span><input id="agent" maxlength="30" placeholder="Keiko"></label>
     <button class="btn ghost small notify" id="notifyBtn" type="button" hidden>🔔 Enable alerts</button>
     <a class="btn ghost small" href="../" id="toSite">🌐 Website</a>
@@ -110,6 +146,15 @@ input:focus,textarea:focus{border-color:var(--pink-2);box-shadow:0 0 0 3px rgba(
     </aside>
     <section class="thread" id="thread">
       <div class="placeholder" id="ph">Select a conversation ♡</div>
+    </section>
+  </div>
+  <div class="main" id="omain" hidden>
+    <aside class="list">
+      <div class="tabs otabs"><button class="on" data-os="open" type="button">Active</button><button data-os="new" type="button">New</button><button data-os="paid" type="button">Paid</button><button data-os="done" type="button">Done</button><button data-os="all" type="button">All</button></div>
+      <div class="items" id="oitems"><div class="empty">Loading…</div></div>
+    </aside>
+    <section class="thread" id="othread">
+      <div class="placeholder">Select an order ♡</div>
     </section>
   </div>
 </div>
@@ -135,12 +180,14 @@ async function api(data){
 const fmt=ts=>{const d=new Date(ts*1000),n=new Date();return d.toDateString()===n.toDateString()?d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}):d.toLocaleDateString([],{day:'numeric',month:'short'})+' '+d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})};
 const el=(tag,cls,text)=>{const e=document.createElement(tag);if(cls)e.className=cls;if(text!=null)e.textContent=text;return e};
 
-function showLogin(){clearInterval(listTimer);clearInterval(thTimer);$('#appView').hidden=true;$('#loginView').hidden=false;$('#pw').focus();}
+function showLogin(){clearInterval(listTimer);clearInterval(thTimer);clearInterval(typeof oTimer==='undefined'?0:oTimer);$('#appView').hidden=true;$('#loginView').hidden=false;$('#pw').focus();}
 async function showApp(){
   $('#loginView').hidden=true;$('#appView').hidden=false;
   $('#agent').value=store.get('ka_agent','Keiko');
   if('Notification' in window&&Notification.permission==='default')$('#notifyBtn').hidden=false;
   await loadList();listTimer=setInterval(()=>loadList(),5000);
+  clearInterval(oTimer);pollOrders();oTimer=setInterval(pollOrders,15000);
+  if(store.get('ka_mode','chat')==='orders'||location.hash==='#orders')setMode('orders');
 }
 $('#agent').addEventListener('change',e=>store.set('ka_agent',e.target.value.trim()||'Keiko'));
 $('#notifyBtn').onclick=async()=>{try{await Notification.requestPermission()}catch(_){} $('#notifyBtn').hidden=true;};
@@ -211,6 +258,95 @@ async function openThread(id){
   j.messages.forEach(addMsg);msgs.scrollTop=msgs.scrollHeight;ta.focus();loadList();
   thTimer=setInterval(async()=>{if(cur!==id||document.visibilityState!=='visible')return;
     try{const k=await api({action:'thread',id,since:last});if(k.messages.length){const atEnd=msgs.scrollHeight-msgs.scrollTop-msgs.clientHeight<60;k.messages.forEach(addMsg);if(atEnd)msgs.scrollTop=msgs.scrollHeight;}}catch(_){}},3000);
+}
+
+/* ===================== ORDERS ===================== */
+const OAPI='../order-api.php', ST_LABEL={new:'New',paid:'Paid',in_progress:'In progress',done:'Done',cancelled:'Cancelled'};
+let mode='chat', ostatus='open', ocur=null, lastNew=-1, oTimer, blobUrls=[];
+const usd=n=>'$'+Number(n||0).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+async function oapi(data,raw){
+  const r=await fetch(OAPI,{method:'POST',headers:{'Content-Type':'application/json','X-Auth':auth},body:JSON.stringify(Object.assign({_auth:auth},data)),cache:'no-store'});
+  if(r.status===401){auth='';store.set('ka_auth','');showLogin();$('#loginErr').textContent='Session expired, please log in again.';throw new Error('login');}
+  if(raw){if(!r.ok)throw new Error('File not found');return r.blob();}
+  let j={};try{j=await r.json()}catch(_){}
+  if(!r.ok)throw new Error(j.error||'Connection problem');
+  return j;
+}
+function setMode(m){
+  mode=m;document.querySelectorAll('.modes button').forEach(b=>b.classList.toggle('on',b.dataset.mode===m));
+  $('#main').hidden=m!=='chat';$('#omain').hidden=m!=='orders';
+  $('.agent').classList.toggle('off',m!=='chat');
+  store.set('ka_mode',m);if(m==='orders')loadOrders();
+}
+document.querySelectorAll('.modes button').forEach(b=>b.onclick=()=>setMode(b.dataset.mode));
+document.querySelectorAll('.otabs button').forEach(b=>b.onclick=()=>{document.querySelectorAll('.otabs button').forEach(x=>x.classList.toggle('on',x===b));ostatus=b.dataset.os;loadOrders();});
+function badge(n){const i=$('#newOrders');i.hidden=!n;i.textContent=n;
+  if(lastNew>=0&&n>lastNew){beep();if('Notification' in window&&Notification.permission==='granted'&&document.visibilityState!=='visible'){try{new Notification('New order!',{body:'Someone placed an order on KeikoArts',icon:'../images/pfp.webp'})}catch(_){}}}
+  lastNew=n;}
+async function pollOrders(){try{const j=await oapi({action:'count'});badge(Number(j.new)||0);if(mode==='orders')loadOrders();}catch(_){}}
+async function loadOrders(){
+  let j;try{j=await oapi({action:'list',status:ostatus})}catch(_){return}
+  badge(Number(j.new)||0);
+  const box=$('#oitems');box.innerHTML='';
+  if(!j.orders.length){box.appendChild(el('div','empty','No orders here yet ♡'));return;}
+  j.orders.forEach(o=>{
+    const b=el('button','item'+(o.status==='new'?' unread':'')+(ocur===o.id?' on':''));b.type='button';
+    b.appendChild(el('b',null,o.name||'Client'));b.appendChild(el('time',null,fmt(o.created)));
+    const line=el('span');const st=el('i','st '+o.status,ST_LABEL[o.status]||o.status);line.appendChild(st);
+    line.appendChild(document.createTextNode(`${o.id} · ${o.kind==='custom'?'Custom order':o.service} · `));line.appendChild(el('b','amt',usd(o.total)));
+    b.appendChild(line);b.onclick=()=>openOrder(o.id);box.appendChild(b);
+  });
+}
+function kvRow(dl,k,v,href){if(v==null||v==='')return;dl.appendChild(el('dt',null,k));const dd=el('dd');
+  if(href){const a=el('a',null,v);a.href=href;a.target='_blank';a.rel='noopener';dd.appendChild(a);}else dd.textContent=v;dl.appendChild(dd);}
+async function openOrder(id){
+  ocur=id;$('#omain').classList.add('reading');blobUrls.forEach(u=>URL.revokeObjectURL(u));blobUrls=[];
+  const th=$('#othread');th.innerHTML='';
+  const head=el('div','th-head');
+  const back=el('button','back','‹');back.type='button';back.setAttribute('aria-label','Back');back.onclick=()=>{ocur=null;$('#omain').classList.remove('reading');loadOrders();};
+  const who=el('div','who');who.appendChild(el('b',null,'…'));who.appendChild(el('span',null,''));
+  const sel=el('select');Object.entries(ST_LABEL).forEach(([k,v])=>{const op=el('option',null,v);op.value=k;sel.appendChild(op);});
+  const delB=el('button','btn ghost small','Delete');delB.type='button';
+  head.append(back,who,sel,delB);
+  const body=el('div','od');th.append(head,body);
+  let j;try{j=await oapi({action:'get',id})}catch(e){if(e.message!=='login')body.appendChild(el('div','err',e.message));return;}
+  const o=j.order,f=o.fields||{};
+  who.firstChild.textContent=`${o.name||'Client'} · ${o.id}`;
+  who.lastChild.textContent=(o.kind==='custom'?'Custom order':'Request')+' · '+fmt(o.created)+(o.mailed?'':' · email to you failed, details are only here');
+  sel.value=o.status;sel.onchange=async()=>{try{await oapi({action:'status',id,status:sel.value});loadOrders();}catch(e){alert(e.message)}};
+  let armed=false;delB.onclick=async()=>{if(!armed){armed=true;delB.textContent='Tap again to delete';setTimeout(()=>{armed=false;delB.textContent='Delete'},3000);return;}
+    await oapi({action:'delete',id});back.onclick();};
+  // money
+  const mc=el('div','card');mc.appendChild(el('h3',null,'Payment'));const m=el('div','money');
+  const box=(k,v)=>{const d=el('div');d.appendChild(el('small',null,k));d.appendChild(el('b',null,v));m.appendChild(d);};
+  if(o.kind==='custom'){box('Client price',usd(o.price));box('Tax 13%',usd(o.tax));box('Total (pay upfront)',usd(o.total));}
+  else{box('Estimated total',usd(o.total));box('Due now · '+(o.plan||''),usd(o.due));}
+  mc.appendChild(m);
+  const hint=el('p',null,`Check PayPal for a payment with "${o.id}" in the item name. When it arrives, set the status to Paid.`);hint.style.cssText='font-size:12px;color:var(--muted);margin-top:8px';mc.appendChild(hint);
+  if(o.pay_url){const a=el('a','btn ghost small','Copy PayPal link for the client');a.href='#';a.style.marginTop='8px';a.onclick=async e=>{e.preventDefault();try{await navigator.clipboard.writeText(o.pay_url);a.textContent='Copied ✓';}catch(_){prompt('PayPal link',o.pay_url)}};mc.appendChild(a);}
+  // client
+  const cc=el('div','card');cc.appendChild(el('h3',null,'Client'));const dl=el('dl','kv');
+  kvRow(dl,'Name',o.name);kvRow(dl,'Discord',o.discord);kvRow(dl,'Email',o.email,o.email?'mailto:'+o.email+'?subject='+encodeURIComponent('Your KeikoArts order '+o.id):null);
+  kvRow(dl,'Deadline',f['Deadline']);cc.appendChild(dl);
+  // order
+  const oc=el('div','card');oc.appendChild(el('h3',null,'Order'));const dl2=el('dl','kv');
+  const skip=new Set(['Name','Discord','Email','Deadline','Details','Reference links',...(o.kind==='custom'?['Package','Payment plan','Add-ons']:[])]);
+  Object.entries(f).forEach(([k,v])=>{if(!skip.has(k)&&v&&v!=='-'&&!(k==='Quantity'&&v==='1'))kvRow(dl2,k,v);});
+  kvRow(dl2,'Details',f['Details']);
+  if(f['Reference links']){dl2.appendChild(el('dt',null,'Reference links'));const dd=el('dd');
+    f['Reference links'].split(/\s+/).forEach(t=>{if(/^https?:\/\//i.test(t)){const a=el('a',null,t);a.href=t;a.target='_blank';a.rel='noopener noreferrer';dd.appendChild(a);dd.appendChild(document.createElement('br'));}else if(t)dd.appendChild(document.createTextNode(t+' '));});dl2.appendChild(dd);}
+  oc.appendChild(dl2);
+  body.append(mc,cc,oc);
+  // files
+  if(o.files&&o.files.length){const fc=el('div','card');fc.appendChild(el('h3',null,`Reference files (${o.files.length})`));const g=el('div','files');fc.appendChild(g);body.appendChild(fc);
+    for(const file of o.files){const a=el('a');a.href='#';a.appendChild(el('span',null,'Loading…'));g.appendChild(a);
+      try{const blob=await oapi({action:'file',id,name:file.name},true);const u=URL.createObjectURL(blob);blobUrls.push(u);
+        a.href=u;a.target='_blank';a.download=file.name;a.innerHTML='';
+        if(/^image\/(png|jpe?g|webp|gif)$/.test(file.type)){const im=el('img');im.src=u;im.alt=file.name;a.appendChild(im);}
+        a.appendChild(el('span',null,file.name+' · '+Math.max(1,Math.round(file.size/1024))+' KB'));
+      }catch(_){a.firstChild.textContent=file.name+' (missing)';}}
+  }
+  loadOrders();
 }
 function alertBox(t){const p=el('div','err',t);$('#thread').appendChild(p);setTimeout(()=>p.remove(),4000);}
 

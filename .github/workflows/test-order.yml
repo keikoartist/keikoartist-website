@@ -1,0 +1,21 @@
+name: Test order endpoint (manual)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send one test custom order to keikoartist.com
+        run: |
+          printf '\x89PNG\r\n\x1a\nTEST' > ref.png
+          code=$(curl -s -o body.json -w "%{http_code}" -m 60 \
+            -H "Origin: https://keikoartist.com" -H "Referer: https://keikoartist.com/" \
+            -F "Service=Custom Inquiry" -F "Package=Custom commission" -F "Payment plan=Full payment" -F "Usage=Personal" \
+            -F "Name=TEST by Claude - please delete" -F "Discord=test" \
+            -F "Details=Automatic test of the new order system. You can delete this order in admin > Orders." \
+            -F "_price=5" -F "_total=5" -F "attachment1=@ref.png;type=image/png" \
+            "https://keikoartist.com/order-api.php?a=submit")
+          echo "::notice::HTTP $code"
+          echo "::notice::Response: $(head -c 600 body.json)"
