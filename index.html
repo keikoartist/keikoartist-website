@@ -1119,7 +1119,7 @@ document.getElementById('yr').textContent=new Date().getFullYear();
 
 
 // reference attachments
-const REF_MAX_FILES=5, REF_MAX_BYTES=10*1024*1024; let refFiles=[];
+const REF_MAX_FILES=5, REF_MAX_BYTES=9*1024*1024; let refFiles=[];
 function renderRefs(){
   const ul=$('#refList');ul.innerHTML='';
   refFiles.forEach((f,i)=>{const li=document.createElement('li');
@@ -1127,7 +1127,7 @@ function renderRefs(){
     const x=document.createElement('button');x.type='button';x.textContent='✕';x.setAttribute('aria-label','Remove '+f.name);x.onclick=()=>{refFiles.splice(i,1);renderRefs();};li.appendChild(x);ul.appendChild(li);});
   const tot=refFiles.reduce((a,f)=>a+f.size,0);
   let info=$('#refInfo');if(!info){info=document.createElement('p');info.id='refInfo';info.className='ref-size';ul.after(info);}
-  info.textContent=refFiles.length?`${refFiles.length} file(s) · ${(tot/1048576).toFixed(1)} MB of 10 MB`:'';
+  info.textContent=refFiles.length?`${refFiles.length} file(s) · ${(tot/1048576).toFixed(1)} MB of 9 MB`:'';
 }
 function refMsg(t,ok){const m=$('#refMsg');m.textContent=t||'';m.classList.toggle('show',!!t);m.classList.toggle('ok',!!ok);}
 async function shrink(f){
@@ -1337,7 +1337,7 @@ form.addEventListener('submit',async e=>{
       done({id:j.id,due:j.due,plan:j.plan,payUrl:j.pay_url||'',rows,emailed:!!j.emailed,warn,
         inv:cmOn?{date:j.date,name,contact:ctx.contact,usage:ctx.usage,deadline:ctx.deadline,brief:ctx.brief,sub:j.price,tax:j.tax,total:j.total,emailed:!!j.emailed}:null});
       return;}
-    if(j&&j.error&&res.status>=400&&res.status<500&&![404,405].includes(res.status)){clearTimeout(slow);
+    if(j&&j.ok===false&&j.error&&![404,405].includes(res.status)&&res.status<500){clearTimeout(slow);
       if(contactWasEmail)$('#fDiscord').value=$('#fEmail').value;
       $('#fEmail').disabled=false;$('#fAuto').disabled=false;setBusy(false);err(j.error);return;}
   }
