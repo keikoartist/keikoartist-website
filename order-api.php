@@ -198,7 +198,7 @@ if (($_GET['a'] ?? '') === 'submit') {
   $dry = !empty($_POST['_dryrun']);                               // test mode: validates everything, saves/sends nothing
   rate_limit(($dry ? 'dry:' : 'order:') . client_ip(), $dry ? 40 : 20, 3600);
 
-  $skip = ['svc', 'pkg', 'add', 'Request ID', 'Estimated total (USD)', 'Amount due now (USD)'];
+  $skip = ['svc', 'pkg', 'add', 'mxType', 'mxSize', 'Request ID', 'Estimated total (USD)', 'Amount due now (USD)'];
   $fields = [];
   foreach ($_POST as $k => $v) {
     if (!is_string($v) || !is_string($k) || $k === '' || $k[0] === '_') continue;

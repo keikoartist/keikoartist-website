@@ -250,6 +250,59 @@ body:has(.modal.show) .fab-order{display:none}
 .budget .bin input{max-width:160px;font-size:16px;font-weight:600}
 .budget small{color:var(--muted);font-size:12px;line-height:1.45}
 .c-slot{display:contents}
+
+/* ===== order sheet ===== */
+#sheet{counter-reset:sec}
+.sh-head{display:flex;align-items:center;gap:12px;background:#fff7fa;border:1px solid var(--line);border-radius:16px;padding:10px 12px}
+.sh-thumb{width:58px;height:58px;border-radius:12px;background:#fde9f0 center/cover no-repeat;flex:none}
+.sh-t{flex:1;min-width:0}
+.sh-t small{display:block;font-size:10.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+.sh-t b{display:block;font-family:"DM Serif Display",serif;font-weight:400;font-size:22px;line-height:1.15;color:var(--ink)}
+.sh-t span{display:block;font-size:12.5px;color:var(--muted)}
+.sh-change{flex:none;border:1.5px solid var(--pink);background:#fff;color:var(--pink);border-radius:999px;padding:6px 12px;font:inherit;font-size:12.5px;font-weight:600;cursor:pointer}
+.sec{border-top:1px dashed var(--line);padding-top:14px;display:grid;gap:10px}
+.sec h4{font-size:14.5px;font-weight:600;display:flex;align-items:center;gap:8px;color:var(--ink)}
+.sec h4::before{counter-increment:sec;content:counter(sec);width:24px;height:24px;border-radius:50%;background:linear-gradient(135deg,#f2628f,#ff8fb1);color:#fff;font-size:12px;display:grid;place-items:center;flex:none}
+.sec h4 small{font-weight:400;color:var(--muted);font-size:12px}
+.chips{flex-wrap:wrap}
+.chips.big label{flex:1 1 0;min-width:96px;flex-direction:column;gap:2px;padding:9px 8px;line-height:1.2;text-align:center;min-height:52px}
+.chips label small{font-size:11px;color:var(--muted);font-weight:500}
+.chips input:checked+label small{color:var(--pink)}
+.chips input:disabled+label{opacity:.45;cursor:not-allowed}
+.mx{display:grid;gap:10px}
+.mx-g{display:grid;gap:6px}
+.mx-g>span{font-size:12.5px;color:var(--muted);font-weight:500}
+.mx-pick{font-size:12.5px;color:var(--muted);background:#fff7fa;border-radius:10px;padding:8px 12px}
+.mx-pick b{color:var(--ink)}
+.tags{display:flex;flex-wrap:wrap;gap:8px}
+.tags input{position:absolute;opacity:0;pointer-events:none;width:auto}
+.tags label{display:inline-flex;align-items:center;gap:6px;border:1.5px solid var(--line);border-radius:999px;padding:8px 14px;font-size:13px;cursor:pointer;background:#fff;transition:.15s}
+.tags label::before{content:"+";color:var(--pink);font-weight:700}
+.tags label em{font-style:normal;color:var(--pink);font-weight:600}
+.tags input:checked+label{background:#fff4f8;border-color:var(--pink);box-shadow:0 0 0 3px rgba(242,98,143,.12)}
+.tags input:checked+label::before{content:"✓"}
+.tags input:focus-visible+label{outline:2px solid var(--pink-2)}
+.switch{display:flex;gap:12px;align-items:flex-start;border:1.5px solid var(--line);border-radius:14px;padding:12px 14px;cursor:pointer;background:#fff;position:relative;font-size:13.5px}
+.switch input{position:absolute;opacity:0;pointer-events:none;width:auto}
+.switch .sw{flex:none;width:40px;height:24px;border-radius:999px;background:#f1d5df;position:relative;transition:.2s;margin-top:1px}
+.switch .sw::after{content:"";position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.2);transition:.2s}
+.switch input:checked+.sw{background:var(--pink)}
+.switch input:checked+.sw::after{left:19px}
+.switch input:focus-visible+.sw{outline:2px solid var(--pink-2)}
+.switch em{font-style:normal;color:var(--pink);font-weight:600}
+.switch small{display:block;color:var(--muted);font-size:12px}
+.stepper{display:flex;align-items:center;gap:8px;font-size:13.5px}
+.stepper>span{flex:1;font-weight:500}
+.stepper button{width:38px;height:38px;border-radius:50%;border:1.5px solid var(--line);background:#fff;font-size:18px;line-height:1;color:var(--pink);cursor:pointer}
+.stepper input{width:70px;text-align:center;font-weight:600}
+.c-inv dt.now,.c-inv dd.now{color:var(--pink);font-weight:600}
+#orderModal .mbox{overflow:visible}
+#orderModal .mhead{border-radius:22px 22px 0 0}
+#orderModal .mnav{position:sticky;bottom:0;z-index:3;background:#fff;margin:16px -24px -26px;padding:12px 24px calc(14px + env(safe-area-inset-bottom));border-top:1px solid var(--line);border-radius:0 0 22px 22px;align-items:center;box-shadow:0 -10px 24px rgba(122,40,70,.07)}
+.mtot{flex:1;text-align:right;line-height:1.1;padding-right:4px}
+.mtot small{display:block;font-size:11px;color:var(--muted)}
+.mtot b{font-family:"DM Serif Display",serif;font-weight:400;font-size:24px;color:var(--pink)}
+@media (max-width:560px){#orderModal .mnav{margin:14px -16px -20px;padding:10px 16px calc(12px + env(safe-area-inset-bottom))}.mtot b{font-size:20px}.sh-t b{font-size:19px}.sh-thumb{width:50px;height:50px}}
 .c-intro{font-size:13.5px;color:var(--muted);margin:-6px 0 0}
 .c-use{display:flex;flex-direction:column;gap:4px}
 .c-use>span{font-size:11.5px;color:var(--muted);font-weight:500;margin:-2px 0 0 4px}
@@ -772,7 +825,7 @@ body:has(.modal.show,.sd.show,.lb.show) .kc-bubble,body:has(.modal.show,.sd.show
     <p class="about-line" id="about"><b>Hi, I'm Keiko ♡</b> Digital artist &amp; Live2D studio making original VTuber models, chibi art, emotes and stream assets. Cute meets gothic, made from scratch with updates at every stage.</p>
     <div class="faq-grid">
       <details><summary>How long does a commission take?</summary><p>Illustrations usually take 1–3 weeks; full VTuber models with rigging take around 4–8 weeks depending on complexity and queue.</p></details>
-      <details><summary>How do I pay?</summary><p>Pay with PayPal right after sending your request (the button appears on the confirmation screen and in your email), or via <a href="https://ko-fi.com/keikoarts" target="_blank" rel="noopener" style="color:var(--pink);font-weight:600">Ko-fi</a>. Larger projects can be split into installments (50% upfront, 50% before delivery).</p></details>
+      <details><summary>How do I pay?</summary><p>Pick your options in the order form and you get your invoice right away: pay it with PayPal in one click, or via <a href="https://ko-fi.com/keikoarts" target="_blank" rel="noopener" style="color:var(--pink);font-weight:600">Ko-fi</a>. Larger projects can be split into installments (50% upfront, 50% before delivery).</p></details>
       <details><summary>Can I use the art commercially?</summary><p>Yes — streaming, monetized videos and social media are included. Merch rights can be added on request.</p></details>
       <details><summary>How many revisions do I get?</summary><p>Revisions are free during the sketch stage. Small tweaks after coloring are included; major changes may have a fee.</p></details>
     </div>
@@ -786,7 +839,7 @@ body:has(.modal.show,.sd.show,.lb.show) .kc-bubble,body:has(.modal.show,.sd.show
       <summary><span class="serif">Terms of Service</span><small>By ordering you agree to these terms. Tap to read.</small></summary>
       <div class="tos">
       <div><h4>1. Ordering</h4><p>Submit a request form. I'll reply within 6 hours by email or Discord to confirm details and the final price. Your slot is secured once payment is received.</p></div>
-      <div><h4>2. Payment</h4><p>Pay with PayPal right after sending your request, or via <a href="https://ko-fi.com/keikoarts" target="_blank" rel="noopener" style="color:var(--pink);font-weight:600">Ko-fi</a>, in USD. Choose full payment, 50/50 (50% upfront, 50% before final files), or 3× installments for orders above $150. Custom orders: you name the price and pay the full invoice upfront; 13% tax is added on the invoice.</p></div>
+      <div><h4>2. Payment</h4><p>You get an invoice right after ordering. Pay it with PayPal, or via <a href="https://ko-fi.com/keikoarts" target="_blank" rel="noopener" style="color:var(--pink);font-weight:600">Ko-fi</a>, in USD. Choose full payment, 50/50 (50% upfront, 50% before final files), or 3× installments for orders above $150. Custom orders: you name the price and pay the full invoice upfront; 13% tax is added on the invoice.</p></div>
       <div><h4>3. Process &amp; timeline</h4><p>Sketch → lineart → coloring → (rigging) → delivery. You get progress updates at every stage. Estimated time is shown in the form; rush delivery is available.</p></div>
       <div><h4>4. Revisions</h4><p>Unlimited small revisions during sketch. Up to 2 minor revisions after coloring; major changes after approval may have extra fees.</p></div>
       <div><h4>5. Refunds</h4><p>Full refund before work starts. After the sketch, refunds are based on completed work. No refund after final files are delivered.</p></div>
@@ -853,8 +906,6 @@ body:has(.modal.show,.sd.show,.lb.show) .kc-bubble,body:has(.modal.show,.sd.show
   <div class="mbox" role="dialog" aria-modal="true" aria-labelledby="mTitle">
     <div class="mhead"><h3 id="mTitle">Commission Request ♡</h3><button class="mclose" type="button" data-close aria-label="Close">✕</button></div>
     <div class="mbody">
-      <div class="stepbar" id="stepbar"><span class="on">1. Service</span><span>2. Options</span><span>3. Your details</span><span>4. Review</span></div>
-      <!-- GANTI email di bawah kalau perlu -->
       <form id="orderForm" method="POST" enctype="multipart/form-data" action="order-api.php?a=submit&amp;html=1">
         <input type="hidden" name="_subject" id="fSubject" value="New commission request — keikoartist.com">
         <input type="hidden" name="_next" id="fNext" value="https://keikoartist.com/?sent=1">
@@ -869,80 +920,90 @@ body:has(.modal.show,.sd.show,.lb.show) .kc-bubble,body:has(.modal.show,.sd.show
         <input type="hidden" name="Quantity" id="fQty">
         <input type="hidden" name="Estimated total (USD)" id="fTotal">
         <input type="hidden" name="Amount due now (USD)" id="fDue">
+        <input type="email" name="email" id="fEmail" hidden>
 
         <div class="ostep on" data-s="1">
-          <div class="lbl">What would you like to order?</div>
+          <p class="c-intro">What would you like to order? Pick one to see its options ♡</p>
           <div class="opts" id="svcOpts"></div>
         </div>
 
-        <div class="ostep" data-s="2">
-          <div class="lbl">Package</div>
-          <div class="opts" id="pkgOpts"></div>
-          <div id="qtyWrap" class="qty" hidden><span class="lbl" style="margin:0">Quantity</span><input type="number" id="qty" min="1" value="1"></div>
-          <div id="budgetWrap" class="budget" hidden><label class="lbl" for="budget">Your budget (USD)</label><div class="bin"><span>$</span><input type="number" id="budget" name="_price" min="5" max="10000" step="0.01" inputmode="decimal" placeholder="e.g. 80"></div><small id="budgetHint">The price you'd like to pay for this commission. 13% tax is added on your invoice.</small></div>
-          <div class="lbl" id="addLbl">Add-ons</div>
-          <div class="opts" id="addOpts"></div>
-          <div class="opt" id="rushWrap"><input type="checkbox" id="rush"><label for="rush">Rush delivery <em>+25%</em><small>Priority in queue, about half the usual time</small></label></div>
-        </div>
+        <div class="ostep" data-s="2" id="sheet">
+          <div class="sh-head">
+            <div class="sh-thumb" id="shThumb"></div>
+            <div class="sh-t"><small>You're ordering</small><b id="shName">—</b><span id="shMeta"></span></div>
+            <button type="button" class="sh-change" id="shChange">Change</button>
+          </div>
+          <p class="c-intro" id="shIntro"></p>
 
-        <div class="ostep" data-s="3">
-          <div class="row"><input name="Name" id="fName" placeholder="Your name / VTuber name" required><input name="email" id="fEmail" type="email" placeholder="Email" required></div>
-          <div class="row"><input name="Discord" id="fDiscord" placeholder="Discord username (required)" required autocomplete="off"><label class="date-f" id="dateF"><span>Deadline / debut date <small>(optional)</small></span><input type="date" name="Deadline" id="fDeadline"></label></div>
-          <div class="refs" id="refsBox">
-            <label class="drop" id="refDrop" tabindex="0">
-              <input type="file" id="refFiles" accept="image/*,.pdf,.psd,.clip" multiple>
-              <b>📎 Attach reference images</b>
-              <span>Click or drag files here · up to 5 files · big images are compressed automatically</span>
-            </label>
-            <p class="ref-msg" id="refMsg" role="status"></p>
-            <ul class="ref-list" id="refList"></ul>
-            <div id="refSlots" hidden></div>
-            <input name="Reference links" placeholder="Or paste links (Drive, Pinterest, Toyhouse…) for bigger files">
+          <div class="sec" id="secPkg">
+            <h4>Choose your package</h4>
+            <div class="mx" id="mx" hidden>
+              <div class="mx-g"><span>What do you need?</span><div class="chips big" id="mxType"></div></div>
+              <div class="mx-g"><span>How much of your character?</span><div class="chips big" id="mxSize"></div></div>
+              <p class="mx-pick" id="mxPick"></p>
+            </div>
+            <div class="opts" id="pkgOpts"></div>
+            <div class="stepper" id="qtyWrap" hidden><span>How many?</span><button type="button" id="qtyMinus" aria-label="One less">−</button><input type="number" id="qty" min="1" max="50" value="1" inputmode="numeric" aria-label="Quantity"><button type="button" id="qtyPlus" aria-label="One more">+</button></div>
           </div>
-          <textarea name="Details" id="fDetails" placeholder="Tell me about your character, personality, colors, and anything I should know ♡" required></textarea>
-          <div class="lbl">Payment plan</div>
-          <div class="opts">
-            <div class="opt"><input type="radio" name="Payment plan" id="pp1" value="Full payment" checked><label for="pp1">Full payment<small>Pay once upfront</small></label></div>
-            <div class="opt"><input type="radio" name="Payment plan" id="pp2" value="50/50"><label for="pp2">50 / 50<small>Half now, half before final</small></label></div>
-            <div class="opt"><input type="radio" name="Payment plan" id="pp3" value="3x installments"><label for="pp3">3× installments<small>Orders above $150</small></label></div>
-          </div>
-        </div>
 
-        <div class="ostep" data-s="4">
-          <div class="summary" id="summary"></div>
-          <label class="check" id="agreeRow"><input type="checkbox" id="agree"><span>I have read and agree to the <a href="#tos" data-close style="color:var(--pink);font-weight:600">Terms of Service</a>.</span></label>
-          <p class="small pay-note" id="payNote" style="font-size:12.5px;color:var(--muted)"></p>
-        </div>
+          <div class="sec" id="secAdd">
+            <h4>Extras <small>optional</small></h4>
+            <div class="tags" id="addOpts"></div>
+            <label class="switch" id="rushWrap"><input type="checkbox" id="rush"><span class="sw" aria-hidden="true"></span><span><b>Rush delivery</b> <em>+25%</em><small>Priority in my queue, about half the usual time</small></span></label>
+          </div>
 
-        <!-- Custom order: one page, instant invoice -->
-        <div class="ostep" data-s="5" id="cStep">
-          <p class="c-intro">Tell me your idea, name your price, and pay right away ♡</p>
-          <div class="lbl">Describe your request</div>
-          <div class="c-slot" data-slot="fDetails"></div>
-          <div class="c-slot" data-slot="refsBox"></div>
-          <div class="c-slot" data-slot="budgetWrap"></div>
-          <div class="row">
-            <div class="c-slot" data-slot="dateF"></div>
-            <div class="c-use"><span>Usage</span><div class="chips"><input type="radio" name="Usage" id="u1" value="Personal" checked disabled><label for="u1">Personal</label><input type="radio" name="Usage" id="u2" value="Commercial" disabled><label for="u2">Commercial</label></div></div>
+          <div class="sec" id="secBudget" hidden>
+            <h4>Your price</h4>
+            <div id="budgetWrap" class="budget"><label class="lbl" for="budget">Your budget (USD)</label><div class="bin"><span>$</span><input type="number" id="budget" name="_price" min="5" max="10000" step="0.01" inputmode="decimal" placeholder="e.g. 80"></div><small id="budgetHint">The price you'd like to pay for this commission. 13% tax is added on your invoice.</small></div>
           </div>
-          <div class="row">
-            <div class="c-slot" data-slot="fName"></div>
-            <div class="c-slot" data-slot="fDiscord"></div>
+
+          <div class="sec">
+            <h4>Tell me about it</h4>
+            <textarea name="Details" id="fDetails" placeholder="Tell me your idea ♡" required></textarea>
+            <div class="refs" id="refsBox">
+              <label class="drop" id="refDrop" tabindex="0">
+                <input type="file" id="refFiles" accept="image/*,.pdf,.psd,.clip" multiple>
+                <b>📎 Attach reference images</b>
+                <span>Click or drag files here · up to 5 files · big images are compressed automatically</span>
+              </label>
+              <p class="ref-msg" id="refMsg" role="status"></p>
+              <ul class="ref-list" id="refList"></ul>
+              <div id="refSlots" hidden></div>
+              <input name="Reference links" placeholder="Or paste links (Drive, Pinterest, Toyhouse…) for bigger files">
+            </div>
+            <div class="row">
+              <label class="date-f" id="dateF"><span>Deadline / debut date <small>(optional)</small></span><input type="date" name="Deadline" id="fDeadline"></label>
+              <div class="c-use" id="useBox" hidden><span>Usage</span><div class="chips"><input type="radio" name="Usage" id="u1" value="Personal" checked disabled><label for="u1">Personal</label><input type="radio" name="Usage" id="u2" value="Commercial" disabled><label for="u2">Commercial</label></div></div>
+            </div>
           </div>
+
+          <div class="sec">
+            <h4>Your info</h4>
+            <div class="row"><input name="Name" id="fName" placeholder="Your name / VTuber name" required autocomplete="name"><input name="Discord" id="fDiscord" placeholder="Discord or email (optional)" autocomplete="off"></div>
+          </div>
+
+          <div class="sec" id="secPay">
+            <h4>How would you like to pay?</h4>
+            <div class="chips big pay">
+              <input type="radio" name="Payment plan" id="pp1" value="Full payment" checked><label for="pp1">Pay in full<small>All at once</small></label>
+              <input type="radio" name="Payment plan" id="pp2" value="50/50"><label for="pp2">50% now<small>Rest before final files</small></label>
+              <input type="radio" name="Payment plan" id="pp3" value="3x installments"><label for="pp3">3 payments<small>Orders above $150</small></label>
+            </div>
+          </div>
+
           <div class="c-inv" aria-live="polite">
-            <div class="c-inv-h">Invoice preview <span>USD</span></div>
-            <dl><dt>Commission price</dt><dd id="cSub">—</dd><dt>Tax (13%)</dt><dd id="cTax">—</dd><dt class="grand">Total</dt><dd class="grand" id="cTot">—</dd></dl>
-            <p>Pay with PayPal on the next screen. Full refund if I can't take your commission.</p>
+            <div class="c-inv-h">Invoice preview <span id="invEta">USD</span></div>
+            <dl id="invLines"></dl>
+            <p id="invNote">You get your invoice right away and pay with PayPal. Full refund if I can't take your order.</p>
           </div>
-          <div class="c-slot" data-slot="agree"></div>
+          <label class="check" id="agreeRow"><input type="checkbox" id="agree"><span>I have read and agree to the <a href="#tos" data-close style="color:var(--pink);font-weight:600">Terms of Service</a>.</span></label>
         </div>
 
-        <div class="total" id="totalBar"><div><small id="totalLbl">Estimated total</small><b id="totalOut">$0</b></div><div style="text-align:right;font-size:12px" id="etaOut"></div></div>
         <p class="err" id="err"></p>
-        <div class="mnav">
+        <div class="mnav" id="mnav">
           <button type="button" class="btn btn-ghost" id="prevBtn">Back</button>
-          <button type="button" class="btn btn-pink arrow" id="nextBtn">Next</button>
-          <button type="submit" class="btn btn-pink" id="sendBtn" hidden>Send Request ♡</button>
+          <div class="mtot" id="navTot"><small id="navLbl">Total</small><b id="navTotal">$0</b></div>
+          <button type="submit" class="btn btn-pink" id="sendBtn">Get Invoice ♡</button>
         </div>
       </form>
     </div>
@@ -1166,12 +1227,13 @@ function attachRefsToForm(){
     const dt=new DataTransfer();dt.items.add(f);inp.files=dt.files;slots.appendChild(inp);});
 }
 
-// modal + steps
-const modal=$('#orderModal'), form=$('#orderForm'); let step=1, svc=null;
+// ===== order modal: service list (step 1) + one order page per service (step 2) =====
+const modal=$('#orderModal'), form=$('#orderForm'); let step=1, svc=null, svcName='', cmOn=false;
+let ORDER={lines:[],total:0,due:0,plan:'Full payment',custom:false};
 $('#svcOpts').innerHTML=Object.entries(SERVICES).map(([k,v],i)=>`<div class="opt"><input type="radio" name="svc" id="s${i}" value="${k}"><label for="s${i}">${k}<small>${v.quote?'Name your price':'From '+money(v.from)}</small></label></div>`).join('');
 function openOrder(service){
   modal.classList.add('show'); modal.setAttribute('aria-hidden','false'); document.body.style.overflow='hidden';
-  if(service&&SERVICES[service]){const r=$$('input[name=svc]').find(x=>x.value===service); r.checked=true; pickService(service); go(SERVICES[service].quote?5:2);} else go(1);
+  if(service&&SERVICES[service]){const r=$$('input[name=svc]').find(x=>x.value===service); r.checked=true; pickService(service); go(2);} else go(1);
 }
 function closeOrder(){modal.classList.remove('show');modal.setAttribute('aria-hidden','true');document.body.style.overflow='';}
 document.addEventListener('click',e=>{
@@ -1180,36 +1242,83 @@ document.addEventListener('click',e=>{
 });
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeOrder()});
 
+const DETAILS_PH={
+  "VTuber":"Tell me about your character: personality, colors, outfit, and must-have details ♡",
+  "VTuber Packages":"Tell me about your character and your debut plans: personality, colors, theme ♡",
+  "Background":"Describe the scene: place, mood, time of day, colors ♡",
+  "Stream Overlay":"Your stream theme, colors, and the text you want on each screen ♡",
+  "Custom PFP":"Who is in it, pose or expression, colors, and the vibe you want ♡",
+  "Banner":"Your character, colors, and where you'll use the banner ♡",
+  "VTuber Logo":"The name or text for your logo, style, colors, and any icon idea ♡",
+  "PNGTuber":"Your character and the expressions you want ♡",
+  "Emotes":"Which emotes? e.g. love, cry, hype, sleepy. Plus your character references ♡",
+  "VTuber Pet":"What kind of pet, colors, personality, and accessories ♡",
+  "Chibi VTuber":"Your character, outfit, and the expressions you want ♡",
+};
+const svcThumb=k=>{const g=(typeof GALLERY!=='undefined'&&GALLERY[k])||[];return g.length?`images/${g[0]}.webp`:'images/pfp.webp';};
+const sizeName=c=>c==='Half'?'Half body':c==='Full'?'Full body':c;
 function pickService(k){
-  svc=SERVICES[k];
-  $('#pkgOpts').innerHTML=svc.packages.map(([n,p,d],i)=>`<div class="opt"><input type="radio" name="pkg" id="p${i}" value="${i}" ${i===0?'checked':''}><label for="p${i}">${n} <em>${svc.quote?'':money(p)+(svc.qty?' each':'')}</em><small>${d}</small></label></div>`).join('');
-  $('#addOpts').innerHTML=svc.addons.map(([n,p],i)=>`<div class="opt"><input type="checkbox" name="add" id="a${i}" value="${i}"><label for="a${i}">${n} <em>${p?'+'+money(p):svc.quote?'Quote':'Free'}</em></label></div>`).join('');
-  $('#addLbl').hidden=!svc.addons.length; $('#qtyWrap').hidden=!svc.qty; $('#qty').value=1;
-  $('#budgetWrap').hidden=!svc.quote; $('#budget').value=''; $('#rushWrap').hidden=!!svc.quote; $('#rush').checked=false;
+  svc=SERVICES[k]; svcName=k; cmOn=!!svc.quote;
+  $('#shName').textContent=k;
+  $('#shMeta').textContent=cmOn?'You name the price · 13% tax added':`From ${money(svc.from)} · ${svc.eta}`;
+  $('#shThumb').style.backgroundImage=`url("${svcThumb(k)}")`;
+  $('#shIntro').textContent=cmOn?'Tell me your idea, name your price, and pay right away ♡':'Choose your options, tell me your idea, and get your invoice right away ♡';
+  const mx=!!svc.table; $('#mx').hidden=!mx; $('#pkgOpts').hidden=mx;
+  $('#pkgOpts').innerHTML=svc.packages.map(([n,p,d],i)=>`<div class="opt"><input type="radio" name="pkg" id="p${i}" value="${i}" ${i===0?'checked':''}><label for="p${i}">${esc(n)} <em>${cmOn?'':money(p)+(svc.qty?' each':'')}</em><small>${esc(d)}</small></label></div>`).join('');
+  if(mx){
+    $('#mxType').innerHTML=svc.table.rows.map(([r,ix],i)=>`<input type="radio" name="mxType" id="mt${i}" value="${i}" ${i===0?'checked':''}><label for="mt${i}">${esc(r)}<small>from ${money(Math.min(...ix.map(j=>svc.packages[j][1])))}</small></label>`).join('');
+    $('#mxSize').innerHTML=svc.table.cols.map((c,i)=>`<input type="radio" name="mxSize" id="ms${i}" value="${i}" ${i===0?'checked':''}><label for="ms${i}">${esc(sizeName(c))}<small></small></label>`).join('');
+  }else{$('#mxType').innerHTML='';$('#mxSize').innerHTML='';}
+  $('#addOpts').innerHTML=svc.addons.map(([n,p],i)=>`<input type="checkbox" name="add" id="a${i}" value="${i}"><label for="a${i}">${esc(n)} <em>${p?'+'+money(p):'Free'}</em></label>`).join('');
+  $('#qtyWrap').hidden=!svc.qty; $('#qty').value=1;
+  $('#secPkg').hidden=cmOn; $('#secAdd').hidden=cmOn; $('#secPay').hidden=cmOn; $('#secBudget').hidden=!cmOn; $('#useBox').hidden=!cmOn;
+  $$('input[name=Usage]').forEach(x=>x.disabled=!cmOn);
+  $('#budget').required=cmOn; $('#budget').value=''; $('#rush').checked=false; $('#pp1').checked=true;
+  $('#fDetails').placeholder=cmOn?"What would you like? Character(s), pose, mood, colors, where you'll use it…":(DETAILS_PH[k]||"Tell me your idea: character, colors, vibe, and anything I should know ♡");
   calc();
 }
-$('#svcOpts').addEventListener('change',e=>pickService(e.target.value));
-form.addEventListener('input',()=>{calc();if(step===4){summary();updatePayNote();}if(step===5){updateInv();err('');}});
+['click','change'].forEach(ev=>$('#svcOpts').addEventListener(ev,e=>{if(e.target.name==='svc'&&e.target.checked){if(step===2&&svcName===e.target.value)return;pickService(e.target.value);go(2);}}));
+$('#shChange').onclick=()=>go(1);
+$('#qtyMinus').onclick=()=>{$('#qty').value=Math.max(1,(parseInt($('#qty').value,10)||1)-1);calc();};
+$('#qtyPlus').onclick=()=>{$('#qty').value=Math.min(50,(parseInt($('#qty').value,10)||1)+1);calc();};
+form.addEventListener('input',()=>{if(svc)calc();if(step===2)err('');});
+form.addEventListener('change',()=>{if(svc)calc();});
 
 function budget(){if(!svc||!svc.quote)return 0;const v=parseFloat($('#budget').value);return v>=5&&v<=10000?Math.round(v*100)/100:0;}
+const radioVal=n=>+(($(`input[name="${n}"]:checked`)||{}).value||0);
+function selIndex(){return svc.table?svc.table.rows[radioVal('mxType')][1][radioVal('mxSize')]:radioVal('pkg');}
 function calc(){
-  if(!svc){$('#totalOut').textContent='$0';$('#etaOut').textContent='';return 0;}
-  const pi=+($('input[name=pkg]:checked')||{value:0}).value, pk=svc.packages[pi];
-  const qty=svc.qty?Math.max(1,+$('#qty').value||1):1;
-  const adds=$$('input[name=add]:checked').map(x=>svc.addons[+x.value]);
-  let t=pk[1]*qty+adds.reduce((a,b)=>a+b[1],0); const rush=!svc.quote&&$('#rush').checked; if(rush)t*=1.25;
-  const bud=budget(); if(svc.quote)t=bud;
-  $('#totalLbl').textContent=svc.quote&&bud?'Your budget':'Estimated total';
-  $('#totalOut').textContent=svc.quote?(bud?money(bud):'Quote'):money(t);
-  $('#etaOut').innerHTML='Estimated time<br><b style="font-size:14px">'+(rush&&!svc.quote?'Rush, about half of '+svc.eta:svc.eta)+'</b>';
-  const name=$('input[name=svc]:checked').value;
-  $('#fService').value=name; $('#fPackage').value=pk[0]; $('#fQty').value=qty;
-  $('#fAddons').value=[...adds.map(a=>a[0]),rush?'Rush delivery (+25%)':''].filter(Boolean).join(', ')||'-';
-  if(svc.quote){const iv=invoice();
+  if(!svc)return 0;
+  if(cmOn){
+    const iv=invoice(), bud=iv.sub;
+    $('#fService').value=svcName;$('#fPackage').value=svc.packages[0][0];$('#fQty').value=1;$('#fAddons').value='-';
     $('#fTotal').value=bud?`${money2(iv.total)} (client's price ${money2(bud)} + 13% tax ${money2(iv.tax)})`:'-';
-    $('#fSubject').value=`New custom order — ${bud?money2(iv.total)+' incl. tax':'no price'}`;}
-  else{$('#fTotal').value=money(t);$('#fSubject').value=`New request: ${name} (${pk[0]}) — ${money(t)}`;}
-  return t;
+    $('#fSubject').value=`New custom order — ${bud?money2(iv.total)+' incl. tax':'no price'}`;
+    ORDER={lines:[[`Custom commission (${usageVal()} use)`,bud],['Tax (13%)',iv.tax]],total:iv.total,due:iv.total,plan:'Full payment',custom:true};
+    renderInv();return bud;
+  }
+  const pk=svc.packages[selIndex()], qty=svc.qty?Math.min(50,Math.max(1,parseInt($('#qty').value,10)||1)):1;
+  const adds=$$('input[name=add]:checked').map(x=>svc.addons[+x.value]);
+  const base=r2(pk[1]*qty), sub=r2(base+adds.reduce((a,x)=>a+x[1],0)), rush=$('#rush').checked, rushAmt=rush?r2(sub*.25):0, t=r2(sub+rushAmt);
+  if(svc.table){const r=radioVal('mxType');
+    $$('#mxSize label').forEach((l,i)=>{const sm=l.querySelector('small');if(sm)sm.textContent=money(svc.packages[svc.table.rows[r][1][i]][1]);});
+    $('#mxPick').innerHTML=`You picked <b>${esc(pk[0])}</b> · ${money(pk[1])} · ${esc(pk[2])}`;}
+  const p3=$('#pp3'); p3.disabled=t<150; if(p3.disabled&&p3.checked)$('#pp1').checked=true;
+  const plan=$('input[name="Payment plan"]:checked').value, due=dueNow(t,plan);
+  $('#fService').value=svcName;$('#fPackage').value=pk[0];$('#fQty').value=qty;
+  $('#fAddons').value=[...adds.map(a=>a[0]),rush?'Rush delivery (+25%)':''].filter(Boolean).join(', ')||'-';
+  $('#fTotal').value=money(t);$('#fSubject').value=`New request: ${svcName} (${pk[0]}${svc.qty?' × '+qty:''}) — ${money(t)}`;
+  ORDER={lines:[[`${svcName} · ${pk[0]}${svc.qty?' × '+qty:''}`,base],...adds.map(a=>[a[0],a[1]]),...(rush?[['Rush delivery (+25%)',rushAmt]]:[])],total:t,due,plan,custom:false,rush};
+  renderInv();return t;
+}
+function renderInv(){
+  const o=ORDER, empty=o.custom&&!o.total, partial=!o.custom&&o.due<o.total;
+  $('#invLines').innerHTML=o.lines.map(([l,a])=>`<dt>${esc(l)}</dt><dd>${empty?'—':a?money2(a):'Free'}</dd>`).join('')
+    +`<dt class="grand">Total</dt><dd class="grand">${empty?'—':money2(o.total)}</dd>`
+    +(partial?`<dt class="now">Pay now · ${esc(planLabel(o.plan))}</dt><dd class="now">${money2(o.due)}</dd>`:'');
+  $('#invEta').textContent=o.custom?'USD':`USD · ${o.rush?'rush, about half of '+svc.eta:'est. '+svc.eta}`;
+  $('#navLbl').textContent=partial?'Pay now':'Total';
+  $('#navTotal').textContent=empty?'—':money2(partial?o.due:o.total);
 }
 
 // ===== PayPal =====
@@ -1226,62 +1335,38 @@ function paypalLink(amount,id,label){
   return '';
 }
 const PAY_ON=()=>!!((PAYPAL.email&&/@/.test(PAYPAL.email))||PAYPAL.me);
-function updatePayNote(){
-  const el=$('#payNote');if(!el||!svc)return;
-  const plan=$('input[name="Payment plan"]:checked').value,total=calc();
-  const bud=svc.quote&&total>0;
-  if((svc.quote&&!bud)||!PAY_ON()){el.innerHTML=bud?`This is a request, not a booked slot yet. I'll review your brief and your budget of <b>${money(total)}</b> and send a PayPal / Ko-fi payment link within 6 hours.`:"This is a request, not a booked slot yet. I'll review your brief and confirm the final price and a PayPal / Ko-fi payment link within 6 hours.";return;}
-  const due=dueNow(total,plan);
-  el.innerHTML=`After sending, you can <b>pay ${money(due)} right away with PayPal</b> (${planLabel(plan)}) to secure your slot. ${bud?"If your budget doesn't fit the brief, I'll suggest an adjustment on Discord first. ":''}If I can't take your request, you get a full refund.`;
-}
-// ===== Custom order: one page (VGen style) + instant invoice =====
+// ===== invoice helpers =====
 const TAX=0.13, r2=n=>Math.round(n*100)/100;
 const money2=n=>'$'+(+n).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
 function invoice(){const sub=budget(),tax=r2(sub*TAX);return {sub,tax,total:r2(sub+tax)};}
 const usageVal=()=>($('input[name=Usage]:checked')||{value:'Personal'}).value;
-const CM=[['fDetails','#fDetails'],['refsBox','#refsBox'],['budgetWrap','#budgetWrap'],['dateF','#dateF'],['fName','#fName'],['fDiscord','#fDiscord'],['agree','#agreeRow']].map(([k,q])=>{const el=$(q),home=document.createComment(k);el.before(home);return {el,home,slot:$(`#cStep [data-slot="${k}"]`)};});
-const PH={d:$('#fDetails').placeholder,c:$('#fDiscord').placeholder};
-let cmOn=false;
-function setCustom(on){
-  if(on===cmOn)return; cmOn=on; $('#fEmail').disabled=false; $('#fAuto').disabled=false;
-  CM.forEach(i=>on?i.slot.appendChild(i.el):i.home.after(i.el));
-  $('#stepbar').hidden=on; $('#totalBar').hidden=on;
-  $('#mTitle').textContent=on?'Custom Order ♡':'Commission Request ♡';
-  $('#fDetails').placeholder=on?"What would you like? Character(s), pose, mood, colors, where you'll use it…":PH.d;
-  $('#fDiscord').placeholder=on?'Discord or email (optional)':PH.c;
-  $('#fDiscord').required=!on; $('#fEmail').required=!on; $('#budget').required=on;
-  $$('input[name=Usage]').forEach(x=>x.disabled=!on);
-  if(on)$('#pp1').checked=true;
-  $('#sendBtn').textContent=on?'Get Invoice ♡':'Send Request ♡';
-}
-function updateInv(){const {sub,tax,total}=invoice();$('#cSub').textContent=sub?money2(sub):'—';$('#cTax').textContent=sub?money2(tax):'—';$('#cTot').textContent=sub?money2(total):'—';}
-function summary(){
-  if(cmOn){const rows=[['Usage',usageVal()+' use'],['Deadline',$('#fDeadline').value||'-'],['Name',$('#fName').value],['Contact',$('#fDiscord').value||$('#fEmail').value||'-'],['References',(refFiles.length?refFiles.length+' file(s)':'')+(form['Reference links'].value?(refFiles.length?' + links':'Links'):'')||'-']];
-    $('#summary').innerHTML=rows.map(([a,b])=>`<div><span>${a}</span><b>${esc(b)}</b></div>`).join('');return;}
-  const rows=[['Service',$('#fService').value],['Package',$('#fPackage').value],svc.qty?['Quantity',$('#fQty').value]:null,['Add-ons',$('#fAddons').value],['Payment plan',$('input[name="Payment plan"]:checked').value],['Name',$('#fName').value],['Discord',$('#fDiscord').value],['Email',$('#fEmail').value],['References',(refFiles.length?refFiles.length+' file(s)':'')+(form['Reference links'].value?(refFiles.length?' + links':'Links'):'')||'-'],budget()?['Your budget',money(budget())]:['Estimated total',$('#fTotal').value]].filter(Boolean);
-  $('#summary').innerHTML=rows.map(([a,b])=>`<div><span>${a}</span><b>${String(b).replace(/</g,'&lt;')}</b></div>`).join('');
+function orderRows(){
+  const refs=(refFiles.length?refFiles.length+' file(s)':'')+(form['Reference links'].value?(refFiles.length?' + links':'Links'):'')||'-';
+  return [['Service',svcName],...(cmOn?[['Usage',usageVal()+' use']]:[['Package',$('#fPackage').value],['Add-ons',$('#fAddons').value],['Payment plan',$('input[name="Payment plan"]:checked').value]]),
+    ['Deadline',$('#fDeadline').value||'-'],['Name',$('#fName').value],['Contact',$('#fDiscord').value||$('#fEmail').value||'-'],['References',refs]];
 }
 function err(m){const e=$('#err');e.textContent=m;e.style.display=m?'block':'none';}
 function valid(n){
   if(n===1&&!$('input[name=svc]:checked'))return err('Please choose a service.'),false;
-  if(n===5){for(const f of [$('#fDetails'),$('#budget'),$('#fDeadline'),$('#fName'),$('#fDiscord')])if(!f.checkValidity()){f.reportValidity();f.focus();return err(f.id==='budget'?'Please enter your price ($5 – $10,000).':f.id==='fDeadline'?'Please pick a deadline that is today or later.':'Please fill in the highlighted field.'),false;}
-    if(!budget())return $('#budget').focus(),err('Please enter your price ($5 – $10,000).'),false;}
-  if(n===3){for(const f of [$('#fName'),$('#fEmail'),$('#fDiscord'),$('#fDeadline'),$('#fDetails')])if(!f.checkValidity()){f.reportValidity();return false;}
-    if($('#pp3').checked&&(!svc.quote||budget()>0)&&calc()<150)return err('Installments are available for orders above $150.'),false;}
+  if(n===2){
+    const list=[$('#fDetails'),...(cmOn?[$('#budget')]:[]),$('#fDeadline'),$('#fName'),$('#fDiscord')];
+    for(const f of list)if(!f.checkValidity()){f.reportValidity();f.focus();return err(f.id==='budget'?'Please enter your price ($5 – $10,000).':f.id==='fDeadline'?'Please pick a deadline that is today or later.':'Please fill in the highlighted field.'),false;}
+    if(cmOn&&!budget())return $('#budget').focus(),err('Please enter your price ($5 – $10,000).'),false;
+    if(!cmOn&&$('#pp3').checked&&calc()<150)return err('3 payments are available for orders above $150.'),false;
+  }
   err('');return true;
 }
 function go(n){
-  step=n; setCustom(n===5); $$('.ostep').forEach(s=>s.classList.toggle('on',+s.dataset.s===n));
-  $$('.stepbar span').forEach((s,i)=>s.classList.toggle('on',i<n));
-  $('#prevBtn').style.visibility=n>1?'visible':'hidden';
-  $('#nextBtn').hidden=n>=4; $('#sendBtn').hidden=n<4;
-  if(n===4){summary();updatePayNote();} if(n===5){calc();updateInv();} err('');
+  step=n; $$('.ostep').forEach(s=>s.classList.toggle('on',+s.dataset.s===n));
+  $('#mnav').hidden=n!==2;
+  $('#mTitle').textContent=n===1?'Start an Order ♡':cmOn?'Custom Order ♡':'Order Form ♡';
+  if(n===2)calc();
+  err('');try{modal.scrollTop=0;}catch(_){}
 }
-$('#nextBtn').onclick=()=>{if(valid(step))go(step===1&&svc&&svc.quote?5:step+1)};
-$('#prevBtn').onclick=()=>go(step===5?1:step-1);
+$('#prevBtn').onclick=()=>go(1);
 form.setAttribute('novalidate','');
 function setBusy(on,label){const sb=$('#sendBtn');if(on){sb.dataset.busy='1';sb.textContent=label;sb.style.opacity='.75';$('#prevBtn').style.visibility='hidden';}
-  else{delete sb.dataset.busy;sb.textContent=cmOn?'Get Invoice ♡':'Send Request ♡';sb.style.opacity='';$('#prevBtn').style.visibility=step>1?'visible':'hidden';}}
+  else{delete sb.dataset.busy;sb.textContent='Get Invoice ♡';sb.style.opacity='';$('#prevBtn').style.visibility='visible';}}
 function resetOrderForm(){form.reset();$('#fEmail').disabled=false;$('#fAuto').disabled=false;refFiles=[];renderRefs();$('#refSlots').innerHTML='';const m=$('#refMsg');if(m)m.textContent='';setBusy(false);err('');}
 const LIVE_SITE=/(^|\.)keikoartist\.com$/i.test(location.hostname)||/^(localhost|127\.0\.0\.1)$/.test(location.hostname);
 function postOrder(fd,onProgress){
@@ -1298,75 +1383,53 @@ function postOrder(fd,onProgress){
 function errHtml(h){const e=$('#err');e.innerHTML=h;e.style.display='block';}
 form.addEventListener('submit',async e=>{
   e.preventDefault();
-  $('#fAuto').disabled=false;$('#fEmail').disabled=false;
-  if(cmOn){$('#fEmail').value='';if(!valid(5))return;}
-  if(!$('#agree').checked){err('Please agree to the Terms of Service first.');return;}
+  if(step!==2||!svc)return;
+  $('#fAuto').disabled=false;$('#fEmail').disabled=false;$('#fEmail').value='';
+  if(!valid(2))return;
+  if(!$('#agree').checked){err('Please agree to the Terms of Service first.');$('#agree').focus();return;}
   const bad=[...form.elements].find(el=>el.willValidate&&!el.checkValidity());
-  if(bad){const st=bad.closest('.ostep');if(st)go(+st.dataset.s);
-    setTimeout(()=>{bad.reportValidity();bad.focus();},50);
-    err(bad.id==='fDeadline'?'Please pick a deadline that is today or later.':'Please check the highlighted field.');return;}
+  if(bad){setTimeout(()=>{bad.reportValidity();bad.focus();},50);err(bad.id==='fDeadline'?'Please pick a deadline that is today or later.':'Please check the highlighted field.');return;}
   if($('#sendBtn').dataset.busy)return;
-  err('');setBusy(true,refFiles.length?'Uploading references…':cmOn?'Creating invoice…':'Sending…');
+  err('');setBusy(true,refFiles.length?'Uploading references…':'Creating invoice…');
   const slow=setTimeout(()=>{if($('#sendBtn').dataset.busy)err('Still sending… slow connection or large files. Please wait, do not close this page.');},15000);
   let contactWasEmail=false;
-  if(cmOn){const c=$('#fDiscord').value.trim();
+  {const c=$('#fDiscord').value.trim();
     if(/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(c)){$('#fEmail').value=c;$('#fDiscord').value='';contactWasEmail=true;}
     if(!$('#fEmail').value){$('#fEmail').disabled=true;$('#fAuto').disabled=true;}}
-  const plan=$('input[name="Payment plan"]:checked').value, totalNum=calc(), iv=cmOn?invoice():null, due=cmOn?iv.total:dueNow(totalNum,plan);
+  const totalNum=calc(), plan=cmOn?'Full payment':$('input[name="Payment plan"]:checked').value, iv=cmOn?invoice():null, due=cmOn?iv.total:dueNow(totalNum,plan);
+  const lines=ORDER.lines.map(x=>x.slice()), invTotal=cmOn?iv.total:totalNum;
   const name=$('#fName').value.trim(), total=$('#fTotal').value;
-  const label=cmOn?`Custom commission, ${usageVal()} use, incl. 13% tax`:`${$('#fService').value} (${$('#fPackage').value})`;
-  summary();
-  const rows=[...$$('#summary div')].map(r=>[r.children[0].textContent,r.children[1].textContent]);
-  const ctx={custom:cmOn,name,usage:usageVal(),deadline:$('#fDeadline').value,brief:$('#fDetails').value.trim().slice(0,140),
-    contact:$('#fDiscord').value?$('#fDiscord').value+' (Discord)':$('#fEmail').value,rows};
+  const label=cmOn?`Custom commission, ${usageVal()} use, incl. 13% tax`:`${svcName} (${$('#fPackage').value})`;
+  const rows=orderRows();
+  const ctx={name,usage:usageVal(),deadline:$('#fDeadline').value,brief:$('#fDetails').value.trim().slice(0,140),contact:$('#fDiscord').value?$('#fDiscord').value+' (Discord)':$('#fEmail').value};
+  const mkInv=(dateStr,emailed,tot,dueAmt)=>({date:dateStr,name,contact:ctx.contact,deadline:ctx.deadline,brief:ctx.brief,usage:cmOn?ctx.usage:'',custom:cmOn,service:svcName,lines,total:tot,due:dueAmt,plan,emailed});
   const done=last=>{clearTimeout(slow);try{sessionStorage.setItem('ka_last',JSON.stringify(last));}catch(_){}resetOrderForm();closeOrder();showThanks(last);};
+  const restore=()=>{clearTimeout(slow);if(contactWasEmail)$('#fDiscord').value=$('#fEmail').value;$('#fEmail').disabled=false;$('#fAuto').disabled=false;setBusy(false);};
+  const stamp=()=>{const d=new Date(),pad=n=>String(n).padStart(2,'0');return {md:pad(d.getMonth()+1)+pad(d.getDate()),date:d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})};};
   // email copy through FormSubmit (used when the hosting can't send email, and as the backup path)
   const buildCopy=(id,payUrl,dateStr,filesNote)=>{
     $('#fReq').value=id;
-    $('#fSubject').value=$('#fSubject').value.replace(/ \[(INV|REQ)-[\d-]+\]$/,'')+' ['+id+']';
+    $('#fSubject').value=$('#fSubject').value.replace(/ \[(INV|REQ)-[\w-]+\]$/,'')+' ['+id+']';
     $('#fDue').value=cmOn?`${money2(due)} — full payment incl. 13% tax`+(payUrl?' (PayPal invoice shown to client)':' (PayPal not set up yet: send the client a payment link)')
-      :due?money(due)+' — '+planLabel(plan)+(payUrl?' (PayPal link shown to client)':''):'Quote';
-    $('#fAuto').value=cmOn?`Hi ${name}, thank you for your custom order at KeikoArts! ♡
+      :due?money2(due)+' — '+planLabel(plan)+(payUrl?' (PayPal link shown to client)':''):'-';
+    const lineTxt=lines.map(([l,a])=>`${l}: ${a?money2(a):'Free'}`).join('\n');
+    $('#fAuto').value=`Hi ${name}, thank you for your order at KeikoArts! ♡
 
-  INVOICE ${id} · ${dateStr}
-  Custom commission (${usageVal()} use): ${money2(iv.sub)}
-  Tax (13%): ${money2(iv.tax)}
-  TOTAL DUE: ${money2(iv.total)} USD
+INVOICE ${id} · ${dateStr}
+${lineTxt}
+TOTAL: ${money2(invTotal)} USD${!cmOn&&due<invTotal?`
+PAY NOW (${planLabel(plan)}): ${money2(due)}`:''}
 
-  ${payUrl?`Pay with PayPal:
-  ${payUrl}`:`I'll send you a PayPal payment link within 6 hours.`}
-  (Full refund if I can't take your commission.)
+${payUrl?`Pay with PayPal:
+${payUrl}`:`I'll send you a PayPal payment link within 6 hours.`}
+(Full refund if I can't take your order.)
 
-  Questions? Message me on Discord with your invoice number:
-  https://discord.com/users/1053527069528707072
+Questions? Message me on Discord with your invoice number:
+https://discord.com/users/1053527069528707072
 
-  — Keiko, KeikoArts`:`Hi ${name}, thank you for your commission request at KeikoArts! ♡
-
-  Request ID: ${id}
-  Service: ${$('#fService').value} (${$('#fPackage').value})
-  Add-ons: ${$('#fAddons').value}
-  Estimated total: ${total}
-  Payment plan: ${plan}
-
-  ${payUrl?`PAY NOW to secure your slot: ${money(due)} (${planLabel(plan)})
-  ${payUrl}
-  (Full refund if I can't take your request.)
-
-  `:''}NEXT STEP: message me on Discord with your Request ID:
-  https://discord.com/users/1053527069528707072
-
-  What happens next:
-  ${payUrl?`1. Pay with the PayPal link above (if you haven't yet).
-  2. We chat on Discord about details. I reply within 6 hours.
-  3. Your slot is secured and I'll send progress updates on Discord.`:`1. We chat on Discord about details. I reply within 6 hours.
-  2. You get the final price and a PayPal / Ko-fi payment link.
-  3. Once paid, your slot is secured and I'll send progress updates on Discord.`}
-
-  Can't use Discord? Just reply to this email or reach me on WhatsApp.
-
-  — Keiko, KeikoArts`;
+— Keiko, KeikoArts`;
     const data={};
-    new FormData(form).forEach((v,k)=>{if(typeof v==='string'&&!['svc','pkg','add','_next','_honey','_dryrun','_price','_total'].includes(k))data[k]=v;});
+    new FormData(form).forEach((v,k)=>{if(typeof v==='string'&&!['svc','pkg','add','mxType','mxSize','_next','_honey','_dryrun','_price','_total'].includes(k))data[k]=v;});
     data._captcha='false';data._template='table';
     if(filesNote)data['Reference files']=filesNote;
     return data;
@@ -1375,20 +1438,18 @@ form.addEventListener('submit',async e=>{
     const r=await fetch('https://formsubmit.co/ajax/keikoarts22@gmail.com',{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify(data),signal:ctl.signal});clearTimeout(to);
     const jj=await r.json().catch(()=>null);return !!(r.ok&&jj&&String(jj.success)==='true');}catch(_){return false;}};
   if(!LIVE_SITE){   // preview copy (e.g. inside the Claude app): show the invoice, nothing is sent
-    const d=new Date(),pad=n=>String(n).padStart(2,'0'),dateStr=d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
-    const id=(cmOn?'INV-':'REQ-')+pad(d.getMonth()+1)+pad(d.getDate())+'-PREVIEW';
-    done({id,due,plan,payUrl:PAY_ON()?paypalLink(due,id,label):'',rows,emailed:false,warn:'PREVIEW ONLY: this order was not sent. Real orders work on keikoartist.com.',
-      inv:cmOn?{date:dateStr,name,contact:ctx.contact,usage:ctx.usage,deadline:ctx.deadline,brief:ctx.brief,sub:iv.sub,tax:iv.tax,total:iv.total,emailed:false}:null});
+    const t=stamp(), id=(cmOn?'INV-':'REQ-')+t.md+'-PREVIEW';
+    done({id,due,plan,payUrl:PAY_ON()?paypalLink(due,id,label):'',rows,emailed:false,warn:'PREVIEW ONLY: this order was not sent. Real orders work on keikoartist.com.',inv:mkInv(t.date,false,invTotal,due)});
     return;}
-  // 1) KeikoArts server: saves the order + files, emails Keiko, returns the invoice
+  // 1) KeikoArts server: saves the order + files, returns the invoice
   if(location.protocol.startsWith('http')){
     const fd=new FormData(form);
-    ['_next','_autoresponse','_subject','_captcha','_template'].forEach(k=>fd.delete(k));
+    ['_next','_autoresponse','_subject','_captcha','_template','mxType','mxSize'].forEach(k=>fd.delete(k));
     [...fd.keys()].filter(k=>/^attachment\d+$/.test(k)).forEach(k=>fd.delete(k));
     refFiles.forEach((f,i)=>fd.append('attachment'+(i+1),f,f.name||`reference-${i+1}.jpg`));
     fd.set('_price',cmOn?String(iv.sub):'0');fd.set('_total',String(totalNum||0));
     if(/[?&]dryrun=1/.test(location.search))fd.set('_dryrun','1');
-    const prog=p=>{if(refFiles.length&&$('#sendBtn').dataset.busy)$('#sendBtn').textContent=p<.995?`Uploading… ${Math.round(p*100)}%`:(cmOn?'Creating invoice…':'Sending…');};
+    const prog=p=>{if(refFiles.length&&$('#sendBtn').dataset.busy)$('#sendBtn').textContent=p<.995?`Uploading… ${Math.round(p*100)}%`:'Creating invoice…';};
     let res=await postOrder(fd,prog);
     if(res.status<=0||(res.status>=500&&!res.j)){await new Promise(r=>setTimeout(r,1500));res=await postOrder(fd,prog);}
     const j=res.j;
@@ -1397,28 +1458,20 @@ form.addEventListener('submit',async e=>{
         j.skipped_files?`${j.skipped_files} reference file(s) couldn't be uploaded${(j.skipped_names||[]).length?' ('+j.skipped_names.join(', ')+')':''}. Please send them to me on Discord.`:''].filter(Boolean).join(' ');
       const copy=(!j.dry_run&&!j.notified)?buildCopy(j.id,j.pay_url||'',j.date,j.files?j.files+' file(s) uploaded: see admin → Orders':''):null;
       if(copy&&j.emailed)delete copy._autoresponse;
-      done({id:j.id,due:j.due,plan:j.plan,payUrl:j.pay_url||'',rows,emailed:!!j.emailed,warn,
-        inv:cmOn?{date:j.date,name,contact:ctx.contact,usage:ctx.usage,deadline:ctx.deadline,brief:ctx.brief,sub:j.price,tax:j.tax,total:j.total,emailed:!!j.emailed}:null});
+      done({id:j.id,due:j.due,plan:j.plan,payUrl:j.pay_url||'',rows,emailed:!!j.emailed,warn,inv:mkInv(j.date,!!j.emailed,j.total,j.due)});
       if(copy)sendCopy(copy);
       return;}
-    if(j&&j.ok===false&&j.error&&![404,405].includes(res.status)&&res.status<500){clearTimeout(slow);
-      if(contactWasEmail)$('#fDiscord').value=$('#fEmail').value;
-      $('#fEmail').disabled=false;$('#fAuto').disabled=false;setBusy(false);err(j.error);return;}
+    if(j&&j.ok===false&&j.error&&![404,405].includes(res.status)&&res.status<500){restore();err(j.error);return;}
   }
   // 2) backup: FormSubmit via AJAX (stays on this page). Only used if the KeikoArts server can't be reached.
-  const d=new Date(),pad=n=>String(n).padStart(2,'0'), dateStr=d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
-  const id=(cmOn?'INV-':'REQ-')+pad(d.getMonth()+1)+pad(d.getDate())+'-'+Math.floor(1000+Math.random()*9000);
+  const t=stamp(), id=(cmOn?'INV-':'REQ-')+t.md+'-'+Math.floor(1000+Math.random()*9000);
   const payUrl=PAY_ON()?paypalLink(due,id,label):'';
-  const ok=await sendCopy(buildCopy(id,payUrl,dateStr,refFiles.length?refFiles.length+' file(s) could not be uploaded: ask the client to send them on Discord':''));
+  const ok=await sendCopy(buildCopy(id,payUrl,t.date,refFiles.length?refFiles.length+' file(s) could not be uploaded: ask the client to send them on Discord':''));
   if(ok){
     if(location.protocol.startsWith('http')){try{fetch('notify-discord.php',{method:'POST',keepalive:true,headers:{'Content-Type':'application/json'},body:JSON.stringify({id,due:$('#fDue').value,service:$('#fService').value,package:$('#fPackage').value,addons:$('#fAddons').value,total,plan,name,email:$('#fEmail').value,discord:$('#fDiscord').value,deadline:$('#fDeadline').value,refs:[refFiles.length?refFiles.length+' file(s) attached (see email)':'',form['Reference links'].value].filter(Boolean).join(' · '),details:(cmOn?`[${usageVal()} use] `:'')+$('#fDetails').value,_honey:form._honey.value})}).catch(()=>{});}catch(_){}}
-    done({id,due,plan,payUrl,rows,emailed:!!$('#fEmail').value,warn:refFiles.length?'Please send your reference images to me on Discord (they could not be uploaded).':'',
-      inv:cmOn?{date:dateStr,name,contact:ctx.contact,usage:ctx.usage,deadline:ctx.deadline,brief:ctx.brief,sub:iv.sub,tax:iv.tax,total:iv.total,emailed:!!$('#fEmail').value}:null});
+    done({id,due,plan,payUrl,rows,emailed:!!$('#fEmail').value,warn:refFiles.length?'Please send your reference images to me on Discord (they could not be uploaded).':'',inv:mkInv(t.date,!!$('#fEmail').value,invTotal,due)});
     return;}
-  clearTimeout(slow);
-  if(contactWasEmail)$('#fDiscord').value=$('#fEmail').value;
-  $('#fEmail').disabled=false;$('#fAuto').disabled=false;$('#fSubject').value=$('#fSubject').value.replace(/ \[(INV|REQ)-[\d-]+\]$/,'');
-  setBusy(false);
+  restore();$('#fSubject').value=$('#fSubject').value.replace(/ \[(INV|REQ)-[\w-]+\]$/,'');
   errHtml(`Sorry, your order couldn't be sent right now. Please check your internet and try again in a minute, or <a href="https://discord.com/users/1053527069528707072" target="_blank" rel="noopener" style="color:inherit;font-weight:600;text-decoration:underline">message me on Discord</a> ♡`);
 });
 
@@ -1678,24 +1731,33 @@ function showThanks(last){
   if(payNow){$('#tyPay').hidden=false;$('#tyPayAmt').textContent=money(last.due);$('#tyPayInfo').textContent=planLabel(last.plan)+' · Request '+last.id;$('#tyPayBtn').href=last.payUrl;$('#tyPayLabel').textContent='Pay '+money(last.due)+' with PayPal';}
   const inv=last&&last.inv;
   if(inv){
+    const custom=inv.custom!==undefined?!!inv.custom:true;
+    const lines=inv.lines||[[`Custom commission (${inv.usage||'Personal'} use)`,inv.sub],['Tax (13%)',inv.tax]];
+    const total=+inv.total||0, due=last.due!=null?+last.due:total, partial=!custom&&due<total;
     const dl=inv.deadline?new Date(inv.deadline+'T00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}):'';
+    const meta=dl?'Deadline '+dl:'';
+    const [first,...rest]=custom?[lines[0]]:lines;
+    const amt=a=>a?money2(a):'Free';
     $('#tyTitle').textContent='Your invoice ♡';
-    $('#tyLead').textContent=payNow?'Thank you for your order! Pay your invoice with PayPal to confirm it ♡':"Thank you for your order! Here's your invoice. Message me on Discord with your invoice number and I'll send you a PayPal link ♡";
+    $('#tyLead').textContent=payNow?(partial?`Thank you for your order! Pay ${money2(due)} now (${planLabel(inv.plan||last.plan)}) with PayPal to secure your slot ♡`:'Thank you for your order! Pay your invoice with PayPal to confirm it ♡')
+      :"Thank you for your order! Here's your invoice. Message me on Discord with your invoice number and I'll send you a PayPal link ♡";
     $('#tyRef').hidden=true;$('#tySummary').hidden=true;
     $('#tyInv').innerHTML=`<div class="inv">
       <div class="inv-head"><div><b>KeikoArts</b><small>Illustration &amp; Live2D Studio<br>keikoartist.com</small></div><span class="inv-tag">INVOICE</span></div>
       <div class="inv-meta"><div><small>Invoice no.</small><b>${esc(last.id)}</b></div><div><small>Date</small><b>${esc(inv.date)}</b></div><div><small>Billed to</small><b>${esc(inv.name)}</b>${inv.contact?`<span>${esc(inv.contact)}</span>`:''}</div></div>
       <table class="inv-t"><thead><tr><th>Description</th><th>Amount</th></tr></thead>
-      <tbody><tr><td>Custom commission<small>${esc(inv.usage)} use${dl?' · Deadline '+esc(dl):''}</small>${inv.brief?`<small>“${esc(inv.brief)}${inv.brief.length>=140?'…':''}”</small>`:''}</td><td>${money2(inv.sub)}</td></tr></tbody>
-      <tfoot><tr><td>Subtotal</td><td>${money2(inv.sub)}</td></tr><tr><td>Tax (13%)</td><td>${money2(inv.tax)}</td></tr><tr class="grand"><td>Total due (USD)</td><td>${money2(inv.total)}</td></tr></tfoot></table>
+      <tbody><tr><td>${esc(first[0])}${meta?`<small>${esc(meta)}</small>`:''}${inv.brief?`<small>“${esc(inv.brief)}${inv.brief.length>=140?'…':''}”</small>`:''}</td><td>${amt(first[1])}</td></tr>${rest.map(([l,a])=>`<tr><td>${esc(l)}</td><td>${amt(a)}</td></tr>`).join('')}</tbody>
+      <tfoot>${custom?`<tr><td>Subtotal</td><td>${money2(lines[0][1])}</td></tr><tr><td>Tax (13%)</td><td>${money2(lines[1]?lines[1][1]:0)}</td></tr><tr class="grand"><td>Total due (USD)</td><td>${money2(total)}</td></tr>`
+        :partial?`<tr><td>Total</td><td>${money2(total)}</td></tr><tr class="grand"><td>Pay now · ${esc(planLabel(inv.plan||last.plan))}</td><td>${money2(due)}</td></tr>`
+        :`<tr class="grand"><td>Total due (USD)</td><td>${money2(total)}</td></tr>`}</tfoot></table>
     </div>`;$('#tyInv').hidden=false;
-    if(payNow){$('#tyPayT').textContent='Pay your invoice';$('#tyPayInfo').textContent='Total incl. 13% tax · '+last.id;$('#tyPayAmt').textContent=money2(inv.total);$('#tyPayLabel').textContent='Pay '+money2(inv.total)+' with PayPal';
-      $('#tyPaySm').textContent="Secure checkout on PayPal (card or PayPal balance). Full refund if I can't take your commission.";
+    if(payNow){$('#tyPayT').textContent=partial?'Pay now to secure your slot':'Pay your invoice';$('#tyPayInfo').textContent=(custom?'Total incl. 13% tax':partial?planLabel(inv.plan||last.plan):'Full payment')+' · '+last.id;$('#tyPayAmt').textContent=money2(due);$('#tyPayLabel').textContent='Pay '+money2(due)+' with PayPal';
+      $('#tyPaySm').textContent="Secure checkout on PayPal (card or PayPal balance). Full refund if I can't take your order.";
       $('#tyDcT').textContent='Questions about your order?';$('#tyDcS').textContent='Message me on Discord with your invoice number.';}
     else{$('#tyDcS').textContent='Send me your invoice number so I can send your PayPal link.';}
     $('#tyNote').textContent=inv.emailed?'A copy of this invoice was sent to your email (check Spam). Other ways to reach me:':'Other ways to reach me:';
   }
-  const steps=inv?(payNow?[['Pay with PayPal','PayPal emails you a receipt.'],['I review your order',"I confirm within 6 hours. Full refund if I can't take it."],['Work starts','I send progress updates until your art is done ♡']]
+  const steps=inv?(payNow?[['Pay with PayPal','PayPal emails you a receipt.'],['I review your order',"I confirm within 6 hours. Full refund if I can't take it."],['Work starts',inv.custom===false&&last.due<inv.total?'I send progress updates; the rest is paid later as agreed ♡':'I send progress updates until your art is done ♡']]
       :[['Message me on Discord','Send your invoice number. I reply within 6 hours.'],['Pay your invoice','I send you a PayPal link for '+money2(inv.total)+'.'],['Work starts','I send progress updates until your art is done ♡']])
     :payNow?[['Pay with PayPal','Secure your slot now. PayPal emails you a receipt.'],['Chat on Discord','Send me your Request ID. I reply within 6 hours.'],['Work starts','I start working and send progress updates on Discord.']]
     :[['Chat on Discord','Add me / send a message with your Request ID. I reply within 6 hours.'],['Confirm & pay','We finalize details and I send a PayPal / Ko-fi payment link.'],['Your slot is secured','I start working on it and send progress updates on Discord.']];
