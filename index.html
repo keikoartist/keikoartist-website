@@ -243,6 +243,12 @@ body:has(.modal.show) .fab-order{display:none}
 .opt input:checked+label{border-color:var(--pink);background:#fff4f8;box-shadow:0 0 0 3px rgba(242,98,143,.12)}
 .qty{display:flex;align-items:center;gap:10px}
 .qty input{width:90px}
+.budget{border:1.5px dashed var(--pink);border-radius:14px;padding:12px 14px;background:#fff7fa;display:grid;gap:6px}
+.budget .lbl{margin:0}
+.budget .bin{display:flex;align-items:center;gap:8px}
+.budget .bin span{font-family:"DM Serif Display",serif;font-size:24px;color:var(--pink)}
+.budget .bin input{max-width:160px;font-size:16px;font-weight:600}
+.budget small{color:var(--muted);font-size:12px;line-height:1.45}
 .total{display:flex;justify-content:space-between;align-items:center;padding:14px 18px;border-radius:14px;background:linear-gradient(135deg,#f2628f,#ff8fb1);color:#fff;margin-top:6px}
 .total b{font-family:"DM Serif Display",serif;font-weight:400;font-size:28px}
 .total small{display:block;font-size:11px;opacity:.9}
@@ -588,6 +594,18 @@ body:has(.modal.show,.sd.show,.lb.show) .kc-bubble,body:has(.modal.show,.sd.show
 .nav-search{border:0;background:none;color:var(--ink);cursor:pointer;width:38px;height:38px;border-radius:50%;display:grid;place-items:center;flex:none}
 .nav-search:hover{background:#fff4f8;color:var(--pink)}
 @media (max-width:820px){.nav-search{margin-left:auto}.svc-search{width:100%}}
+
+/* paypal */
+.btn-paypal{background:#ffc439;color:#003087;box-shadow:0 8px 20px rgba(255,196,57,.35);justify-content:center}
+.btn-paypal:hover{background:#f2b62f;transform:translateY(-1px)}
+.ty-pay{border:1.5px solid #ffd77a;background:#fffaf0;border-radius:14px;padding:14px 16px;display:grid;gap:10px}
+.ty-pay-top{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.ty-pay b{display:block;font-size:14px;color:var(--ink)}
+.ty-pay span{font-size:12.5px;color:var(--muted)}
+.ty-pay strong{font-family:"DM Serif Display",serif;font-weight:400;font-size:30px;color:#003087;white-space:nowrap}
+.ty-pay .btn{width:100%;padding:13px}
+.ty-pay small{font-size:11.5px;color:var(--muted);text-align:center}
+.pay-note b{color:var(--ink)}
 </style>
 </head>
 <body>
@@ -672,7 +690,7 @@ body:has(.modal.show,.sd.show,.lb.show) .kc-bubble,body:has(.modal.show,.sd.show
       <div class="card"><div class="img"></div><h3>PNGTuber</h3><p>Simple avatar with talking and idle states, ready for streaming.</p><div class="price"><b>From $60</b></div><button class="btn btn-pink req" data-order="PNGTuber">Start Request</button></div>
       <div class="card"><div class="img art" style="--src:url(images/mascot-pet.webp);background-position:center 30%"></div><h3>VTuber Pet</h3><p>A cute companion pet for your VTuber.</p><div class="price"><b>From $62.60</b></div><button class="btn btn-pink req" data-order="VTuber Pet">Start Request</button></div>
       <div class="card"><div class="img art" style="--src:url(images/chibi-witch.webp);background-position:center 20%"></div><h3>Chibi VTuber</h3><p>Cute chibi version of your VTuber character.</p><div class="price"><b>From $45</b></div><button class="btn btn-pink req" data-order="Chibi VTuber">Start Request</button></div>
-      <div class="card"><div class="img" style="--src:url(images/illustration-cottage.webp);background-position:center 30%"></div><h3>Custom Inquiry</h3><p>Have an idea that is not listed? Tell me and I'll send you a quote.</p><div class="price"><b>Ask a quote</b></div><button class="btn btn-pink req" data-order="Custom Inquiry">Start Inquiry</button></div>
+      <div class="card"><div class="img" style="--src:url(images/illustration-cottage.webp);background-position:center 30%"></div><h3>Custom Inquiry</h3><p>Have an idea that is not listed? Describe it and name your own budget ♡</p><div class="price"><b>Your budget</b></div><button class="btn btn-pink req" data-order="Custom Inquiry">Start Inquiry</button></div>
     </div>
   </div>
 </section>
@@ -717,7 +735,7 @@ body:has(.modal.show,.sd.show,.lb.show) .kc-bubble,body:has(.modal.show,.sd.show
     <p class="about-line" id="about"><b>Hi, I'm Keiko ♡</b> Digital artist &amp; Live2D studio making original VTuber models, chibi art, emotes and stream assets. Cute meets gothic, made from scratch with updates at every stage.</p>
     <div class="faq-grid">
       <details><summary>How long does a commission take?</summary><p>Illustrations usually take 1–3 weeks; full VTuber models with rigging take around 4–8 weeks depending on complexity and queue.</p></details>
-      <details><summary>How do I pay?</summary><p>Payment via PayPal invoice or <a href="https://ko-fi.com/keikoarts" target="_blank" rel="noopener" style="color:var(--pink);font-weight:600">Ko-fi</a>. Larger projects can be split into installments (50% upfront, 50% before delivery).</p></details>
+      <details><summary>How do I pay?</summary><p>Pay with PayPal right after sending your request (the button appears on the confirmation screen and in your email), or via <a href="https://ko-fi.com/keikoarts" target="_blank" rel="noopener" style="color:var(--pink);font-weight:600">Ko-fi</a>. Larger projects can be split into installments (50% upfront, 50% before delivery).</p></details>
       <details><summary>Can I use the art commercially?</summary><p>Yes — streaming, monetized videos and social media are included. Merch rights can be added on request.</p></details>
       <details><summary>How many revisions do I get?</summary><p>Revisions are free during the sketch stage. Small tweaks after coloring are included; major changes may have a fee.</p></details>
     </div>
@@ -731,7 +749,7 @@ body:has(.modal.show,.sd.show,.lb.show) .kc-bubble,body:has(.modal.show,.sd.show
       <summary><span class="serif">Terms of Service</span><small>By ordering you agree to these terms. Tap to read.</small></summary>
       <div class="tos">
       <div><h4>1. Ordering</h4><p>Submit a request form. I'll reply within 6 hours by email or Discord to confirm details and the final price. Your slot is secured once payment is received.</p></div>
-      <div><h4>2. Payment</h4><p>PayPal invoice or <a href="https://ko-fi.com/keikoarts" target="_blank" rel="noopener" style="color:var(--pink);font-weight:600">Ko-fi</a>, in USD. Choose full payment, 50/50 (50% upfront, 50% before final files), or 3× installments for orders above $150.</p></div>
+      <div><h4>2. Payment</h4><p>Pay with PayPal right after sending your request, or via <a href="https://ko-fi.com/keikoarts" target="_blank" rel="noopener" style="color:var(--pink);font-weight:600">Ko-fi</a>, in USD. Choose full payment, 50/50 (50% upfront, 50% before final files), or 3× installments for orders above $150.</p></div>
       <div><h4>3. Process &amp; timeline</h4><p>Sketch → lineart → coloring → (rigging) → delivery. You get progress updates at every stage. Estimated time is shown in the form; rush delivery is available.</p></div>
       <div><h4>4. Revisions</h4><p>Unlimited small revisions during sketch. Up to 2 minor revisions after coloring; major changes after approval may have extra fees.</p></div>
       <div><h4>5. Refunds</h4><p>Full refund before work starts. After the sketch, refunds are based on completed work. No refund after final files are delivered.</p></div>
@@ -813,6 +831,7 @@ body:has(.modal.show,.sd.show,.lb.show) .kc-bubble,body:has(.modal.show,.sd.show
         <input type="hidden" name="Add-ons" id="fAddons">
         <input type="hidden" name="Quantity" id="fQty">
         <input type="hidden" name="Estimated total (USD)" id="fTotal">
+        <input type="hidden" name="Amount due now (USD)" id="fDue">
 
         <div class="ostep on" data-s="1">
           <div class="lbl">What would you like to order?</div>
@@ -823,9 +842,10 @@ body:has(.modal.show,.sd.show,.lb.show) .kc-bubble,body:has(.modal.show,.sd.show
           <div class="lbl">Package</div>
           <div class="opts" id="pkgOpts"></div>
           <div id="qtyWrap" class="qty" hidden><span class="lbl" style="margin:0">Quantity</span><input type="number" id="qty" min="1" value="1"></div>
+          <div id="budgetWrap" class="budget" hidden><label class="lbl" for="budget">Your budget (USD)</label><div class="bin"><span>$</span><input type="number" id="budget" min="5" max="10000" step="1" inputmode="decimal" placeholder="e.g. 80"></div><small id="budgetHint">Name the amount you'd like to pay for this. Not sure yet? Leave it empty and I'll send you a quote.</small></div>
           <div class="lbl" id="addLbl">Add-ons</div>
           <div class="opts" id="addOpts"></div>
-          <div class="opt"><input type="checkbox" id="rush"><label for="rush">Rush delivery <em>+25%</em><small>Priority in queue, about half the usual time</small></label></div>
+          <div class="opt" id="rushWrap"><input type="checkbox" id="rush"><label for="rush">Rush delivery <em>+25%</em><small>Priority in queue, about half the usual time</small></label></div>
         </div>
 
         <div class="ostep" data-s="3">
@@ -854,10 +874,10 @@ body:has(.modal.show,.sd.show,.lb.show) .kc-bubble,body:has(.modal.show,.sd.show
         <div class="ostep" data-s="4">
           <div class="summary" id="summary"></div>
           <label class="check"><input type="checkbox" id="agree"> I have read and agree to the <a href="#tos" data-close style="color:var(--pink);font-weight:600">Terms of Service</a>.</label>
-          <p class="small" style="font-size:12.5px;color:var(--muted)">This is a request, not a booked slot yet. I'll review your brief first, then confirm whether I can take it, the final price and a PayPal / Ko-fi payment link within 6 hours. You join the queue only after we agree and payment is received.</p>
+          <p class="small pay-note" id="payNote" style="font-size:12.5px;color:var(--muted)"></p>
         </div>
 
-        <div class="total"><div><small>Estimated total</small><b id="totalOut">$0</b></div><div style="text-align:right;font-size:12px" id="etaOut"></div></div>
+        <div class="total"><div><small id="totalLbl">Estimated total</small><b id="totalOut">$0</b></div><div style="text-align:right;font-size:12px" id="etaOut"></div></div>
         <p class="err" id="err"></p>
         <div class="mnav">
           <button type="button" class="btn btn-ghost" id="prevBtn">Back</button>
@@ -873,19 +893,20 @@ body:has(.modal.show,.sd.show,.lb.show) .kc-bubble,body:has(.modal.show,.sd.show
   <div class="mbox ty-box" role="dialog" aria-modal="true" aria-labelledby="tyTitle">
     <div class="mhead"><h3 id="tyTitle">Request sent! ♡</h3><button class="mclose" type="button" data-tyclose aria-label="Close">✕</button></div>
     <div class="mbody">
-      <p class="ty-lead">Thank you for choosing KeikoArts! Your request has been received ♡ I'll review your brief first. You'll be added to the queue once we've agreed on the details and payment is received.</p>
+      <p class="ty-lead" id="tyLead">Thank you for choosing KeikoArts! Your request has been received ♡</p>
       <div class="ty-ref" id="tyRef" hidden>Request ID: <b id="tyRefId"></b></div>
       <div class="summary" id="tySummary" hidden></div>
+      <div class="ty-pay" id="tyPay" hidden>
+        <div class="ty-pay-top"><div><b>Pay now to secure your slot</b><span id="tyPayInfo"></span></div><strong id="tyPayAmt"></strong></div>
+        <a class="btn btn-paypal" id="tyPayBtn" href="#" target="_blank" rel="noopener"><span id="tyPayLabel">Pay with PayPal</span></a>
+        <small>Secure checkout on PayPal (card or PayPal balance). Full refund if I can't take your request.</small>
+      </div>
       <div class="ty-dc">
         <div><b>Next step: message me on Discord</b><span>Send me your Request ID so we can discuss details and payment.</span></div>
         <button class="btn btn-pink" type="button" id="tyDiscord">Copy ID &amp; open Discord</button>
       </div>
       <h4 class="ty-h">What happens next</h4>
-      <ol class="ty-steps">
-        <li><b>Chat on Discord</b><span>Add me / send a message with your Request ID. I reply within 6 hours.</span></li>
-        <li><b>Confirm &amp; pay</b><span>We finalize details and I send a PayPal / Ko-fi payment link.</span></li>
-        <li><b>Your slot is secured</b><span>I start working on it and send progress updates on Discord.</span></li>
-      </ol>
+      <ol class="ty-steps" id="tySteps"></ol>
       <p class="ty-note">A confirmation email is also on its way (check Spam). Can't use Discord? Reach me here:</p>
       <div class="ty-btns">
         <a class="btn btn-ghost" href="https://wa.me/6289502127488" target="_blank" rel="noopener">WhatsApp</a>
@@ -916,6 +937,11 @@ body:has(.modal.show,.sd.show,.lb.show) .kc-bubble,body:has(.modal.show,.sd.show
 /* ==========================================================
    EDIT DI SINI — slot, antrian, harga & add-on
    ========================================================== */
+const PAYPAL = {          // isi salah satu. email = email akun PayPal penerima (disarankan), me = username paypal.me
+  email: "",
+  me: "",
+  currency: "USD",
+};
 const GALLERY = {   // contoh karya per service (geser di kartu Services). Tambah/ubah nama file di sini.
   "VTuber":          ["vtuber-witch","vtuber-maid","vtuber-rocker","vtuber-wolf","vtuber-dragon"],
   "VTuber Packages": ["pkg-keikomi","vtuber-dragon","vtuber-witch","chibi-witch","emotes-witch","bg-stream-room"],
@@ -967,8 +993,8 @@ const DETAILS = {   // deskripsi lengkap tiap service (muncul saat kartu diklik)
     includes:["Full-body chibi art","3 expressions","Layered, ready to rig"],
     notes:"Add toggles, hairstyles or outfits as needed." },
   "Custom Inquiry": { about:"Have an idea that isn't listed? Illustrations, stream assets or something new: just describe it.",
-    includes:["Full illustrations and scenes","Stream screens, overlays and alerts","Anything else, quoted to your needs"],
-    notes:"I'll reply with a quote within 6 hours." },
+    includes:["Full illustrations and scenes","Stream screens, overlays and alerts","Anything else, priced to your budget"],
+    notes:"Name your own budget when ordering and pay right away, or leave it empty and I'll reply with a quote within 6 hours." },
 };
 const VTUBERS = [   // VTuber yang pernah kamu buat. name & link opsional (link: Twitch/YouTube/X)
   { img:"av-vtuber-witch",  name:"Mirabelle", link:"" },
@@ -1080,7 +1106,7 @@ function attachRefsToForm(){
 
 // modal + steps
 const modal=$('#orderModal'), form=$('#orderForm'); let step=1, svc=null;
-$('#svcOpts').innerHTML=Object.entries(SERVICES).map(([k,v],i)=>`<div class="opt"><input type="radio" name="svc" id="s${i}" value="${k}"><label for="s${i}">${k}<small>${v.quote?'Ask a quote':'From '+money(v.from)}</small></label></div>`).join('');
+$('#svcOpts').innerHTML=Object.entries(SERVICES).map(([k,v],i)=>`<div class="opt"><input type="radio" name="svc" id="s${i}" value="${k}"><label for="s${i}">${k}<small>${v.quote?'Name your budget':'From '+money(v.from)}</small></label></div>`).join('');
 function openOrder(service){
   modal.classList.add('show'); modal.setAttribute('aria-hidden','false'); document.body.style.overflow='hidden';
   if(service&&SERVICES[service]){const r=$$('input[name=svc]').find(x=>x.value===service); r.checked=true; pickService(service); go(2);} else go(1);
@@ -1097,35 +1123,63 @@ function pickService(k){
   $('#pkgOpts').innerHTML=svc.packages.map(([n,p,d],i)=>`<div class="opt"><input type="radio" name="pkg" id="p${i}" value="${i}" ${i===0?'checked':''}><label for="p${i}">${n} <em>${svc.quote?'':money(p)+(svc.qty?' each':'')}</em><small>${d}</small></label></div>`).join('');
   $('#addOpts').innerHTML=svc.addons.map(([n,p],i)=>`<div class="opt"><input type="checkbox" name="add" id="a${i}" value="${i}"><label for="a${i}">${n} <em>${p?'+'+money(p):svc.quote?'Quote':'Free'}</em></label></div>`).join('');
   $('#addLbl').hidden=!svc.addons.length; $('#qtyWrap').hidden=!svc.qty; $('#qty').value=1;
+  $('#budgetWrap').hidden=!svc.quote; $('#budget').value=''; $('#budgetHint').textContent="Name the amount you'd like to pay for this."+(PAY_ON()?' You can pay it with PayPal right after sending.':'')+" Not sure yet? Leave it empty and I'll send you a quote."; $('#rushWrap').hidden=!!svc.quote; if(svc.quote)$('#rush').checked=false;
   calc();
 }
 $('#svcOpts').addEventListener('change',e=>pickService(e.target.value));
-form.addEventListener('input',calc);
+form.addEventListener('input',()=>{calc();if(step===4){summary();updatePayNote();}});
 
+function budget(){if(!svc||!svc.quote)return 0;const v=parseFloat($('#budget').value);return v>=5&&v<=10000?Math.round(v*100)/100:0;}
 function calc(){
   if(!svc){$('#totalOut').textContent='$0';$('#etaOut').textContent='';return 0;}
   const pi=+($('input[name=pkg]:checked')||{value:0}).value, pk=svc.packages[pi];
   const qty=svc.qty?Math.max(1,+$('#qty').value||1):1;
   const adds=$$('input[name=add]:checked').map(x=>svc.addons[+x.value]);
-  let t=pk[1]*qty+adds.reduce((a,b)=>a+b[1],0); const rush=$('#rush').checked; if(rush)t*=1.25;
-  $('#totalOut').textContent=svc.quote?'Quote':money(t);
+  let t=pk[1]*qty+adds.reduce((a,b)=>a+b[1],0); const rush=!svc.quote&&$('#rush').checked; if(rush)t*=1.25;
+  const bud=budget(); if(svc.quote)t=bud;
+  $('#totalLbl').textContent=svc.quote&&bud?'Your budget':'Estimated total';
+  $('#totalOut').textContent=svc.quote?(bud?money(bud):'Quote'):money(t);
   $('#etaOut').innerHTML='Estimated time<br><b style="font-size:14px">'+(rush&&!svc.quote?'Rush, about half of '+svc.eta:svc.eta)+'</b>';
   const name=$('input[name=svc]:checked').value;
   $('#fService').value=name; $('#fPackage').value=pk[0]; $('#fQty').value=qty;
   $('#fAddons').value=[...adds.map(a=>a[0]),rush?'Rush delivery (+25%)':''].filter(Boolean).join(', ')||'-';
-  $('#fTotal').value=svc.quote?'Quote':money(t);
-  $('#fSubject').value=`New request: ${name} (${pk[0]}) — ${svc.quote?'quote':money(t)}`;
+  $('#fTotal').value=svc.quote?(bud?money(bud)+" (client's budget)":'Quote'):money(t);
+  $('#fSubject').value=`New request: ${name} (${pk[0]}) — ${svc.quote?(bud?money(bud)+' budget':'quote'):money(t)}`;
   return t;
 }
+
+// ===== PayPal =====
+function dueNow(total,plan){if(!(total>0))return 0;const k=/50\/50/.test(plan)?.5:/3x|3×/i.test(plan)?1/3:1;return Math.ceil(total*k*100)/100;}
+function planLabel(plan){return /50\/50/.test(plan)?'50% deposit':/3x|3×/i.test(plan)?'1st of 3 installments':'full payment';}
+function paypalLink(amount,id,label){
+  if(!(amount>0))return '';
+  const cur=PAYPAL.currency||'USD', amt=amount.toFixed(2), back=location.protocol.startsWith('http')?location.origin+'/':'https://keikoartist.com/';
+  if(PAYPAL.email&&/@/.test(PAYPAL.email)){
+    const q=new URLSearchParams({cmd:'_xclick',business:PAYPAL.email,item_name:`KeikoArts commission – ${label} [${id}]`.slice(0,127),item_number:id,amount:amt,currency_code:cur,no_shipping:'1',rm:'1',return:back+'?paid=1&rid='+encodeURIComponent(id),cancel_return:back});
+    return 'https://www.paypal.com/cgi-bin/webscr?'+q.toString();
+  }
+  if(PAYPAL.me)return `https://www.paypal.com/paypalme/${encodeURIComponent(PAYPAL.me)}/${amt}${cur}`;
+  return '';
+}
+const PAY_ON=()=>!!((PAYPAL.email&&/@/.test(PAYPAL.email))||PAYPAL.me);
+function updatePayNote(){
+  const el=$('#payNote');if(!el||!svc)return;
+  const plan=$('input[name="Payment plan"]:checked').value,total=calc();
+  const bud=svc.quote&&total>0;
+  if((svc.quote&&!bud)||!PAY_ON()){el.innerHTML=bud?`This is a request, not a booked slot yet. I'll review your brief and your budget of <b>${money(total)}</b> and send a PayPal / Ko-fi payment link within 6 hours.`:"This is a request, not a booked slot yet. I'll review your brief and confirm the final price and a PayPal / Ko-fi payment link within 6 hours.";return;}
+  const due=dueNow(total,plan);
+  el.innerHTML=`After sending, you can <b>pay ${money(due)} right away with PayPal</b> (${planLabel(plan)}) to secure your slot. ${bud?"If your budget doesn't fit the brief, I'll suggest an adjustment on Discord first. ":''}If I can't take your request, you get a full refund.`;
+}
 function summary(){
-  const rows=[['Service',$('#fService').value],['Package',$('#fPackage').value],svc.qty?['Quantity',$('#fQty').value]:null,['Add-ons',$('#fAddons').value],['Payment plan',$('input[name="Payment plan"]:checked').value],['Name',$('#fName').value],['Discord',$('#fDiscord').value],['Email',$('#fEmail').value],['References',(refFiles.length?refFiles.length+' file(s)':'')+(form['Reference links'].value?(refFiles.length?' + links':'Links'):'')||'-'],['Estimated total',$('#fTotal').value]].filter(Boolean);
+  const rows=[['Service',$('#fService').value],['Package',$('#fPackage').value],svc.qty?['Quantity',$('#fQty').value]:null,['Add-ons',$('#fAddons').value],['Payment plan',$('input[name="Payment plan"]:checked').value],['Name',$('#fName').value],['Discord',$('#fDiscord').value],['Email',$('#fEmail').value],['References',(refFiles.length?refFiles.length+' file(s)':'')+(form['Reference links'].value?(refFiles.length?' + links':'Links'):'')||'-'],budget()?['Your budget',money(budget())]:['Estimated total',$('#fTotal').value]].filter(Boolean);
   $('#summary').innerHTML=rows.map(([a,b])=>`<div><span>${a}</span><b>${String(b).replace(/</g,'&lt;')}</b></div>`).join('');
 }
 function err(m){const e=$('#err');e.textContent=m;e.style.display=m?'block':'none';}
 function valid(n){
   if(n===1&&!$('input[name=svc]:checked'))return err('Please choose a service.'),false;
+  if(n===2&&svc&&svc.quote&&$('#budget').value.trim()&&!budget()){$('#budget').focus();return err('Please enter a budget between $5 and $10,000, or leave it empty for a quote.'),false;}
   if(n===3){for(const f of [$('#fName'),$('#fEmail'),$('#fDiscord'),$('#fDeadline'),$('#fDetails')])if(!f.checkValidity()){f.reportValidity();return false;}
-    if($('#pp3').checked&&!svc.quote&&calc()<150)return err('Installments are available for orders above $150.'),false;}
+    if($('#pp3').checked&&(!svc.quote||budget()>0)&&calc()<150)return err('Installments are available for orders above $150.'),false;}
   err('');return true;
 }
 function go(n){
@@ -1133,7 +1187,7 @@ function go(n){
   $$('.stepbar span').forEach((s,i)=>s.classList.toggle('on',i<n));
   $('#prevBtn').style.visibility=n>1?'visible':'hidden';
   $('#nextBtn').hidden=n===4; $('#sendBtn').hidden=n!==4;
-  if(n===4)summary(); err('');
+  if(n===4){summary();updatePayNote();} err('');
 }
 $('#nextBtn').onclick=()=>{if(valid(step))go(step+1)};
 $('#prevBtn').onclick=()=>go(step-1);
@@ -1153,27 +1207,36 @@ form.addEventListener('submit',e=>{
   $('#fReq').value=id;
   $('#fSubject').value=$('#fSubject').value+' ['+id+']';
   const name=$('#fName').value.trim(), total=$('#fTotal').value;
+  const plan=$('input[name="Payment plan"]:checked').value, totalNum=calc(), due=dueNow(totalNum,plan), bud=svc.quote&&totalNum>0;
+  const label=`${$('#fService').value} (${$('#fPackage').value})`, payUrl=PAY_ON()?paypalLink(due,id,label):'';
+  $('#fDue').value=due?money(due)+' — '+planLabel(plan)+(payUrl?' (PayPal link shown to client)':''):'Quote';
   $('#fAuto').value=`Hi ${name}, thank you for your commission request at KeikoArts! ♡
 
 Request ID: ${id}
 Service: ${$('#fService').value} (${$('#fPackage').value})
 Add-ons: ${$('#fAddons').value}
-Estimated total: ${total}
+${bud?'Your budget':'Estimated total'}: ${bud?money(totalNum):total}
 Payment plan: ${$('input[name="Payment plan"]:checked').value}
 
-NEXT STEP: please message me on Discord with your Request ID:
+${payUrl?`PAY NOW to secure your slot: ${money(due)} (${planLabel(plan)})
+${payUrl}
+${bud?"(If your budget doesn't fit the brief, I'll suggest an adjustment on Discord first. Full refund if I can't take your request.)":"(Full refund if I can't take your request.)"}
+
+`:''}NEXT STEP: message me on Discord with your Request ID:
 https://discord.com/users/1053527069528707072
 
 What happens next:
-1. We chat on Discord about details. I reply within 6 hours.
+${payUrl?`1. Pay with the PayPal link above (if you haven't yet).
+2. We chat on Discord about details. I reply within 6 hours.
+3. Your slot is secured and I'll send progress updates on Discord.`:`1. We chat on Discord about details. I reply within 6 hours.
 2. You get the final price and a PayPal / Ko-fi payment link.
-3. Once paid, your slot is secured and I'll send progress updates on Discord.
+3. Once paid, your slot is secured and I'll send progress updates on Discord.`}
 
 Can't use Discord? Just reply to this email or reach me on WhatsApp.
 
 — Keiko, KeikoArts`;
-  if(location.protocol.startsWith('http')){try{fetch('notify-discord.php',{method:'POST',keepalive:true,headers:{'Content-Type':'application/json'},body:JSON.stringify({id,service:$('#fService').value,package:$('#fPackage').value,addons:$('#fAddons').value,total,plan:$('input[name="Payment plan"]:checked').value,name,email:$('#fEmail').value,discord:$('#fDiscord').value,deadline:$('#fDeadline').value,refs:[refFiles.length?refFiles.length+' file(s) attached (see email)':'',form['Reference links'].value].filter(Boolean).join(' · '),details:$('#fDetails').value,_honey:form._honey.value})}).catch(()=>{});}catch(_){}}
-  try{sessionStorage.setItem('ka_last',JSON.stringify({id,rows:[...$$('#summary div')].map(r=>[r.children[0].textContent,r.children[1].textContent])}));}catch(_){}
+  if(location.protocol.startsWith('http')){try{fetch('notify-discord.php',{method:'POST',keepalive:true,headers:{'Content-Type':'application/json'},body:JSON.stringify({id,due:$('#fDue').value,service:$('#fService').value,package:$('#fPackage').value,addons:$('#fAddons').value,total,plan:$('input[name="Payment plan"]:checked').value,name,email:$('#fEmail').value,discord:$('#fDiscord').value,deadline:$('#fDeadline').value,refs:[refFiles.length?refFiles.length+' file(s) attached (see email)':'',form['Reference links'].value].filter(Boolean).join(' · '),details:$('#fDetails').value,_honey:form._honey.value})}).catch(()=>{});}catch(_){}}
+  try{sessionStorage.setItem('ka_last',JSON.stringify({id,due,plan,payUrl,quote:!!svc.quote&&!bud,rows:[...$$('#summary div')].map(r=>[r.children[0].textContent,r.children[1].textContent])}));}catch(_){}
 });
 
 
@@ -1419,11 +1482,27 @@ if(location.search.includes('sent=1')){
   const ty=$('#tyModal');let last=null;try{last=JSON.parse(sessionStorage.getItem('ka_last')||'null');sessionStorage.removeItem('ka_last');}catch(_){}
   if(last){$('#tyRefId').textContent=last.id;$('#tyRef').hidden=false;
     $('#tySummary').innerHTML=last.rows.filter(r=>r[0]!=='Email').map(([a,b])=>`<div><span>${esc(a)}</span><b>${esc(b)}</b></div>`).join('');$('#tySummary').hidden=false;}
+  const payNow=last&&last.payUrl&&last.due>0;
+  if(payNow){$('#tyPay').hidden=false;$('#tyPayAmt').textContent=money(last.due);$('#tyPayInfo').textContent=planLabel(last.plan)+' · Request '+last.id;$('#tyPayBtn').href=last.payUrl;$('#tyPayLabel').textContent='Pay '+money(last.due)+' with PayPal';}
+  const steps=payNow?[['Pay with PayPal','Secure your slot now. PayPal emails you a receipt.'],['Chat on Discord','Send me your Request ID. I reply within 6 hours.'],['Work starts','I start working and send progress updates on Discord.']]
+    :[['Chat on Discord','Add me / send a message with your Request ID. I reply within 6 hours.'],['Confirm & pay','We finalize details and I send a PayPal / Ko-fi payment link.'],['Your slot is secured','I start working on it and send progress updates on Discord.']];
+  $('#tySteps').innerHTML=steps.map(([a,b])=>`<li><b>${a}</b><span>${b}</span></li>`).join('');
   ty.classList.add('show');ty.setAttribute('aria-hidden','false');document.body.style.overflow='hidden';
   const closeTy=()=>{ty.classList.remove('show');ty.setAttribute('aria-hidden','true');document.body.style.overflow='';history.replaceState(null,'',location.pathname);};
   $$('[data-tyclose]').forEach(b=>b.onclick=closeTy);
   $('#tyDiscord').onclick=async()=>{const id=last&&last.id;if(id){try{await navigator.clipboard.writeText(id);$('#tyDiscord').textContent='Copied '+id+' ✓ Opening…';}catch(_){}}window.open('https://discord.com/users/1053527069528707072','_blank','noopener');};ty.addEventListener('click',e=>{if(e.target===ty)closeTy();});
   document.addEventListener('keydown',e=>{if(e.key==='Escape'&&ty.classList.contains('show'))closeTy();});
+}
+if(/[?&]paid=1/.test(location.search)){
+  const ty=$('#tyModal'),rid=(location.search.match(/[?&]rid=([\w-]+)/)||[])[1]||'';
+  $('#tyTitle').textContent='Payment sent! ♡';
+  $('#tyLead').textContent="Thank you! PayPal will email you a receipt. I'll confirm your payment and slot on Discord within 6 hours.";
+  if(rid){$('#tyRefId').textContent=rid;$('#tyRef').hidden=false;}
+  $('#tySteps').innerHTML=[['Chat on Discord','Send me your Request ID so I can match your payment.'],['Work starts','I start working and send progress updates on Discord.']].map(([a,b])=>`<li><b>${a}</b><span>${b}</span></li>`).join('');
+  ty.classList.add('show');ty.setAttribute('aria-hidden','false');document.body.style.overflow='hidden';
+  const closeTy=()=>{ty.classList.remove('show');ty.setAttribute('aria-hidden','true');document.body.style.overflow='';history.replaceState(null,'',location.pathname);};
+  $$('[data-tyclose]').forEach(b=>b.onclick=closeTy);ty.addEventListener('click',e=>{if(e.target===ty)closeTy();});
+  $('#tyDiscord').onclick=async()=>{if(rid){try{await navigator.clipboard.writeText(rid)}catch(_){}}window.open('https://discord.com/users/1053527069528707072','_blank','noopener');};
 }
 if(location.hash==='#order')openOrder();
 addEventListener('pageshow',()=>{const sb=$('#sendBtn');delete sb.dataset.busy;sb.textContent='Send Request ♡';sb.style.opacity='';});

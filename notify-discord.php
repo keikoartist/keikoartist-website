@@ -38,7 +38,7 @@ function clean($v, $max = 300) {
   return mb_substr($v, 0, $max);
 }
 $f = [];
-foreach (['id','service','package','addons','total','plan','name','email','discord','deadline','refs','details'] as $k) $f[$k] = clean($d[$k] ?? '', $k === 'details' ? 1000 : 300);
+foreach (['id','due','service','package','addons','total','plan','name','email','discord','deadline','refs','details'] as $k) $f[$k] = clean($d[$k] ?? '', $k === 'details' ? 1000 : 300);
 if (!$f['name'] || !$f['service']) out(400, 'missing');
 
 $field = fn($n, $v, $in = true) => ['name' => $n, 'value' => $v !== '' ? $v : '-', 'inline' => $in];
@@ -53,6 +53,7 @@ $payload = [
       $field('Service', $f['service'] . ($f['package'] ? " — {$f['package']}" : '')),
       $field('Estimated total', $f['total']),
       $field('Payment plan', $f['plan']),
+      $field('Due now', $f['due']),
       $field('Client', $f['name']),
       $field('Discord', $f['discord']),
       $field('Email', $f['email']),
