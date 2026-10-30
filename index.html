@@ -1655,7 +1655,8 @@ addEventListener('scroll',()=>{let cur='home';links.forEach(l=>{const s=document
   links.forEach(l=>l.classList.toggle('active',l.getAttribute('href')==='#'+cur))},{passive:true});
 links.forEach(l=>l.addEventListener('click',()=>$('#menu').classList.remove('open')));
 const TY0={};['tyTitle','tyLead','tyPayT','tyPaySm','tyDcT','tyDcS','tyNote','tyRefLbl','tyDiscord'].forEach(k=>TY0[k]=$('#'+k).textContent);
-function closeTy(){const ty=$('#tyModal');ty.classList.remove('show');ty.setAttribute('aria-hidden','true');document.body.style.overflow='';if(location.search)history.replaceState(null,'',location.pathname);}
+function closeTy(){const ty=$('#tyModal');ty.classList.remove('show');ty.setAttribute('aria-hidden','true');document.body.style.overflow='';
+  if(/[?&](sent|paid|rid)=/.test(location.search)){const q=new URLSearchParams(location.search);['sent','paid','rid'].forEach(k=>q.delete(k));const qs=q.toString();history.replaceState(null,'',location.pathname+(qs?'?'+qs:''));}}
 $$('[data-tyclose]').forEach(b=>b.onclick=closeTy);$('#tyModal').addEventListener('click',e=>{if(e.target.id==='tyModal')closeTy();});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&$('#tyModal').classList.contains('show'))closeTy();});
 function showThanks(last){

@@ -161,6 +161,24 @@ if (($_GET['a'] ?? '') === 'ping') {
              'php' => PHP_MAJOR_VERSION . '.' . PHP_MINOR_VERSION, 'sqlite' => in_array('sqlite', PDO::getAvailableDrivers(), true), 'data_writable' => is_writable(data_dir())]);
 }
 
+/* =================== one-off: remove Claude's automated test orders (exact test signatures only) =================== */
+if (($_GET['a'] ?? '') === 'cleanup_tests') {
+  $db = db(); $ids = [];
+  foreach ($db->query('SELECT id, name, email, discord, fields FROM orders')->fetchAll() as $r) {
+    $f = json_decode((string)$r['fields'], true) ?: [];
+    $browserTest = $r['name'] === 'Test' && $r['email'] === 'test@example.com' && $r['discord'] === 'tester' && ($f['Details'] ?? '') === 'Automated test';
+    $apiTest = $r['name'] === 'TEST by Claude - please delete' && strpos((string)($f['Details'] ?? ''), 'Automatic test of the new order system') === 0;
+    if ($browserTest || $apiTest) $ids[] = $r['id'];
+  }
+  foreach ($ids as $id) {
+    $dir = data_dir() . '/order-files/' . $id;
+    if (is_dir($dir)) { foreach (glob("$dir/*") ?: [] as $f) @unlink($f); @rmdir($dir); }
+    $db->prepare('DELETE FROM orders WHERE id = ?')->execute([$id]);
+  }
+  $left = (int)$db->query('SELECT COUNT(*) FROM orders')->fetchColumn();
+  jout(200, ['deleted' => $ids, 'orders_left' => $left]);
+}
+
 /* =================== public: new order =================== */
 if (($_GET['a'] ?? '') === 'submit') {
   if (!$_POST) fail(413, 'Your reference files are too big to upload. Please attach smaller images, or paste links instead.');

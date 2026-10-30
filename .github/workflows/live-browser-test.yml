@@ -64,12 +64,13 @@ jobs:
                   q=dict(urllib.parse.parse_qsl(urllib.parse.urlparse(st['h']).query))
                   out.append(f"CUSTOM OK {st['t']} total {st['tot']} / {st['p']} amount={q.get('amount')} to={q.get('business')} [{st['w']}]")
                   await pg.locator('#tyModal [data-tyclose]').first.click()
+                  if 'dryrun=1' not in pg.url: raise Exception('test mode lost after closing: '+pg.url)
                   await pg.evaluate("openOrder('VTuber')"); await pg.click('label[for=p4]'); await pg.click('#nextBtn')
                   await pg.fill('#fName','Test'); await pg.fill('#fEmail','test@example.com'); await pg.fill('#fDiscord','tester'); await pg.fill('#fDetails','Automated test')
                   await pg.click('label[for=pp2]'); await pg.click('#nextBtn'); await pg.check('#agree'); await pg.click('#sendBtn')
                   await pg.wait_for_selector('#tyModal.show',timeout=90000)
-                  st=await pg.evaluate("({t:$('#tyTitle').textContent,p:$('#tyPayLabel').textContent})")
-                  out.append(f"REQUEST OK {st['t']} {st['p']}")
+                  st=await pg.evaluate("({t:$('#tyTitle').textContent,p:$('#tyPayLabel').textContent,w:$('#tyWarn').textContent})")
+                  out.append(f"REQUEST OK {st['t']} {st['p']} [{st['w']}]")
               except Exception as e:
                   et=''
                   try: et=await pg.evaluate("($('#err')||{}).textContent")
