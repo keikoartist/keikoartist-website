@@ -602,6 +602,8 @@ a.vt:hover img{transform:scale(1.06)}
 .ref-list img{width:100%;height:100%;object-fit:cover}
 .ref-list .up{position:absolute;left:3px;bottom:3px;min-width:22px;height:18px;padding:0 5px;border-radius:999px;background:rgba(122,40,70,.78);color:#fff;font-size:10px;font-weight:600;display:grid;place-items:center;line-height:1}
 .ref-list .up.done{background:#1d9a55}.ref-list .up.fail{background:#c22b52}
+.iab{display:flex;gap:10px;align-items:center;font-size:12.5px;background:#fff6e0;border:1px solid #ffd77a;color:#7a4b00;border-radius:12px;padding:8px 12px;margin-bottom:14px}
+.iab button{flex:none;border:1px solid #e0b252;background:#fff;color:#7a4b00;border-radius:999px;padding:6px 10px;font:inherit;font-size:12px;font-weight:600;cursor:pointer}
 .draft-note{display:flex;gap:10px;align-items:center;justify-content:space-between;font-size:12.5px;background:#eefaf2;border:1px solid #bfe8cf;color:#1d6b40;border-radius:12px;padding:8px 12px}
 .draft-note button{border:0;background:none;color:inherit;font:inherit;font-weight:600;text-decoration:underline;cursor:pointer;white-space:nowrap}
 .resume{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);z-index:90;display:flex;gap:10px;align-items:center;background:#fff;border:1px solid var(--line);border-radius:999px;padding:8px 8px 8px 16px;box-shadow:0 14px 34px rgba(122,40,70,.22);font-size:13px;max-width:calc(100% - 24px)}
@@ -913,6 +915,7 @@ body:has(.modal.show,.sd.show,.lb.show) .kc-bubble,body:has(.modal.show,.sd.show
   <div class="mbox" role="dialog" aria-modal="true" aria-labelledby="mTitle">
     <div class="mhead"><h3 id="mTitle">Commission Request ♡</h3><button class="mclose" type="button" data-close aria-label="Close">✕</button></div>
     <div class="mbody">
+      <div class="iab" id="iabNote" hidden><span>You're browsing inside the <b>app</b> browser. If uploading or paying doesn't work, open <b>keikoartist.com</b> in Chrome or Safari (tap ⋯ → Open in browser).</span><button type="button">Copy link</button></div>
       <form id="orderForm" method="POST" enctype="multipart/form-data" action="order-api.php?a=submit&amp;html=1">
         <input type="hidden" name="_subject" id="fSubject" value="New commission request — keikoartist.com">
         <input type="hidden" name="_next" id="fNext" value="https://keikoartist.com/?sent=1">
@@ -1873,6 +1876,10 @@ if(/[?&]paid=1/.test(location.search)){
   ty.classList.add('show');ty.setAttribute('aria-hidden','false');document.body.style.overflow='hidden';
   $('#tyDiscord').onclick=async()=>{if(rid){try{await navigator.clipboard.writeText(rid)}catch(_){}}window.open('https://discord.com/users/1053527069528707072','_blank','noopener');};
 }
+{const m=(navigator.userAgent||'').match(/Instagram|FBAN|FBAV|FB_IAB|musical_ly|BytedanceWebview|TikTok|Line\/|Snapchat/i);
+  if(m){const k=m[0],app=/insta/i.test(k)?'Instagram':/^FB/i.test(k)?'Facebook':/musical|bytedance|tiktok/i.test(k)?'TikTok':/line/i.test(k)?'LINE':'Snapchat';
+    const n=$('#iabNote');n.hidden=false;n.querySelector('b').textContent=app;
+    n.querySelector('button').onclick=async e=>{try{await navigator.clipboard.writeText('https://keikoartist.com/');e.target.textContent='Copied ✓';}catch(_){prompt('Copy this link and open it in Chrome or Safari','https://keikoartist.com/');}};}}
 if(location.hash==='#order')openOrder();
 {const d=!/[?&](sent|paid)=1/.test(location.search)&&readDraft();
   if(d&&Date.now()-d.t<864e5){const bar=document.createElement('div');bar.className='resume';bar.setAttribute('role','status');

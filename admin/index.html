@@ -96,6 +96,21 @@ input:focus,textarea:focus{border-color:var(--pink-2);box-shadow:0 0 0 3px rgba(
 .files span{display:block;padding:6px 8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 select{padding:7px 10px;border:1px solid var(--line);border-radius:999px;background:#fff;font:inherit;font-size:12.5px;color:var(--ink)}
 .main>*,.od>*{min-width:0}
+.set-bg{position:fixed;inset:0;background:rgba(122,40,70,.38);display:grid;place-items:center;z-index:50;padding:16px}
+.set-box{background:#fff;border-radius:18px;max-width:520px;width:100%;padding:20px;display:grid;gap:12px;max-height:92vh;overflow:auto;box-shadow:0 24px 60px rgba(122,40,70,.25)}
+.set-head{display:flex;align-items:center;justify-content:space-between}
+.set-head h2{font-size:24px}
+.set-head button{border:0;background:var(--soft);width:34px;height:34px;border-radius:50%;cursor:pointer;color:var(--ink)}
+.set-box h3{font-size:15px}
+.set-box .muted{font-size:13px;color:var(--muted)}
+.set-status{font-size:13px;font-weight:600;background:var(--soft);border-radius:10px;padding:8px 12px}
+.set-status.on{background:#e3f6e9;color:#1d7a43}
+.set-status small{display:block;font-weight:400;color:var(--muted);word-break:break-all}
+.set-steps{font-size:13px;padding-left:18px;display:grid;gap:4px}
+.set-btns{display:flex;gap:8px;flex-wrap:wrap}
+.set-msg{font-size:12.5px;min-height:1em;color:#c22b52}
+.set-msg.ok{color:#1d7a43}
+@media (max-width:820px){.set-txt{display:none}}
 .agent.off{display:none}
 @media (max-width:820px){
   .main{grid-template-columns:minmax(0,1fr)}
@@ -136,6 +151,7 @@ select{padding:7px 10px;border:1px solid var(--line);border-radius:999px;backgro
     <div class="modes" role="tablist"><button type="button" class="on" data-mode="chat">💬 Chats</button><button type="button" data-mode="orders">🧾 Orders <i id="newOrders" hidden></i></button></div>
     <label class="agent"><span>Reply as</span><input id="agent" maxlength="30" placeholder="Keiko"></label>
     <button class="btn ghost small notify" id="notifyBtn" type="button" hidden>🔔 Enable alerts</button>
+    <button class="btn ghost small" id="setBtn" type="button">⚙️<span class="set-txt"> Settings</span></button>
     <a class="btn ghost small" href="../" id="toSite">🌐 Website</a>
     <button class="btn ghost small" id="logout" type="button">Log out</button>
   </div>
@@ -156,6 +172,23 @@ select{padding:7px 10px;border:1px solid var(--line);border-radius:999px;backgro
     <section class="thread" id="othread">
       <div class="placeholder">Select an order ♡</div>
     </section>
+  </div>
+</div>
+
+<div class="set-bg" id="setPanel" hidden>
+  <div class="set-box" role="dialog" aria-modal="true" aria-labelledby="setTitle">
+    <div class="set-head"><h2 class="serif" id="setTitle">Settings</h2><button type="button" id="setClose" aria-label="Close">✕</button></div>
+    <h3>🔔 Discord notifications</h3>
+    <p class="muted">Get a Discord message for every new order and website chat, so you see them on your phone right away.</p>
+    <div class="set-status" id="hookStatus">Checking…</div>
+    <ol class="set-steps">
+      <li>In Discord, open your server → <b>Server Settings</b> → <b>Integrations</b> → <b>Webhooks</b> → <b>New Webhook</b>.</li>
+      <li>Choose the channel for the notifications, then tap <b>Copy Webhook URL</b>.</li>
+      <li>Paste it below, tap <b>Save</b>, then <b>Send test</b>.</li>
+    </ol>
+    <input id="hookUrl" placeholder="https://discord.com/api/webhooks/…" autocomplete="off" spellcheck="false">
+    <div class="set-btns"><button class="btn" type="button" id="hookSave">Save</button><button class="btn ghost" type="button" id="hookTest">Send test</button><button class="btn ghost" type="button" id="hookDel" hidden>Remove</button></div>
+    <div class="set-msg" id="setMsg" role="status"></div>
   </div>
 </div>
 
@@ -348,6 +381,24 @@ async function openOrder(id){
   }
   loadOrders();
 }
+/* ===================== SETTINGS ===================== */
+function setMsg(t,ok){const m=$('#setMsg');m.textContent=t||'';m.classList.toggle('ok',!!ok);}
+async function loadSettings(){
+  const st=$('#hookStatus');
+  try{const j=await oapi({action:'settings_get'});
+    st.className='set-status'+(j.discord_set?' on':'');st.textContent=j.discord_set?'✅ Connected':'⚪ Not connected yet';
+    if(j.discord_set){const sm=el('small',null,j.discord_hint);st.appendChild(sm);}
+    $('#hookDel').hidden=!j.discord_set||j.from_config;$('#hookTest').hidden=!j.discord_set;
+  }catch(e){if(e.message!=='login')st.textContent=e.message;}
+}
+$('#setBtn').onclick=()=>{$('#setPanel').hidden=false;setMsg('');loadSettings();};
+$('#setClose').onclick=()=>{$('#setPanel').hidden=true;};
+$('#setPanel').addEventListener('click',e=>{if(e.target.id==='setPanel')$('#setPanel').hidden=true;});
+$('#hookSave').onclick=async()=>{const v=$('#hookUrl').value.trim();if(!v){setMsg('Paste the webhook link first.');return;}
+  setMsg('Saving…',true);try{await oapi({action:'settings_set',discord_webhook:v});$('#hookUrl').value='';setMsg('Saved ✓ Now tap "Send test".',true);loadSettings();}catch(e){if(e.message!=='login')setMsg(e.message);}};
+$('#hookTest').onclick=async()=>{setMsg('Sending a test message…',true);try{await oapi({action:'settings_test'});setMsg('Test message sent ✓ Check your Discord channel.',true);}catch(e){if(e.message!=='login')setMsg(e.message);}};
+$('#hookDel').onclick=async()=>{try{await oapi({action:'settings_set',discord_webhook:''});setMsg('Removed.',true);loadSettings();}catch(e){if(e.message!=='login')setMsg(e.message);}};
+
 function alertBox(t){const p=el('div','err',t);$('#thread').appendChild(p);setTimeout(()=>p.remove(),4000);}
 
 (async()=>{auth=store.get('ka_auth','')||'';if(!auth){showLogin();return;}try{await api({action:'me'});showApp();}catch(_){showLogin();}})();

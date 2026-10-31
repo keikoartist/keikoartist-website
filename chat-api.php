@@ -83,8 +83,9 @@ function msgs(string $conv, int $since): array {
   return array_map(function ($m) { $m['id'] = (int)$m['id']; $m['created'] = (int)$m['created']; return $m; }, $st->fetchAll());
 }
 function discord_ping(array $cfg, array $c, string $text, bool $isNew): void {
-  $hook = $cfg['discord_webhook'] ?? '';
-  if (!preg_match('#^https://(discord|discordapp)\.com/api/webhooks/\d+/[\w-]+$#', $hook) || !function_exists('curl_init')) return;
+  $hook = (string)($cfg['discord_webhook'] ?? '');
+  if (!preg_match('#^https://(?:ptb\.|canary\.)?(?:discord|discordapp)\.com/api/webhooks/\d+/[\w-]+$#', $hook)) { $st = json_decode((string)@file_get_contents(data_dir() . '/settings.json'), true); $hook = is_array($st) ? (string)($st['discord_webhook'] ?? '') : ''; }
+  if (!preg_match('#^https://(?:ptb\.|canary\.)?(?:discord|discordapp)\.com/api/webhooks/\d+/[\w-]+$#', $hook) || !function_exists('curl_init')) return;
   $now = time();
   if (!$isNew && $now - (int)$c['last_ping'] < 120) return;                 // don't spam: max 1 ping / 2 min per chat
   db()->prepare('UPDATE conversations SET last_ping = ? WHERE id = ?')->execute([$now, $c['id']]);

@@ -2,6 +2,11 @@ name: Live browser test (test mode, saves nothing)
 
 on:
   workflow_dispatch:
+  schedule:
+    - cron: '13 1 * * *'   # every day around 08:13 WIB
+
+permissions:
+  contents: read
 
 jobs:
   api:
@@ -12,12 +17,15 @@ jobs:
           B="https://keikoartist.com/order-api.php?a=submit"
           UA="Mozilla/5.0 (iPhone; CPU iPhone OS 17_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.5 Mobile/15E148 Safari/604.1"
           echo "::notice::PING $(curl -s -m 30 -X POST -H 'Origin: https://keikoartist.com' 'https://keikoartist.com/order-api.php?a=ping')"
-          t(){ n=$1; shift; c=$(curl -s -o r.json -w "%{http_code}" -m 120 -A "$UA" -H "Origin: https://keikoartist.com" -H "Referer: https://keikoartist.com/" -F "_dryrun=1" -F "Service=Custom Inquiry" -F "Name=Test" -F "_price=100" "$@" "$B"); echo "::notice::$n -> HTTP $c $(jq -c '{ok,id,total,files,skipped_files,error}' r.json 2>/dev/null || head -c 150 r.json)"; }
+          bad=0
+          t(){ n=$1; shift; c=$(curl -s -o r.json -w "%{http_code}" -m 120 -A "$UA" -H "Origin: https://keikoartist.com" -H "Referer: https://keikoartist.com/" -F "_dryrun=1" -F "Service=Custom Inquiry" -F "Name=Test" -F "_price=100" "$@" "$B"); echo "::notice::$n -> HTTP $c $(jq -c '{ok,id,total,files,skipped_files,error}' r.json 2>/dev/null || head -c 150 r.json)"; [ "$c" = 200 ] && jq -e '.ok==true' r.json >/dev/null || bad=$((bad+1)); }
           t plain -F "Details=Simple request"
           t links -F "Details=see refs" -F "Reference links=https://pin.it/3xYz https://drive.google.com/file/d/1AbC/view?usp=sharing https://www.pinterest.com/pin/123/ https://toyhou.se/123.oc"
           t quotes -F "Details=She's a \"cute\" fox <3 <b>bold</b> & more 😊🦊 ~ 100% #1"
           t risky -F "Details=select union of colors; drop shadow; insert stars; ../../etc/passwd; <script>alert(1)</script> OR 1=1"
+          [ "$bad" = 0 ] || { echo "::error::$bad order check(s) failed"; exit 1; }
       - name: File uploads
+        if: github.event_name == 'workflow_dispatch'
         run: |
           B="https://keikoartist.com/order-api.php?a=submit"
           for s in 1 3 7 12; do head -c $((s*1024*1024)) /dev/urandom > f$s.bin; done
@@ -64,7 +72,7 @@ jobs:
                   await pg.fill('#fDetails','Automated cross-browser test (test mode, nothing saved)')
                   await pg.fill('#budget','100'); await pg.fill('#fName','Test'); await pg.fill('#fDiscord','tester')
                   refs=[{'name':'ref.png','mimeType':'image/png','buffer':PNG}]
-                  if label=='Chrome desktop': refs.append({'name':'big-ref.pdf','mimeType':'application/pdf','buffer':os.urandom(15*1024*1024)})
+                  if label=='Chrome desktop' and os.environ.get('GITHUB_EVENT_NAME')=='workflow_dispatch': refs.append({'name':'big-ref.pdf','mimeType':'application/pdf','buffer':os.urandom(15*1024*1024)})
                   await pg.set_input_files('#refFiles',files=refs); await pg.wait_for_timeout(1000)
                   await pg.check('#agree'); await pg.click('#sendBtn')
                   await pg.wait_for_selector('#tyModal.show',timeout=90000)
@@ -85,12 +93,39 @@ jobs:
                   try: et=await pg.evaluate("($('#err')||{}).textContent")
                   except Exception: pass
                   out.append('FAILED: '+str(e).split('\n')[0][:140]+f" | api status {last.get('api')} | form msg: {et}")
-              print(f"::notice::[{label}] "+' || '.join(out)+(f" | JS errors: {errs[:3]}" if errs else ' | no JS errors'), flush=True)
+              line=f"[{label}] "+' || '.join(out)+(f" | JS errors: {errs[:3]}" if errs else ' | no JS errors')
+              print("::notice::"+line, flush=True)
+              if errs or any(o.startswith('FAILED') for o in out): PROBLEMS.append(line)
               await br.close()
+          PROBLEMS=[]
           async def main():
               async with async_playwright() as p:
                   for a in [('Chrome desktop','chromium',None),('Android Chrome','chromium','Pixel 7'),('iPhone Safari','webkit','iPhone 13'),('Mac Safari','webkit',None),('Firefox','firefox',None)]:
                       await run(p,*a)
           asyncio.run(main())
+          if PROBLEMS:
+              open('problems.txt','w').write('\n'.join(PROBLEMS)); raise SystemExit(1)
           PY
           python t.py
+
+  notify:
+    if: always() && github.event_name == 'schedule'
+    needs: [api, browsers]
+    runs-on: ubuntu-24.04
+    permissions:
+      issues: write
+    steps:
+      - name: Open or close the "website check" issue
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          R: ${{ github.repository }}
+          RESULT: ${{ needs.api.result }}/${{ needs.browsers.result }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          open=$(gh issue list -R "$R" --label site-check --state open --json number -q '.[0].number' 2>/dev/null || true)
+          if [ "$RESULT" = "success/success" ]; then
+            if [ -n "$open" ]; then gh issue close "$open" -R "$R" -c "✅ Fixed: the daily check passed again."; fi
+          elif [ -z "$open" ]; then
+            gh label create site-check -R "$R" --color F2628F --description "Daily website order check" 2>/dev/null || true
+            gh issue create -R "$R" --label site-check --title "⚠️ keikoartist.com: the daily order check failed" --body "@keikoartist the automatic daily check found a problem with ordering on keikoartist.com (result: $RESULT). Please tell Claude about it. Details: $RUN_URL"
+          fi

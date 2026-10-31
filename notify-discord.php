@@ -14,10 +14,16 @@ $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
 if ($origin && strtolower((string)parse_url($origin, PHP_URL_HOST)) !== $host) out(403, 'bad origin');
 
 $cfgFile = __DIR__ . '/keikoarts-config.php';
-if (!is_file($cfgFile)) out(200, 'not configured');
-$cfg = include $cfgFile;
-$hook = $cfg['discord_webhook'] ?? '';
-if (!preg_match('#^https://(discord|discordapp)\.com/api/webhooks/\d+/[\w-]+$#', $hook)) out(200, 'webhook not set');
+$cfg = is_file($cfgFile) ? (include $cfgFile) : [];
+if (!is_array($cfg)) $cfg = [];
+$hook = (string)($cfg['discord_webhook'] ?? '');
+if ($hook === '') {   // webhook saved from the admin page (Settings)
+  foreach ([dirname(__DIR__, 2) . '/keikoarts-data/settings.json', __DIR__ . '/chat-data/settings.json'] as $sf) {
+    $st = json_decode((string)@file_get_contents($sf), true);
+    if (is_array($st) && !empty($st['discord_webhook'])) { $hook = (string)$st['discord_webhook']; break; }
+  }
+}
+if (!preg_match('#^https://(?:ptb\.|canary\.)?(?:discord|discordapp)\.com/api/webhooks/\d+/[\w-]+$#', $hook)) out(200, 'webhook not set');
 
 // simple rate limit: 5 requests / 10 min per IP
 $ip = $_SERVER['REMOTE_ADDR'] ?? '0';

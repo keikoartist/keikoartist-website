@@ -138,9 +138,20 @@ function send_mail(string $to, string $subject, string $html, string $text, stri
   if (!$ok) $ok = @mail($to, $subj, $body, $hdr);
   return (bool)$ok;
 }
+const HOOK_RE = '#^https://(?:ptb\.|canary\.)?(?:discord|discordapp)\.com/api/webhooks/\d+/[\w-]+$#';
+function settings(): array { $j = json_decode((string)@file_get_contents(data_dir() . '/settings.json'), true); return is_array($j) ? $j : []; }
+function save_settings(array $s): bool { $f = data_dir() . '/settings.json'; $ok = @file_put_contents($f, json_encode($s, JSON_UNESCAPED_SLASHES)) !== false; @chmod($f, 0600); return $ok; }
+function discord_hook(array $cfg): string { $h = (string)($cfg['discord_webhook'] ?? ''); if (!preg_match(HOOK_RE, $h)) $h = (string)(settings()['discord_webhook'] ?? ''); return preg_match(HOOK_RE, $h) ? $h : ''; }
+function discord_post(string $hook, array $payload): int {
+  if (!function_exists('curl_init')) return 0;
+  $ch = curl_init($hook);
+  curl_setopt_array($ch, [CURLOPT_POST => true, CURLOPT_POSTFIELDS => json_encode($payload), CURLOPT_HTTPHEADER => ['Content-Type: application/json'], CURLOPT_RETURNTRANSFER => true, CURLOPT_TIMEOUT => 6, CURLOPT_CONNECTTIMEOUT => 4]);
+  curl_exec($ch); $code = (int)curl_getinfo($ch, CURLINFO_HTTP_CODE); curl_close($ch);
+  return $code;
+}
 function discord_ping(array $cfg, array $o, array $fields): void {
-  $hook = $cfg['discord_webhook'] ?? '';
-  if (!preg_match('#^https://(discord|discordapp)\.com/api/webhooks/\d+/[\w-]+$#', $hook) || !function_exists('curl_init')) return;
+  $hook = discord_hook($cfg);
+  if ($hook === '') return;
   $safe = fn($s) => str_replace(['@everyone', '@here'], ["@\u{200B}everyone", "@\u{200B}here"], (string)$s);
   $f = fn($n, $v, $in = true) => ['name' => $n, 'value' => $safe($v !== '' && $v !== null ? mb_substr((string)$v, 0, 1000) : '-'), 'inline' => $in];
   $payload = ['username' => 'KeikoArts Orders', 'allowed_mentions' => ['parse' => []], 'embeds' => [[
@@ -156,9 +167,7 @@ function discord_ping(array $cfg, array $o, array $fields): void {
     ],
     'footer' => ['text' => 'See keikoartist.com/admin → Orders'],
   ]]];
-  $ch = curl_init($hook);
-  curl_setopt_array($ch, [CURLOPT_POST => true, CURLOPT_POSTFIELDS => json_encode($payload), CURLOPT_HTTPHEADER => ['Content-Type: application/json'], CURLOPT_RETURNTRANSFER => true, CURLOPT_TIMEOUT => 4]);
-  curl_exec($ch); curl_close($ch);
+  discord_post($hook, $payload);
 }
 
 /* ---------- admin auth (same login/token as the chat inbox) ---------- */
@@ -182,25 +191,10 @@ try {
 if (($_GET['a'] ?? '') === 'ping') {
   jout(200, ['upload_max' => ini_get('upload_max_filesize'), 'post_max' => ini_get('post_max_size'), 'max_file_uploads' => (int)ini_get('max_file_uploads'),
              'mail' => function_exists('mail'), 'mail_in_disabled_list' => stripos((string)ini_get('disable_functions'), 'mail') !== false,
-             'php' => PHP_MAJOR_VERSION . '.' . PHP_MINOR_VERSION, 'sqlite' => in_array('sqlite', PDO::getAvailableDrivers(), true), 'data_writable' => is_writable(data_dir())]);
-}
-
-/* =================== one-off: remove Claude's automated test orders (exact test signatures only) =================== */
-if (($_GET['a'] ?? '') === 'cleanup_tests') {
-  $db = db(); $ids = [];
-  foreach ($db->query('SELECT id, name, email, discord, fields FROM orders')->fetchAll() as $r) {
-    $f = json_decode((string)$r['fields'], true) ?: [];
-    $browserTest = $r['name'] === 'Test' && $r['email'] === 'test@example.com' && $r['discord'] === 'tester' && ($f['Details'] ?? '') === 'Automated test';
-    $apiTest = $r['name'] === 'TEST by Claude - please delete' && strpos((string)($f['Details'] ?? ''), 'Automatic test of the new order system') === 0;
-    if ($browserTest || $apiTest) $ids[] = $r['id'];
-  }
-  foreach ($ids as $id) {
-    $dir = data_dir() . '/order-files/' . $id;
-    if (is_dir($dir)) { foreach (glob("$dir/*") ?: [] as $f) @unlink($f); @rmdir($dir); }
-    $db->prepare('DELETE FROM orders WHERE id = ?')->execute([$id]);
-  }
-  $left = (int)$db->query('SELECT COUNT(*) FROM orders')->fetchColumn();
-  jout(200, ['deleted' => $ids, 'orders_left' => $left]);
+             'php' => PHP_MAJOR_VERSION . '.' . PHP_MINOR_VERSION, 'sqlite' => in_array('sqlite', PDO::getAvailableDrivers(), true), 'data_writable' => is_writable(data_dir()),
+             'discord_reachable' => !empty($_GET['net']) ? (function () { rate_limit('net:' . client_ip(), 5, 3600); if (!function_exists('curl_init')) return 'no curl';
+                 $ch = curl_init('https://discord.com/api/v10/gateway'); curl_setopt_array($ch, [CURLOPT_RETURNTRANSFER => true, CURLOPT_TIMEOUT => 6, CURLOPT_CONNECTTIMEOUT => 4]);
+                 curl_exec($ch); $c = (int)curl_getinfo($ch, CURLINFO_HTTP_CODE); $e = curl_error($ch); curl_close($ch); return $c ? "HTTP $c" : "failed: $e"; })() : null]);
 }
 
 /* =================== public: background upload of reference files, in pieces =================== */
@@ -461,6 +455,23 @@ switch ($action) {
       }
     }
     fail(404, 'file not found');
+  }
+  case 'settings_get': {
+    $h = discord_hook($cfg);
+    jout(200, ['discord_set' => $h !== '', 'discord_hint' => $h ? substr($h, 0, 40) . '…' . substr($h, -4) : '', 'from_config' => preg_match(HOOK_RE, (string)($cfg['discord_webhook'] ?? '')) === 1]);
+  }
+  case 'settings_set': {
+    $h = trim((string)($in['discord_webhook'] ?? ''));
+    if ($h !== '' && !preg_match(HOOK_RE, $h)) fail(400, 'That is not a Discord webhook link. It should start with https://discord.com/api/webhooks/');
+    $s = settings(); if ($h === '') unset($s['discord_webhook']); else $s['discord_webhook'] = $h;
+    if (!save_settings($s)) fail(500, 'Could not save the setting on the server.');
+    jout(200, ['discord_set' => $h !== '']);
+  }
+  case 'settings_test': {
+    $h = discord_hook($cfg); if ($h === '') fail(400, 'No Discord webhook saved yet.');
+    $code = discord_post($h, ['username' => 'KeikoArts Orders', 'allowed_mentions' => ['parse' => []], 'embeds' => [['title' => '✅ Notifications are working!', 'description' => 'You will get a message here for every new order and website chat.', 'color' => 0xF2628F]]]);
+    if ($code >= 200 && $code < 300) jout(200, ['sent' => true]);
+    fail(502, $code ? "Discord answered with error $code. Please check the webhook link." : 'The server could not reach Discord. Your hosting may block outgoing connections.');
   }
   case 'delete': {
     $o = order_row((string)($in['id'] ?? ''));
