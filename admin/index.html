@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
+<script>if(location.protocol==='http:'&&/(^|\.)keikoartist\.com$/i.test(location.hostname))location.replace('https://'+location.host+location.pathname+location.search+location.hash);</script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
 <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate">
@@ -78,6 +79,13 @@ input:focus,textarea:focus{border-color:var(--pink-2);box-shadow:0 0 0 3px rgba(
 .modes i{font-style:normal;min-width:18px;height:18px;border-radius:999px;background:#fff;color:var(--pink);font-size:10.5px;display:inline-grid;place-items:center;padding:0 5px}
 .modes button:not(.on) i{background:var(--pink);color:#fff}
 .otabs{flex-wrap:wrap}
+.otools{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:6px 12px;border-bottom:1px solid var(--line);font-size:12px;color:var(--muted)}
+.pays{display:grid;gap:4px;margin-top:10px;font-size:12.5px}
+.pays div{display:flex;justify-content:space-between;gap:10px;background:#f3fbf6;border-radius:8px;padding:6px 10px;color:#1d6b40}
+.pays div.neg{background:#fdf0f0;color:#9b3030}
+.paylinks{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:10px}
+.paylinks input{width:110px;padding:7px 10px;font-size:13px}
+.note-off{font-size:12.5px;color:var(--muted);background:var(--soft);border-radius:10px;padding:8px 12px}
 .item .amt{font-weight:600;color:var(--ink);font-size:12.5px}
 .st{display:inline-block;font-size:10.5px;font-weight:600;border-radius:999px;padding:2px 8px;background:#eee;color:#555;margin-right:4px}
 .st.new{background:#ffe3ec;color:#d23a6b}.st.paid{background:#e3f6e9;color:#1d7a43}.st.in_progress{background:#e8ecff;color:#3f4fc4}.st.done{background:#f0f0f0;color:#666}.st.cancelled{background:#f6e3e3;color:#9b3030}
@@ -167,6 +175,7 @@ select{padding:7px 10px;border:1px solid var(--line);border-radius:999px;backgro
   <div class="main" id="omain" hidden>
     <aside class="list">
       <div class="tabs otabs"><button class="on" data-os="open" type="button">Active</button><button data-os="new" type="button">New</button><button data-os="paid" type="button">Paid</button><button data-os="done" type="button">Done</button><button data-os="all" type="button">All</button></div>
+      <div class="otools"><span id="storage">💾 …</span><button type="button" class="btn ghost small" id="exportBtn">⬇ Export CSV</button></div>
       <div class="items" id="oitems"><div class="empty">Loading…</div></div>
     </aside>
     <section class="thread" id="othread">
@@ -296,7 +305,7 @@ async function openThread(id){
 /* ===================== ORDERS ===================== */
 const OAPI='../order-api.php', ST_LABEL={new:'New',paid:'Paid',in_progress:'In progress',done:'Done',cancelled:'Cancelled'};
 let mode='chat', ostatus='open', ocur=null, lastNew=-1, oTimer, blobUrls=[];
-const usd=n=>'$'+Number(n||0).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+const usd=n=>(Number(n)<0?'-':'')+'$'+Math.abs(Number(n||0)).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
 async function oapi(data,raw){
   const r=await fetch(OAPI,{method:'POST',headers:{'Content-Type':'application/json','X-Auth':auth},body:JSON.stringify(Object.assign({_auth:auth},data)),cache:'no-store'});
   if(r.status===401){auth='';store.set('ka_auth','');showLogin();$('#loginErr').textContent='Session expired, please log in again.';throw new Error('login');}
@@ -309,7 +318,7 @@ function setMode(m){
   mode=m;document.querySelectorAll('.modes button').forEach(b=>b.classList.toggle('on',b.dataset.mode===m));
   $('#main').hidden=m!=='chat';$('#omain').hidden=m!=='orders';
   $('.agent').classList.toggle('off',m!=='chat');
-  store.set('ka_mode',m);if(m==='orders')loadOrders();
+  store.set('ka_mode',m);if(m==='orders'){loadOrders();loadStorage();}
 }
 document.querySelectorAll('.modes button').forEach(b=>b.onclick=()=>setMode(b.dataset.mode));
 document.querySelectorAll('.otabs button').forEach(b=>b.onclick=()=>{document.querySelectorAll('.otabs button').forEach(x=>x.classList.toggle('on',x===b));ostatus=b.dataset.os;loadOrders();});
@@ -317,6 +326,11 @@ function badge(n){const i=$('#newOrders');i.hidden=!n;i.textContent=n;
   if(lastNew>=0&&n>lastNew){beep();if('Notification' in window&&Notification.permission==='granted'&&document.visibilityState!=='visible'){try{new Notification('New order!',{body:'Someone placed an order on KeikoArts',icon:'../images/pfp.webp'})}catch(_){}}}
   lastNew=n;}
 async function pollOrders(){try{const j=await oapi({action:'count'});badge(Number(j.new)||0);if(mode==='orders')loadOrders();}catch(_){}}
+async function loadStorage(){try{const j=await oapi({action:'storage'});const mb=j.bytes/1048576;$('#storage').textContent=`💾 ${mb<10?mb.toFixed(1):Math.round(mb)} MB of files · ${j.orders} orders`;}catch(_){}}
+$('#exportBtn').onclick=async()=>{const b=$('#exportBtn');b.disabled=true;b.textContent='Preparing…';
+  try{const blob=await oapi({action:'export'},true);const u=URL.createObjectURL(blob),a=document.createElement('a');a.href=u;a.download='keikoarts-orders-'+new Date().toISOString().slice(0,10)+'.csv';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),5000);}
+  catch(e){if(e.message!=='login')alert(e.message);}
+  b.disabled=false;b.textContent='⬇ Export CSV';};
 async function loadOrders(){
   let j;try{j=await oapi({action:'list',status:ostatus})}catch(_){return}
   badge(Number(j.new)||0);
@@ -327,6 +341,7 @@ async function loadOrders(){
     b.appendChild(el('b',null,o.name||'Client'));b.appendChild(el('time',null,fmt(o.created)));
     const line=el('span');const st=el('i','st '+o.status,ST_LABEL[o.status]||o.status);line.appendChild(st);
     line.appendChild(document.createTextNode(`${o.id} · ${o.kind==='custom'?'Custom order':o.service} · `));line.appendChild(el('b','amt',usd(o.total)));
+    if(o.paid>0)line.appendChild(document.createTextNode(o.paid>=o.total?' · fully paid ✓':` · paid ${usd(o.paid)}`));
     b.appendChild(line);b.onclick=()=>openOrder(o.id);box.appendChild(b);
   });
 }
@@ -355,8 +370,19 @@ async function openOrder(id){
   if(o.kind==='custom'){box('Client price',usd(o.price));box('Tax 13%',usd(o.tax));box('Total (pay upfront)',usd(o.total));}
   else{box('Estimated total',usd(o.total));box('Due now · '+(o.plan||''),usd(o.due));}
   mc.appendChild(m);
-  const hint=el('p',null,`Check PayPal for a payment with "${o.id}" in the item name. When it arrives, set the status to Paid.`);hint.style.cssText='font-size:12px;color:var(--muted);margin-top:8px';mc.appendChild(hint);
-  if(o.pay_url){const a=el('a','btn ghost small','Copy PayPal link for the client');a.href='#';a.style.marginTop='8px';a.onclick=async e=>{e.preventDefault();try{await navigator.clipboard.writeText(o.pay_url);a.textContent='Copied ✓';}catch(_){prompt('PayPal link',o.pay_url)}};mc.appendChild(a);}
+  const copyBtn=(label,url)=>{const a=el('a','btn ghost small',label);a.href='#';a.onclick=async e=>{e.preventDefault();try{await navigator.clipboard.writeText(url);a.textContent='Copied ✓';setTimeout(()=>a.textContent=label,2500);}catch(_){prompt('PayPal link',url)}};return a;};
+  if(o.payments&&o.payments.length){const pl=el('div','pays');
+    o.payments.forEach(p=>{const r=el('div',p.amount<0?'neg':null);r.appendChild(el('span',null,`${p.status==='Completed'?'💰':'↩️'} ${usd(p.amount)} ${p.currency!=='USD'?p.currency:''} · ${fmt(p.created)}`));r.appendChild(el('span',null,p.payer||''));pl.appendChild(r);});
+    mc.appendChild(pl);}
+  const sumLine=el('p',null,o.paid>0?(o.paid>=o.total?`✅ Fully paid: ${usd(o.paid)}`:`Paid so far ${usd(o.paid)} · remaining ${usd(o.remaining)}`):'Not paid yet. Payments made with the website\'s PayPal button appear here automatically and set the status to Paid.');
+  sumLine.style.cssText='font-size:12.5px;color:var(--muted);margin-top:10px';mc.appendChild(sumLine);
+  const links=el('div','paylinks');
+  if(o.pay_url&&!(o.paid>0))links.appendChild(copyBtn(`Copy link: ${usd(o.due)}`,o.pay_url));
+  if(o.remaining_url)links.appendChild(copyBtn(`Copy link: remaining ${usd(o.remaining)}`,o.remaining_url));
+  const amt=el('input');amt.type='number';amt.min='1';amt.step='0.01';amt.placeholder='Amount $';amt.setAttribute('aria-label','Amount for a new payment link');
+  const mk=el('button','btn ghost small','Create link');mk.type='button';
+  mk.onclick=async()=>{const v=parseFloat(amt.value);if(!(v>=1)){amt.focus();return;}try{const j=await oapi({action:'paylink',id,amount:v,note:'payment of '+usd(v)});try{await navigator.clipboard.writeText(j.url);mk.textContent='Link copied ✓';}catch(_){prompt('PayPal link',j.url);}setTimeout(()=>mk.textContent='Create link',2500);}catch(e){if(e.message!=='login')alert(e.message);}};
+  links.append(amt,mk);mc.appendChild(links);
   // client
   const cc=el('div','card');cc.appendChild(el('h3',null,'Client'));const dl=el('dl','kv');
   kvRow(dl,'Name',o.name);kvRow(dl,'Discord',o.discord);kvRow(dl,'Email',o.email,o.email?'mailto:'+o.email+'?subject='+encodeURIComponent('Your KeikoArts order '+o.id):null);
@@ -371,7 +397,8 @@ async function openOrder(id){
   oc.appendChild(dl2);
   body.append(mc,cc,oc);
   // files
-  if(o.files&&o.files.length){const fc=el('div','card');fc.appendChild(el('h3',null,`Reference files (${o.files.length})`));const g=el('div','files');fc.appendChild(g);body.appendChild(fc);
+  if(o.files_removed&&o.files&&o.files.length){const fc=el('div','card');fc.appendChild(el('h3',null,'Reference files'));fc.appendChild(el('p','note-off',`${o.files.length} file(s) were removed automatically 30 days after this order was finished, to save hosting space.`));body.appendChild(fc);}
+  else if(o.files&&o.files.length){const fc=el('div','card');fc.appendChild(el('h3',null,`Reference files (${o.files.length})`));const g=el('div','files');fc.appendChild(g);body.appendChild(fc);
     for(const file of o.files){const a=el('a');a.href='#';a.appendChild(el('span',null,'Loading…'));g.appendChild(a);
       try{const blob=await oapi({action:'file',id,name:file.name},true);const u=URL.createObjectURL(blob);blobUrls.push(u);
         a.href=u;a.target='_blank';a.download=file.name;a.innerHTML='';

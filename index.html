@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
+<script>if(location.protocol==='http:'&&/(^|\.)keikoartist\.com$/i.test(location.hostname))location.replace('https://'+location.host+location.pathname+location.search+location.hash);</script>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>KeikoArts — Custom VTuber Model, Live2D Rigging &amp; Commissions</title>
 <meta name="description" content="Commission custom VTuber models, Live2D rigging, PNGTuber, emotes, banners and logos from KeikoArts. Clear prices and easy online ordering.">
@@ -604,6 +605,20 @@ a.vt:hover img{transform:scale(1.06)}
 .ref-list .up.done{background:#1d9a55}.ref-list .up.fail{background:#c22b52}
 .iab{display:flex;gap:10px;align-items:center;font-size:12.5px;background:#fff6e0;border:1px solid #ffd77a;color:#7a4b00;border-radius:12px;padding:8px 12px;margin-bottom:14px}
 .iab button{flex:none;border:1px solid #e0b252;background:#fff;color:#7a4b00;border-radius:999px;padding:6px 10px;font:inherit;font-size:12px;font-weight:600;cursor:pointer}
+.inv-actions{display:flex;gap:8px;flex-wrap:wrap}
+.inv-actions .btn{flex:1 1 180px;justify-content:center;padding:10px 14px;font-size:13px}
+.inv-bar{bottom:18px}
+.print-only{display:none}
+@media print{
+  @page{margin:14mm}
+  body>*:not(#tyModal){display:none!important}
+  body{background:#fff!important}
+  #tyModal{position:static!important;display:block!important;background:none!important;padding:0!important;overflow:visible!important}
+  #tyModal .mbox{box-shadow:none!important;width:100%!important;border:0!important}
+  #tyModal .mhead,#tyModal .ty-lead,#tyModal .ty-warn,#tyModal .ty-dc,#tyModal .ty-h,#tyModal .ty-steps,#tyModal .ty-note,#tyModal .ty-btns,#tyModal .inv-actions,#tyModal #tyPayBtn,#tyModal #tyPaySm{display:none!important}
+  #tyModal .print-only{display:block!important}
+  .pay-link{font-size:11px;word-break:break-all;color:#7a2846}
+}
 .draft-note{display:flex;gap:10px;align-items:center;justify-content:space-between;font-size:12.5px;background:#eefaf2;border:1px solid #bfe8cf;color:#1d6b40;border-radius:12px;padding:8px 12px}
 .draft-note button{border:0;background:none;color:inherit;font:inherit;font-weight:600;text-decoration:underline;cursor:pointer;white-space:nowrap}
 .resume{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);z-index:90;display:flex;gap:10px;align-items:center;background:#fff;border:1px solid var(--line);border-radius:999px;padding:8px 8px 8px 16px;box-shadow:0 14px 34px rgba(122,40,70,.22);font-size:13px;max-width:calc(100% - 24px)}
@@ -1035,6 +1050,7 @@ body:has(.modal.show,.sd.show,.lb.show) .kc-bubble,body:has(.modal.show,.sd.show
         <a class="btn btn-paypal" id="tyPayBtn" href="#" target="_blank" rel="noopener"><span id="tyPayLabel">Pay with PayPal</span></a>
         <small id="tyPaySm">Secure checkout on PayPal (card or PayPal balance). Full refund if I can't take your request.</small>
       </div>
+      <div class="inv-actions" id="invActions" hidden><button type="button" class="btn btn-ghost" id="invSave">💾 Save invoice (PDF)</button><button type="button" class="btn btn-ghost" id="invCopy">🔗 Copy payment link</button></div>
       <div class="ty-dc">
         <div><b id="tyDcT">Next step: message me on Discord</b><span id="tyDcS">Send me your Request ID so we can discuss details and payment.</span></div>
         <button class="btn btn-pink" type="button" id="tyDiscord">Copy ID &amp; open Discord</button>
@@ -1290,7 +1306,7 @@ function attachRefsToForm(){
 }
 
 // ===== order modal: service list (step 1) + one order page per service (step 2) =====
-const modal=$('#orderModal'), form=$('#orderForm'); let step=1, svc=null, svcName='', cmOn=false;
+const modal=$('#orderModal'), form=$('#orderForm'); let step=1, svc=null, svcName='', cmOn=false, sheetStart=0;
 let ORDER={lines:[],total:0,due:0,plan:'Full payment',custom:false};
 $('#svcOpts').innerHTML=Object.entries(SERVICES).map(([k,v],i)=>`<div class="opt"><input type="radio" name="svc" id="s${i}" value="${k}"><label for="s${i}">${k}<small>${v.quote?'Name your price':'From '+money(v.from)}</small></label></div>`).join('');
 function openOrder(service){
@@ -1352,7 +1368,7 @@ const DRAFT_KEY='ka_draft', DRAFT_IDS=['fDetails','fName','fDiscord','fDeadline'
 let draftTimer=0;
 function saveDraft(){
   if(step!==2||!svc)return;
-  try{const d={t:Date.now(),svc:svcName,v:{},sel:[],qty:$('#qty').value,links:form['Reference links'].value};
+  try{const old=readDraft(),d={t:Date.now(),start:(old&&old.start)||sheetStart||Date.now(),svc:svcName,v:{},sel:[],qty:$('#qty').value,links:form['Reference links'].value};
     DRAFT_IDS.forEach(id=>d.v[id]=$('#'+id).value);
     d.sel=[...$$('#sheet input[type=radio]:checked'),...$$('#sheet input[type=checkbox]:checked')].map(x=>x.id).filter(id=>id&&id!=='agree');
     if(Object.values(d.v).some(Boolean)||d.links)localStorage.setItem(DRAFT_KEY,JSON.stringify(d));}catch(_){}
@@ -1365,6 +1381,7 @@ function restoreDraft(k){
   if(d.links)form['Reference links'].value=d.links;
   (d.sel||[]).forEach(id=>{const el=document.getElementById(id);if(el&&!el.disabled)el.checked=true;});
   if(d.qty)$('#qty').value=d.qty;
+  if(d.start&&(!sheetStart||d.start<sheetStart))sheetStart=d.start;
   return !!(d.v.fDetails||d.v.fName||d.links);
 }
 form.addEventListener('input',()=>{clearTimeout(draftTimer);draftTimer=setTimeout(saveDraft,400);});
@@ -1417,7 +1434,7 @@ function paypalLink(amount,id,label){
   if(!(amount>0))return '';
   const cur=PAYPAL.currency||'USD', amt=amount.toFixed(2), back=location.protocol.startsWith('http')?location.origin+'/':'https://keikoartist.com/';
   if(PAYPAL.email&&/@/.test(PAYPAL.email)){
-    const q=new URLSearchParams({cmd:'_xclick',business:PAYPAL.email,item_name:`KeikoArts commission – ${label} [${id}]`.slice(0,127),item_number:id,amount:amt,currency_code:cur,no_shipping:'1',rm:'1',return:back+'?paid=1&rid='+encodeURIComponent(id),cancel_return:back});
+    const q=new URLSearchParams({cmd:'_xclick',business:PAYPAL.email,item_name:`KeikoArts commission – ${label} [${id}]`.slice(0,127),item_number:id,amount:amt,currency_code:cur,no_shipping:'1',rm:'1',return:back+'?paid=1&rid='+encodeURIComponent(id),cancel_return:back,notify_url:'https://keikoartist.com/order-api.php?a=ipn'});
     return 'https://www.paypal.com/cgi-bin/webscr?'+q.toString();
   }
   if(PAYPAL.me)return `https://www.paypal.com/paypalme/${encodeURIComponent(PAYPAL.me)}/${amt}${cur}`;
@@ -1449,14 +1466,19 @@ function go(n){
   step=n; $$('.ostep').forEach(s=>s.classList.toggle('on',+s.dataset.s===n));
   $('#mnav').hidden=n!==2;
   $('#mTitle').textContent=n===1?'Start an Order ♡':cmOn?'Custom Order ♡':'Order Form ♡';
-  if(n===2)calc();
+  if(n===2){calc();if(!sheetStart)sheetStart=Date.now();}
   err('');try{modal.scrollTop=0;}catch(_){}
 }
 $('#prevBtn').onclick=()=>go(1);
 form.setAttribute('novalidate','');
+// ===== the client's latest invoice is kept on their device until it is paid =====
+const INV_KEY='ka_inv';
+function saveInvoice(last){try{if(last&&last.id&&last.payUrl&&!/PREVIEW|0000-0000/.test(last.id))localStorage.setItem(INV_KEY,JSON.stringify(Object.assign({savedAt:Date.now()},last)));}catch(_){}}
+function readInvoice(){try{const v=JSON.parse(localStorage.getItem(INV_KEY)||'null');return v&&v.id&&Date.now()-v.savedAt<45*864e5?v:null;}catch(_){return null;}}
+function dropInvoice(id){try{const v=readInvoice();if(!v||!id||v.id===id)localStorage.removeItem(INV_KEY);}catch(_){}}
 function setBusy(on,label){const sb=$('#sendBtn');if(on){sb.dataset.busy='1';sb.textContent=label;sb.style.opacity='.75';$('#prevBtn').style.visibility='hidden';}
   else{delete sb.dataset.busy;sb.textContent='Get Invoice ♡';sb.style.opacity='';$('#prevBtn').style.visibility='visible';}}
-function resetOrderForm(){form.reset();$('#fEmail').disabled=false;$('#fAuto').disabled=false;upState.forEach(s=>{if(s.url)URL.revokeObjectURL(s.url);});upState.clear();upToken=hex(32);refFiles=[];renderRefs();clearDraft();$('#draftNote').hidden=true;$('#refSlots').innerHTML='';const m=$('#refMsg');if(m)m.textContent='';setBusy(false);err('');}
+function resetOrderForm(){form.reset();$('#fEmail').disabled=false;$('#fAuto').disabled=false;upState.forEach(s=>{if(s.url)URL.revokeObjectURL(s.url);});upState.clear();upToken=hex(32);refFiles=[];renderRefs();clearDraft();$('#draftNote').hidden=true;sheetStart=0;$('#refSlots').innerHTML='';const m=$('#refMsg');if(m)m.textContent='';setBusy(false);err('');}
 const LIVE_SITE=/(^|\.)keikoartist\.com$/i.test(location.hostname)||/^(localhost|127\.0\.0\.1)$/.test(location.hostname);
 function postOrder(fd,onProgress){
   return new Promise(res=>{
@@ -1546,7 +1568,7 @@ https://discord.com/users/1053527069528707072
     ['_next','_autoresponse','_subject','_captcha','_template','mxType','mxSize'].forEach(k=>fd.delete(k));
     [...fd.keys()].filter(k=>/^attachment\d+$/.test(k)).forEach(k=>fd.delete(k));
     fd.set('_up_token',upToken);fd.set('_up_files',upOk.map(f=>upState.get(f).fid).join(','));
-    fd.set('_price',cmOn?String(iv.sub):'0');fd.set('_total',String(totalNum||0));
+    fd.set('_price',cmOn?String(iv.sub):'0');fd.set('_total',String(totalNum||0));fd.set('_t',String(Math.max(0,Math.round((Date.now()-(sheetStart||Date.now()))/1000))));
     if(/[?&]dryrun=1/.test(location.search))fd.set('_dryrun','1');
     const prog=p=>{if(refFiles.length&&$('#sendBtn').dataset.busy)$('#sendBtn').textContent=p<.995?`Uploading… ${Math.round(p*100)}%`:'Creating invoice…';};
     let res=await postOrder(fd,prog);
@@ -1558,7 +1580,9 @@ https://discord.com/users/1053527069528707072
         missing.length?`${missing.length} reference file(s) couldn't be uploaded (${missing.join(', ')}). Please send them to me on Discord.`:''].filter(Boolean).join(' ');
       const copy=(!j.dry_run&&!j.notified)?buildCopy(j.id,j.pay_url||'',j.date,j.files?j.files+' file(s) uploaded: see admin → Orders':''):null;
       if(copy&&j.emailed)delete copy._autoresponse;
-      done({id:j.id,due:j.due,plan:j.plan,payUrl:j.pay_url||'',rows,emailed:!!j.emailed,warn,inv:mkInv(j.date,!!j.emailed,j.total,j.due)});
+      const lastInv={id:j.id,due:j.due,plan:j.plan,payUrl:j.pay_url||'',rows,emailed:!!j.emailed,warn,key:j.key||'',inv:mkInv(j.date,!!j.emailed,j.total,j.due)};
+      if(!j.dry_run)saveInvoice(Object.assign({},lastInv,{warn:''}));
+      done(lastInv);
       if(copy)sendCopy(copy);
       return;}
     if(j&&j.ok===false&&j.error&&![404,405].includes(res.status)&&res.status<500){restore();err(j.error);return;}
@@ -1569,7 +1593,9 @@ https://discord.com/users/1053527069528707072
   const ok=await sendCopy(buildCopy(id,payUrl,t.date,refFiles.length?refFiles.length+' file(s) could not be uploaded: ask the client to send them on Discord':''));
   if(ok){
     if(location.protocol.startsWith('http')){try{fetch('notify-discord.php',{method:'POST',keepalive:true,headers:{'Content-Type':'application/json'},body:JSON.stringify({id,due:$('#fDue').value,service:$('#fService').value,package:$('#fPackage').value,addons:$('#fAddons').value,total,plan,name,email:$('#fEmail').value,discord:$('#fDiscord').value,deadline:$('#fDeadline').value,refs:[refFiles.length?refFiles.length+' file(s) attached (see email)':'',form['Reference links'].value].filter(Boolean).join(' · '),details:(cmOn?`[${usageVal()} use] `:'')+$('#fDetails').value,_honey:form._honey.value})}).catch(()=>{});}catch(_){}}
-    done({id,due,plan,payUrl,rows,emailed:!!$('#fEmail').value,warn:refFiles.length?'Please send your reference images to me on Discord (they could not be uploaded).':'',inv:mkInv(t.date,!!$('#fEmail').value,invTotal,due)});
+    const lastInv={id,due,plan,payUrl,rows,emailed:!!$('#fEmail').value,warn:refFiles.length?'Please send your reference images to me on Discord (they could not be uploaded).':'',inv:mkInv(t.date,!!$('#fEmail').value,invTotal,due)};
+    saveInvoice(Object.assign({},lastInv,{warn:''}));
+    done(lastInv);
     return;}
   restore();$('#fSubject').value=$('#fSubject').value.replace(/ \[(INV|REQ)-[\w-]+\]$/,'');
   errHtml(`Sorry, your order couldn't be sent right now. Please check your internet and try again in a minute, or <a href="https://discord.com/users/1053527069528707072" target="_blank" rel="noopener" style="color:inherit;font-weight:600;text-decoration:underline">message me on Discord</a> ♡`);
@@ -1822,7 +1848,10 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'&&$('#tyModal').class
 function showThanks(last){
   const ty=$('#tyModal');
   Object.entries(TY0).forEach(([k,v])=>$('#'+k).textContent=v);
-  ['#tyRef','#tySummary','#tyPay','#tyInv'].forEach(q=>$(q).hidden=true);
+  ['#tyRef','#tySummary','#tyPay','#tyInv','#invActions'].forEach(q=>$(q).hidden=true);
+  if(last&&last.inv){$('#invActions').hidden=false;$('#invCopy').hidden=!last.payUrl;$('#invCopy').textContent='🔗 Copy payment link';
+    $('#invCopy').onclick=async()=>{try{await navigator.clipboard.writeText(last.payUrl);$('#invCopy').textContent='Copied ✓';}catch(_){prompt('Your payment link',last.payUrl);}};
+    $('#invSave').onclick=()=>window.print();}
   $('#tyWarn').textContent=(last&&last.warn)||'';$('#tyWarn').hidden=!(last&&last.warn);
   if(last&&!last.inv&&last.emailed===false)$('#tyNote').textContent="Can't use Discord? Reach me here:";
   if(last){$('#tyRefId').textContent=last.id;$('#tyRef').hidden=false;
@@ -1850,6 +1879,7 @@ function showThanks(last){
       <tfoot>${custom?`<tr><td>Subtotal</td><td>${money2(lines[0][1])}</td></tr><tr><td>Tax (13%)</td><td>${money2(lines[1]?lines[1][1]:0)}</td></tr><tr class="grand"><td>Total due (USD)</td><td>${money2(total)}</td></tr>`
         :partial?`<tr><td>Total</td><td>${money2(total)}</td></tr><tr class="grand"><td>Pay now · ${esc(planLabel(inv.plan||last.plan))}</td><td>${money2(due)}</td></tr>`
         :`<tr class="grand"><td>Total due (USD)</td><td>${money2(total)}</td></tr>`}</tfoot></table>
+      ${last.payUrl&&due>0?`<p class="print-only pay-link">Pay ${money2(due)} online with PayPal: <a href="${esc(last.payUrl)}">${esc(last.payUrl)}</a></p>`:''}
     </div>`;$('#tyInv').hidden=false;
     if(payNow){$('#tyPayT').textContent=partial?'Pay now to secure your slot':'Pay your invoice';$('#tyPayInfo').textContent=(custom?'Total incl. 13% tax':partial?planLabel(inv.plan||last.plan):'Full payment')+' · '+last.id;$('#tyPayAmt').textContent=money2(due);$('#tyPayLabel').textContent='Pay '+money2(due)+' with PayPal';
       $('#tyPaySm').textContent="Secure checkout on PayPal (card or PayPal balance). Full refund if I can't take your order.";
@@ -1872,6 +1902,7 @@ if(/[?&]paid=1/.test(location.search)){
   $('#tyLead').textContent="Thank you! PayPal will email you a receipt. I'll confirm your payment and slot on Discord within 6 hours.";
   if(rid){$('#tyRefId').textContent=rid;$('#tyRef').hidden=false;if(/^INV-/.test(rid))$('#tyRefLbl').textContent='Invoice no.';}
   try{const l=JSON.parse(sessionStorage.getItem('ka_last')||'null');if(l&&l.id===rid)sessionStorage.removeItem('ka_last');}catch(_){}
+  dropInvoice(rid);
   $('#tySteps').innerHTML=[['Chat on Discord','Send me your Request ID so I can match your payment.'],['Work starts','I start working and send progress updates on Discord.']].map(([a,b])=>`<li><b>${a}</b><span>${b}</span></li>`).join('');
   ty.classList.add('show');ty.setAttribute('aria-hidden','false');document.body.style.overflow='hidden';
   $('#tyDiscord').onclick=async()=>{if(rid){try{await navigator.clipboard.writeText(rid)}catch(_){}}window.open('https://discord.com/users/1053527069528707072','_blank','noopener');};
@@ -1881,6 +1912,20 @@ if(/[?&]paid=1/.test(location.search)){
     const n=$('#iabNote');n.hidden=false;n.querySelector('b').textContent=app;
     n.querySelector('button').onclick=async e=>{try{await navigator.clipboard.writeText('https://keikoartist.com/');e.target.textContent='Copied ✓';}catch(_){prompt('Copy this link and open it in Chrome or Safari','https://keikoartist.com/');}};}}
 if(location.hash==='#order')openOrder();
+{const v=!/[?&](sent|paid)=1/.test(location.search)&&readInvoice();
+  const showBar=()=>{if(document.querySelector('.inv-bar'))return;let off=false;try{off=sessionStorage.getItem('ka_inv_off')===v.id;}catch(_){}if(off)return;
+    const bar=document.createElement('div');bar.className='resume inv-bar';bar.setAttribute('role','status');
+    bar.innerHTML=`<span>Unpaid invoice <b>${esc(v.id)}</b> · ${money2(v.due)}</span><a class="btn btn-paypal" href="${esc(v.payUrl)}" target="_blank" rel="noopener">Pay now</a><button type="button" class="btn btn-ghost">View</button><button type="button" class="x" aria-label="Dismiss">✕</button>`;
+    bar.querySelector('.btn-ghost').onclick=()=>{bar.remove();showThanks(v);};
+    bar.querySelector('.x').onclick=()=>{bar.remove();try{sessionStorage.setItem('ka_inv_off',v.id);}catch(_){}};
+    if(document.querySelector('.resume:not(.inv-bar)'))bar.style.bottom='74px';
+    document.body.appendChild(bar);};
+  if(v){
+    if(v.key&&location.protocol.startsWith('http')){const fd=new FormData();fd.append('id',v.id);fd.append('key',v.key);
+      xhr('order-api.php?a=status',fd,null,15000).then(r=>{const j=r.j;
+        if(r.status===404||(r.status===200&&j&&j.ok&&(j.paid>0||['paid','in_progress','done','cancelled'].includes(j.status))))dropInvoice(v.id);else showBar();});}
+    else showBar();
+  }}
 {const d=!/[?&](sent|paid)=1/.test(location.search)&&readDraft();
   if(d&&Date.now()-d.t<864e5){const bar=document.createElement('div');bar.className='resume';bar.setAttribute('role','status');
     bar.innerHTML=`<span>You have an unfinished order: <b>${esc(d.svc)}</b></span><button type="button" class="btn btn-pink">Continue</button><button type="button" class="x" aria-label="Dismiss">✕</button>`;

@@ -77,6 +77,11 @@ function db(): PDO {
       fields TEXT, files TEXT, mailed INTEGER DEFAULT 0, created INTEGER, updated INTEGER)');
   $pdo->exec('CREATE INDEX IF NOT EXISTS idx_orders_created ON orders(created)');
   $pdo->exec('CREATE TABLE IF NOT EXISTS hits(k TEXT, t INTEGER)');
+  $cols = array_column($pdo->query('PRAGMA table_info(orders)')->fetchAll(), 'name');
+  foreach (['paid' => 'REAL DEFAULT 0', 'view_key' => 'TEXT', 'files_removed' => 'INTEGER DEFAULT 0'] as $c => $t) if (!in_array($c, $cols, true)) $pdo->exec("ALTER TABLE orders ADD COLUMN $c $t");
+  $pdo->exec('CREATE TABLE IF NOT EXISTS payments(txn_id TEXT PRIMARY KEY, order_id TEXT, amount REAL, currency TEXT, payer TEXT, status TEXT, created INTEGER)');
+  $pdo->exec('CREATE INDEX IF NOT EXISTS idx_pay_order ON payments(order_id)');
+  $pdo->exec('CREATE TABLE IF NOT EXISTS ipn_log(id INTEGER PRIMARY KEY AUTOINCREMENT, created INTEGER, ok INTEGER, note TEXT)');
   return $pdo;
 }
 
@@ -114,8 +119,18 @@ function paypal_link(float $amount, string $id, string $label, string $site): st
   return 'https://www.paypal.com/cgi-bin/webscr?' . http_build_query([
     'cmd' => '_xclick', 'business' => PAYPAL_EMAIL, 'item_name' => mb_substr("KeikoArts commission – $label [$id]", 0, 127),
     'item_number' => $id, 'amount' => number_format($amount, 2, '.', ''), 'currency_code' => 'USD', 'no_shipping' => '1', 'rm' => '1',
-    'return' => $site . '?paid=1&rid=' . rawurlencode($id), 'cancel_return' => $site]);
+    'return' => $site . '?paid=1&rid=' . rawurlencode($id), 'cancel_return' => $site, 'notify_url' => $site . 'order-api.php?a=ipn']);
 }
+function order_label(array $o): string {
+  return ($o['kind'] ?? '') === 'custom' ? 'Custom commission, incl. 13% tax' : trim(($o['service'] ?? '') . ' (' . ($o['package'] ?? '') . ')');
+}
+function prune_files(): void {   // reference files of finished orders are removed 30 days after the order was marked Done / Cancelled
+  $db = db();
+  $st = $db->prepare("SELECT id FROM orders WHERE status IN ('done','cancelled') AND updated < ? AND COALESCE(files_removed,0) = 0 AND files <> '[]' LIMIT 50");
+  $st->execute([time() - 30 * 86400]);
+  foreach ($st->fetchAll() as $r) { rrmdir(data_dir() . '/order-files/' . $r['id']); $db->prepare('UPDATE orders SET files_removed = 1 WHERE id = ?')->execute([$r['id']]); }
+}
+function dir_bytes(string $d): int { $n = 0; if (!is_dir($d)) return 0; foreach (new RecursiveIteratorIterator(new RecursiveDirectoryIterator($d, FilesystemIterator::SKIP_DOTS)) as $f) $n += $f->getSize(); return $n; }
 function send_mail(string $to, string $subject, string $html, string $text, string $replyTo = '', array $attach = []): bool {
   if (!function_exists('mail')) return false;
   $b1 = 'mix_' . bin2hex(random_bytes(8)); $b2 = 'alt_' . bin2hex(random_bytes(8));
@@ -194,7 +209,10 @@ if (($_GET['a'] ?? '') === 'ping') {
              'php' => PHP_MAJOR_VERSION . '.' . PHP_MINOR_VERSION, 'sqlite' => in_array('sqlite', PDO::getAvailableDrivers(), true), 'data_writable' => is_writable(data_dir()),
              'discord_reachable' => !empty($_GET['net']) ? (function () { rate_limit('net:' . client_ip(), 5, 3600); if (!function_exists('curl_init')) return 'no curl';
                  $ch = curl_init('https://discord.com/api/v10/gateway'); curl_setopt_array($ch, [CURLOPT_RETURNTRANSFER => true, CURLOPT_TIMEOUT => 6, CURLOPT_CONNECTTIMEOUT => 4]);
-                 curl_exec($ch); $c = (int)curl_getinfo($ch, CURLINFO_HTTP_CODE); $e = curl_error($ch); curl_close($ch); return $c ? "HTTP $c" : "failed: $e"; })() : null]);
+                 curl_exec($ch); $c = (int)curl_getinfo($ch, CURLINFO_HTTP_CODE); $e = curl_error($ch); curl_close($ch); return $c ? "HTTP $c" : "failed: $e"; })() : null,
+             'paypal_reachable' => !empty($_GET['net']) && function_exists('curl_init') ? (function () {
+                 $ch = curl_init('https://ipnpb.paypal.com/cgi-bin/webscr'); curl_setopt_array($ch, [CURLOPT_POST => true, CURLOPT_POSTFIELDS => 'cmd=_notify-validate', CURLOPT_RETURNTRANSFER => true, CURLOPT_TIMEOUT => 10, CURLOPT_CONNECTTIMEOUT => 6]);
+                 $r = trim((string)curl_exec($ch)); $c = (int)curl_getinfo($ch, CURLINFO_HTTP_CODE); $e = curl_error($ch); curl_close($ch); return $c ? "HTTP $c " . substr($r, 0, 12) : "failed: $e"; })() : null]);
 }
 
 /* =================== public: background upload of reference files, in pieces =================== */
@@ -236,12 +254,58 @@ if (($_GET['a'] ?? '') === 'unupload') {
   jout(200);
 }
 
+/* =================== public: PayPal tells us about a payment (IPN) =================== */
+if (($_GET['a'] ?? '') === 'ipn') {
+  $raw = file_get_contents('php://input', false, null, 0, 20000) ?: '';
+  $log = function (int $ok, string $note) { try { $d = db(); $d->prepare('INSERT INTO ipn_log(created, ok, note) VALUES(?,?,?)')->execute([time(), $ok, mb_substr($note, 0, 500)]); $d->exec('DELETE FROM ipn_log WHERE id NOT IN (SELECT id FROM ipn_log ORDER BY id DESC LIMIT 300)'); } catch (Throwable $e) {} };
+  if ($raw === '' || !function_exists('curl_init')) { $log(0, 'empty request or no curl'); http_response_code(200); exit; }
+  $ch = curl_init('https://ipnpb.paypal.com/cgi-bin/webscr');
+  curl_setopt_array($ch, [CURLOPT_POST => true, CURLOPT_POSTFIELDS => 'cmd=_notify-validate&' . $raw, CURLOPT_RETURNTRANSFER => true, CURLOPT_TIMEOUT => 25, CURLOPT_CONNECTTIMEOUT => 8, CURLOPT_HTTPHEADER => ['Connection: Close', 'User-Agent: KeikoArts-IPN']]);
+  $res = trim((string)curl_exec($ch)); $code = (int)curl_getinfo($ch, CURLINFO_HTTP_CODE); curl_close($ch);
+  parse_str($raw, $p);
+  $id = (string)($p['item_number'] ?? ''); $txn = (string)($p['txn_id'] ?? ''); $ps = (string)($p['payment_status'] ?? '');
+  if ($res !== 'VERIFIED') { $log(0, "not verified by PayPal (HTTP $code " . substr($res, 0, 20) . ") $id $txn $ps"); http_response_code(200); exit; }
+  $me = strtolower(PAYPAL_EMAIL);
+  if (strtolower((string)($p['receiver_email'] ?? '')) !== $me && strtolower((string)($p['business'] ?? '')) !== $me) { $log(0, "payment to another receiver $id $txn"); http_response_code(200); exit; }
+  $st = db()->prepare('SELECT * FROM orders WHERE id = ?'); $st->execute([$id]); $o = $st->fetch();
+  if (!$o || $txn === '') { $log(0, "no matching order ($id) $txn $ps"); http_response_code(200); exit; }
+  if (!in_array($ps, ['Completed', 'Refunded', 'Reversed', 'Canceled_Reversal'], true)) { $log(1, "status $ps for $id ($txn)"); http_response_code(200); exit; }
+  $db = db(); $amt = round((float)($p['mc_gross'] ?? 0), 2); $cur = (string)($p['mc_currency'] ?? '');
+  $ins = $db->prepare('INSERT OR IGNORE INTO payments(txn_id, order_id, amount, currency, payer, status, created) VALUES(?,?,?,?,?,?,?)');
+  $ins->execute([$txn, $id, $amt, $cur, mb_substr((string)($p['payer_email'] ?? ''), 0, 120), $ps, time()]);
+  if ($ins->rowCount() === 0) { $log(1, "duplicate notice $txn"); http_response_code(200); exit; }
+  $sum = $db->prepare("SELECT COALESCE(SUM(amount),0) FROM payments WHERE order_id = ? AND currency = 'USD'"); $sum->execute([$id]); $paid = round((float)$sum->fetchColumn(), 2);
+  $status = ($ps === 'Completed' && $o['status'] === 'new') ? 'paid' : $o['status'];
+  $db->prepare('UPDATE orders SET paid = ?, status = ?, updated = ? WHERE id = ?')->execute([$paid, $status, time(), $id]);
+  $log(1, "$ps $amt $cur for $id ($txn)");
+  $hook = discord_hook($cfg);
+  if ($hook) discord_post($hook, ['username' => 'KeikoArts Orders', 'allowed_mentions' => ['parse' => []], 'embeds' => [[
+    'title' => ($ps === 'Completed' ? '💰 Payment received · ' : '↩️ Payment ' . strtolower($ps) . ' · ') . $id,
+    'description' => money2($amt) . " $cur" . ($cur !== 'USD' ? ' (not USD, please check)' : '') . ' via PayPal', 'color' => $ps === 'Completed' ? 0x1D9A55 : 0xC22B52,
+    'fields' => [['name' => 'Client', 'value' => (string)($o['name'] ?: '-'), 'inline' => true], ['name' => 'Paid so far', 'value' => money2($paid) . ' of ' . money2((float)$o['total']), 'inline' => true]],
+    'footer' => ['text' => 'keikoartist.com/admin → Orders']]]]);
+  http_response_code(200); exit;
+}
+
+/* =================== public: the client checks whether their invoice is paid =================== */
+if (($_GET['a'] ?? '') === 'status') {
+  rate_limit('status:' . client_ip(), 120, 3600);
+  $id = (string)($_POST['id'] ?? ''); $key = (string)($_POST['key'] ?? '');
+  if (!preg_match('/^(INV|REQ)-\d{4}-\d{4}$/', $id) || !preg_match('/^[a-f0-9]{16}$/', $key)) fail(400, 'bad request');
+  $st = db()->prepare('SELECT status, paid, due, total, view_key FROM orders WHERE id = ?'); $st->execute([$id]); $o = $st->fetch();
+  if (!$o || !hash_equals((string)$o['view_key'], $key)) fail(404, 'not found');
+  jout(200, ['status' => $o['status'], 'paid' => (float)$o['paid'], 'due' => (float)$o['due'], 'total' => (float)$o['total']]);
+}
+
 /* =================== public: new order =================== */
 if (($_GET['a'] ?? '') === 'submit') {
   if (!$_POST) fail(413, 'Your reference files are too big to upload. Please attach smaller images, or paste links instead.');
   if (!empty($_POST['_honey'])) jout(200, ['id' => 'REQ-0000-0000', 'pay_url' => '']);
   $dry = !empty($_POST['_dryrun']);                               // test mode: validates everything, saves/sends nothing
+  $secs = isset($_POST['_t']) ? (int)$_POST['_t'] : -1;            // seconds the client spent on the order page
+  if (!$dry && !$HTML_MODE && $secs < 3) jout(200, ['id' => 'REQ-0000-0000', 'pay_url' => '']);   // bots: pretend success, save nothing
   rate_limit(($dry ? 'dry:' : 'order:') . client_ip(), $dry ? 40 : 20, 3600);
+  if (!$dry) rate_limit('orderday:' . client_ip(), 40, 86400);
 
   $skip = ['svc', 'pkg', 'add', 'mxType', 'mxSize', 'Request ID', 'Estimated total (USD)', 'Amount due now (USD)'];
   $fields = [];
@@ -335,10 +399,10 @@ if (($_GET['a'] ?? '') === 'submit') {
   $o = ['id' => $id, 'kind' => $kind, 'name' => $name, 'email' => $email, 'discord' => $fields['Discord'] ?? '',
         'service' => $service, 'package' => $fields['Package'] ?? '', 'plan' => $plan, 'price' => $price, 'tax' => $tax,
         'total' => $total, 'due' => $due, 'fields' => json_encode($fields, JSON_UNESCAPED_UNICODE), 'files' => json_encode($files)];
-  $now = time();
-  $db->prepare('INSERT INTO orders(id,kind,status,name,email,discord,service,package,plan,price,tax,total,due,fields,files,created,updated)
-                VALUES(?,?,\'new\',?,?,?,?,?,?,?,?,?,?,?,?,?,?)')
-     ->execute([$id, $kind, $name, $email, $o['discord'], $service, $o['package'], $plan, $price, $tax, $total, $due, $o['fields'], $o['files'], $now, $now]);
+  $now = time(); $vkey = bin2hex(random_bytes(8));
+  $db->prepare('INSERT INTO orders(id,kind,status,name,email,discord,service,package,plan,price,tax,total,due,fields,files,created,updated,paid,view_key)
+                VALUES(?,?,\'new\',?,?,?,?,?,?,?,?,?,?,?,?,?,?,0,?)')
+     ->execute([$id, $kind, $name, $email, $o['discord'], $service, $o['package'], $plan, $price, $tax, $total, $due, $o['fields'], $o['files'], $now, $now, $vkey]);
 
   $label = $kind === 'custom' ? 'Custom commission, ' . ($fields['Usage'] ?? 'Personal') . ' use, incl. 13% tax' : trim($service . ' (' . ($o['package']) . ')');
   $payUrl = paypal_link($due, $id, $label, $SITE);
@@ -404,7 +468,7 @@ if (($_GET['a'] ?? '') === 'submit') {
       . ($payUrl && $due > 0 ? '<a class="pp" href="' . h($payUrl) . '">Pay ' . money2($due) . ' with PayPal</a><p class="muted">Secure checkout on PayPal. Full refund if I can\'t take your ' . ($kind === 'custom' ? 'commission' : 'request') . '.</p>' : ''));
   }
   jout(200, ['id' => $id, 'kind' => $kind, 'price' => $price, 'tax' => $tax, 'total' => $total, 'due' => $due, 'plan' => $plan,
-             'pay_url' => $payUrl, 'date' => $dateStr, 'emailed' => $clientMailed, 'notified' => $mailed, 'files' => count($files), 'skipped_files' => $skipped, 'skipped_names' => $skippedNames]);
+             'pay_url' => $payUrl, 'date' => $dateStr, 'emailed' => $clientMailed, 'notified' => $mailed, 'files' => count($files), 'skipped_files' => $skipped, 'skipped_names' => $skippedNames, 'key' => $vkey]);
 }
 
 /* =================== admin =================== */
@@ -420,21 +484,54 @@ switch ($action) {
   }
   case 'list': {
     $s = (string)($in['status'] ?? 'new');
-    $sql = 'SELECT id, kind, status, name, email, discord, service, package, plan, total, due, files, created FROM orders';
+    if (mt_rand(1, 5) === 1) prune_files();
+    $sql = 'SELECT id, kind, status, name, email, discord, service, package, plan, total, due, paid, files, created FROM orders';
     if ($s === 'open') { $st = db()->prepare("$sql WHERE status IN ('new','paid','in_progress') ORDER BY created DESC LIMIT 300"); $st->execute(); }
     elseif (in_array($s, STATUSES, true)) { $st = db()->prepare("$sql WHERE status = ? ORDER BY created DESC LIMIT 300"); $st->execute([$s]); }
     else { $st = db()->prepare("$sql ORDER BY created DESC LIMIT 300"); $st->execute(); }
-    $rows = array_map(function ($r) { $r['total'] = (float)$r['total']; $r['due'] = (float)$r['due']; $r['created'] = (int)$r['created']; $r['files'] = count(json_decode((string)$r['files'], true) ?: []); return $r; }, $st->fetchAll());
+    $rows = array_map(function ($r) { $r['total'] = (float)$r['total']; $r['due'] = (float)$r['due']; $r['paid'] = (float)$r['paid']; $r['created'] = (int)$r['created']; $r['files'] = count(json_decode((string)$r['files'], true) ?: []); return $r; }, $st->fetchAll());
     $new = (int)db()->query("SELECT COUNT(*) FROM orders WHERE status = 'new'")->fetchColumn();
     jout(200, ['orders' => $rows, 'new' => $new]);
   }
   case 'get': {
     $o = order_row((string)($in['id'] ?? ''));
-    foreach (['price', 'tax', 'total', 'due'] as $k) $o[$k] = (float)$o[$k];
-    $o['created'] = (int)$o['created']; $o['updated'] = (int)$o['updated']; $o['mailed'] = (int)$o['mailed'];
+    foreach (['price', 'tax', 'total', 'due', 'paid'] as $k) $o[$k] = (float)$o[$k];
+    $o['created'] = (int)$o['created']; $o['updated'] = (int)$o['updated']; $o['mailed'] = (int)$o['mailed']; $o['files_removed'] = (int)$o['files_removed'];
     $o['fields'] = json_decode((string)$o['fields'], true) ?: []; $o['files'] = json_decode((string)$o['files'], true) ?: [];
-    $o['pay_url'] = paypal_link((float)$o['due'], $o['id'], $o['kind'] === 'custom' ? 'Custom commission, incl. 13% tax' : $o['service'] . ' (' . $o['package'] . ')', $SITE);
+    $o['pay_url'] = paypal_link((float)$o['due'], $o['id'], order_label($o), $SITE);
+    $rem = round((float)$o['total'] - (float)$o['paid'], 2);
+    $o['remaining'] = max(0, $rem);
+    $o['remaining_url'] = $rem > 0 && $o['paid'] > 0 ? paypal_link($rem, $o['id'], order_label($o) . ', remaining balance', $SITE) : '';
+    unset($o['view_key']);
+    $ps = db()->prepare('SELECT txn_id, amount, currency, payer, status, created FROM payments WHERE order_id = ? ORDER BY created'); $ps->execute([$o['id']]);
+    $o['payments'] = array_map(function ($r) { $r['amount'] = (float)$r['amount']; $r['created'] = (int)$r['created']; return $r; }, $ps->fetchAll());
     jout(200, ['order' => $o]);
+  }
+  case 'paylink': {
+    $o = order_row((string)($in['id'] ?? ''));
+    $amt = round((float)($in['amount'] ?? 0), 2); if ($amt < 1 || $amt > 100000) fail(400, 'Please enter an amount between $1 and $100,000.');
+    $note = clean((string)($in['note'] ?? ''), 40);
+    jout(200, ['url' => paypal_link($amt, $o['id'], order_label($o) . ($note !== '' ? ", $note" : ''), $SITE)]);
+  }
+  case 'storage': {
+    $d = data_dir();
+    jout(200, ['bytes' => dir_bytes("$d/order-files") + dir_bytes("$d/tmp-uploads"), 'orders' => (int)db()->query('SELECT COUNT(*) FROM orders')->fetchColumn()]);
+  }
+  case 'ipnlog': {
+    jout(200, ['log' => db()->query('SELECT created, ok, note FROM ipn_log ORDER BY id DESC LIMIT 30')->fetchAll()]);
+  }
+  case 'export': {
+    $rows = db()->query('SELECT * FROM orders ORDER BY created DESC')->fetchAll();
+    header('Content-Type: text/csv; charset=utf-8'); header('Content-Disposition: attachment; filename="keikoarts-orders-' . date('Y-m-d') . '.csv"');
+    $out = fopen('php://output', 'w'); fwrite($out, "\xEF\xBB\xBF");
+    fputcsv($out, ['Order ID', 'Date', 'Status', 'Type', 'Name', 'Email', 'Discord', 'Service', 'Package', 'Add-ons', 'Usage', 'Payment plan', 'Total (USD)', 'Due first (USD)', 'Paid (USD)', 'Deadline', 'Details', 'Reference links', 'Files']);
+    foreach ($rows as $r) {
+      $f = json_decode((string)$r['fields'], true) ?: [];
+      fputcsv($out, [$r['id'], date('Y-m-d H:i', (int)$r['created']), $r['status'], $r['kind'], $r['name'], $r['email'], $r['discord'], $r['service'], $r['package'],
+        $f['Add-ons'] ?? '', $f['Usage'] ?? '', $r['plan'], number_format((float)$r['total'], 2, '.', ''), number_format((float)$r['due'], 2, '.', ''), number_format((float)$r['paid'], 2, '.', ''),
+        $f['Deadline'] ?? '', $f['Details'] ?? '', $f['Reference links'] ?? '', count(json_decode((string)$r['files'], true) ?: [])]);
+    }
+    fclose($out); exit;
   }
   case 'status': {
     $o = order_row((string)($in['id'] ?? ''));
