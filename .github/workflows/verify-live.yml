@@ -13,7 +13,8 @@ jobs:
             h=$(curl -s -I -m 20 "$u" | tr -d '\r' | grep -iE '^(HTTP|cache-control|expires|last-modified|etag|x-litespeed|x-cache|location|server|age|x-proxy)' | tr '\n' ' ')
             echo "::notice::$u => $h"
           done
+          echo "::notice::PING $(curl -s -m 30 -X POST -H 'Origin: https://keikoartist.com' 'https://keikoartist.com/order-api.php?a=ping&net=1')"
           html=$(curl -sL -H "Cache-Control: no-cache" "https://keikoartist.com/?v=$(date +%s)")
-          for t in "order-api.php?a=submit" "Get Invoice" "theresa.oktavia10@gmail.com"; do
+          for t in "order-api.php?a=submit" "Get Invoice" "theresa.oktavia10@gmail.com" "iabNote" "draftNote"; do
             if grep -q "$t" <<<"$html"; then echo "::notice::FOUND $t"; else echo "::warning::MISSING $t"; fi
           done
