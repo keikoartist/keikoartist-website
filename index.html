@@ -782,6 +782,131 @@ body{-webkit-tap-highlight-color:rgba(242,98,143,.12)}
   .kc-bubble .kc-label{display:none}
   .kc-bubble .kc-badge{position:absolute;top:-4px;right:-4px}
 }
+
+/* ===================== REFINED LANDING (light, pink + lavender, gothic-cute) ===================== */
+:root{--lav:#f5f0fd;--lav-2:#c9b6ef;--blush:#fff6f9}
+main>section{padding:76px 0;background:none!important}
+main>section:nth-of-type(even):not(.hero){background:none}
+main>section.tint-lav{background:linear-gradient(180deg,#fff 0,var(--lav) 70px,var(--lav) calc(100% - 70px),#fff 100%)!important}
+main>section.tint-pink{background:linear-gradient(180deg,#fff 0,var(--blush) 70px,var(--blush) calc(100% - 70px),#fff 100%)!important}
+main>section#tos{padding-top:0}
+.sec-head{margin-bottom:28px;align-items:flex-end}
+.sec-head h2{font-size:clamp(28px,3.2vw,40px);line-height:1.1}
+.sec-head h2::before{font-size:22px;color:var(--lav-2)}
+.sec-more{display:flex;align-items:center;justify-content:center;gap:18px;flex-wrap:wrap;margin-top:28px}
+/* hero */
+.hero{min-height:0;display:block;overflow:visible;background:radial-gradient(60% 80% at 85% 30%,#f3ecff 0,rgba(243,236,255,0) 70%),radial-gradient(50% 70% at 10% 90%,#fff0f6 0,rgba(255,240,246,0) 70%),#fff;padding:0!important}
+.hero::before,.hero-bg{display:none!important}
+.hero-grid{display:grid;grid-template-columns:minmax(0,.92fr) minmax(0,1.08fr);gap:56px;align-items:center;padding:64px 0 76px}
+.hero-copy{position:relative;z-index:1}
+.hero h1{font-size:clamp(40px,4.6vw,64px);line-height:1.04;margin:16px 0 18px;max-width:none}
+.hero p{max-width:470px;font-size:16.5px}
+.hero .btns{margin:28px 0 32px}
+.hero-art{position:relative;margin:0}
+.hero-art::before{content:"";position:absolute;inset:18px -18px -18px 18px;border-radius:30px;background:linear-gradient(135deg,var(--lav-2),#ffb3cb);opacity:.45;z-index:0}
+.hero-art img{position:relative;z-index:1;width:100%;height:auto;aspect-ratio:16/9;border-radius:28px;border:6px solid #fff;box-shadow:0 22px 50px rgba(122,40,70,.16);background:#efe7fb}
+.hero-art figcaption{position:absolute;z-index:2;left:22px;bottom:20px;background:rgba(255,255,255,.92);border-radius:999px;padding:6px 14px;font-size:12px;font-weight:500;color:var(--ink);box-shadow:0 6px 16px rgba(122,40,70,.12)}
+.perks{gap:0}
+/* featured works */
+.works.fw{display:grid;grid-template-columns:repeat(4,1fr);grid-auto-rows:clamp(230px,23vw,300px);gap:14px}
+.fw .work{aspect-ratio:auto;height:100%;border-radius:20px;border:1px solid var(--line);background:linear-gradient(160deg,#fff 0,var(--lav) 100%)}
+.fw .work img{width:100%;height:100%;object-fit:contain;padding:12px 10px 34px}
+.fw .work.fw-wide{grid-column:span 2;background:#f3ecff}
+.fw .work .tag{display:inline-block;left:12px;bottom:10px;font-family:Poppins,sans-serif;font-size:11.5px;font-weight:500;padding:4px 12px;border:1px solid var(--line)}
+@media (hover:hover){.fw .work:hover{transform:translateY(-4px);box-shadow:0 14px 30px rgba(122,40,70,.12)}}
+/* custom VTuber section */
+.vm-card{border-radius:20px;padding:22px}
+.vm-card h3{font-family:"DM Serif Display",serif;font-weight:400;font-size:20px;margin-bottom:8px}
+/* services */
+.services{grid-template-columns:repeat(3,1fr)!important;gap:20px!important}
+.services:not(.all):not(.searching) .card.extra{display:none}
+.card{border-radius:22px;padding:14px 14px 18px!important;border-color:var(--line)}
+.card .gal{aspect-ratio:4/3!important;border-radius:16px;margin-bottom:16px;background:linear-gradient(160deg,#fff 0,var(--lav) 100%)}
+.card .gal .gal-track{aspect-ratio:auto!important;height:100%}
+.card .gal-slide{background-size:contain;background-color:transparent}
+.card .gal-slide.wide{background-size:cover;background-position:center}
+.card .gal-slide.contain{background-size:84% auto}
+.card .gal-slide[style*="banner"]{background-size:contain;background-color:#1d1418}
+.card .gal-slide[style*="emotes-witch"]{background-size:contain;background-color:#f7f7f7}
+.card h3{font-size:22px!important;line-height:1.15;padding:0 4px}
+.card p{display:block!important;font-size:13.5px!important;line-height:1.5;margin:6px 4px 10px!important;color:var(--muted);flex:none!important;display:-webkit-box!important;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.card .tiers{display:none!important}
+.card .more{margin:0 4px auto;font-size:13px}
+.card .price{margin:12px 4px 0!important}
+.card .price b{font-size:22px}
+.card .req{margin-top:12px!important;padding:12px 14px!important;font-size:14px!important}
+.svc-note{text-align:center;margin-top:16px;font-size:14px;color:var(--muted)}
+.svc-note a{color:var(--pink);font-weight:600}
+/* reviews */
+.rv-score{font-size:14px;color:var(--muted)}.rv-score span{color:var(--pink);letter-spacing:2px;margin-right:6px}
+.rv-grid{columns:3;column-gap:18px}
+.rv-card{break-inside:avoid;margin:0 0 18px;background:#fff;border:1px solid var(--line);border-radius:22px;padding:22px 22px 18px;display:flex;flex-direction:column;gap:12px}
+.rv-stars{color:var(--pink);letter-spacing:3px;font-size:15px}
+.rv-card blockquote{font-family:"DM Serif Display",serif;font-size:19px;line-height:1.4;color:var(--ink)}
+.rv-rated{font-size:13px;color:var(--muted)}
+.rv-tags{display:flex;flex-wrap:wrap;gap:6px;list-style:none}
+.rv-tags li{font-size:11.5px;background:var(--lav);color:#6b4a91;border-radius:999px;padding:4px 10px}
+.rv-tagsonly .rv-tags li{background:#fff0f5;color:var(--ink)}
+.rv-card figcaption{display:flex;align-items:center;gap:10px;margin-top:2px}
+.rv-av{width:36px;height:36px;border-radius:50%;flex:none;display:grid;place-items:center;font-weight:600;color:#fff;background:linear-gradient(135deg,var(--pink),var(--lav-2))}
+.rv-card figcaption b{display:block;font-size:14px;font-weight:600;line-height:1.2}
+.rv-card figcaption small{font-size:12px;color:var(--muted)}
+/* process + team */
+.step{border-radius:20px}
+/* responsive */
+@media (max-width:1050px){.hero-grid{gap:36px}.works.fw{grid-template-columns:repeat(3,1fr)}.works.fw .work:nth-child(n+6){display:none}.rv-grid{columns:2}}
+@media (max-width:820px){
+  main>section{padding:56px 0}
+  .hero-grid{grid-template-columns:1fr;gap:30px;padding:36px 0 52px}
+  .hero-art{max-width:640px}
+  .services{grid-template-columns:repeat(2,1fr)!important;gap:14px!important}
+}
+@media (max-width:560px){
+  main>section{padding:46px 0}
+  .hero-grid{padding:26px 0 44px;gap:26px}
+  .hero h1{font-size:clamp(34px,9.6vw,42px)}
+  .hero p{font-size:15px}
+  .hero .btns{margin:22px 0 26px}
+  .hero-art::before{inset:10px -8px -10px 10px;border-radius:22px}
+  .hero-art img{border-radius:20px;border-width:4px}
+  .hero-art figcaption{left:14px;bottom:12px;font-size:11px;padding:4px 10px}
+  .works.fw{grid-template-columns:1fr 1fr;grid-auto-rows:auto;gap:10px}
+  .works.fw .work:nth-child(n+6){display:block}
+  .fw .work{aspect-ratio:4/5;height:auto}
+  .fw .work.fw-wide{grid-column:1/-1;aspect-ratio:16/9}
+  .fw .work img{padding:8px 6px 30px}
+  .services{gap:10px!important}
+  .card{padding:8px 8px 12px!important;border-radius:18px}
+  .card .gal{margin-bottom:10px;border-radius:12px}
+  .card h3{font-size:17px!important}
+  .card p{font-size:12px!important;margin:4px 4px 6px!important}
+  .card .price b{font-size:18px}
+  .card .req{padding:10px 8px!important;font-size:13px!important}
+  .vm-card{padding:16px}
+  .rv-grid{columns:auto;display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;padding:2px 2px 10px;margin:0 -16px;padding-inline:16px;scrollbar-width:none}
+  .rv-grid::-webkit-scrollbar{display:none}
+  .rv-card{flex:0 0 84%;scroll-snap-align:center;margin:0}
+  .rv-card blockquote{font-size:17px}
+  .sec-head{margin-bottom:18px}
+}
+@media (max-width:1100px) and (min-width:821px){
+  .menu{display:none}
+  .menu.open{display:flex;flex-direction:column;position:absolute;top:76px;left:0;right:0;background:#fff;padding:20px;gap:14px;border-bottom:1px solid var(--line);box-shadow:var(--shadow)}
+  .burger{display:inline-flex!important;min-width:44px;min-height:44px;align-items:center;justify-content:center}
+}
+@media (max-width:560px){
+  .step:not(:last-child)::after{display:none}
+  .perks{display:grid!important;grid-template-columns:repeat(4,1fr);gap:4px;row-gap:0}
+  .perks div{font-size:10.5px;padding:0!important;border:0!important;line-height:1.25}
+  .perks span{font-size:20px}
+}
+@media (max-width:820px){
+  .fab-order{transition:opacity .25s,transform .25s}
+  body:not(.past-hero) .fab-order{opacity:0;pointer-events:none;transform:translateY(12px)}
+}
+/* artworks mostly have white backgrounds: keep their tiles white so no box shows */
+.card .gal{background:#fff!important}
+.fw .work{background:#fff}
 </style>
 </head>
 <body>
@@ -794,6 +919,7 @@ body{-webkit-tap-highlight-color:rgba(242,98,143,.12)}
       <a href="#services">Services</a>
       <a href="/vtuber-pricing/">Pricing</a>
       <a href="#portfolio">Portfolio</a>
+      <a href="#reviews">Reviews</a>
       <a href="#process">Process</a>
       <a href="#tos">TOS</a>
       <a href="#faq">FAQ</a>
@@ -807,22 +933,27 @@ body{-webkit-tap-highlight-color:rgba(242,98,143,.12)}
 
 <main>
 <!-- HERO -->
-<section class="hero" id="home" style="padding:0">
-  <div class="hero-bg img" style="--src:url(images/hero.webp)"></div>
-  <div class="wrap hero-inner">
-    <div class="eyebrow">VTuber Artist &amp; Live2D Studio</div>
-    <h1 class="serif">Custom <em>VTuber</em> Models &amp; Live2D Rigging</h1>
-    <p>Create your own custom VTuber model with personalized anime artwork, expressive Live2D rigging, and a design tailored to your character.</p>
-    <div class="btns">
-      <a href="/custom-vtuber-model/" class="btn btn-pink arrow">Explore VTuber Models</a>
-      <a href="#order" data-order class="btn btn-ghost">Start a Request 💬</a>
-    </div>
-    <div class="perks">
+<section class="hero" id="home">
+  <div class="wrap hero-grid">
+    <div class="hero-copy">
+      <div class="eyebrow">VTuber Artist &amp; Live2D Studio</div>
+      <h1 class="serif">Custom <em>VTuber</em> Models &amp; Live2D Rigging</h1>
+      <p>Create your own custom VTuber model with personalized anime artwork, expressive Live2D rigging, and a design tailored to your character.</p>
+      <div class="btns">
+        <a href="#order" data-order class="btn btn-pink arrow">Start a Project</a>
+        <a href="/custom-vtuber-model/" class="btn btn-ghost">Explore VTuber Models</a>
+      </div>
+      <div class="perks">
       <div><span>✎</span>Custom Design</div>
       <div><span>⬡</span>Live2D Rigging</div>
       <div><span>▭</span>Stream Assets</div>
       <div><span>♡</span>Friendly Support</div>
+      </div>
     </div>
+    <figure class="hero-art">
+      <img src="images/hero.webp" alt="Pink-haired witch VTuber character sitting on a crescent moon under a purple starry sky, illustrated by KeikoArts" width="1600" height="900" fetchpriority="high" decoding="async">
+      <figcaption>✦ Original art by KeikoArts</figcaption>
+    </figure>
   </div>
 </section>
 
@@ -831,24 +962,26 @@ body{-webkit-tap-highlight-color:rgba(242,98,143,.12)}
   <div class="wrap">
     <div class="sec-head">
       <h2 class="serif">Featured Works</h2>
-      <a href="/vtuber-portfolio/" class="link arrow">View full portfolio </a>
+      <a href="/vtuber-portfolio/" class="link arrow">Portfolio </a>
     </div>
-    <div class="works works-strip">
-      <div class="work rig">
+    <div class="works fw">
+      <div class="work rig fw-wide">
         <video id="rigVid" src="images/rigging-showcase.mp4" poster="images/rigging-poster.webp" muted loop playsinline preload="none" aria-label="Live2D rigging showcase"></video>
         <span class="tag">Live2D Rigging</span>
       </div>
-      <a href="#services" class="work img art" role="img" aria-label="Pink witch VTuber model" style="--src:url(images/vtuber-witch.webp);background-position:center 12%"><span class="tag">VTuber</span><span class="go">↗</span></a>
-      <a href="#services" class="work img art" role="img" aria-label="Dragon girl VTuber model in a pink and black dress" style="--src:url(images/vtuber-dragon.webp);background-position:center 12%"><span class="tag">VTuber</span><span class="go">↗</span></a>
-      <a href="#services" class="work img art" role="img" aria-label="Maid VTuber model with cat ears and playing cards" style="--src:url(images/vtuber-maid.webp);background-position:center 12%"><span class="tag">VTuber</span><span class="go">↗</span></a>
-      <a href="#services" class="work img art" role="img" aria-label="Illustration of a woman reading in a cottage garden" style="--src:url(images/illustration-cottage.webp);background-position:center 25%"><span class="tag">Illustration</span><span class="go">↗</span></a>
-      <a href="#services" class="work img art" role="img" aria-label="Green leaf cat mascot pet" style="--src:url(images/mascot-pet.webp);background-position:center 30%"><span class="tag">Mascot Pet</span><span class="go">↗</span></a>
+      <a href="images/vtuber-kitsune-gown.webp" class="work"><img src="images/vtuber-kitsune-gown.webp" alt="Full-body VTuber model art of a fox-eared girl in a pink and black layered gown" width="814" height="1000" loading="lazy" decoding="async"><span class="tag">VTuber model</span></a>
+      <a href="images/vtuber-witch.webp" class="work"><img src="images/vtuber-witch.webp" alt="Full-body VTuber model art of a pink-haired witch holding a pink flame" width="772" height="1000" loading="lazy" decoding="async"><span class="tag">VTuber model</span></a>
+      <a href="images/vtuber-dragon.webp" class="work"><img src="images/vtuber-dragon.webp" alt="Full-body VTuber model art of a dragon girl in a pink and black frilled dress" width="920" height="1000" loading="lazy" decoding="async"><span class="tag">VTuber model</span></a>
+      <a href="images/vtuber-maid.webp" class="work"><img src="images/vtuber-maid.webp" alt="Full-body VTuber model art of a pink-haired maid with cat ears and playing cards" width="1000" height="1000" loading="lazy" decoding="async"><span class="tag">VTuber model</span></a>
+      <a href="images/mascot-anglercat.webp" class="work"><img src="images/mascot-anglercat.webp" alt="VTuber pet: fluffy blue cat sitting on a glowing anglerfish" width="1000" height="1000" loading="lazy" decoding="async"><span class="tag">VTuber pet</span></a>
+      <a href="images/illustration-calico.webp" class="work"><img src="images/illustration-calico.webp" alt="Illustration of a fluffy calico cat in a flower meadow" width="1000" height="1000" loading="lazy" decoding="async"><span class="tag">Illustration</span></a>
     </div>
+    <div class="sec-more"><a href="/vtuber-portfolio/" class="btn btn-ghost arrow">View full portfolio</a></div>
   </div>
 </section>
 
 <!-- VTUBER MODELS -->
-<section id="vtuber-models" class="vm">
+<section id="vtuber-models" class="vm tint-lav">
   <div class="wrap">
     <div class="sec-head"><h2 class="serif">Custom VTuber models, made from scratch</h2><a href="/custom-vtuber-model/" class="link arrow">Full details </a></div>
     <p class="vm-lead">Every model starts from your idea: a description, a character sheet or a few references. I design and draw your character, split the art into clean layers and rig it in Live2D, so it's ready to stream in VTube Studio.</p>
@@ -872,19 +1005,21 @@ body{-webkit-tap-highlight-color:rgba(242,98,143,.12)}
     </div>
     <p class="svc-empty" id="svcEmpty" hidden>No service matches “<span></span>”. Try another word, or <a href="#order" data-order="Custom Inquiry">make a custom order</a> ♡</p>
     <div class="services">
-      <div class="card"><div class="img art" style="--src:url(images/vtuber-witch.webp)"></div><h3>VTuber</h3><p>Live2D VTuber model: bust, half or full body.</p><div class="price"><b>From $100</b></div><button class="btn btn-pink req" data-order="VTuber">Start Request</button></div>
-      <div class="card"><div class="img" style="--src:url(images/pkg-keikomi.webp)"></div><h3>VTuber Packages</h3><p>All-in-one debut bundle: model, rig, emotes and stream assets.</p><div class="price"><b>From $250</b></div><button class="btn btn-pink req" data-order="VTuber Packages">Start Request</button></div>
-      <div class="card"><div class="img" style="--src:url(images/bg-stream-room.webp)"></div><h3>Background</h3><p>Original background for your stream layout.</p><div class="price"><b>From $100</b></div><button class="btn btn-pink req" data-order="Background">Start Request</button></div>
-      <div class="card"><div class="img" style="--src:url(images/overlay-keikomi.webp)"></div><h3>Stream Overlay</h3><p>Matching stream screens, layouts and panels for your channel.</p><div class="price"><b>From $45</b></div><button class="btn btn-pink req" data-order="Stream Overlay">Start Request</button></div>
-      <div class="card"><div class="img art" style="--src:url(images/pfp-glasses.webp);background-position:center 35%"></div><h3>Custom PFP</h3><p>Profile picture of your character for socials.</p><div class="price"><b>From $36</b></div><button class="btn btn-pink req" data-order="Custom PFP">Start Request</button></div>
-      <div class="card"><div class="img art" style="--src:url(images/emotes-witch.webp);background-color:#f7f7f7;background-position:center"></div><h3>Emotes</h3><p>Static or animated emotes tailored to your character.</p><div class="price"><b>From $5</b></div><button class="btn btn-pink req" data-order="Emotes">Start Request</button></div>
-      <div class="card"><div class="img"></div><h3>Banner</h3><p>Eye or mouth banner for your stream, static or animated.</p><div class="price"><b>From $45</b></div><button class="btn btn-pink req" data-order="Banner">Start Request</button></div>
-      <div class="card"><div class="img"></div><h3>VTuber Logo</h3><p>Custom name logo that matches your character and brand.</p><div class="price"><b>From $30</b></div><button class="btn btn-pink req" data-order="VTuber Logo">Start Request</button></div>
-      <div class="card"><div class="img"></div><h3>PNGTuber</h3><p>Simple avatar with talking and idle states, ready for streaming.</p><div class="price"><b>From $60</b></div><button class="btn btn-pink req" data-order="PNGTuber">Start Request</button></div>
-      <div class="card"><div class="img art" style="--src:url(images/mascot-pet.webp);background-position:center 30%"></div><h3>VTuber Pet</h3><p>A cute companion pet for your VTuber.</p><div class="price"><b>From $62.60</b></div><button class="btn btn-pink req" data-order="VTuber Pet">Start Request</button></div>
-      <div class="card"><div class="img art" style="--src:url(images/chibi-witch.webp);background-position:center 20%"></div><h3>Chibi VTuber</h3><p>Cute chibi version of your VTuber character.</p><div class="price"><b>From $45</b></div><button class="btn btn-pink req" data-order="Chibi VTuber">Start Request</button></div>
-      <div class="card"><div class="img" style="--src:url(images/illustration-cottage.webp);background-position:center 30%"></div><h3>Custom Inquiry</h3><p>Have an idea that is not listed? Describe it and name your price ♡</p><div class="price"><b>Your price</b></div><button class="btn btn-pink req" data-order="Custom Inquiry">Start Inquiry</button></div>
+      <div class="card"><div class="img art" style="--src:url(images/vtuber-witch.webp)"></div><h3>VTuber</h3><p>Live2D VTuber model: bust, half or full body.</p><div class="price"><b>From $100</b></div><button class="btn btn-pink req" data-order="VTuber">Order now</button></div>
+      <div class="card"><div class="img" style="--src:url(images/pkg-keikomi.webp)"></div><h3>VTuber Packages</h3><p>All-in-one debut bundle: model, rig, emotes and stream assets.</p><div class="price"><b>From $250</b></div><button class="btn btn-pink req" data-order="VTuber Packages">Order now</button></div>
+      <div class="card"><div class="img"></div><h3>PNGTuber</h3><p>Simple avatar with talking and idle states, ready for streaming.</p><div class="price"><b>From $60</b></div><button class="btn btn-pink req" data-order="PNGTuber">Order now</button></div>
+      <div class="card"><div class="img art" style="--src:url(images/mascot-pet.webp);background-position:center 30%"></div><h3>VTuber Pet</h3><p>A cute companion pet for your VTuber.</p><div class="price"><b>From $62.60</b></div><button class="btn btn-pink req" data-order="VTuber Pet">Order now</button></div>
+      <div class="card"><div class="img art" style="--src:url(images/emotes-witch.webp);background-color:#f7f7f7;background-position:center"></div><h3>Emotes</h3><p>Static or animated emotes tailored to your character.</p><div class="price"><b>From $5</b></div><button class="btn btn-pink req" data-order="Emotes">Order now</button></div>
+      <div class="card"><div class="img art" style="--src:url(images/pfp-glasses.webp);background-position:center 35%"></div><h3>Custom PFP</h3><p>Profile picture of your character for socials.</p><div class="price"><b>From $36</b></div><button class="btn btn-pink req" data-order="Custom PFP">Order now</button></div>
+      <div class="card extra"><div class="img"></div><h3>Banner</h3><p>Eye or mouth banner for your stream, static or animated.</p><div class="price"><b>From $45</b></div><button class="btn btn-pink req" data-order="Banner">Order now</button></div>
+      <div class="card extra"><div class="img art" style="--src:url(images/chibi-witch.webp);background-position:center 20%"></div><h3>Chibi VTuber</h3><p>Cute chibi version of your VTuber character.</p><div class="price"><b>From $45</b></div><button class="btn btn-pink req" data-order="Chibi VTuber">Order now</button></div>
+      <div class="card extra"><div class="img"></div><h3>VTuber Logo</h3><p>Custom name logo that matches your character and brand.</p><div class="price"><b>From $30</b></div><button class="btn btn-pink req" data-order="VTuber Logo">Order now</button></div>
+      <div class="card extra"><div class="img" style="--src:url(images/overlay-keikomi.webp)"></div><h3>Stream Overlay</h3><p>Matching stream screens, layouts and panels for your channel.</p><div class="price"><b>From $45</b></div><button class="btn btn-pink req" data-order="Stream Overlay">Order now</button></div>
+      <div class="card extra"><div class="img" style="--src:url(images/bg-stream-room.webp)"></div><h3>Background</h3><p>Original background for your stream layout.</p><div class="price"><b>From $100</b></div><button class="btn btn-pink req" data-order="Background">Order now</button></div>
+      <div class="card extra"><div class="img" style="--src:url(images/illustration-cottage.webp);background-position:center 30%"></div><h3>Custom Inquiry</h3><p>Have an idea that is not listed? Describe it and name your price ♡</p><div class="price"><b>Your price</b></div><button class="btn btn-pink req" data-order="Custom Inquiry">Send inquiry</button></div>
     </div>
+    <div class="sec-more"><button type="button" class="btn btn-ghost" id="svcAll" aria-expanded="false">View all services (12)</button><a href="/vtuber-pricing/" class="link arrow">Compare all prices </a></div>
+    <p class="svc-note">Something else in mind? <a href="#order" data-order="Custom Inquiry">Send a custom inquiry</a> and name your price ♡</p>
   </div>
 </section>
 
@@ -893,6 +1028,57 @@ body{-webkit-tap-highlight-color:rgba(242,98,143,.12)}
   <div class="wrap">
     <div class="sec-head"><h2 class="serif">VTuber Children</h2></div>
     <div class="vt-marquee" aria-label="VTuber Children by KeikoArts"><div class="vt-track" id="vtTrack"></div></div>
+  </div>
+</section>
+
+<!-- REVIEWS (real client reviews; add new ones by copying a <figure>) -->
+<section id="reviews" class="tint-pink">
+  <div class="wrap">
+    <div class="sec-head"><h2 class="serif">Kind words from clients</h2><p class="rv-score"><span aria-hidden="true">★★★★★</span> 5.0 from 7 reviews</p></div>
+    <div class="rv-grid">
+      <figure class="rv-card">
+        <div class="rv-stars" role="img" aria-label="5 out of 5 stars">★★★★★</div>
+        <blockquote>“Keiko did such an amazing job on this and they listened and adjusted when I gave my feedback which made me very happy. I will def be coming back to Keiko when I need another mascot done!!!”</blockquote>
+        <ul class="rv-tags"><li>Receptive to feedback</li><li>Above and beyond</li><li>On time delivery</li></ul>
+        <figcaption><span class="rv-av" aria-hidden="true">K</span><span><b>KeivaAegis</b><small>Apr 2026</small></span></figcaption>
+      </figure>
+      <figure class="rv-card">
+        <div class="rv-stars" role="img" aria-label="5 out of 5 stars">★★★★★</div>
+        <blockquote>“I am very impressed with this work by Keiko! They were very patient with any revisions and requests I had, all while expressing excitement over the art. Speaking of art, the design itself is incredible! I absolutely love it 🥰”</blockquote>
+        <ul class="rv-tags"><li>Amazing skills</li><li>Receptive to feedback</li><li>Proactive updates</li></ul>
+        <figcaption><span class="rv-av" aria-hidden="true">L</span><span><b>Larkin</b><small>Jan 2026</small></span></figcaption>
+      </figure>
+      <figure class="rv-card">
+        <div class="rv-stars" role="img" aria-label="5 out of 5 stars">★★★★★</div>
+        <blockquote>“Absolutely amazing work! Exceeded my expectations and blew it out of the water!!! I would recommend for any future projects and will definitely commission again!”</blockquote>
+        <ul class="rv-tags"><li>Above and beyond</li><li>Attentive to details</li><li>On time delivery</li></ul>
+        <figcaption><span class="rv-av" aria-hidden="true">D</span><span><b>dailykiq</b><small>Aug 2026</small></span></figcaption>
+      </figure>
+      <figure class="rv-card">
+        <div class="rv-stars" role="img" aria-label="5 out of 5 stars">★★★★★</div>
+        <blockquote>“So far, I love the model they had made as it was pretty unique and quite creative in the design! I may not have been the best client though, but they did amazing for what they had.”</blockquote>
+        <ul class="rv-tags"><li>Professional</li><li>Amazing skills</li><li>Clear communication</li></ul>
+        <figcaption><span class="rv-av" aria-hidden="true">S</span><span><b>SeikyoSakura</b><small>Aug 2026</small></span></figcaption>
+      </figure>
+      <figure class="rv-card">
+        <div class="rv-stars" role="img" aria-label="5 out of 5 stars">★★★★★</div>
+        <blockquote>“Lovely and beautiful art from Keiko.”</blockquote>
+        <ul class="rv-tags"><li>Proactive updates</li><li>Clear communication</li><li>Great value</li></ul>
+        <figcaption><span class="rv-av" aria-hidden="true">K</span><span><b>Kureychi</b><small>Aug 2026</small></span></figcaption>
+      </figure>
+      <figure class="rv-card rv-tagsonly">
+        <div class="rv-stars" role="img" aria-label="5 out of 5 stars">★★★★★</div>
+        <p class="rv-rated">Rated 5 stars for:</p>
+        <ul class="rv-tags"><li>On time delivery</li><li>Professional</li><li>Amazing skills</li><li>Great value</li><li>Clear communication</li><li>Proactive updates</li><li>Very responsive</li><li>Attentive to details</li></ul>
+        <figcaption><span class="rv-av" aria-hidden="true">A</span><span><b>Aus</b><small>Sep 2026</small></span></figcaption>
+      </figure>
+      <figure class="rv-card rv-tagsonly">
+        <div class="rv-stars" role="img" aria-label="5 out of 5 stars">★★★★★</div>
+        <p class="rv-rated">Rated 5 stars for:</p>
+        <ul class="rv-tags"><li>Professional</li><li>Amazing skills</li><li>Very responsive</li><li>Attentive to details</li></ul>
+        <figcaption><span class="rv-av" aria-hidden="true">J</span><span><b>JiraiKeiRei</b><small>Mar 2026</small></span></figcaption>
+      </figure>
+    </div>
   </div>
 </section>
 
@@ -909,7 +1095,7 @@ body{-webkit-tap-highlight-color:rgba(242,98,143,.12)}
 </section>
 
 <!-- TEAM -->
-<section id="team">
+<section id="team" class="tint-lav">
   <div class="wrap">
     <div class="sec-head"><h2 class="serif">Meet Team Keiko</h2></div>
     <div class="team">
@@ -993,7 +1179,7 @@ body{-webkit-tap-highlight-color:rgba(242,98,143,.12)}
       <h4>What's included</h4><ul class="sd-inc" id="sdInc"></ul>
       <p class="sd-note" id="sdNote"></p>
       <div class="sd-meta" id="sdMeta"></div>
-      <button class="btn btn-pink arrow sd-order" type="button" id="sdOrder">Start Request</button>
+      <button class="btn btn-pink arrow sd-order" type="button" id="sdOrder">Order now</button>
     </div>
   </div>
 </div>
@@ -1738,7 +1924,7 @@ $$('.card').forEach(card=>{
   let x0=null;lb.addEventListener('touchstart',e=>{x0=e.touches[0].clientX},{passive:true});
   lb.addEventListener('touchend',e=>{if(x0===null)return;const dx=e.changedTouches[0].clientX-x0;if(Math.abs(dx)>40)step(dx<0?1:-1);x0=null;},{passive:true});
   $('#lbOrder').onclick=()=>{close();openOrder(svc||undefined);};
-  const urlOf=el=>(getComputedStyle(el).backgroundImage.match(/url\(["']?([^"')]+)["']?\)/)||[])[1];
+  const urlOf=el=>{const i=el.querySelector('img');return i?(i.currentSrc||i.src):(getComputedStyle(el).backgroundImage.match(/url\(["']?([^"')]+)["']?\)/)||[])[1];};
   // service galleries
   $$('.card').forEach(card=>{
     const name=card.querySelector('h3')?.textContent.trim();
@@ -1768,7 +1954,7 @@ $$('.card').forEach(card=>{
     $('#sdInc').innerHTML=(d.includes||[]).map(x=>`<li>${esc(x)}</li>`).join('');
     $('#sdNote').textContent=d.notes||'';$('#sdNote').hidden=!d.notes;
     $('#sdMeta').innerHTML=`<span>Price: <b>${card.querySelector('.price b').textContent}</b></span>${sv&&sv.eta?`<span>Estimated time: <b>${sv.eta}</b></span>`:''}`;
-    $('#sdOrder').textContent=name==='Custom Inquiry'?'Start Inquiry':'Start Request';
+    $('#sdOrder').textContent=name==='Custom Inquiry'?'Send inquiry':'Order now';
     sd.classList.add('show');sd.setAttribute('aria-hidden','false');document.body.style.overflow='hidden';
     $('#sdTrack').scrollLeft=0;$('.sd-x').focus();
   };
@@ -1920,12 +2106,21 @@ $$('.card').forEach(card=>{
     if(!hits.length)hits=cards.filter(c=>words.every(w=>has(c.key+' '+c.text,w))); // fallback: full description
     const show=words.length?new Set(hits):new Set(cards);
     cards.forEach(c=>c.card.classList.toggle('hide-s',!show.has(c)));
+    $('.services').classList.toggle('searching',words.length>0);
     empty.hidden=show.size>0;empty.querySelector('span').textContent=input.value.trim();
   }
   input.addEventListener('input',run);
   input.addEventListener('keydown',e=>{if(e.key==='Escape'){input.value='';run();}});
   $('#navSearch').onclick=()=>{$('#services').scrollIntoView({behavior:'smooth',block:'start'});setTimeout(()=>input.focus({preventScroll:true}),450);$('#menu').classList.remove('open');};
 })();
+// the floating "Order now" button appears once the hero buttons are scrolled away
+(function(){const hb=document.querySelector('.hero .btns');if(!hb||!('IntersectionObserver' in window)){document.body.classList.add('past-hero');return;}
+  new IntersectionObserver(es=>es.forEach(e=>document.body.classList.toggle('past-hero',!e.isIntersecting&&e.boundingClientRect.top<0))).observe(hb);})();
+// services: 6 main ones, the rest behind "View all services"
+(function(){const b=$('#svcAll'),g=$('.services');if(!b||!g)return;
+  const n=g.querySelectorAll('.card').length;b.textContent='View all services ('+n+')';
+  b.onclick=()=>{const open=g.classList.toggle('all');b.setAttribute('aria-expanded',open);b.textContent=open?'Show fewer services':'View all services ('+n+')';
+    if(!open)$('#services').scrollIntoView({behavior:'smooth',block:'start'});};})();
 // open Terms when a TOS link is used
 document.addEventListener('click',e=>{const a=e.target.closest('a[href="#tos"]');if(a){const d=$('.tos-box');if(d)d.open=true;}});
 // nav

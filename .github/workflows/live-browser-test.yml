@@ -67,6 +67,7 @@ jobs:
               out=[]
               try:
                   await pg.goto(URL,wait_until='load',timeout=90000); await pg.wait_for_timeout(1000)
+                  await pg.locator('#svcAll').scroll_into_view_if_needed(); await pg.click('#svcAll')
                   b=pg.locator('.card:has(h3:text-is("Custom Inquiry")) [data-order]')
                   await b.scroll_into_view_if_needed(); await b.click()
                   await pg.fill('#fDetails','Automated cross-browser test (test mode, nothing saved)')
