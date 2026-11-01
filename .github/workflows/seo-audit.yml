@@ -1,0 +1,14 @@
+name: SEO audit (manual)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  audit:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Old / special URLs
+        run: python3 tools/seo_audit.py https://keikoartist.com/ probe / /index.php /index.html /wp-login.php /wp-admin/ /wp-content/ /wp-json/ /?p=1 /shop/ /portfolio/ /about/ /contact/ /feed/ /wp-sitemap.xml /sitemap_index.xml /xmlrpc.php /admin/ /.htaccess /robots.txt /sitemap.xml /custom-vtuber-model /custom-vtuber-model/ /live2d-rigging/ /custom-pngtuber-model/ /vtuber-portfolio/ /vtuber-pricing/ https://www.keikoartist.com/ http://keikoartist.com/
+      - name: Crawl
+        run: python3 tools/seo_audit.py https://keikoartist.com/ crawl
