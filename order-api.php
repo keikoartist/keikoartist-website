@@ -253,6 +253,7 @@ function order_row(string $id): array {
 try {
 /* =================== public: health check (upload limits) =================== */
 if (($_GET['a'] ?? '') === 'ping') {
+  if (!empty($_GET['defer'])) { rate_limit('defer:' . client_ip(), 10, 3600); after_response(function () { usleep(3000000); }); }   // self-test: the answer must arrive before this 3 s job ends
   jout(200, ['upload_max' => ini_get('upload_max_filesize'), 'post_max' => ini_get('post_max_size'), 'max_file_uploads' => (int)ini_get('max_file_uploads'),
              'mail' => function_exists('mail'), 'mail_in_disabled_list' => stripos((string)ini_get('disable_functions'), 'mail') !== false,
              'pdf' => !empty($_GET['pdf']) ? (function () { try { $s = order_pdf(['id' => 'INV-0000-0000', 'kind' => 'custom', 'name' => 'Test Ünïcode 名前', 'discord' => 'test', 'email' => '', 'service' => 'Custom Inquiry', 'package' => '', 'plan' => 'Full payment', 'price' => 100, 'tax' => 13, 'total' => 113, 'due' => 113, 'created' => time(), 'files' => '[]', 'fields' => json_encode(['Details' => "Line one ♡ 🎀\nCafé – “quotes”", 'Usage' => 'Personal'])]); return substr($s, 0, 5) === '%PDF-' ? strlen($s) : 'bad output'; } catch (Throwable $e) { return 'error: ' . $e->getMessage(); } })() : null,
