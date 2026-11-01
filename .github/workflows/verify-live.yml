@@ -16,6 +16,6 @@ jobs:
           echo "::notice::PING $(curl -s -m 30 -X POST -H 'Origin: https://keikoartist.com' 'https://keikoartist.com/order-api.php?a=ping&net=1&pdf=1')"
           echo "::notice::DEFER answer after $(curl -s -o /dev/null -w '%{time_total}' -m 30 -X POST -H 'Origin: https://keikoartist.com' 'https://keikoartist.com/order-api.php?a=ping&defer=1')s (should be well under 3s)"
           html=$(curl -sL -H "Cache-Control: no-cache" "https://keikoartist.com/?v=$(date +%s)")
-          for t in "order-api.php?a=submit" "Send Order" "Get your invoice" "iabNote" "draftNote" "ty-soc" "wa.me" "Get Invoice"; do
+          for t in "order-api.php?a=submit" "Send Order" "Get your invoice" "I send your invoice here" "iabNote" "draftNote" "ty-soc" "wa.me" "Get Invoice"; do
             if grep -q "$t" <<<"$html"; then echo "::notice::FOUND $t"; else echo "::warning::MISSING $t"; fi
           done

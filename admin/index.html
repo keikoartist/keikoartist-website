@@ -390,7 +390,18 @@ async function openOrder(id){
     catch(e){dcB.textContent='📤 Send PDF to Discord';if(e.message!=='login')alert(e.message);}
     dcB.disabled=false;setTimeout(()=>dcB.textContent='📤 Send PDF to Discord',3000);};
   const tl=el('small',null,'Invoice total $');tl.style.cssText='color:var(--muted);font-size:12px';
-  links.append(tl,tot,pdfB,dcB);mc.appendChild(links);
+  // ready-made email to the client with the invoice link
+  const invMsg=async()=>{const t=totVal();let url=o.pdf_url||'';if(t!==undefined){const j=await oapi({action:'pdflink',id,total:t});url=j.url;}
+    const tt=t!==undefined?t:o.total,k=o.kind==='custom'?1:/50\/50/.test(o.plan)?.5:/3x|3×/i.test(o.plan)?1/3:1,due=Math.ceil(Math.round(tt*k*1e8)/1e6)/100;
+    const pl=k===.5?'50% deposit':k<.5?'1st of 3 installments':'';
+    const body=`Hi ${o.name||'there'},\n\nThank you for your order at KeikoArts! ♡\nHere is your invoice (PDF): ${url}\n\nTotal: ${usd(tt)} USD${pl?`\nTo pay now (${pl}): ${usd(due)}`:''}\n\nPlease pay via Ko-fi: https://ko-fi.com/keikoarts\nand write your invoice number ${id} in the Ko-fi message.\n\nYour slot is secured once the payment is received. Just reply to this email if you have any questions!\n\nKeiko, KeikoArts`;
+    return {subject:`Your KeikoArts invoice ${id}`,body};};
+  const gm=el('button','btn small','✉️ Email invoice (Gmail)');gm.type='button';
+  if(!o.email){gm.disabled=true;gm.title='This client did not leave an email';}
+  gm.onclick=async()=>{const w=window.open('','_blank');try{const m=await invMsg();const u='https://mail.google.com/mail/?view=cm&fs=1&to='+encodeURIComponent(o.email)+'&su='+encodeURIComponent(m.subject)+'&body='+encodeURIComponent(m.body);if(w)w.location.href=u;else location.href=u;}catch(e){if(w)w.close();if(e.message!=='login')alert(e.message);}};
+  const cp=el('button','btn ghost small','📋 Copy message');cp.type='button';
+  cp.onclick=async()=>{try{const m=await invMsg();try{await navigator.clipboard.writeText(m.body);cp.textContent='Copied ✓';}catch(_){prompt('Invoice message',m.body);}setTimeout(()=>cp.textContent='📋 Copy message',2500);}catch(e){if(e.message!=='login')alert(e.message);}};
+  links.append(tl,tot,gm,cp,pdfB,dcB);mc.appendChild(links);
   // client
   const cc=el('div','card');cc.appendChild(el('h3',null,'Client'));const dl=el('dl','kv');
   kvRow(dl,'Name',o.name);kvRow(dl,'Discord',o.discord);kvRow(dl,'Email',o.email,o.email?'mailto:'+o.email+'?subject='+encodeURIComponent('Your KeikoArts order '+o.id):null);
