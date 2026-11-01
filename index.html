@@ -810,7 +810,7 @@ body:has(.modal.show,.sd.show,.lb.show) .kc-bubble,body:has(.modal.show,.sd.show
       <div class="card"><div class="img"></div><h3>PNGTuber</h3><p>Simple avatar with talking and idle states, ready for streaming.</p><div class="price"><b>From $60</b></div><button class="btn btn-pink req" data-order="PNGTuber">Start Request</button></div>
       <div class="card"><div class="img art" style="--src:url(images/mascot-pet.webp);background-position:center 30%"></div><h3>VTuber Pet</h3><p>A cute companion pet for your VTuber.</p><div class="price"><b>From $62.60</b></div><button class="btn btn-pink req" data-order="VTuber Pet">Start Request</button></div>
       <div class="card"><div class="img art" style="--src:url(images/chibi-witch.webp);background-position:center 20%"></div><h3>Chibi VTuber</h3><p>Cute chibi version of your VTuber character.</p><div class="price"><b>From $45</b></div><button class="btn btn-pink req" data-order="Chibi VTuber">Start Request</button></div>
-      <div class="card"><div class="img" style="--src:url(images/illustration-cottage.webp);background-position:center 30%"></div><h3>Custom Inquiry</h3><p>Have an idea that is not listed? Describe it, name your price and pay right away ♡</p><div class="price"><b>Your price</b></div><button class="btn btn-pink req" data-order="Custom Inquiry">Start Inquiry</button></div>
+      <div class="card"><div class="img" style="--src:url(images/illustration-cottage.webp);background-position:center 30%"></div><h3>Custom Inquiry</h3><p>Have an idea that is not listed? Describe it and name your price ♡</p><div class="price"><b>Your price</b></div><button class="btn btn-pink req" data-order="Custom Inquiry">Start Inquiry</button></div>
     </div>
   </div>
 </section>
@@ -1096,20 +1096,20 @@ const PAYPAL = {          // dikosongkan: pembayaran sekarang lewat Ko-fi (invoi
   currency: "USD",
 };
 const GALLERY = {   // contoh karya per service (geser di kartu Services). Tambah/ubah nama file di sini.
-  "VTuber":          ["vtuber-witch","vtuber-maid","vtuber-rocker","vtuber-wolf","vtuber-dragon"],
+  "VTuber":          ["vtuber-kitsune-gown","vtuber-witch","vtuber-maid","vtuber-rocker","vtuber-wolf","vtuber-dragon"],
   "VTuber Packages": ["pkg-keikomi","vtuber-dragon","vtuber-witch","chibi-witch","emotes-witch","bg-stream-room"],
   "Background":      ["bg-stream-room"],
   "Custom PFP":      ["pfp-glasses","pfp-leaf"],
   "Emotes":          ["emotes-witch","emote-witch-1"],
   "Stream Overlay":  ["overlay-keikomi","bg-stream-room"],
-  "Banner":          ["eye-banner-silver-animated","mouth-banner","eye-banner-fire","eye-banner-sakura"],
-  "VTuber Pet":      ["mascot-pet","mascot-tiger","mascot-anglercat","mascot-snowleopard","mascot-peach","mascot-bear"],
+  "Banner":          ["eye-banner-blue","eye-banner-silver-animated","mouth-banner","eye-banner-fire","eye-banner-sakura"],
+  "VTuber Pet":      ["mascot-anglercat","mascot-pet","mascot-tiger","mascot-snowleopard","mascot-peach","mascot-bear"],
   "Chibi VTuber":    ["chibi-witch"],
   "VTuber Logo":     ["logo-mosswing"],
   "PNGTuber":        ["pngtuber-catmask","pngtuber-violet"],
-  "Custom Inquiry":  ["illustration-cottage"],
+  "Custom Inquiry":  ["illustration-calico","illustration-tabby","illustration-couple-selfie","illustration-cottage"],
 };
-const WIDE = ["pkg-keikomi","overlay-keikomi","bg-stream-room","emotes-witch","eye-banner-fire","eye-banner-sakura","eye-banner-silver-animated","mouth-banner","illustration-cottage"];
+const WIDE = ["pkg-keikomi","overlay-keikomi","bg-stream-room","emotes-witch","eye-banner-fire","eye-banner-sakura","eye-banner-silver-animated","mouth-banner","illustration-cottage","eye-banner-blue","illustration-couple-selfie"];
 const CONTAIN = ["logo-mosswing"];
 const DETAILS = {   // deskripsi lengkap tiap service (muncul saat kartu diklik). Edit bebas.
   "VTuber": { about:"A fully original Live2D VTuber model designed around your character, personality and stream style.",
@@ -1441,9 +1441,9 @@ function renderInv(){
   const o=ORDER, empty=o.custom&&!o.total, partial=!o.custom&&o.due<o.total;
   $('#invLines').innerHTML=o.lines.map(([l,a])=>`<dt>${esc(l)}</dt><dd>${empty?'—':a?money2(a):'Free'}</dd>`).join('')
     +`<dt class="grand">Total</dt><dd class="grand">${empty?'—':money2(o.total)}</dd>`
-    +(partial?`<dt class="now">Pay now · ${esc(planLabel(o.plan))}</dt><dd class="now">${money2(o.due)}</dd>`:'');
+    +(partial?`<dt class="now">First payment · ${esc(planLabel(o.plan))}</dt><dd class="now">${money2(o.due)}</dd>`:'');
   $('#invEta').textContent=o.custom?'USD':`USD · ${o.rush?'rush, about half of '+svc.eta:'est. '+svc.eta}`;
-  $('#navLbl').textContent=partial?'Pay now':'Total';
+  $('#navLbl').textContent=partial?'1st payment':'Total';
   $('#navTotal').textContent=empty?'—':money2(partial?o.due:o.total);
 }
 
