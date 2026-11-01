@@ -1,0 +1,43 @@
+name: Server redirects (.htaccess, manual)
+
+# Adds the "KeikoArts SEO" block (tools/htaccess_block.txt) to the top of the server's .htaccess:
+# http -> https, www -> non-www, /index.html -> /, custom 404 page, image caching.
+# Keeps a backup on the server (.htaccess.keiko-backup) and restores it automatically if the site breaks.
+on:
+  workflow_dispatch:
+
+jobs:
+  apply:
+    runs-on: ubuntu-24.04
+    env:
+      SRV: ${{ secrets.FTP_SERVER }}
+      USR: ${{ secrets.FTP_USERNAME }}
+      PW: ${{ secrets.FTP_PASSWORD }}
+      DIR: ${{ secrets.FTP_DIR || 'public_html/' }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download current .htaccess
+        run: |
+          set +e
+          curl -sS --fail -u "$USR:$PW" "ftp://$SRV/${DIR}.htaccess" -o orig.htaccess; c=$?
+          [ $c -eq 0 ] && echo "downloaded ($(wc -c < orig.htaccess) bytes)" || { echo "no existing .htaccess (curl $c)"; rm -f orig.htaccess; }
+          if [ -f orig.htaccess ]; then curl -sS --fail -u "$USR:$PW" -T orig.htaccess "ftp://$SRV/${DIR}.htaccess.keiko-backup" && echo "backup saved on server as .htaccess.keiko-backup"; fi
+      - name: Merge and upload
+        run: |
+          python3 tools/htaccess_merge.py orig.htaccess tools/htaccess_block.txt new.htaccess
+          curl -sS --fail -u "$USR:$PW" -T new.htaccess "ftp://$SRV/${DIR}.htaccess" && echo uploaded
+      - name: Check the site (restore on failure)
+        run: |
+          sleep 5; ok=1
+          chk(){ echo "$1 -> $2"; }
+          h=$(curl -s -o /dev/null -w '%{http_code}' https://keikoartist.com/); chk "https://keikoartist.com/" "$h"; [ "$h" = 200 ] || ok=0
+          p=$(curl -s -X POST -H 'Origin: https://keikoartist.com' 'https://keikoartist.com/order-api.php?a=ping'); chk "order-api ping" "$(echo "$p" | head -c 120)"; echo "$p" | grep -q '"ok":true' || ok=0
+          for u in http://keikoartist.com/ https://www.keikoartist.com/ http://www.keikoartist.com/live2d-rigging/ https://keikoartist.com/index.html https://keikoartist.com/custom-vtuber-model; do
+            r=$(curl -s -o /dev/null -w '%{http_code} %{redirect_url}' "$u"); chk "$u" "$r"; done
+          f=$(curl -sL -o /dev/null -w '%{http_code} %{url_effective} (%{num_redirects} redirects)' --max-redirs 5 http://www.keikoartist.com/vtuber-pricing/); chk "final" "$f"
+          echo "$f" | grep -q '^200 https://keikoartist.com/vtuber-pricing/' || ok=0
+          n=$(curl -s -w ' %{http_code}' https://keikoartist.com/this-page-does-not-exist | grep -o '<title>[^<]*</title>\|[0-9]*$' | tr '\n' ' '); chk "404 page" "$n"
+          if [ $ok = 1 ]; then echo "ALL GOOD"; exit 0; fi
+          echo "PROBLEM: restoring the original .htaccess"
+          if [ -f orig.htaccess ]; then curl -sS -u "$USR:$PW" -T orig.htaccess "ftp://$SRV/${DIR}.htaccess"; else curl -sS -u "$USR:$PW" -Q "DELE ${DIR}.htaccess" "ftp://$SRV/" -o /dev/null; fi
+          sleep 3; echo "after restore: $(curl -s -o /dev/null -w '%{http_code}' https://keikoartist.com/)"; exit 1

@@ -1,0 +1,19 @@
+# BEGIN KeikoArts SEO
+# One address for every page: https://keikoartist.com (no www, no http, no /index.html)
+ErrorDocument 404 /404.html
+<IfModule mod_rewrite.c>
+RewriteEngine On
+RewriteCond %{HTTPS} !=on [OR]
+RewriteCond %{HTTP_HOST} ^www\. [NC]
+RewriteRule ^(.*)$ https://keikoartist.com/$1 [R=301,L,NE]
+RewriteCond %{THE_REQUEST} \s/+index\.html[?\s] [NC]
+RewriteRule ^index\.html$ https://keikoartist.com/ [R=301,L]
+</IfModule>
+<IfModule mod_expires.c>
+ExpiresActive On
+ExpiresByType image/webp "access plus 7 days"
+ExpiresByType image/svg+xml "access plus 7 days"
+ExpiresByType video/mp4 "access plus 7 days"
+ExpiresByType text/css "access plus 7 days"
+</IfModule>
+# END KeikoArts SEO
