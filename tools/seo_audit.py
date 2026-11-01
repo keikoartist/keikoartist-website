@@ -23,8 +23,8 @@ def meta(body):
     return {'title': html.unescape(g(r'<title>(.*?)</title>') or ''), 'desc': html.unescape(g(r'<meta name="description" content="([^"]*)"') or ''),
             'canonical': g(r'<link rel="canonical" href="([^"]*)"'), 'robots': g(r'<meta name="robots" content="([^"]*)"'),
             'h1': [html.unescape(h) for h in h1s], 'ld': len(re.findall(r'application/ld\+json', t)),
-            'imgs_no_alt': len([i for i in re.findall(r'<img\b[^>]*>', t, re.I) if not re.search(r'\balt="[^"]+"', i)]),
-            'links': re.findall(r'(?:href|src|poster)="([^"#]+)', t)}
+            'imgs_no_alt': len([i for i in re.findall(r'<img\b[^>]*>', t, re.I) if not re.search(r'\balt="', i)]),   # alt="" = decorative, allowed
+            'links': [l for l in re.findall(r'(?:href|src|poster)="([^"#]+)', re.sub(r'<script\b.*?</script>', '', t, flags=re.S | re.I)) if '${' not in l]}
 mode = sys.argv[2] if len(sys.argv) > 2 else 'crawl'
 if mode == 'probe':
     for p in sys.argv[3:]:
@@ -51,7 +51,7 @@ while todo:
         a = urllib.parse.urljoin(u, html.unescape(l)).split('#')[0]
         pu = urllib.parse.urlparse(a)
         if pu.scheme not in ('http', 'https') or pu.netloc != host: continue
-        if any(x in pu.path for x in ('order-api.php', 'chat-api.php', 'notify-discord.php')): continue
+        if any(x in pu.path for x in ('order-api.php', 'chat-api.php', 'notify-discord.php', '/admin/')) or pu.query.startswith('order'): continue
         if pu.path.endswith(('.webp', '.png', '.jpg', '.mp4', '.svg', '.css', '.js', '.ico', '.xml', '.txt')):
             if a not in seen:
                 s2, h2, _ = fetch(a, 'HEAD'); seen[a] = s2

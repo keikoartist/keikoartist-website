@@ -144,7 +144,7 @@ def page(path, title, desc, h1, crumb, body, faq, og_image, order='', extra_ld=N
   <div class="wrap nav">
     <a href="/" class="logo"><img src="/images/pfp.webp" alt="KeikoArts logo" width="40" height="40"><span><b>KeikoArts</b><small>Illustration &amp; Live2D Studio</small></span></a>
     <nav class="menu" id="menu" aria-label="Main">{nav}</nav>
-    <a href="{order_url}" class="btn btn-pink nav-cta arrow">Start a Project</a>
+    <a href="{order_url}" rel="nofollow" class="btn btn-pink nav-cta arrow">Start a Project</a>
     <button class="burger" type="button" aria-label="Menu" aria-controls="menu" aria-expanded="false">☰</button>
   </div>
 </header>
@@ -189,7 +189,7 @@ def related(exclude):
 
 def cta(title, text, order, label):
     return f'''  <div class="wrap"><div class="cta"><div><h2>{title}</h2><p>{text}</p></div>
-    <a class="btn btn-pink arrow" href="{"/?order=" + order.replace(" ", "%20") if order else "/?order"}">{label}</a></div></div>'''
+    <a class="btn btn-pink arrow" rel="nofollow" href="{"/?order=" + order.replace(" ", "%20") if order else "/?order"}">{label}</a></div></div>'''
 
 def service_ld(name, url, desc, low):
     return {"@context": "https://schema.org", "@type": "Service", "name": name, "url": url, "description": desc,
@@ -210,7 +210,7 @@ def custom_vtuber():
       <p class="eyebrow">VTuber model commission</p>
       <h1 class="serif">Custom VTuber Model Commission</h1>
       <p class="lead">{e(DETAILS["VTuber"]["about"])} I draw your character from scratch, split the art into layers ready for Live2D and, if you choose, rig it and set it up for VTube Studio so you can go live.</p>
-      <div class="btns"><a class="btn btn-pink arrow" href="/?order=VTuber">Start your VTuber model</a><a class="btn btn-ghost" href="/vtuber-pricing/">See all prices</a></div>
+      <div class="btns"><a class="btn btn-pink arrow" rel="nofollow" href="/?order=VTuber">Start your VTuber model</a><a class="btn btn-ghost" href="/vtuber-pricing/">See all prices</a></div>
       <div class="facts"><span>Art from <b>{money(vp["Bust · Art only"])}</b></span><span>Art + rig from <b>{money(vp["Bust · Art + Rig"])}</b></span><span>About <b>{e(V["eta"])}</b></span></div>
     </div>
     <figure>{img(vtubers[0], eager=True)}</figure>
@@ -289,7 +289,7 @@ def rigging():
       <p class="eyebrow">Live2D rigging commission</p>
       <h1 class="serif">Live2D Rigging for VTuber Models</h1>
       <p class="lead">Turn layered character art into a moving VTuber model. Rigging covers head turns, blinking, lip-sync and hair &amp; clothing physics, and you get a VTube Studio file that's ready to stream.</p>
-      <div class="btns"><a class="btn btn-pink arrow" href="/?order=VTuber">Order rigging</a><a class="btn btn-ghost" href="/custom-vtuber-model/">Need the art too?</a></div>
+      <div class="btns"><a class="btn btn-pink arrow" rel="nofollow" href="/?order=VTuber">Order rigging</a><a class="btn btn-ghost" href="/custom-vtuber-model/">Need the art too?</a></div>
       <div class="facts"><span>Rig only from <b>{money(vp["Bust · Rig only"])}</b></span><span>Art + rig from <b>{money(vp["Bust · Art + Rig"])}</b></span><span>VTube Studio <b>ready</b></span></div>
     </div>
     <figure class="cover"><video src="/images/rigging-showcase.mp4" poster="/images/rigging-poster.webp" controls muted loop playsinline preload="none" width="1280" height="720" aria-label="Live2D rigging showcase: head turns, blinking and hair physics"></video></figure>
@@ -360,7 +360,7 @@ def pngtuber():
       <p class="eyebrow">PNGTuber commission</p>
       <h1 class="serif">Custom PNGTuber Model</h1>
       <p class="lead">{e(DETAILS["PNGTuber"]["about"])} Your character switches between idle and talking images while you speak, and blinks on its own. No rigging needed, so it's quicker and more affordable than a Live2D model.</p>
-      <div class="btns"><a class="btn btn-pink arrow" href="/?order=PNGTuber">Start your PNGTuber</a><a class="btn btn-ghost" href="/custom-vtuber-model/">Compare with Live2D</a></div>
+      <div class="btns"><a class="btn btn-pink arrow" rel="nofollow" href="/?order=PNGTuber">Start your PNGTuber</a><a class="btn btn-ghost" href="/custom-vtuber-model/">Compare with Live2D</a></div>
       <div class="facts"><span>From <b>{money(P["from"])}</b></span><span>About <b>{e(P["eta"])}</b></span></div>
     </div>
     <figure>{img(imgs[0], eager=True)}</figure>
@@ -447,7 +447,7 @@ def portfolio():
       <p class="eyebrow">Portfolio</p>
       <h1 class="serif">VTuber &amp; Live2D Art Portfolio</h1>
       <p class="lead">VTuber models, Live2D rigging, PNGTubers, pets, emotes, banners, logos and illustrations made by Team Keiko. Every piece was drawn from scratch. Tap an image to see it full size.</p>
-      <div class="btns"><a class="btn btn-pink arrow" href="/?order">Start a project</a><a class="btn btn-ghost" href="/vtuber-pricing/">See prices</a></div>
+      <div class="btns"><a class="btn btn-pink arrow" rel="nofollow" href="/?order">Start a project</a><a class="btn btn-ghost" href="/vtuber-pricing/">See prices</a></div>
       <div class="facts">{"".join(f"<span>{t}</span>" for t in toc[:6])}</div>
     </div>
     <figure>{img(GALLERY["VTuber"][0], eager=True)}</figure>
@@ -478,7 +478,7 @@ def pricing():
         more = f' · <a href="{pages[n]}">Details</a>' if n in pages else ''
         blocks.append(f'''    <div class="svc" id="{slug(n)}">
       <h3>{e(n)}</h3>
-      <p class="meta">From {money(s["from"])}{" per emote" if s.get("qty") else ""} · about {e(s["eta"])} · <a href="/?order={n.replace(" ", "%20")}">Order</a>{more}</p>
+      <p class="meta">From {money(s["from"])}{" per emote" if s.get("qty") else ""} · about {e(s["eta"])} · <a rel="nofollow" href="/?order={n.replace(" ", "%20")}">Order</a>{more}</p>
       {svc_table(n)}
       {addons_line(n)}
     </div>''')
@@ -500,7 +500,7 @@ def pricing():
     <h2>Payment and rules</h2>
     <div class="grid">
       <div class="box"><h3>How you pay</h3><p>After you send the order form, I email you an invoice (PDF). {e(PAY)}</p></div>
-      <div class="box"><h3>Custom requests</h3><p>Have an idea that isn't listed? With a <a href="/?order=Custom%20Inquiry">custom inquiry</a> you name your price; 13% tax is added on the invoice and it's paid upfront.</p></div>
+      <div class="box"><h3>Custom requests</h3><p>Have an idea that isn't listed? With a <a rel="nofollow" href="/?order=Custom%20Inquiry">custom inquiry</a> you name your price; 13% tax is added on the invoice and it's paid upfront.</p></div>
       <div class="box"><h3>Rush and complex designs</h3><p>Rush delivery is +25%. Very complex designs (for example wings or many accessories) may cost a bit more; the final price is always on your invoice before you pay.</p></div>
       <div class="box"><h3>Revisions</h3><p>Unlimited small revisions during the sketch. Up to 2 minor revisions after coloring; major changes after approval may have extra fees.</p></div>
       <div class="box"><h3>Refunds</h3><p>Full refund before work starts. After the sketch, refunds are based on completed work. No refund after final files are delivered.</p></div>
