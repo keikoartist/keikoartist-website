@@ -370,19 +370,27 @@ async function openOrder(id){
   if(o.kind==='custom'){box('Client price',usd(o.price));box('Tax 13%',usd(o.tax));box('Total (pay upfront)',usd(o.total));}
   else{box('Estimated total',usd(o.total));box('Due now · '+(o.plan||''),usd(o.due));}
   mc.appendChild(m);
-  const copyBtn=(label,url)=>{const a=el('a','btn ghost small',label);a.href='#';a.onclick=async e=>{e.preventDefault();try{await navigator.clipboard.writeText(url);a.textContent='Copied ✓';setTimeout(()=>a.textContent=label,2500);}catch(_){prompt('PayPal link',url)}};return a;};
   if(o.payments&&o.payments.length){const pl=el('div','pays');
     o.payments.forEach(p=>{const r=el('div',p.amount<0?'neg':null);r.appendChild(el('span',null,`${p.status==='Completed'?'💰':'↩️'} ${usd(p.amount)} ${p.currency!=='USD'?p.currency:''} · ${fmt(p.created)}`));r.appendChild(el('span',null,p.payer||''));pl.appendChild(r);});
     mc.appendChild(pl);}
-  const sumLine=el('p',null,o.paid>0?(o.paid>=o.total?`✅ Fully paid: ${usd(o.paid)}`:`Paid so far ${usd(o.paid)} · remaining ${usd(o.remaining)}`):'Not paid yet. Payments made with the website\'s PayPal button appear here automatically and set the status to Paid.');
+  const sumLine=el('p',null,o.paid>0?(o.paid>=o.total?`✅ Fully paid: ${usd(o.paid)}`:`Paid so far ${usd(o.paid)} · remaining ${usd(o.remaining)}`):'Not paid yet. When the Ko-fi payment arrives, set the status (top right) to Paid.');
   sumLine.style.cssText='font-size:12.5px;color:var(--muted);margin-top:10px';mc.appendChild(sumLine);
+  // invoice PDF (brief + invoice + pay via Ko-fi)
   const links=el('div','paylinks');
-  if(o.pay_url&&!(o.paid>0))links.appendChild(copyBtn(`Copy link: ${usd(o.due)}`,o.pay_url));
-  if(o.remaining_url)links.appendChild(copyBtn(`Copy link: remaining ${usd(o.remaining)}`,o.remaining_url));
-  const amt=el('input');amt.type='number';amt.min='1';amt.step='0.01';amt.placeholder='Amount $';amt.setAttribute('aria-label','Amount for a new payment link');
-  const mk=el('button','btn ghost small','Create link');mk.type='button';
-  mk.onclick=async()=>{const v=parseFloat(amt.value);if(!(v>=1)){amt.focus();return;}try{const j=await oapi({action:'paylink',id,amount:v,note:'payment of '+usd(v)});try{await navigator.clipboard.writeText(j.url);mk.textContent='Link copied ✓';}catch(_){prompt('PayPal link',j.url);}setTimeout(()=>mk.textContent='Create link',2500);}catch(e){if(e.message!=='login')alert(e.message);}};
-  links.append(amt,mk);mc.appendChild(links);
+  const tot=el('input');tot.type='number';tot.min='0';tot.step='0.01';tot.value=String(o.total);tot.title='Final total (USD). Change it if you agreed on a different price.';tot.setAttribute('aria-label','Final total for the invoice PDF');
+  const totVal=()=>{const v=parseFloat(tot.value);return v>=0&&Math.abs(v-o.total)>=0.005?v:undefined;};
+  const pdfB=el('button','btn ghost small','📄 Download PDF');pdfB.type='button';
+  pdfB.onclick=async()=>{pdfB.disabled=true;pdfB.textContent='Making PDF…';
+    try{const blob=await oapi({action:'pdf',id,total:totVal()},true);const u=URL.createObjectURL(blob),a=document.createElement('a');a.href=u;a.download=id+'.pdf';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),8000);pdfB.textContent='Downloaded ✓';}
+    catch(e){pdfB.textContent='📄 Download PDF';if(e.message!=='login')alert('The PDF could not be made. Please try again.');}
+    pdfB.disabled=false;setTimeout(()=>pdfB.textContent='📄 Download PDF',2500);};
+  const dcB=el('button','btn ghost small','📤 Send PDF to Discord');dcB.type='button';
+  dcB.onclick=async()=>{dcB.disabled=true;dcB.textContent='Sending…';
+    try{await oapi({action:'discord',id,total:totVal()});dcB.textContent='Sent to Discord ✓';}
+    catch(e){dcB.textContent='📤 Send PDF to Discord';if(e.message!=='login')alert(e.message);}
+    dcB.disabled=false;setTimeout(()=>dcB.textContent='📤 Send PDF to Discord',3000);};
+  const tl=el('small',null,'Invoice total $');tl.style.cssText='color:var(--muted);font-size:12px';
+  links.append(tl,tot,pdfB,dcB);mc.appendChild(links);
   // client
   const cc=el('div','card');cc.appendChild(el('h3',null,'Client'));const dl=el('dl','kv');
   kvRow(dl,'Name',o.name);kvRow(dl,'Discord',o.discord);kvRow(dl,'Email',o.email,o.email?'mailto:'+o.email+'?subject='+encodeURIComponent('Your KeikoArts order '+o.id):null);

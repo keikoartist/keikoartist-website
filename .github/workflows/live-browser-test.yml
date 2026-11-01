@@ -16,9 +16,9 @@ jobs:
         run: |
           B="https://keikoartist.com/order-api.php?a=submit"
           UA="Mozilla/5.0 (iPhone; CPU iPhone OS 17_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.5 Mobile/15E148 Safari/604.1"
-          echo "::notice::PING $(curl -s -m 30 -X POST -H 'Origin: https://keikoartist.com' 'https://keikoartist.com/order-api.php?a=ping')"
+          echo "::notice::PING $(curl -s -m 30 -X POST -H 'Origin: https://keikoartist.com' 'https://keikoartist.com/order-api.php?a=ping&pdf=1')"
           bad=0
-          t(){ n=$1; shift; c=$(curl -s -o r.json -w "%{http_code}" -m 120 -A "$UA" -H "Origin: https://keikoartist.com" -H "Referer: https://keikoartist.com/" -F "_dryrun=1" -F "Service=Custom Inquiry" -F "Name=Test" -F "_price=100" "$@" "$B"); echo "::notice::$n -> HTTP $c $(jq -c '{ok,id,total,files,skipped_files,error}' r.json 2>/dev/null || head -c 150 r.json)"; [ "$c" = 200 ] && jq -e '.ok==true' r.json >/dev/null || bad=$((bad+1)); }
+          t(){ n=$1; shift; c=$(curl -s -o r.json -w "%{http_code}" -m 120 -A "$UA" -H "Origin: https://keikoartist.com" -H "Referer: https://keikoartist.com/" -F "_dryrun=1" -F "Service=Custom Inquiry" -F "Name=Test" -F "_price=100" "$@" "$B"); echo "::notice::$n -> HTTP $c $(jq -c '{ok,id,total,pdf,files,skipped_files,error}' r.json 2>/dev/null || head -c 150 r.json)"; [ "$c" = 200 ] && jq -e '.ok==true and (.pdf|type)=="number" and .pdf>1000' r.json >/dev/null || bad=$((bad+1)); }
           t plain -F "Details=Simple request"
           t links -F "Details=see refs" -F "Reference links=https://pin.it/3xYz https://drive.google.com/file/d/1AbC/view?usp=sharing https://www.pinterest.com/pin/123/ https://toyhou.se/123.oc"
           t quotes -F "Details=She's a \"cute\" fox <3 <b>bold</b> & more 😊🦊 ~ 100% #1"
@@ -61,7 +61,7 @@ jobs:
               async def grab(r):
                   if 'a=submit' in r.url:
                       try:
-                          j=await r.json(); last['files']=f"{j.get('files')} ok, skipped {j.get('skipped_names')}"
+                          j=await r.json(); last['files']=f"{j.get('files')} ok, skipped {j.get('skipped_names')}"; last['pdf']=j.get('pdf')
                       except Exception: pass
               pg.on('response',lambda r:asyncio.ensure_future(grab(r)))
               out=[]
@@ -76,18 +76,21 @@ jobs:
                   await pg.set_input_files('#refFiles',files=refs); await pg.wait_for_timeout(1000)
                   await pg.check('#agree'); await pg.click('#sendBtn')
                   await pg.wait_for_selector('#tyModal.show',timeout=90000)
-                  st=await pg.evaluate("({t:$('#tyTitle').textContent,w:$('#tyWarn').textContent,p:$('#tyPayLabel').textContent,h:$('#tyPayBtn').href,tot:(document.querySelector('.inv-t .grand td:last-child')||{}).textContent})")
-                  out.append('refs uploaded: '+str(last.get('files')))
-                  q=dict(urllib.parse.parse_qsl(urllib.parse.urlparse(st['h']).query))
-                  out.append(f"CUSTOM OK {st['t']} total {st['tot']} / {st['p']} amount={q.get('amount')} to={q.get('business')} [{st['w']}]")
+                  await pg.wait_for_timeout(500)
+                  st=await pg.evaluate("({t:$('#tyTitle').textContent,w:$('#tyWarn').textContent,id:$('#tyRefId').textContent,pay:!$('#tyPay').hidden,sum:$('#tySummary').innerText})")
+                  out.append('refs uploaded: '+str(last.get('files'))+' | pdf '+str(last.get('pdf')))
+                  if st['pay'] or '$113.00' not in st['sum'] or not isinstance(last.get('pdf'),int): raise Exception('custom summary wrong: '+str(st)+' pdf '+str(last.get('pdf')))
+                  out.append(f"CUSTOM OK {st['t']} {st['id']} {st['sum'].split(chr(10))[-1]} [{st['w']}]")
                   await pg.locator('#tyModal [data-tyclose]').first.click()
                   if 'dryrun=1' not in pg.url: raise Exception('test mode lost after closing: '+pg.url)
                   await pg.evaluate("openOrder('VTuber')"); await pg.click('label[for=mt1]'); await pg.click('label[for=ms1]'); await pg.click('label[for=a0]'); await pg.click('label[for=pp2]')
                   await pg.fill('#fDetails','Automated test'); await pg.fill('#fName','Test'); await pg.fill('#fDiscord','tester')
                   await pg.check('#agree'); await pg.click('#sendBtn')
                   await pg.wait_for_selector('#tyModal.show',timeout=90000)
-                  st=await pg.evaluate("({t:$('#tyTitle').textContent,p:$('#tyPayLabel').textContent,w:$('#tyWarn').textContent,tot:(document.querySelector('.inv-t tfoot')||{}).innerText})")
-                  out.append(f"REQUEST OK {st['t']} {st['p']} | {str(st['tot']).replace(chr(10),' ')} [{st['w']}]")
+                  await pg.wait_for_timeout(500)
+                  st=await pg.evaluate("({t:$('#tyTitle').textContent,w:$('#tyWarn').textContent,id:$('#tyRefId').textContent,pay:!$('#tyPay').hidden,sum:$('#tySummary').innerText})")
+                  if st['pay'] or not isinstance(last.get('pdf'),int): raise Exception('request summary wrong: '+str(st)+' pdf '+str(last.get('pdf')))
+                  out.append(f"REQUEST OK {st['t']} {st['id']} {st['sum'].split(chr(10))[-1]} pdf {last.get('pdf')} [{st['w']}]")
               except Exception as e:
                   et=''
                   try: et=await pg.evaluate("($('#err')||{}).textContent")

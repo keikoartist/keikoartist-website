@@ -855,7 +855,7 @@ body:has(.modal.show,.sd.show,.lb.show) .kc-bubble,body:has(.modal.show,.sd.show
     <p class="about-line" id="about"><b>Hi, I'm Keiko ♡</b> Digital artist &amp; Live2D studio making original VTuber models, chibi art, emotes and stream assets. Cute meets gothic, made from scratch with updates at every stage.</p>
     <div class="faq-grid">
       <details><summary>How long does a commission take?</summary><p>Illustrations usually take 1–3 weeks; full VTuber models with rigging take around 4–8 weeks depending on complexity and queue.</p></details>
-      <details><summary>How do I pay?</summary><p>Pick your options in the order form and you get your invoice right away: pay it with PayPal in one click (card or PayPal balance). Ko-fi also works: the link is on your invoice. Larger projects can be split into installments (50% upfront, 50% before delivery).</p></details>
+      <details><summary>How do I pay?</summary><p>Send the order form, then message me on Discord with your order ID (you get the link after ordering). I confirm the details and send your invoice as a PDF, and you pay via Ko-fi in USD. Larger projects can be split into installments (50% upfront, 50% before delivery).</p></details>
       <details><summary>Can I use the art commercially?</summary><p>Yes — streaming, monetized videos and social media are included. Merch rights can be added on request.</p></details>
       <details><summary>How many revisions do I get?</summary><p>Revisions are free during the sketch stage. Small tweaks after coloring are included; major changes may have a fee.</p></details>
     </div>
@@ -868,8 +868,8 @@ body:has(.modal.show,.sd.show,.lb.show) .kc-bubble,body:has(.modal.show,.sd.show
     <details class="panel tos-box">
       <summary><span class="serif">Terms of Service</span><small>By ordering you agree to these terms. Tap to read.</small></summary>
       <div class="tos">
-      <div><h4>1. Ordering</h4><p>Submit a request form. I'll reply within 6 hours by email or Discord to confirm details and the final price. Your slot is secured once payment is received.</p></div>
-      <div><h4>2. Payment</h4><p>You get an invoice right after ordering. Pay it with PayPal (or Ko-fi, linked on your invoice) in USD. Choose full payment, 50/50 (50% upfront, 50% before final files), or 3× installments for orders above $150. Custom orders: you name the price and pay the full invoice upfront; 13% tax is added on the invoice.</p></div>
+      <div><h4>1. Ordering</h4><p>Send the order form, then message me on Discord with your order ID. I reply within 6 hours to confirm details and the final price. Your slot is secured once payment is received.</p></div>
+      <div><h4>2. Payment</h4><p>Once the details are confirmed, I send your invoice as a PDF. Pay it via Ko-fi in USD. Choose full payment, 50/50 (50% upfront, 50% before final files), or 3× installments for orders above $150. Custom orders: you name the price and pay the full invoice upfront; 13% tax is added on the invoice.</p></div>
       <div><h4>3. Process &amp; timeline</h4><p>Sketch → lineart → coloring → (rigging) → delivery. You get progress updates at every stage. Estimated time is shown in the form; rush delivery is available.</p></div>
       <div><h4>4. Revisions</h4><p>Unlimited small revisions during sketch. Up to 2 minor revisions after coloring; major changes after approval may have extra fees.</p></div>
       <div><h4>5. Refunds</h4><p>Full refund before work starts. After the sketch, refunds are based on completed work. No refund after final files are delivered.</p></div>
@@ -1024,9 +1024,9 @@ body:has(.modal.show,.sd.show,.lb.show) .kc-bubble,body:has(.modal.show,.sd.show
           </div>
 
           <div class="c-inv" aria-live="polite">
-            <div class="c-inv-h">Invoice preview <span id="invEta">USD</span></div>
+            <div class="c-inv-h">Price estimate <span id="invEta">USD</span></div>
             <dl id="invLines"></dl>
-            <p id="invNote">You get your invoice right away and pay with PayPal. Full refund if I can't take your order.</p>
+            <p id="invNote">After sending, message me on Discord with your order ID. I confirm the details and send your invoice (PDF); you pay via Ko-fi. Nothing is charged now.</p>
           </div>
           <label class="check" id="agreeRow"><input type="checkbox" id="agree"><span>I have read and agree to the <a href="#tos" data-close style="color:var(--pink);font-weight:600">Terms of Service</a>.</span></label>
         </div>
@@ -1035,7 +1035,7 @@ body:has(.modal.show,.sd.show,.lb.show) .kc-bubble,body:has(.modal.show,.sd.show
         <div class="mnav" id="mnav">
           <button type="button" class="btn btn-ghost" id="prevBtn" aria-label="Back to the service list">Back</button>
           <div class="mtot" id="navTot"><small id="navLbl">Total</small><b id="navTotal">$0</b></div>
-          <button type="submit" class="btn btn-pink" id="sendBtn">Get Invoice ♡</button>
+          <button type="submit" class="btn btn-pink" id="sendBtn">Send Order ♡</button>
         </div>
       </form>
     </div>
@@ -1044,11 +1044,11 @@ body:has(.modal.show,.sd.show,.lb.show) .kc-bubble,body:has(.modal.show,.sd.show
 
 <div class="modal ty" id="tyModal" aria-hidden="true">
   <div class="mbox ty-box" role="dialog" aria-modal="true" aria-labelledby="tyTitle">
-    <div class="mhead"><h3 id="tyTitle">Request sent! ♡</h3><button class="mclose" type="button" data-tyclose aria-label="Close">✕</button></div>
+    <div class="mhead"><h3 id="tyTitle">Order sent! ♡</h3><button class="mclose" type="button" data-tyclose aria-label="Close">✕</button></div>
     <div class="mbody">
       <p class="ty-warn" id="tyWarn" hidden></p>
-      <p class="ty-lead" id="tyLead">Thank you for choosing KeikoArts! Your request has been received ♡</p>
-      <div class="ty-ref" id="tyRef" hidden><span id="tyRefLbl">Request ID</span>: <b id="tyRefId"></b></div>
+      <p class="ty-lead" id="tyLead">Thank you for choosing KeikoArts! Your order has been received ♡</p>
+      <div class="ty-ref" id="tyRef" hidden><span id="tyRefLbl">Order ID</span>: <b id="tyRefId"></b></div>
       <div id="tyInv" hidden></div>
       <div class="summary" id="tySummary" hidden></div>
       <div class="ty-pay" id="tyPay" hidden>
@@ -1059,7 +1059,7 @@ body:has(.modal.show,.sd.show,.lb.show) .kc-bubble,body:has(.modal.show,.sd.show
       </div>
       <div class="inv-actions" id="invActions" hidden><button type="button" class="btn btn-ghost" id="invSave">💾 Save invoice (PDF)</button><button type="button" class="btn btn-ghost" id="invCopy">🔗 Copy payment link</button></div>
       <div class="ty-dc">
-        <div><b id="tyDcT">Next step: message me on Discord</b><span id="tyDcS">Send me your Request ID so we can discuss details and payment.</span></div>
+        <div><b id="tyDcT">Next step: message me on Discord</b><span id="tyDcS">Send me your order ID. I confirm the details and send your invoice (PDF).</span></div>
         <button class="btn btn-pink" type="button" id="tyDiscord">Copy ID &amp; open Discord</button>
       </div>
       <h4 class="ty-h">What happens next</h4>
@@ -1090,8 +1090,8 @@ body:has(.modal.show,.sd.show,.lb.show) .kc-bubble,body:has(.modal.show,.sd.show
 /* ==========================================================
    EDIT DI SINI — slot, antrian, harga & add-on
    ========================================================== */
-const PAYPAL = {          // isi salah satu. email = email akun PayPal penerima (disarankan), me = username paypal.me
-  email: "theresa.oktavia10@gmail.com",
+const PAYPAL = {          // dikosongkan: pembayaran sekarang lewat Ko-fi (invoice PDF dikirim lewat Discord)
+  email: "",
   me: "",
   currency: "USD",
 };
@@ -1147,7 +1147,7 @@ const DETAILS = {   // deskripsi lengkap tiap service (muncul saat kartu diklik)
     notes:"Add toggles, hairstyles or outfits as needed." },
   "Custom Inquiry": { about:"Have an idea that isn't listed? Illustrations, stream assets or something new: just describe it.",
     includes:["Full illustrations and scenes","Stream screens, overlays and alerts","Anything else, priced to your budget"],
-    notes:"Name your price, get an instant invoice (+13% tax) and pay with PayPal right away." },
+    notes:"Name your price (+13% tax). I confirm the details on Discord and send your invoice; you pay via Ko-fi." },
 };
 const VTUBERS = [   // VTuber yang pernah kamu buat. name & link opsional (link: Twitch/YouTube/X)
   { img:"av-vtuber-witch",  name:"Mirabelle", link:"" },
@@ -1350,7 +1350,7 @@ function pickService(k){
   $('#shName').textContent=k;
   $('#shMeta').textContent=cmOn?'You name the price · 13% tax added':`From ${money(svc.from)} · ${svc.eta}`;
   $('#shThumb').style.backgroundImage=`url("${svcThumb(k)}")`;
-  $('#shIntro').textContent=cmOn?'Tell me your idea, name your price, and pay right away ♡':'Choose your options, tell me your idea, and get your invoice right away ♡';
+  $('#shIntro').textContent=cmOn?'Tell me your idea and name your price ♡':'Choose your options and tell me your idea ♡';
   const mx=!!svc.table; $('#mx').hidden=!mx; $('#pkgOpts').hidden=mx;
   $('#pkgOpts').innerHTML=svc.packages.map(([n,p,d],i)=>`<div class="opt"><input type="radio" name="pkg" id="p${i}" value="${i}" ${i===0?'checked':''}><label for="p${i}">${esc(n)} <em>${cmOn?'':money(p)+(svc.qty?' each':'')}</em><small>${esc(d)}</small></label></div>`).join('');
   if(mx){
@@ -1469,7 +1469,8 @@ const usageVal=()=>($('input[name=Usage]:checked')||{value:'Personal'}).value;
 function orderRows(){
   const refs=(refFiles.length?refFiles.length+' file(s)':'')+(form['Reference links'].value?(refFiles.length?' + links':'Links'):'')||'-';
   return [['Service',svcName],...(cmOn?[['Usage',usageVal()+' use']]:[['Package',$('#fPackage').value],['Add-ons',$('#fAddons').value],['Payment plan',$('input[name="Payment plan"]:checked').value]]),
-    ['Deadline',$('#fDeadline').value||'-'],['Name',$('#fName').value],['Contact',$('#fDiscord').value||$('#fEmail').value||'-'],['References',refs]];
+    ['Deadline',$('#fDeadline').value||'-'],['Name',$('#fName').value],['Contact',$('#fDiscord').value||$('#fEmail').value||'-'],['References',refs],
+    ['Total',ORDER.total?money2(ORDER.total)+(ORDER.custom?' incl. 13% tax':' (estimate)'):'-']];
 }
 function err(m){const e=$('#err');e.textContent=m;e.style.display=m?'block':'none';}
 function valid(n){
@@ -1497,7 +1498,7 @@ function saveInvoice(last){try{if(last&&last.id&&last.payUrl&&!/PREVIEW|0000-000
 function readInvoice(){try{const v=JSON.parse(localStorage.getItem(INV_KEY)||'null');return v&&v.id&&Date.now()-v.savedAt<45*864e5?v:null;}catch(_){return null;}}
 function dropInvoice(id){try{const v=readInvoice();if(!v||!id||v.id===id)localStorage.removeItem(INV_KEY);}catch(_){}}
 function setBusy(on,label){const sb=$('#sendBtn');if(on){sb.dataset.busy='1';sb.textContent=label;sb.style.opacity='.75';$('#prevBtn').style.visibility='hidden';}
-  else{delete sb.dataset.busy;sb.textContent='Get Invoice ♡';sb.style.opacity='';$('#prevBtn').style.visibility='visible';}}
+  else{delete sb.dataset.busy;sb.textContent='Send Order ♡';sb.style.opacity='';$('#prevBtn').style.visibility='visible';}}
 function resetOrderForm(){form.reset();$('#fEmail').disabled=false;$('#fAuto').disabled=false;upState.forEach(s=>{if(s.url&&s.url.startsWith('blob:'))URL.revokeObjectURL(s.url);});upState.clear();upToken=hex(32);refFiles=[];renderRefs();clearDraft();$('#draftNote').hidden=true;sheetStart=0;$('#refSlots').innerHTML='';const m=$('#refMsg');if(m)m.textContent='';setBusy(false);err('');}
 const LIVE_SITE=/(^|\.)keikoartist\.com$/i.test(location.hostname)||/^(localhost|127\.0\.0\.1)$/.test(location.hostname);
 function postOrder(fd,onProgress){
@@ -1521,7 +1522,7 @@ form.addEventListener('submit',async e=>{
   const bad=[...form.elements].find(el=>el.willValidate&&!el.checkValidity());
   if(bad){setTimeout(()=>{bad.reportValidity();bad.focus();},50);err(bad.id==='fDeadline'?'Please pick a deadline that is today or later.':'Please check the highlighted field.');return;}
   if($('#sendBtn').dataset.busy)return;
-  err('');setBusy(true,refFiles.length?'Uploading references…':'Creating invoice…');
+  err('');setBusy(true,refFiles.length?'Uploading references…':'Sending…');
   const slow=setTimeout(()=>{if($('#sendBtn').dataset.busy)err('Still sending… slow connection or large files. Please wait, do not close this page.');},15000);
   let contactWasEmail=false;
   {const c=$('#fDiscord').value.trim();
@@ -1534,7 +1535,7 @@ form.addEventListener('submit',async e=>{
       $('#sendBtn').textContent=`Uploading references… ${Math.min(99,Math.round(sent/tot*100))}%`;
       await new Promise(z=>setTimeout(z,300));
     }
-    $('#sendBtn').textContent='Creating invoice…';
+    $('#sendBtn').textContent='Sending…';
   }
   const upOk=refFiles.filter(f=>(upState.get(f)||{}).status==='done'), upBad=refFiles.filter(f=>(upState.get(f)||{}).status!=='done');
   const totalNum=calc(), plan=cmOn?'Full payment':$('input[name="Payment plan"]:checked').value, iv=cmOn?invoice():null, due=cmOn?iv.total:dueNow(totalNum,plan);
@@ -1551,22 +1552,18 @@ form.addEventListener('submit',async e=>{
   const buildCopy=(id,payUrl,dateStr,filesNote)=>{
     $('#fReq').value=id;
     $('#fSubject').value=$('#fSubject').value.replace(/ \[(INV|REQ)-[\w-]+\]$/,'')+' ['+id+']';
-    $('#fDue').value=cmOn?`${money2(due)} — full payment incl. 13% tax`+(payUrl?' (PayPal invoice shown to client)':' (PayPal not set up yet: send the client a payment link)')
-      :due?money2(due)+' — '+planLabel(plan)+(payUrl?' (PayPal link shown to client)':''):'-';
+    $('#fDue').value=cmOn?`${money2(due)} — full payment incl. 13% tax (invoice PDF: Discord / admin)`
+      :due?money2(due)+' — '+planLabel(plan)+' (invoice PDF: Discord / admin)':'-';
     const lineTxt=lines.map(([l,a])=>`${l}: ${a?money2(a):'Free'}`).join('\n');
     $('#fAuto').value=`Hi ${name}, thank you for your order at KeikoArts! ♡
 
-INVOICE ${id} · ${dateStr}
+ORDER ${id} · ${dateStr}
 ${lineTxt}
-TOTAL: ${money2(invTotal)} USD${!cmOn&&due<invTotal?`
-PAY NOW (${planLabel(plan)}): ${money2(due)}`:''}
+TOTAL: ${money2(invTotal)} USD${cmOn?' (incl. 13% tax)':' (estimate)'}
 
-${payUrl?`Pay with PayPal:
-${payUrl}`:`I'll send you a PayPal payment link within 6 hours.`}
-(Full refund if I can't take your order.)
-
-Questions? Message me on Discord with your invoice number:
+Next step: message me on Discord with your order ID ${id}:
 https://discord.com/users/1053527069528707072
+I reply within 6 hours, confirm the details and send you your invoice (PDF). Payment is via Ko-fi.
 
 — Keiko, KeikoArts`;
     const data={};
@@ -1580,7 +1577,7 @@ https://discord.com/users/1053527069528707072
     const jj=await r.json().catch(()=>null);return !!(r.ok&&jj&&String(jj.success)==='true');}catch(_){return false;}};
   if(!LIVE_SITE){   // preview copy (e.g. inside the Claude app): show the invoice, nothing is sent
     const t=stamp(), id=(cmOn?'INV-':'REQ-')+t.md+'-PREVIEW';
-    done({id,due,plan,payUrl:PAY_ON()?paypalLink(due,id,label):'',rows,emailed:false,warn:'PREVIEW ONLY: this order was not sent. Real orders work on keikoartist.com.',inv:mkInv(t.date,false,invTotal,due)});
+    done({id,due,plan,payUrl:'',rows,emailed:false,warn:'PREVIEW ONLY: this order was not sent. Real orders work on keikoartist.com.'});
     return;}
   // 1) KeikoArts server: saves the order + files, returns the invoice
   if(location.protocol.startsWith('http')){
@@ -1588,9 +1585,9 @@ https://discord.com/users/1053527069528707072
     ['_next','_autoresponse','_subject','_captcha','_template','mxType','mxSize'].forEach(k=>fd.delete(k));
     [...fd.keys()].filter(k=>/^attachment\d+$/.test(k)).forEach(k=>fd.delete(k));
     fd.set('_up_token',upToken);fd.set('_up_files',upOk.map(f=>upState.get(f).fid).join(','));
-    fd.set('_price',cmOn?String(iv.sub):'0');fd.set('_total',String(totalNum||0));fd.set('_t',String(Math.max(0,Math.round((Date.now()-(sheetStart||Date.now()))/1000))));
+    fd.set('_lines',JSON.stringify(lines));fd.set('_price',cmOn?String(iv.sub):'0');fd.set('_total',String(totalNum||0));fd.set('_t',String(Math.max(0,Math.round((Date.now()-(sheetStart||Date.now()))/1000))));
     if(/[?&]dryrun=1/.test(location.search))fd.set('_dryrun','1');
-    const prog=p=>{if(refFiles.length&&$('#sendBtn').dataset.busy)$('#sendBtn').textContent=p<.995?`Uploading… ${Math.round(p*100)}%`:'Creating invoice…';};
+    const prog=p=>{if(refFiles.length&&$('#sendBtn').dataset.busy)$('#sendBtn').textContent=p<.995?`Uploading… ${Math.round(p*100)}%`:'Sending…';};
     let res=await postOrder(fd,prog);
     if(res.status<=0||(res.status>=500&&!res.j)){await new Promise(r=>setTimeout(r,1500));res=await postOrder(fd,prog);}
     const j=res.j;
@@ -1600,7 +1597,7 @@ https://discord.com/users/1053527069528707072
         missing.length?`${missing.length} reference file(s) couldn't be uploaded (${missing.join(', ')}). Please send them to me on Discord.`:''].filter(Boolean).join(' ');
       const copy=(!j.dry_run&&!j.notified)?buildCopy(j.id,j.pay_url||'',j.date,j.files?j.files+' file(s) uploaded: see admin → Orders':''):null;
       if(copy&&j.emailed)delete copy._autoresponse;
-      const lastInv={id:j.id,due:j.due,plan:j.plan,payUrl:j.pay_url||'',rows,emailed:!!j.emailed,warn,key:j.key||'',inv:mkInv(j.date,!!j.emailed,j.total,j.due)};
+      const lastInv={id:j.id,due:j.due,plan:j.plan,payUrl:'',rows,emailed:!!j.emailed,warn,key:j.key||''};
       if(!j.dry_run)saveInvoice(Object.assign({},lastInv,{warn:''}));
       done(lastInv);
       if(copy)sendCopy(copy);
@@ -1613,7 +1610,7 @@ https://discord.com/users/1053527069528707072
   const ok=await sendCopy(buildCopy(id,payUrl,t.date,refFiles.length?refFiles.length+' file(s) could not be uploaded: ask the client to send them on Discord':''));
   if(ok){
     if(location.protocol.startsWith('http')){try{fetch('notify-discord.php',{method:'POST',keepalive:true,headers:{'Content-Type':'application/json'},body:JSON.stringify({id,due:$('#fDue').value,service:$('#fService').value,package:$('#fPackage').value,addons:$('#fAddons').value,total,plan,name,email:$('#fEmail').value,discord:$('#fDiscord').value,deadline:$('#fDeadline').value,refs:[refFiles.length?refFiles.length+' file(s) attached (see email)':'',form['Reference links'].value].filter(Boolean).join(' · '),details:(cmOn?`[${usageVal()} use] `:'')+$('#fDetails').value,_honey:form._honey.value})}).catch(()=>{});}catch(_){}}
-    const lastInv={id,due,plan,payUrl,rows,emailed:!!$('#fEmail').value,warn:refFiles.length?'Please send your reference images to me on Discord (they could not be uploaded).':'',inv:mkInv(t.date,!!$('#fEmail').value,invTotal,due)};
+    const lastInv={id,due,plan,payUrl:'',rows,emailed:!!$('#fEmail').value,warn:refFiles.length?'Please send your reference images to me on Discord (they could not be uploaded).':''};
     saveInvoice(Object.assign({},lastInv,{warn:''}));
     done(lastInv);
     return;}
@@ -1911,7 +1908,7 @@ function showThanks(last){
   const steps=inv?(payNow?[['Pay with PayPal','PayPal emails you a receipt.'],['I review your order',"I confirm within 6 hours. Full refund if I can't take it."],['Work starts',inv.custom===false&&last.due<inv.total?'I send progress updates; the rest is paid later as agreed ♡':'I send progress updates until your art is done ♡']]
       :[['Message me on Discord','Send your invoice number. I reply within 6 hours.'],['Pay your invoice','I send you a PayPal link for '+money2(inv.total)+'.'],['Work starts','I send progress updates until your art is done ♡']])
     :payNow?[['Pay with PayPal','Secure your slot now. PayPal emails you a receipt.'],['Chat on Discord','Send me your Request ID. I reply within 6 hours.'],['Work starts','I start working and send progress updates on Discord.']]
-    :[['Chat on Discord','Add me / send a message with your Request ID. I reply within 6 hours.'],['Confirm & pay','We finalize details and I send a PayPal / Ko-fi payment link.'],['Your slot is secured','I start working on it and send progress updates on Discord.']];
+    :[['Message me on Discord','Send me your order ID. I reply within 6 hours and we confirm the details.'],['Get your invoice','I send your invoice as a PDF. You pay via Ko-fi.'],['Your slot is secured','I start working on it and send progress updates on Discord.']];
   $('#tySteps').innerHTML=steps.map(([a,b])=>`<li><b>${a}</b><span>${b}</span></li>`).join('');
   ty.classList.add('show');ty.setAttribute('aria-hidden','false');document.body.style.overflow='hidden';ty.scrollTop=0;
   $('#tyDiscord').onclick=async()=>{const id=last&&last.id;if(id){try{await navigator.clipboard.writeText(id);$('#tyDiscord').textContent='Copied '+id+' ✓ Opening…';}catch(_){}}window.open('https://discord.com/users/1053527069528707072','_blank','noopener');};
