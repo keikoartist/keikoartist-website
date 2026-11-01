@@ -1,7 +1,11 @@
 User-agent: *
 Allow: /
+Disallow: /admin/
+Disallow: /order-api.php
+Disallow: /chat-api.php
+Disallow: /notify-discord.php
+Disallow: /lib/
 Disallow: /wp-admin/
 Disallow: /wp-includes/
-Disallow: /admin/
 
 Sitemap: https://keikoartist.com/sitemap.xml
