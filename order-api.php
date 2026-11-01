@@ -33,11 +33,11 @@ function jout(int $code, array $data = []): void {
   echo json_encode($data + ['ok' => $code === 200], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES); exit;
 }
 $HTML_MODE = !empty($_GET['html']);   // plain form post (browser without working JavaScript): answer with a page, not JSON
-function page(string $title, string $body): void {
+function page(string $title, string $body, bool $client = false): void {
   header('Content-Type: text/html; charset=utf-8');
   echo '<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><title>' . htmlspecialchars($title) . ' · KeikoArts</title>'
      . '<style>body{margin:0;font-family:Arial,sans-serif;background:#fff4f8;color:#7a2846}main{max-width:560px;margin:24px auto;background:#fff;border:1px solid #fbd3e0;border-radius:18px;padding:24px}h1{color:#f2628f;font-size:24px;margin:0 0 8px}table{width:100%;border-collapse:collapse;font-size:15px;margin:14px 0}td{padding:6px 0;border-bottom:1px solid #fde9f0}td:last-child{text-align:right}.tot td{font-weight:bold;border:0;padding-top:10px}.pp{display:block;text-align:center;background:#ffc439;color:#003087;font-weight:bold;padding:14px;border-radius:999px;text-decoration:none;margin:16px 0 8px}.muted{color:#a8607a;font-size:13px}a.back{color:#f2628f}</style></head><body><main>'
-     . $body . '<p class="muted">Questions? <a class="back" href="https://discord.com/users/1053527069528707072">Message me on Discord</a> · <a class="back" href="/">Back to keikoartist.com</a></p></main></body></html>';
+     . $body . '<p class="muted">Questions? ' . ($client ? '<a class="back" href="' . DISCORD_USER . '">Message me on Discord</a> or <a class="back" href="mailto:' . OWNER_EMAIL . '">email me</a>' : '<a class="back" href="mailto:' . OWNER_EMAIL . '">Email me at ' . OWNER_EMAIL . '</a>') . ' · <a class="back" href="/">Back to keikoartist.com</a></p></main></body></html>';
   exit;
 }
 function fail(int $code, string $msg): void {
@@ -465,7 +465,7 @@ if (($_GET['a'] ?? '') === 'submit') {
     page($kind === 'custom' ? 'Your invoice' : 'Request sent',
       '<h1>' . ($kind === 'custom' ? 'Your invoice ♡' : 'Request sent! ♡') . '</h1><p class="muted">' . ($kind === 'custom' ? 'Invoice no.' : 'Request ID') . ' <b>' . h($id) . '</b> · ' . h($dateStr) . '</p><p>Billed to <b>' . h($name) . '</b></p>'
       . '<table>' . $rowsH . '</table>'
-      . ($payUrl && $due > 0 ? '<a class="pp" href="' . h($payUrl) . '">Pay ' . money2($due) . ' with PayPal</a><p class="muted">Secure checkout on PayPal. Full refund if I can\'t take your ' . ($kind === 'custom' ? 'commission' : 'request') . '.</p>' : ''));
+      . ($payUrl && $due > 0 ? '<a class="pp" href="' . h($payUrl) . '">Pay ' . money2($due) . ' with PayPal</a><p class="muted">Secure checkout on PayPal. Full refund if I can\'t take your ' . ($kind === 'custom' ? 'commission' : 'request') . '.</p>' : ''), true);
   }
   jout(200, ['id' => $id, 'kind' => $kind, 'price' => $price, 'tax' => $tax, 'total' => $total, 'due' => $due, 'plan' => $plan,
              'pay_url' => $payUrl, 'date' => $dateStr, 'emailed' => $clientMailed, 'notified' => $mailed, 'files' => count($files), 'skipped_files' => $skipped, 'skipped_names' => $skippedNames, 'key' => $vkey]);

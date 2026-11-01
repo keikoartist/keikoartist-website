@@ -15,6 +15,6 @@ jobs:
           done
           echo "::notice::PING $(curl -s -m 30 -X POST -H 'Origin: https://keikoartist.com' 'https://keikoartist.com/order-api.php?a=ping&net=1')"
           html=$(curl -sL -H "Cache-Control: no-cache" "https://keikoartist.com/?v=$(date +%s)")
-          for t in "order-api.php?a=submit" "Get Invoice" "theresa.oktavia10@gmail.com" "iabNote" "draftNote" "wa.me"; do
+          for t in "order-api.php?a=submit" "Get Invoice" "theresa.oktavia10@gmail.com" "iabNote" "draftNote" "ty-soc" "wa.me"; do
             if grep -q "$t" <<<"$html"; then echo "::notice::FOUND $t"; else echo "::warning::MISSING $t"; fi
           done
