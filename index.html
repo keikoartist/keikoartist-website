@@ -1216,7 +1216,7 @@ a:focus-visible,button:focus-visible,summary:focus-visible,[tabindex]:focus-visi
     <div class="faq-grid">
       <details><summary>How long does a commission take?</summary><p>VTuber models usually take 25–40 days, depending on complexity and the queue. Smaller pieces like PFPs, emotes and banners take about 3–7 days. Each service shows its estimate in the order form.</p></details>
       <details><summary>How do I pay?</summary><p>Send the order form. I review your order and email you your invoice as a PDF, and you pay via Ko-fi in USD. Larger projects can be split into installments (50% upfront, 50% before delivery).</p></details>
-      <details><summary>Can I use the art commercially?</summary><p>Yes — streaming, monetized videos and social media are included. Merch rights can be added on request.</p></details>
+      <details><summary>Can I use the art commercially?</summary><p>Yes — streaming, monetized videos and social media are included. Merch / commercial rights are a $30 add-on for any service.</p></details>
       <details><summary>Will my model work in VTube Studio?</summary><p>Yes. Art + Rig and Rig only orders include a VTube Studio file, ready to stream with webcam or iPhone tracking. Art only orders get a layered PSD that's ready to rig.</p></details>
       <details><summary>What's the difference between bust, half body and full body?</summary><p>Bust shows your character up to the chest, half body up to the waist, and full body from head to toe. See <a href="/vtuber-pricing/" style="color:var(--pink);font-weight:600">VTuber prices</a> for each size.</p></details>
       <details><summary>How many revisions do I get?</summary><p>Revisions are free during the sketch stage. Small tweaks after coloring are included; major changes may have a fee.</p></details>
@@ -1235,7 +1235,7 @@ a:focus-visible,button:focus-visible,summary:focus-visible,[tabindex]:focus-visi
       <div><h4>3. Process &amp; timeline</h4><p>Sketch → lineart → coloring → (rigging) → delivery. You get progress updates at every stage. Estimated time is shown in the form; rush delivery is available.</p></div>
       <div><h4>4. Revisions</h4><p>Unlimited small revisions during sketch. Up to 2 minor revisions after coloring; major changes after approval may have extra fees.</p></div>
       <div><h4>5. Refunds</h4><p>Full refund before work starts. After the sketch, refunds are based on completed work. No refund after final files are delivered.</p></div>
-      <div><h4>6. Usage rights</h4><ul><li>Personal and streaming use, monetized content and socials are allowed.</li><li>Merch / commercial rights on request.</li><li>The artist keeps copyright. No reselling, no NFT, no AI training.</li></ul></div>
+      <div><h4>6. Usage rights</h4><ul><li>Personal and streaming use, monetized content and socials are allowed.</li><li>Merch / commercial rights: $30 add-on for any service.</li><li>The artist keeps copyright. No reselling, no NFT, no AI training.</li></ul></div>
       <div><h4>7. Portfolio</h4><p>I may share finished work on my portfolio and socials unless you request a private or delayed reveal.</p></div>
       <div><h4>8. Agreement</h4><p>By placing an order, you agree to these terms.</p></div>
     </div>
@@ -1533,32 +1533,32 @@ const SERVICES = {
     addons:   [ ["Extra emote", 5], ["Extra outfit", 40], ["VTuber pet", 55], ["Commercial / merch rights", 30] ] },
   "Background": { from: 100, eta: "7–10 days",
     packages: [ ["Static", 100, "1 scene, 1920×1080"], ["Animated", 130, "Looping MP4/WebM"] ],
-    addons:   [ ["Day / night variant", 40], ["Blurred & clean versions", 10] ] },
+    addons:   [ ["Day / night variant", 40], ["Blurred & clean versions", 10], ["Commercial / merch rights", 30] ] },
   "Stream Overlay": { from: 45, eta: "10–14 days",
     packages: [ ["Screens set", 45, "Starting Soon, BRB and Ending screens"],
                 ["Full overlay pack", 150, "Screens + game screen + talking/chatting screen + 6 panels"] ],
-    addons:   [ ["Simple loop animation", 30], ["Advanced loop animation", 50], ["Extra text screen", 20], ["Custom chibi doll", 15], ["Pet", 20], ["PSD file", 50] ] },
+    addons:   [ ["Simple loop animation", 30], ["Advanced loop animation", 50], ["Extra text screen", 20], ["Custom chibi doll", 15], ["Pet", 20], ["PSD file", 50], ["Commercial / merch rights", 30] ] },
   "Custom PFP": { from: 36, eta: "3–5 days",
     packages: [ ["Headshot", 36, "Simple background"], ["Bust", 41, "Up to chest"], ["Half body", 46, "Up to waist"] ],
-    addons:   [ ["Extra character", 20], ["Detailed background", 30] ] },
+    addons:   [ ["Extra character", 20], ["Detailed background", 30], ["Commercial / merch rights", 30] ] },
   "Banner": { from: 45, eta: "5–7 days",
     packages: [ ["Eye banner", 45, "Static, 3:1"], ["Mouth banner", 45, "Static, 3:1"] ],
-    addons:   [ ["Asymmetry banner", 15], ["Night lighting", 20], ["Day + night versions", 40], ["Simple animation", 30], ["Advanced animation", 50], ["PSD file", 50] ] },
+    addons:   [ ["Asymmetry banner", 15], ["Night lighting", 20], ["Day + night versions", 40], ["Simple animation", 30], ["Advanced animation", 50], ["PSD file", 50], ["Commercial / merch rights", 30] ] },
   "VTuber Logo": { from: 30, eta: "5–7 days",
     packages: [ ["Custom logo", 30, "Stylized name lettering, PNG"], ["Logo + icon", 40, "Logo plus small icon / emblem"] ],
-    addons:   [ ["Logo animation", 20], ["Commercial use", 20] ] },
+    addons:   [ ["Logo animation", 20], ["Commercial / merch rights", 30] ] },
   "PNGTuber": { from: 60, eta: "7–10 days",
     packages: [ ["Bust-up", 60, "Idle + talking, blinking"], ["Thigh-up / full body", 100, "Idle + talking, blinking"] ],
-    addons:   [ ["Extra expression", 20], ["Props / accessories", 0] ] },
+    addons:   [ ["Extra expression", 20], ["Props / accessories", 0], ["Commercial / merch rights", 30] ] },
   "Emotes": { from: 5, eta: "5–7 days", qty: true,
     packages: [ ["Static emote", 5, "Price per emote"], ["Animated emote", 15, "Price per emote"] ],
-    addons:   [ ["Sub badge set (3)", 15], ["Twitch-ready resizing", 0] ] },
+    addons:   [ ["Sub badge set (3)", 15], ["Twitch-ready resizing", 0], ["Commercial / merch rights", 30] ] },
   "VTuber Pet": { from: 62.60, eta: "10–14 days",
     packages: [ ["Pet art", 62.60, "Layered, ready to rig"], ["Pet art + rig", 110, "Rigged for VTS"] ],
-    addons:   [ ["Extra expression", 10], ["Accessory", 15] ] },
+    addons:   [ ["Extra expression", 10], ["Accessory", 15], ["Commercial / merch rights", 30] ] },
   "Chibi VTuber": { from: 45, eta: "10–14 days",
     packages: [ ["Chibi model art", 45, "Full body + 3 expressions, ready to rig"] ],
-    addons:   [ ["Extra toggle", 5], ["Extra hairstyle", 10], ["Extra outfit", 20] ] },
+    addons:   [ ["Extra toggle", 5], ["Extra hairstyle", 10], ["Extra outfit", 20], ["Commercial / merch rights", 30] ] },
   "Custom Inquiry": { from: 0, eta: "Ask", quote: true,
     packages: [ ["Custom commission", 0, "Describe it below"] ],
     addons:   [] },

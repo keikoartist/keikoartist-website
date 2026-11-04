@@ -407,7 +407,7 @@ def pngtuber():
         ('Which apps can I use it with?', 'You get transparent PNGs that are ready for PNGTuber Plus or Veadotube.'),
         ('How long does it take?', f'About {e(P["eta"])}.'),
         ('What is the difference between a PNGTuber and a VTuber model?', 'A PNGTuber swaps between images (idle, talking, blinking). A Live2D VTuber model is rigged, so it follows your head, eyes and mouth smoothly. See <a href="/custom-vtuber-model/">custom VTuber models</a>.'),
-        ('Can I use it on monetized streams?', 'Yes. Personal use, streaming, monetized content and social media are allowed. Merch or other commercial use is available on request.'),
+        ('Can I use it on monetized streams?', 'Yes. Personal use, streaming, monetized content and social media are allowed. Merch / commercial rights are a $30 add-on.'),
     ]
     desc = f'A custom PNGTuber avatar with idle and talking states and blinking, delivered as transparent PNGs ready for PNGTuber Plus or Veadotube. From {money(P["from"])}.'
     return page('custom-pngtuber-model', 'Custom PNGTuber Model Commission | KeikoArtist', desc, 'Custom PNGTuber Model', 'Custom PNGTuber Model',
@@ -504,7 +504,7 @@ def pricing():
       <div class="box"><h3>Rush and complex designs</h3><p>Rush delivery is +25%. Very complex designs (for example wings or many accessories) may cost a bit more; the final price is always on your invoice before you pay.</p></div>
       <div class="box"><h3>Revisions</h3><p>Unlimited small revisions during the sketch. Up to 2 minor revisions after coloring; major changes after approval may have extra fees.</p></div>
       <div class="box"><h3>Refunds</h3><p>Full refund before work starts. After the sketch, refunds are based on completed work. No refund after final files are delivered.</p></div>
-      <div class="box"><h3>Usage rights</h3><p>Personal use, streaming, monetized content and socials are included. Merch / commercial rights on request (some services list them as an add-on).</p></div>
+      <div class="box"><h3>Usage rights</h3><p>Personal use, streaming, monetized content and socials are included. Merch / commercial rights are a $30 add-on for any service.</p></div>
     </div>
   </div></section>
 {related("/vtuber-pricing/")}
