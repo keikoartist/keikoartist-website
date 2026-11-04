@@ -160,7 +160,7 @@ def page(path, title, desc, h1, crumb, body, faq, og_image, order='', extra_ld=N
   <div class="wrap">
     <div class="foot">
       <a href="/" class="logo"><img src="/images/pfp.webp" alt="" width="40" height="40"><span><b>KeikoArts</b><small>Illustration &amp; Live2D Studio</small></span></a>
-      <span><a href="mailto:keikoarts22@gmail.com">✉ keikoarts22@gmail.com</a> &nbsp;·&nbsp; <a href="https://discord.gg/FbgWxMPjf" target="_blank" rel="noopener"><b>Join Keiko's Discord</b></a></span>
+      <span><a href="https://discord.gg/FbgWxMPjf" target="_blank" rel="noopener"><b>Join Keiko's Discord</b></a></span>
     </div>
     <nav class="foot-links" aria-label="Services">{"".join(f'<a href="{u}">{t}</a>' for u, t in FOOT)}</nav>
     <div class="copy">© {datetime.date.today().year} KeikoArts · keikoartist.com</div>
@@ -194,7 +194,7 @@ def cta(title, text, order, label):
 def service_ld(name, url, desc, low):
     return {"@context": "https://schema.org", "@type": "Service", "name": name, "url": url, "description": desc,
             "serviceType": name, "areaServed": "Worldwide",
-            "provider": {"@type": "ProfessionalService", "name": "KeikoArts", "url": SITE, "email": "keikoarts22@gmail.com"},
+            "provider": {"@type": "ProfessionalService", "name": "KeikoArts", "url": SITE},
             "offers": {"@type": "Offer", "price": str(low), "priceCurrency": "USD", "url": url}}
 
 V, P = SERVICES['VTuber'], SERVICES['PNGTuber']
