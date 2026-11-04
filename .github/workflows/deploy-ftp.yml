@@ -18,12 +18,36 @@ jobs:
         run: echo "FTP_SERVER secret belum diisi — deploy dilewati."
 
       - name: Upload website via FTP
+        id: ftp1
+        continue-on-error: true
         if: env.FTP_SERVER != ''
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
           server: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
+          timeout: 120000
+          server-dir: ${{ secrets.FTP_DIR || 'public_html/' }}
+          exclude: |
+            **/.git*
+            **/.git*/**
+            .github/**
+            README.md
+            docs/**
+            tools/**
+
+      - name: Wait before retry
+        if: env.FTP_SERVER != '' && steps.ftp1.outcome == 'failure'
+        run: sleep 45
+
+      - name: Upload website via FTP (retry)
+        if: env.FTP_SERVER != '' && steps.ftp1.outcome == 'failure'
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          timeout: 180000
           server-dir: ${{ secrets.FTP_DIR || 'public_html/' }}
           exclude: |
             **/.git*
