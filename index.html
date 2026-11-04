@@ -1138,7 +1138,7 @@ a:focus-visible,button:focus-visible,summary:focus-visible,[tabindex]:focus-visi
 <!-- REVIEWS (real client reviews; add new ones by copying a <figure>) -->
 <section id="reviews" class="tint-pink">
   <div class="wrap">
-    <div class="sec-head"><h2 class="serif">Kind words from clients</h2><p class="rv-score"><span aria-hidden="true">★★★★★</span> 5.0 from 7 reviews</p></div>
+    <div class="sec-head"><h2 class="serif">Kind words from clients</h2><p class="rv-score"><span aria-hidden="true">★★★★★</span> 5.0 from 7 reviews · verified VGen commissions</p></div>
     <div class="rv-grid">
       <figure class="rv-card">
         <div class="rv-stars" role="img" aria-label="5 out of 5 stars">★★★★★</div>
@@ -1353,17 +1353,17 @@ a:focus-visible,button:focus-visible,summary:focus-visible,[tabindex]:focus-visi
 
           <div class="sec">
             <h4>Tell me about it</h4>
-            <textarea name="Details" id="fDetails" placeholder="Tell me your idea ♡" required></textarea>
+            <textarea name="Details" id="fDetails" placeholder="Tell me your idea ♡ (character, outfit, colors, mood…)" aria-label="Describe your idea (required)" required></textarea>
             <div class="refs" id="refsBox">
               <label class="drop" id="refDrop" tabindex="0">
                 <input type="file" id="refFiles" accept="image/*,.pdf,.psd,.clip" multiple>
-                <b>📎 Attach reference images</b>
+                <b>📎 Attach reference images <small style="font-weight:400;color:var(--muted)">(optional)</small></b>
                 <span id="dropHint">Click or drag files here · up to 8 files, 60 MB total · they start uploading right away</span>
               </label>
               <p class="ref-msg" id="refMsg" role="status"></p>
               <ul class="ref-list" id="refList"></ul>
               <div id="refSlots" hidden></div>
-              <input name="Reference links" placeholder="Or paste links (Drive, Pinterest, Toyhouse…) for bigger files">
+              <input name="Reference links" aria-label="Reference links (optional)" placeholder="Or paste links (Drive, Pinterest, Toyhouse…) · optional">
             </div>
             <div class="row">
               <label class="date-f" id="dateF"><span>Deadline / debut date <small>(optional)</small></span><input type="date" name="Deadline" id="fDeadline"></label>
@@ -1373,8 +1373,8 @@ a:focus-visible,button:focus-visible,summary:focus-visible,[tabindex]:focus-visi
 
           <div class="sec">
             <h4>Your info</h4>
-            <div class="row"><input name="Name" id="fName" placeholder="Your name / VTuber name" required autocomplete="name"><input type="email" name="email" id="fEmail" placeholder="Email (I send your invoice here)" required autocomplete="email" inputmode="email"></div>
-            <input name="Discord" id="fDiscord" placeholder="Discord username (optional)" autocomplete="off" style="margin-top:12px">
+            <div class="row"><input name="Name" id="fName" aria-label="Your name (required)" placeholder="Your name / VTuber name *" required autocomplete="name"><input type="email" name="email" id="fEmail" aria-label="Email (required)" placeholder="Email (I send your invoice here) *" required autocomplete="email" inputmode="email"></div>
+            <input name="Discord" id="fDiscord" aria-label="Discord username (optional)" placeholder="Discord username (optional)" autocomplete="off" style="margin-top:12px">
           </div>
 
           <div class="sec" id="secPay">
