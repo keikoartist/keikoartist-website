@@ -27,7 +27,7 @@ const MAX_ORDER_UPLOAD = 60 * 1024 * 1024;            // all references of one o
 const UPLOAD_CHUNK_MAX = 4 * 1024 * 1024;
 const ALLOWED_EXT = ['jpg', 'jpeg', 'png', 'webp', 'gif', 'pdf', 'psd', 'clip', 'heic'];
 const MAIL_ATTACH_MAX = 15 * 1024 * 1024;              // bigger uploads stay in the admin inbox only
-const DISCORD_USER   = 'https://discord.com/users/1053527069528707072';
+const DISCORD_USER   = 'https://discord.gg/FbgWxMPjf';   // Keiko's Discord server invite
 const STATUSES       = ['new', 'paid', 'in_progress', 'done', 'cancelled'];
 
 function jout(int $code, array $data = []): void {
@@ -539,8 +539,8 @@ if (($_GET['a'] ?? '') === 'submit') {
       $body = "<p>Hi $cn, thank you for your commission request at KeikoArts! ♡</p><p>Request ID: <b style=\"color:#f2628f\">" . h($id) . '</b><br>Service: ' . h($service . ' (' . $o['package'] . ')') . '<br>Estimated total: ' . money2($total) . '<br>Payment plan: ' . h($plan) . '</p>';
       $txt = "Hi " . (no_links($name) ?: 'there') . ", thank you for your commission request at KeikoArts!\n\nRequest ID: $id\nService: $service ({$o['package']})\nEstimated total: " . money2($total) . "\nPayment plan: $plan\n\n";
     }
-    $body .= '<p>I review your order and email you your invoice (PDF) within 6 hours. Payment is via Ko-fi.</p><p>Want to chat on Discord? <a href="' . DISCORD_USER . '">Add me as a friend</a> and send your order ID <b>' . h($id) . '</b>.</p><p>— Keiko, KeikoArts</p>';
-    $txt .= "I review your order and email you your invoice (PDF) within 6 hours. Payment is via Ko-fi.\nWant to chat on Discord? Add me as a friend and send your order ID $id:\n" . DISCORD_USER . "\n\n— Keiko, KeikoArts";
+    $body .= '<p>I review your order and email you your invoice (PDF) within 6 hours. Payment is via Ko-fi.</p><p>Want to chat on Discord? <a href="' . DISCORD_USER . '">Join my server</a> and send your order ID <b>' . h($id) . '</b>.</p><p>— Keiko, KeikoArts</p>';
+    $txt .= "I review your order and email you your invoice (PDF) within 6 hours. Payment is via Ko-fi.\nWant to chat on Discord? Join my server and send your order ID $id:\n" . DISCORD_USER . "\n\n— Keiko, KeikoArts";
     $clientMailed = send_mail($email, $subj, '<div style="font-family:Arial,sans-serif;color:#7a2846;font-size:14px">' . $body . '</div>', $txt, OWNER_EMAIL);
   }
   $db->prepare('UPDATE orders SET mailed = ? WHERE id = ?')->execute([$mailed ? 1 : 0, $id]);
@@ -556,7 +556,7 @@ if (($_GET['a'] ?? '') === 'submit') {
     page('Order sent',
       '<h1>Order sent! ♡</h1><p class="muted">Order ID <b>' . h($id) . '</b> · ' . h($dateStr) . '</p><p>Name <b>' . h($name) . '</b></p>'
       . '<table>' . $rowsH . '</table>'
-      . '<p><b>Next step:</b> I review your order and email you your invoice (PDF) within 6 hours. Payment is via Ko-fi.</p><p class="muted">Want to chat on Discord? <a class="back" href="' . DISCORD_USER . '">Add me as a friend</a> and send your order ID.</p>', true);
+      . '<p><b>Next step:</b> I review your order and email you your invoice (PDF) within 6 hours. Payment is via Ko-fi.</p><p class="muted">Want to chat on Discord? <a class="back" href="' . DISCORD_USER . '">Join my Discord server</a> and send your order ID.</p>', true);
   }
   jout(200, ['id' => $id, 'kind' => $kind, 'price' => $price, 'tax' => $tax, 'total' => $total, 'due' => $due, 'plan' => $plan,
              'pay_url' => $payUrl, 'pdf_url' => pdf_link(['id' => $id, 'view_key' => $vkey], $SITE), 'date' => $dateStr, 'emailed' => $clientMailed, 'notified' => $mailed, 'files' => count($files), 'skipped_files' => $skipped, 'skipped_names' => $skippedNames, 'key' => $vkey]);

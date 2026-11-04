@@ -1005,6 +1005,10 @@ a:focus-visible,button:focus-visible,summary:focus-visible,[tabindex]:focus-visi
 .card:focus-visible{outline:2px solid var(--pink);outline-offset:3px}
 @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}.vt-track{animation:none!important}}
 .vt-marquee:not(:has(.vt)) {display:none}
+.foot-dc{display:inline-flex;align-items:center;gap:6px;background:#fff;color:var(--pink)!important;font-weight:600;border-radius:999px;padding:8px 16px}
+.foot-dc:hover{text-decoration:none!important;opacity:.9}
+@media (min-width:1101px){.menu .menu-dc{display:none}}
+.menu-dc{color:#5865f2!important;font-weight:600}
 </style>
 </head>
 <body>
@@ -1022,6 +1026,7 @@ a:focus-visible,button:focus-visible,summary:focus-visible,[tabindex]:focus-visi
       <a href="#faq" class="nav-2nd">FAQ</a>
       <a href="#tos" class="nav-2nd">TOS</a>
       <a href="#chat" class="menu-chat">💬 Chat with us</a>
+      <a href="https://discord.gg/FbgWxMPjf" target="_blank" rel="noopener" class="nav-2nd menu-dc">Join our Discord</a>
     </nav>
     <button type="button" class="nav-search" id="navSearch" aria-label="Search services"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2"/><path d="m20 20-4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
     <a href="admin/" class="admin-pill" id="adminPill" hidden>💬 Inbox <b id="adminCount" hidden></b></a>
@@ -1419,8 +1424,8 @@ a:focus-visible,button:focus-visible,summary:focus-visible,[tabindex]:focus-visi
       <h4 class="ty-h">What happens next</h4>
       <ol class="ty-steps" id="tySteps"></ol>
       <div class="ty-dc">
-        <div><b id="tyDcT">Want to chat on Discord? (optional)</b><span id="tyDcS">Send me a friend request with your order ID. Everything else happens by email.</span></div>
-        <button class="btn btn-pink" type="button" id="tyDiscord">Copy ID &amp; add me on Discord</button>
+        <div><b id="tyDcT">Join Keiko's Discord (optional)</b><span id="tyDcS">Join the server, then message me with your order ID. No friend request needed. Everything else happens by email.</span></div>
+        <button class="btn btn-pink" type="button" id="tyDiscord">Copy ID &amp; join Discord</button>
       </div>
       <p class="ty-note" id="tyNote">A confirmation email is also on its way (check Spam). Can't use Discord? Reach me here:</p>
       <div class="ty-btns">
@@ -1438,6 +1443,7 @@ a:focus-visible,button:focus-visible,summary:focus-visible,[tabindex]:focus-visi
       <a href="#home" class="logo"><img class="pfp" src="images/pfp.webp" alt="Keiko"><span><b>KeikoArts</b><small>Illustration &amp; Live2D Studio</small></span></a>
       <div class="socials">
         <a href="mailto:keikoarts22@gmail.com">✉ keikoarts22@gmail.com</a>
+        <a href="https://discord.gg/FbgWxMPjf" target="_blank" rel="noopener" class="foot-dc">Join Keiko's Discord</a>
       </div>
     </div>
     <nav class="foot-links" aria-label="Services"><a href="#process">How it works</a><a href="#faq">FAQ</a><a href="#tos">Terms of Service</a><a href="#reviews">Reviews</a><a href="/custom-vtuber-model/">Custom VTuber Model</a><a href="/live2d-rigging/">Live2D Rigging</a><a href="/custom-pngtuber-model/">Custom PNGTuber Model</a><a href="/vtuber-pricing/">VTuber Pricing</a><a href="/vtuber-portfolio/">Portfolio</a></nav>
@@ -1919,8 +1925,8 @@ ${lineTxt}
 TOTAL: ${money2(invTotal)} USD${cmOn?' (incl. 13% tax)':' (estimate)'}
 
 I review your order and email you your invoice (PDF) within 6 hours. Payment is via Ko-fi.
-Want to chat on Discord? Send me a friend request with your order ID:
-https://discord.com/users/1053527069528707072
+Want to chat on Discord? Join my server and message me with your order ID:
+https://discord.gg/FbgWxMPjf
 
 — Keiko, KeikoArts`;
     const data={};
@@ -2296,7 +2302,7 @@ function showThanks(last){
     :[['I review your order','Within 6 hours. If I have questions, I email you.'],['Get your invoice','I email you your invoice (PDF). Please check your Spam folder too.'],['Pay & start','Pay via Ko-fi. Your slot is secured and I start working ♡']];
   $('#tySteps').innerHTML=steps.map(([a,b])=>`<li><b>${a}</b><span>${b}</span></li>`).join('');
   ty.classList.add('show');ty.setAttribute('aria-hidden','false');document.body.style.overflow='hidden';ty.scrollTop=0;
-  $('#tyDiscord').onclick=async()=>{const id=last&&last.id;if(id){try{await navigator.clipboard.writeText(id);$('#tyDiscord').textContent='Copied '+id+' ✓ Opening…';}catch(_){}}window.open('https://discord.com/users/1053527069528707072','_blank','noopener');};
+  $('#tyDiscord').onclick=async()=>{const id=last&&last.id;if(id){try{await navigator.clipboard.writeText(id);$('#tyDiscord').textContent='Copied '+id+' ✓ Opening…';}catch(_){}}window.open('https://discord.gg/FbgWxMPjf','_blank','noopener');};
 }
 if(location.search.includes('sent=1')){let last=null;try{last=JSON.parse(sessionStorage.getItem('ka_last')||'null');if(!(last&&last.inv))sessionStorage.removeItem('ka_last');}catch(_){}showThanks(last);}
 if(/[?&]paid=1/.test(location.search)){
@@ -2308,7 +2314,7 @@ if(/[?&]paid=1/.test(location.search)){
   dropInvoice(rid);
   $('#tySteps').innerHTML=[['Chat on Discord','Send me your Request ID so I can match your payment.'],['Work starts','I start working and send progress updates on Discord.']].map(([a,b])=>`<li><b>${a}</b><span>${b}</span></li>`).join('');
   ty.classList.add('show');ty.setAttribute('aria-hidden','false');document.body.style.overflow='hidden';
-  $('#tyDiscord').onclick=async()=>{if(rid){try{await navigator.clipboard.writeText(rid)}catch(_){}}window.open('https://discord.com/users/1053527069528707072','_blank','noopener');};
+  $('#tyDiscord').onclick=async()=>{if(rid){try{await navigator.clipboard.writeText(rid)}catch(_){}}window.open('https://discord.gg/FbgWxMPjf','_blank','noopener');};
 }
 {const m=(navigator.userAgent||'').match(/Instagram|FBAN|FBAV|FB_IAB|musical_ly|BytedanceWebview|TikTok|Line\/|Snapchat/i);
   if(m){const k=m[0],app=/insta/i.test(k)?'Instagram':/^FB/i.test(k)?'Facebook':/musical|bytedance|tiktok/i.test(k)?'TikTok':/line/i.test(k)?'LINE':'Snapchat';
