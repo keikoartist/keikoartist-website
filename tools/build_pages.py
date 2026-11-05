@@ -40,6 +40,7 @@ ALT = {
     'bg-stream-room': 'Night-time streamer bedroom background with gaming chair, desk and window',
     'chibi-witch': 'Full-body chibi VTuber art of a pink-haired witch in a black and pink outfit',
     'emotes-witch': 'Two Twitch emotes of a pink-haired witch: blushing and surprised',
+    'emotes-animated-witch': 'Set of 8 animated Twitch emotes of a pink-haired witch: surprised, tongue out, smug, nervous, crying, giggling with phone, blowing a kiss and holding money',
     'emote-witch-1': 'Twitch emote of a pink-haired witch sticking out her tongue',
     'eye-banner-blue': 'Eye banner of glowing blue eyes framed by purple hair',
     'eye-banner-silver-animated': 'Animated eye banner of silver-haired character with glasses',
