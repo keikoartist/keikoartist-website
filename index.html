@@ -1011,6 +1011,39 @@ a:focus-visible,button:focus-visible,summary:focus-visible,[tabindex]:focus-visi
 @media (min-width:1101px){.menu .menu-dc{display:none}}
 .menu-dc{color:#5865f2!important;font-weight:600}
 .gal-slide[style*="emotes-animated"],#sdTrack div[style*="emotes-animated"]{background-size:contain!important;background-color:#fff!important;background-position:center!important}
+
+/* ===== polish pass: rhythm, radius, process, FAQ, final CTA ===== */
+:root{--r-card:20px}
+main>section{padding-top:72px!important;padding-bottom:72px!important}
+main>section#home{padding:0!important}
+main>section#tos{padding-top:0!important;padding-bottom:24px!important}
+main>section#faq{padding-bottom:28px!important}
+.hero + section{padding-top:48px!important}
+@media (max-width:767px){main>section{padding-top:48px!important;padding-bottom:48px!important}.hero + section{padding-top:34px!important}main>section#faq{padding-bottom:20px!important}}
+.card,.fw .work,.vm-card,.rv-card,.step,.tos-box,.fc-box{border-radius:var(--r-card)!important}
+@media (min-width:1200px){.hero-grid{grid-template-columns:minmax(0,.86fr) minmax(0,1.14fr)!important;gap:48px!important}}
+/* process */
+.steps{gap:16px}
+.step{padding:22px 22px!important;gap:16px;align-items:flex-start}
+.step .n{width:42px;height:42px;font-size:20px}
+.step h4{font-size:16px;margin-bottom:2px}
+.step p{font-size:14px;line-height:1.5}
+/* FAQ */
+.about-line{font-size:14.5px;line-height:1.7;margin:0 auto 22px}
+.faq-grid{gap:10px 14px}
+.faq-grid details{border-radius:14px!important;padding:14px 18px!important;transition:border-color .2s}
+.faq-grid summary{font-size:14.5px;font-weight:500;cursor:pointer}
+.faq-grid details[open]{border-color:var(--pink-2)!important}
+.faq-grid details p{font-size:14px!important;line-height:1.65;margin-top:8px}
+@media (hover:hover){.faq-grid details:hover{border-color:var(--pink-2)!important}}
+/* final CTA */
+.final-cta{padding-top:8px!important}
+.fc-box{background:var(--blush);border:1px solid var(--line);padding:36px 40px;display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap}
+.fc-box h2{font-size:clamp(26px,3vw,36px);line-height:1.15;margin-bottom:8px}
+.fc-box p{color:var(--muted);font-size:15px;max-width:560px}
+.fc-btns{display:flex;gap:12px;flex-wrap:wrap}
+@media (max-width:767px){.fc-box{padding:26px 22px}.fc-btns{width:100%;flex-direction:column}.fc-btns .btn{width:100%;justify-content:center;min-height:52px}}
+footer{margin-top:24px}
 </style>
 </head>
 <body>
@@ -1214,6 +1247,7 @@ a:focus-visible,button:focus-visible,summary:focus-visible,[tabindex]:focus-visi
 <!-- ABOUT + FAQ -->
 <section id="faq">
   <div class="wrap">
+    <div class="sec-head"><h2 class="serif">Questions &amp; answers</h2><a href="#tos" class="link arrow">Terms of Service </a></div>
     <p class="about-line" id="about"><b>Hi, I'm Keiko ♡</b> Digital artist &amp; Live2D studio making original VTuber models, chibi art, emotes and stream assets. Cute meets gothic, made from scratch with updates at every stage.</p>
     <div class="faq-grid">
       <details><summary>How long does a commission take?</summary><p>VTuber models usually take 25–40 days, depending on complexity and the queue. Smaller pieces like PFPs, emotes and banners take about 3–7 days. Each service shows its estimate in the order form.</p></details>
@@ -1242,6 +1276,16 @@ a:focus-visible,button:focus-visible,summary:focus-visible,[tabindex]:focus-visi
       <div><h4>8. Agreement</h4><p>By placing an order, you agree to these terms.</p></div>
     </div>
     </details>
+  </div>
+</section>
+
+<!-- FINAL CTA -->
+<section id="start" class="final-cta">
+  <div class="wrap">
+    <div class="fc-box">
+      <div><h2 class="serif">Ready to bring your character to life?</h2><p>Send your idea and get your invoice by email, usually within 6 hours. Nothing is charged until you pay it.</p></div>
+      <div class="fc-btns"><a href="#order" data-order class="btn btn-pink arrow">Start a Project</a><a href="/vtuber-pricing/" class="btn btn-ghost">See all prices</a></div>
+    </div>
   </div>
 </section>
 </main>
