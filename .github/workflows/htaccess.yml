@@ -15,7 +15,7 @@ jobs:
       PW: ${{ secrets.FTP_PASSWORD }}
       DIR: ${{ secrets.FTP_DIR || 'public_html/' }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Download current .htaccess
         run: |
           set +e

@@ -7,11 +7,11 @@ on:
 
 jobs:
   deploy:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     env:
       FTP_SERVER: ${{ secrets.FTP_SERVER }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Skip (FTP secrets not set yet)
         if: env.FTP_SERVER == ''
