@@ -66,7 +66,14 @@ jobs:
               pg.on('response',lambda r:asyncio.ensure_future(grab(r)))
               out=[]
               try:
-                  await pg.goto(URL,wait_until='load',timeout=90000); await pg.wait_for_timeout(1000)
+                  for attempt in range(3):
+                      try:
+                          await pg.goto(URL,wait_until='load',timeout=90000); break
+                      except Exception as ge:
+                          if attempt==2: raise
+                          print(f"::warning::[{label}] page load try {attempt+1} failed ({str(ge).splitlines()[0][:80]}), retrying", flush=True)
+                          await pg.wait_for_timeout(15000)
+                  await pg.wait_for_timeout(1000)
                   await pg.locator('#svcAll').scroll_into_view_if_needed(); await pg.click('#svcAll')
                   b=pg.locator('.card:has(h3:text-is("Custom Inquiry")) [data-order]')
                   await b.scroll_into_view_if_needed(); await b.click()
