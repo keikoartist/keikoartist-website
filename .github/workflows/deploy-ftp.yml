@@ -17,42 +17,24 @@ jobs:
         if: env.FTP_SERVER == ''
         run: echo "FTP_SERVER secret belum diisi — deploy dilewati."
 
-      - name: Upload website via FTP
+      - name: Upload changed files via FTP
         id: ftp1
         continue-on-error: true
         if: env.FTP_SERVER != ''
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
-        with:
-          server: ${{ secrets.FTP_SERVER }}
-          username: ${{ secrets.FTP_USERNAME }}
-          password: ${{ secrets.FTP_PASSWORD }}
-          timeout: 120000
-          server-dir: ${{ secrets.FTP_DIR || 'public_html/' }}
-          exclude: |
-            **/.git*
-            **/.git*/**
-            .github/**
-            README.md
-            docs/**
-            tools/**
+        env:
+          FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
+          FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
+          FTP_DIR: ${{ secrets.FTP_DIR || 'public_html/' }}
+        run: python3 tools/ftp_deploy.py
 
       - name: Wait before retry
         if: env.FTP_SERVER != '' && steps.ftp1.outcome == 'failure'
         run: sleep 45
 
-      - name: Upload website via FTP (retry)
+      - name: Upload changed files via FTP (retry)
         if: env.FTP_SERVER != '' && steps.ftp1.outcome == 'failure'
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
-        with:
-          server: ${{ secrets.FTP_SERVER }}
-          username: ${{ secrets.FTP_USERNAME }}
-          password: ${{ secrets.FTP_PASSWORD }}
-          timeout: 180000
-          server-dir: ${{ secrets.FTP_DIR || 'public_html/' }}
-          exclude: |
-            **/.git*
-            **/.git*/**
-            .github/**
-            README.md
-            docs/**
-            tools/**
+        env:
+          FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
+          FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
+          FTP_DIR: ${{ secrets.FTP_DIR || 'public_html/' }}
+        run: python3 tools/ftp_deploy.py
