@@ -7,7 +7,6 @@ if (!defined('KA_API')) { http_response_code(404); exit; }
 if (!defined('FPDF_FONTPATH')) define('FPDF_FONTPATH', __DIR__ . '/lib/fpdf/font/');
 require_once __DIR__ . '/lib/fpdf/fpdf.php';
 
-const KA_KOFI = 'https://ko-fi.com/keikoarts';
 const KA_DOT  = "\xB7";   // middle dot in the PDF font encoding
 
 /* UTF-8 -> the PDF font encoding (Windows-1252). Emoji are dropped, other unsupported letters become "?". */
@@ -99,7 +98,7 @@ function ka_order_pdf(array $o, $newTotal = null): string {
   $pdf->Rect(120, $y - 2, 74, 26, 'DF');
   $pdf->SetXY(124, $y + 1); $pdf->SetFont('Helvetica', 'B', 8); $color($muted); $pdf->Cell(66, 4, $due < $total ? 'AMOUNT DUE NOW' : 'TOTAL DUE');
   $pdf->SetXY(124, $y + 6); $pdf->SetFont('Helvetica', 'B', 20); $color($pink); $pdf->Cell(66, 10, ka_money($due) . ' USD');
-  $pdf->SetXY(124, $y + 16.5); $pdf->SetFont('Helvetica', '', 8.5); $color($muted); $pdf->Cell(66, 4, 'Pay via Ko-fi  ' . KA_DOT . '  ' . $planLbl);
+  $pdf->SetXY(124, $y + 16.5); $pdf->SetFont('Helvetica', '', 8.5); $color($muted); $pdf->Cell(66, 4, 'Pay with PayPal  ' . KA_DOT . '  ' . $planLbl);
   $pdf->SetY(max($leftEnd, $y + 24) + 1);
 
   $section = function ($n, $title, $need = 30) use ($pdf, $color, $pink, $ink, $line) {
@@ -178,13 +177,17 @@ function ka_order_pdf(array $o, $newTotal = null): string {
   $y = $pdf->GetY();
   $pdf->SetFillColor(255, 244, 248); $pdf->SetDrawColor($pink[0], $pink[1], $pink[2]); $pdf->SetLineWidth(0.5);
   $pdf->Rect(16, $y, 178, 30, 'DF');
-  $pdf->SetXY(21, $y + 3); $pdf->SetFont('Helvetica', 'B', 11); $color($ink); $pdf->Cell(0, 6, 'Pay via Ko-fi', 0, 1);
-  $pdf->SetFont('Helvetica', '', 10);
-  $pdf->SetX(21); $color($ink); $pdf->Cell(5, 6, '1.'); $pdf->Cell($pdf->GetStringWidth('Open') + 2.6, 6, 'Open'); $pdf->SetFont('Helvetica', 'BU', 10); $color($pink);
-  $pdf->Cell(40, 6, 'ko-fi.com/keikoarts', 0, 1, 'L', false, KA_KOFI);
-  $pdf->SetFont('Helvetica', '', 10); $color($ink);
-  $pdf->SetX(21); $pdf->Cell(5, 6, '2.'); $pdf->Cell(0, 6, 'Send ' . ka_money($due) . ' USD' . ($due < $total ? ' (' . $planLbl . ')' : ''), 0, 1);
-  $pdf->SetX(21); $pdf->Cell(5, 6, '3.'); $pdf->Cell(0, 6, 'Write your invoice number ' . $T($id) . ' in the Ko-fi message', 0, 1);
+  $payUrl = function_exists('pay_link') && ($o['view_key'] ?? '') !== '' ? pay_link($o, (string)($GLOBALS['SITE'] ?? 'https://keikoartist.com/'), $newTotal !== null ? round((float)$newTotal, 2) : null) : '';
+  $pdf->SetXY(21, $y + 3); $pdf->SetFont('Helvetica', 'B', 11); $color($ink); $pdf->Cell(0, 6, 'Pay with PayPal (card or PayPal balance)', 0, 1);
+  if ($payUrl !== '') {
+    $pdf->SetXY(21, $y + 11); $pdf->SetFillColor(255, 196, 57); $pdf->SetTextColor(0, 48, 135); $pdf->SetFont('Helvetica', 'B', 12);
+    $pdf->Cell(78, 11, 'Pay ' . ka_money($due) . ' USD with PayPal', 0, 0, 'C', true, $payUrl);
+    $pdf->SetXY(103, $y + 11); $pdf->SetFont('Helvetica', '', 9.5); $color($ink);
+    $pdf->MultiCell(86, 5, "Click the yellow button. The amount is already filled in" . ($due < $total ? ' (' . $planLbl . ')' : '') . ', no need to type anything.', 0, 'L');
+  } else {
+    $pdf->SetFont('Helvetica', '', 10); $color($ink);
+    $pdf->SetX(21); $pdf->Cell(0, 6, 'Amount: ' . ka_money($due) . ' USD' . ($due < $total ? ' (' . $planLbl . ')' : '') . '. I email you a one-click PayPal link.', 0, 1);
+  }
   $pdf->SetY($y + 32);
   $pdf->SetX(16); $pdf->SetFont('Helvetica', '', 8.8); $color($muted);
   $pdf->MultiCell(178, 4.6, "Your slot is secured once the payment is received. Full refund if I can't take your commission. "

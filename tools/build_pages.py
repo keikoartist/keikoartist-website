@@ -201,7 +201,7 @@ def service_ld(name, url, desc, low):
 V, P = SERVICES['VTuber'], SERVICES['PNGTuber']
 vp = {p[0]: p[1] for p in V['packages']}
 vadd = {a[0]: a[1] for a in V['addons']}
-PAY = 'Pay via Ko-fi in USD: in full, 50/50 (half upfront, half before final files), or in 3 installments for orders above $150.'
+PAY = 'Pay with a one-click PayPal link (card or PayPal balance) in USD: in full, 50/50 (half upfront, half before final files), or in 3 installments for orders above $150.'
 
 # ---------------------------------------------------------------- 1. custom VTuber model
 def custom_vtuber():
@@ -460,7 +460,7 @@ def portfolio():
         ('Who made these artworks?', 'Team Keiko: Keiko (artist), Zhopio (illustrator) and Tomy (rigger). Every piece here is original work, drawn from scratch.'),
         ('Can I order something in a similar style?', 'Yes. Mention the piece you like in the order form, and attach it as a reference if you want.'),
         ('Will my commission be shown in the portfolio?', 'Finished work may be shared on the portfolio and socials, unless you ask for a private or delayed reveal.'),
-        ('How do I order?', 'Click "Start a project", choose a service, describe your idea and send the form. I email you your invoice (PDF), and you pay via Ko-fi.'),
+        ('How do I order?', 'Click "Start a project", choose a service, describe your idea and send the form. I email you your invoice (PDF) with a one-click PayPal link.'),
     ]
     desc = 'VTuber models, Live2D rigging, PNGTubers, chibi models, pets, emotes, banners, logos and illustrations made by KeikoArts for streamers.'
     gallery_ld = {"@context": "https://schema.org", "@type": "CollectionPage", "name": "VTuber & Live2D Art Portfolio", "url": SITE + 'vtuber-portfolio/',
@@ -513,7 +513,7 @@ def pricing():
     faq = [
         ('How much does a custom VTuber model cost?', f'Art only starts at {money(vp["Bust · Art only"])} (bust); art + rig at {money(vp["Bust · Art + Rig"])}. A full-body model with rigging is {money(vp["Full body · Art + Rig"])}. See <a href="/custom-vtuber-model/">custom VTuber models</a>.'),
         ('Can I pay in installments?', 'Yes: 50/50 (half upfront, half before final files), or 3 installments for orders above $150.'),
-        ('Which currency do you use?', 'All prices are in US dollars (USD). You pay via Ko-fi.'),
+        ('Which currency do you use?', 'All prices are in US dollars (USD). You pay with a one-click PayPal link (card or PayPal balance).'),
         ('Why do some prices say "from"?', 'It is the starting price of the smallest package. The final price depends on the options and add-ons you choose, and is confirmed on your invoice.'),
         ('What does a VTuber debut package include?', '; '.join(f'{e(p[0])} ({money(p[1])}): {e(p[2])}' for p in SERVICES["VTuber Packages"]["packages"]) + '.'),
     ]

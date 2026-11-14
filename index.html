@@ -1251,7 +1251,7 @@ footer{margin-top:24px}
     <p class="about-line" id="about"><b>Hi, I'm Keiko ♡</b> Digital artist &amp; Live2D studio making original VTuber models, chibi art, emotes and stream assets. Cute meets gothic, made from scratch with updates at every stage.</p>
     <div class="faq-grid">
       <details><summary>How long does a commission take?</summary><p>VTuber models usually take 25–40 days, depending on complexity and the queue. Smaller pieces like PFPs, emotes and banners take about 3–7 days. Each service shows its estimate in the order form.</p></details>
-      <details><summary>How do I pay?</summary><p>Send the order form. I review your order and email you your invoice as a PDF, and you pay via Ko-fi in USD. Larger projects can be split into installments (50% upfront, 50% before delivery).</p></details>
+      <details><summary>How do I pay?</summary><p>Send the order form. I review your order and email you your invoice (PDF) with a one-click PayPal link: card or PayPal balance, in USD. Larger projects can be split into installments (50% upfront, 50% before delivery).</p></details>
       <details><summary>Can I use the art commercially?</summary><p>Yes — streaming, monetized videos and social media are included. Merch / commercial rights are a $30 add-on for any service.</p></details>
       <details><summary>Will my model work in VTube Studio?</summary><p>Yes. Art + Rig and Rig only orders include a VTube Studio file, ready to stream with webcam or iPhone tracking. Art only orders get a layered PSD that's ready to rig.</p></details>
       <details><summary>What's the difference between bust, half body and full body?</summary><p>Bust shows your character up to the chest, half body up to the waist, and full body from head to toe. See <a href="/vtuber-pricing/" style="color:var(--pink);font-weight:600">VTuber prices</a> for each size.</p></details>
@@ -1267,7 +1267,7 @@ footer{margin-top:24px}
       <summary><span class="serif">Terms of Service</span><small>By ordering you agree to these terms. Tap to read.</small></summary>
       <div class="tos">
       <div><h4>1. Ordering</h4><p>Send the order form. I reply by email within 6 hours to confirm details and the final price. Your slot is secured once payment is received.</p></div>
-      <div><h4>2. Payment</h4><p>Once the details are confirmed, I send your invoice as a PDF. Pay it via Ko-fi in USD. Choose full payment, 50/50 (50% upfront, 50% before final files), or 3× installments for orders above $150. Custom orders: you name the price and pay the full invoice upfront; 13% tax is added on the invoice.</p></div>
+      <div><h4>2. Payment</h4><p>Once the details are confirmed, I send your invoice as a PDF with a one-click PayPal link (card or PayPal balance, USD). Choose full payment, 50/50 (50% upfront, 50% before final files), or 3× installments for orders above $150. Custom orders: you name the price and pay the full invoice upfront; 13% tax is added on the invoice.</p></div>
       <div><h4>3. Process &amp; timeline</h4><p>Sketch → lineart → coloring → (rigging) → delivery. You get progress updates at every stage. Estimated time is shown in the form; rush delivery is available.</p></div>
       <div><h4>4. Revisions</h4><p>Unlimited small revisions during sketch. Up to 2 minor revisions after coloring; major changes after approval may have extra fees.</p></div>
       <div><h4>5. Refunds</h4><p>Full refund before work starts. After the sketch, refunds are based on completed work. No refund after final files are delivered.</p></div>
@@ -1435,7 +1435,7 @@ footer{margin-top:24px}
           <div class="c-inv" aria-live="polite">
             <div class="c-inv-h">Price estimate <span id="invEta">USD</span></div>
             <dl id="invLines"></dl>
-            <p id="invNote">After sending, I review your order and email you your invoice (PDF). You pay via Ko-fi. Nothing is charged now.</p>
+            <p id="invNote">After sending, I review your order and email you your invoice (PDF) with a one-click PayPal link. Nothing is charged now.</p>
           </div>
           <label class="check" id="agreeRow"><input type="checkbox" id="agree"><span>I have read and agree to the <a href="#tos" data-close style="color:var(--pink);font-weight:600">Terms of Service</a>.</span></label>
         </div>
@@ -1500,7 +1500,7 @@ footer{margin-top:24px}
 /* ==========================================================
    EDIT DI SINI — slot, antrian, harga & add-on
    ========================================================== */
-const PAYPAL = {          // dikosongkan: pembayaran sekarang lewat Ko-fi (invoice PDF dikirim lewat Discord)
+const PAYPAL = {          // kosong: link PayPal dikirim lewat email invoice setelah order dicek (bukan langsung di website)
   email: "",
   me: "",
   currency: "USD",
@@ -1557,7 +1557,7 @@ const DETAILS = {   // deskripsi lengkap tiap service (muncul saat kartu diklik)
     notes:"Add toggles, hairstyles or outfits as needed." },
   "Custom Inquiry": { about:"Have an idea that isn't listed? Illustrations, stream assets or something new: just describe it.",
     includes:["Full illustrations and scenes","Stream screens, overlays and alerts","Anything else, priced to your budget"],
-    notes:"Name your price (+13% tax). I confirm the details and email you your invoice; you pay via Ko-fi." },
+    notes:"Name your price (+13% tax). I confirm the details and email you your invoice with a one-click PayPal link." },
 };
 const VTUBERS = [   // VTuber yang pernah kamu buat. name & link opsional (link: Twitch/YouTube/X)
   { img:"av-vtuber-witch",  name:"Mirabelle", link:"" },
@@ -1969,7 +1969,7 @@ ORDER ${id} · ${dateStr}
 ${lineTxt}
 TOTAL: ${money2(invTotal)} USD${cmOn?' (incl. 13% tax)':' (estimate)'}
 
-I review your order and email you your invoice (PDF) within 6 hours. Payment is via Ko-fi.
+I review your order and email you your invoice (PDF) within 6 hours, with a one-click PayPal link.
 Want to chat on Discord? Join my server and message me with your order ID:
 https://discord.gg/FbgWxMPjf
 
@@ -2344,7 +2344,7 @@ function showThanks(last){
   const steps=inv?(payNow?[['Pay with PayPal','PayPal emails you a receipt.'],['I review your order',"I confirm within 6 hours. Full refund if I can't take it."],['Work starts',inv.custom===false&&last.due<inv.total?'I send progress updates; the rest is paid later as agreed ♡':'I send progress updates until your art is done ♡']]
       :[['Message me on Discord','Send your invoice number. I reply within 6 hours.'],['Pay your invoice','I send you a PayPal link for '+money2(inv.total)+'.'],['Work starts','I send progress updates until your art is done ♡']])
     :payNow?[['Pay with PayPal','Secure your slot now. PayPal emails you a receipt.'],['Chat on Discord','Send me your Request ID. I reply within 6 hours.'],['Work starts','I start working and send progress updates on Discord.']]
-    :[['I review your order','Within 6 hours. If I have questions, I email you.'],['Get your invoice','I email you your invoice (PDF). Please check your Spam folder too.'],['Pay & start','Pay via Ko-fi. Your slot is secured and I start working ♡']];
+    :[['I review your order','Within 6 hours. If I have questions, I email you.'],['Get your invoice','I email you your invoice (PDF). Please check your Spam folder too.'],['Pay & start','Pay with the one-click PayPal link. Your slot is secured and I start working ♡']];
   $('#tySteps').innerHTML=steps.map(([a,b])=>`<li><b>${a}</b><span>${b}</span></li>`).join('');
   ty.classList.add('show');ty.setAttribute('aria-hidden','false');document.body.style.overflow='hidden';ty.scrollTop=0;
   $('#tyDiscord').onclick=async()=>{const id=last&&last.id;if(id){try{await navigator.clipboard.writeText(id);$('#tyDiscord').textContent='Copied '+id+' ✓ Opening…';}catch(_){}}window.open('https://discord.gg/FbgWxMPjf','_blank','noopener');};

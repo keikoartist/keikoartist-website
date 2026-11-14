@@ -3,7 +3,7 @@
  * KeikoArts orders API.
  *  - POST ?a=submit (multipart form from the website): saves the order + reference files OUTSIDE the
  *    public folder, emails Keiko, and posts the order to Keiko's Discord as a PDF (brief + invoice +
- *    "pay via Ko-fi"), together with the reference images. The client gets an order ID and is asked to
+ *    "Pay with PayPal" link), together with the reference images. The client gets an order ID and is asked to
  *    message Keiko on Discord; Keiko confirms the details and forwards the PDF.
  *  - JSON POST {action:...} with the admin token (same login as the chat inbox): list/view/update orders.
  * Optional config in keikoarts-config.php (server only): 'discord_webhook', 'chat_admin_password'.
@@ -48,14 +48,14 @@ function fail(int $code, string $msg): void {
   jout($code, ['error' => $msg]);
 }
 
-if ($_SERVER['REQUEST_METHOD'] !== 'POST' && ($_GET['a'] ?? '') !== 'pdf') fail(405, 'POST only');   // GET only for the invoice PDF link
+if ($_SERVER['REQUEST_METHOD'] !== 'POST' && !in_array($_GET['a'] ?? '', ['pdf', 'pay'], true)) fail(405, 'POST only');   // GET only for the invoice PDF and pay links
 $hostHdr = strtolower($_SERVER['HTTP_HOST'] ?? '');
 $host = preg_replace('/:\d+$/', '', $hostHdr);
 $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
 if ($origin && strtolower((string)parse_url($origin, PHP_URL_HOST)) !== $host) fail(403, 'bad origin');
 
 $cfgFile = __DIR__ . '/keikoarts-config.php';
-ob_start(); $cfg = is_file($cfgFile) ? (include $cfgFile) : []; ob_end_clean();   // ignore stray spaces/newlines around <?php ?> in the server config
+ob_start(); $cfg = is_file($cfgFile) ? (include $cfgFile) : []; ob_end_clean();   // ignore stray spaces or newlines printed by the server config file
 if (!is_array($cfg)) $cfg = [];
 $SITE = preg_match('/^(localhost|127\.0\.0\.1)$/', $host) ? "http://$hostHdr/" : 'https://keikoartist.com/';
 
@@ -182,8 +182,21 @@ function pdf_link(array $o, string $site, $total = null): string {
   if ($total !== null) { $t = number_format((float)$total, 2, '.', ''); $q['t'] = $t; $q['s'] = substr(hash_hmac('sha256', $o['id'] . '|' . $t, $o['view_key']), 0, 16); }
   return $site . 'order-api.php?' . http_build_query($q);
 }
+/* short, safe "pay this invoice" link (keikoartist.com/order-api.php?a=pay...) that opens PayPal with the amount filled in */
+function pay_link(array $o, string $site, $total = null): string {
+  $l = pdf_link($o, $site, $total);
+  return $l === '' ? '' : str_replace('a=pdf', 'a=pay', $l);
+}
+/* amount the client should pay now: plan share (50/50, 3x) on the first payment, otherwise what is left */
+function pay_amount(array $o, $total = null): float {
+  $t = round($total !== null ? (float)$total : (float)$o['total'], 2); $paid = (float)($o['paid'] ?? 0);
+  if ($paid > 0) return max(0.0, round($t - $paid, 2));
+  $plan = (string)($o['plan'] ?? '');   // same rule as the PDF invoice (order-pdf.php)
+  $k = ($o['kind'] ?? '') === 'custom' ? 1 : (strpos($plan, '50/50') !== false ? 0.5 : (preg_match('/3x|3×/iu', $plan) ? 1 / 3 : 1));
+  return $t > 0 ? ceil(round($t * $k * 100, 6)) / 100 : 0.0;
+}
 function order_pdf(array $o, $newTotal = null): string { require_once __DIR__ . '/order-pdf.php'; return ka_order_pdf($o, $newTotal); }
-/* posts an order to Keiko's Discord: summary + the PDF (brief, invoice, pay via Ko-fi) + reference images. Returns the HTTP code. */
+/* posts an order to Keiko's Discord: summary + the PDF (brief, invoice, Pay with PayPal link) + reference images. Returns the HTTP code. */
 function discord_order(array $cfg, array $o, $newTotal = null, bool $resend = false): int {
   $hook = discord_hook($cfg);
   if ($hook === '') return 0;
@@ -292,6 +305,28 @@ if (($_GET['a'] ?? '') === 'pdf') {
   header('Content-Type: application/pdf'); header('Content-Disposition: inline; filename="KeikoArts-' . $id . '.pdf"');
   header('Content-Length: ' . strlen($pdf)); header('X-Robots-Tag: noindex');
   echo $pdf; exit;
+}
+
+/* =================== public: "Pay with PayPal" link from the invoice (PDF / email) =================== */
+if (($_GET['a'] ?? '') === 'pay') {
+  rate_limit('pay:' . client_ip(), 60, 3600);
+  $nf = function () { http_response_code(404); page('Invoice not found', '<h1>Invoice not found</h1><p>Please check the link, or email me.</p>'); };
+  $id = (string)($_GET['id'] ?? ''); $k = (string)($_GET['k'] ?? '');
+  if (!preg_match('/^(INV|REQ)-\d{4}-\d{4}$/', $id) || !preg_match('/^[a-f0-9]{16}$/', $k)) $nf();
+  $st = db()->prepare('SELECT * FROM orders WHERE id = ?'); $st->execute([$id]); $o = $st->fetch();
+  if (!$o || !hash_equals((string)$o['view_key'], $k)) $nf();
+  $t = null;
+  if (isset($_GET['t'])) {
+    $tv = (string)$_GET['t'];
+    if (!preg_match('/^\d{1,6}\.\d{2}$/', $tv) || !hash_equals(substr(hash_hmac('sha256', "$id|$tv", $k), 0, 16), (string)($_GET['s'] ?? ''))) $nf();
+    $t = (float)$tv;
+  }
+  if (in_array($o['status'], ['cancelled'], true)) page('Order cancelled', '<h1>This order was cancelled</h1><p>No payment is needed. Questions? Just reply to my email.</p>', true);
+  $amt = pay_amount($o, $t);
+  if ($amt <= 0) page('Already paid', '<h1>Already paid ♡</h1><p>Thank you! This invoice (' . htmlspecialchars($id) . ') is fully paid.</p>', true);
+  $url = paypal_link($amt, $id, order_label($o) . ((float)$o['paid'] > 0 ? ', remaining balance' : ''), $SITE);
+  if ($url === '') page('Sorry', '<h1>Sorry</h1><p>Online payment is not available right now. Please reply to my email and I will help you.</p>', true);
+  header('Location: ' . $url, true, 302); exit;
 }
 
 /* =================== public: background upload of reference files, in pieces =================== */
@@ -497,7 +532,7 @@ if (($_GET['a'] ?? '') === 'submit') {
                 VALUES(?,?,\'new\',?,?,?,?,?,?,?,?,?,?,?,?,?,?,0,?,?)')
      ->execute([$id, $kind, $name, $email, $o['discord'], $service, $o['package'], $plan, $price, $tax, $total, $due, $o['fields'], $o['files'], $now, $now, $vkey, json_encode($lines, JSON_UNESCAPED_UNICODE)]);
 
-  $payUrl = '';   // payment is arranged on Discord (Ko-fi), the site no longer shows a PayPal button
+  $payUrl = '';   // Keiko reviews the order first, then emails the invoice with a one-click PayPal link
   $dateStr = date('M j, Y');
 
   // ---- email to Keiko ----
@@ -539,8 +574,8 @@ if (($_GET['a'] ?? '') === 'submit') {
       $body = "<p>Hi $cn, thank you for your commission request at KeikoArts! ♡</p><p>Request ID: <b style=\"color:#f2628f\">" . h($id) . '</b><br>Service: ' . h($service . ' (' . $o['package'] . ')') . '<br>Estimated total: ' . money2($total) . '<br>Payment plan: ' . h($plan) . '</p>';
       $txt = "Hi " . (no_links($name) ?: 'there') . ", thank you for your commission request at KeikoArts!\n\nRequest ID: $id\nService: $service ({$o['package']})\nEstimated total: " . money2($total) . "\nPayment plan: $plan\n\n";
     }
-    $body .= '<p>I review your order and email you your invoice (PDF) within 6 hours. Payment is via Ko-fi.</p><p>Want to chat on Discord? <a href="' . DISCORD_USER . '">Join my server</a> and send your order ID <b>' . h($id) . '</b>.</p><p>— Keiko, KeikoArts</p>';
-    $txt .= "I review your order and email you your invoice (PDF) within 6 hours. Payment is via Ko-fi.\nWant to chat on Discord? Join my server and send your order ID $id:\n" . DISCORD_USER . "\n\n— Keiko, KeikoArts";
+    $body .= '<p>I review your order and email you your invoice (PDF) within 6 hours. You pay securely with PayPal (one click, card or PayPal balance).</p><p>Want to chat on Discord? <a href="' . DISCORD_USER . '">Join my server</a> and send your order ID <b>' . h($id) . '</b>.</p><p>— Keiko, KeikoArts</p>';
+    $txt .= "I review your order and email you your invoice (PDF) within 6 hours. You pay securely with PayPal (one click, card or PayPal balance).\nWant to chat on Discord? Join my server and send your order ID $id:\n" . DISCORD_USER . "\n\n— Keiko, KeikoArts";
     $clientMailed = send_mail($email, $subj, '<div style="font-family:Arial,sans-serif;color:#7a2846;font-size:14px">' . $body . '</div>', $txt, OWNER_EMAIL);
   }
   $db->prepare('UPDATE orders SET mailed = ? WHERE id = ?')->execute([$mailed ? 1 : 0, $id]);
@@ -556,7 +591,7 @@ if (($_GET['a'] ?? '') === 'submit') {
     page('Order sent',
       '<h1>Order sent! ♡</h1><p class="muted">Order ID <b>' . h($id) . '</b> · ' . h($dateStr) . '</p><p>Name <b>' . h($name) . '</b></p>'
       . '<table>' . $rowsH . '</table>'
-      . '<p><b>Next step:</b> I review your order and email you your invoice (PDF) within 6 hours. Payment is via Ko-fi.</p><p class="muted">Want to chat on Discord? <a class="back" href="' . DISCORD_USER . '">Join my Discord server</a> and send your order ID.</p>', true);
+      . '<p><b>Next step:</b> I review your order and email you your invoice (PDF) within 6 hours. You pay securely with PayPal (one click, card or PayPal balance).</p><p class="muted">Want to chat on Discord? <a class="back" href="' . DISCORD_USER . '">Join my Discord server</a> and send your order ID.</p>', true);
   }
   jout(200, ['id' => $id, 'kind' => $kind, 'price' => $price, 'tax' => $tax, 'total' => $total, 'due' => $due, 'plan' => $plan,
              'pay_url' => $payUrl, 'pdf_url' => pdf_link(['id' => $id, 'view_key' => $vkey], $SITE), 'date' => $dateStr, 'emailed' => $clientMailed, 'notified' => $mailed, 'files' => count($files), 'skipped_files' => $skipped, 'skipped_names' => $skippedNames, 'key' => $vkey]);
@@ -592,6 +627,7 @@ switch ($action) {
     $o['pay_url'] = paypal_link((float)$o['due'], $o['id'], order_label($o), $SITE);
     if (!preg_match('/^[a-f0-9]{16}$/', (string)$o['view_key'])) { $o['view_key'] = bin2hex(random_bytes(8)); db()->prepare('UPDATE orders SET view_key = ? WHERE id = ?')->execute([$o['view_key'], $o['id']]); }
     $o['pdf_url'] = pdf_link($o, $SITE);
+    $o['pay_link'] = pay_link($o, $SITE); $o['pay_now'] = pay_amount($o);
     $rem = round((float)$o['total'] - (float)$o['paid'], 2);
     $o['remaining'] = max(0, $rem);
     $o['remaining_url'] = $rem > 0 && $o['paid'] > 0 ? paypal_link($rem, $o['id'], order_label($o) . ', remaining balance', $SITE) : '';
@@ -619,7 +655,8 @@ switch ($action) {
     $t = isset($in['total']) && is_numeric($in['total']) ? round((float)$in['total'], 2) : null;
     if ($t !== null && ($t < 0 || $t > 100000)) fail(400, 'Please enter a total between $0 and $100,000.');
     if (!preg_match('/^[a-f0-9]{16}$/', (string)$o['view_key'])) { $o['view_key'] = bin2hex(random_bytes(8)); db()->prepare('UPDATE orders SET view_key = ? WHERE id = ?')->execute([$o['view_key'], $o['id']]); }
-    jout(200, ['url' => pdf_link($o, $SITE, $t !== null && abs($t - (float)$o['total']) >= 0.005 ? $t : null)]);
+    $tt = $t !== null && abs($t - (float)$o['total']) >= 0.005 ? $t : null;
+    jout(200, ['url' => pdf_link($o, $SITE, $tt), 'pay' => pay_link($o, $SITE, $tt), 'pay_now' => pay_amount($o, $tt)]);
   }
   case 'discord': {
     $o = order_row((string)($in['id'] ?? ''));

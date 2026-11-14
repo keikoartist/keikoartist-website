@@ -14,7 +14,7 @@ $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
 if ($origin && strtolower((string)parse_url($origin, PHP_URL_HOST)) !== $host) out(403, 'bad origin');
 
 $cfgFile = __DIR__ . '/keikoarts-config.php';
-ob_start(); $cfg = is_file($cfgFile) ? (include $cfgFile) : []; ob_end_clean();   // ignore stray spaces/newlines around <?php ?> in the server config
+ob_start(); $cfg = is_file($cfgFile) ? (include $cfgFile) : []; ob_end_clean();   // ignore stray spaces or newlines printed by the server config file
 if (!is_array($cfg)) $cfg = [];
 $hook = (string)($cfg['discord_webhook'] ?? '');
 if ($hook === '') {   // webhook saved from the admin page (Settings)
