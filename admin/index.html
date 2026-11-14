@@ -29,6 +29,12 @@ input:focus,textarea:focus{border-color:var(--pink-2);box-shadow:0 0 0 3px rgba(
 .login img{width:56px;height:56px;border-radius:50%;border:2px solid var(--pink);justify-self:center}
 .login h1{font-size:26px;text-align:center}
 .login p{font-size:12.5px;color:var(--muted);text-align:center}
+.selbar{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:6px 12px;border-bottom:1px solid var(--line,#f3d6e0)}
+.selbar #selTools{display:flex;align-items:center;gap:8px}.selbar #selTools[hidden]{display:none}
+.selbar .linkbtn{background:none;border:0;color:var(--pink,#d6457a);font:inherit;font-size:13px;font-weight:600;cursor:pointer;padding:6px 2px}
+.btn.danger{background:#c22b52;color:#fff;border-color:#c22b52}.btn.danger:disabled{opacity:.45}
+.item .chk{width:20px;height:20px;border-radius:6px;border:2px solid #e3a3b9;display:inline-grid;place-items:center;font-size:13px;color:#fff;margin-right:8px;vertical-align:-4px;flex:none}
+.item.sel .chk{background:#d6457a;border-color:#d6457a}.item.sel{background:#fff0f5}
 .login .linkbtn{background:none;border:0;color:var(--pink);font:inherit;font-size:13px;font-weight:600;cursor:pointer;padding:6px;justify-self:center;text-decoration:underline}
 .login .okmsg{font-size:13px;line-height:1.5;color:#1d7a4a;background:#effaf3;border:1px solid #bfe8cf;border-radius:12px;padding:10px 12px;text-align:center}
 .err{color:#c22b52;font-size:12.5px;min-height:1em}
@@ -179,6 +185,7 @@ select{padding:7px 10px;border:1px solid var(--line);border-radius:999px;backgro
   <div class="main" id="main">
     <aside class="list">
       <div class="tabs"><button class="on" data-s="open" type="button">Open</button><button data-s="closed" type="button">Closed</button></div>
+      <div class="selbar" id="selbar"><button type="button" class="linkbtn" id="selToggle">☑️ Select</button><span id="selTools" hidden><button type="button" class="linkbtn" id="selAll">Select all</button><button type="button" class="btn small danger" id="selDel" disabled>Delete (0)</button></span></div>
       <div class="items" id="items"><div class="empty">Loading…</div></div>
     </aside>
     <section class="thread" id="thread">
@@ -285,9 +292,22 @@ async function loadList(){
     b.appendChild(el('b',null,c.name||'Visitor'));b.appendChild(el('time',null,fmt(c.updated)));
     b.appendChild(el('span',null,(c.last_sender==='admin'?'You: ':'')+(c.last||'')));
     if(un){const d=el('i','dot',String(un));b.appendChild(d);}
-    b.onclick=()=>openThread(c.id);box.appendChild(b);
+    if(selMode){const k=el('span','chk',sel.has(c.id)?'✓':'');b.querySelector('b').prepend(k);if(sel.has(c.id))b.classList.add('sel');}
+    b.onclick=()=>{if(selMode){sel.has(c.id)?sel.delete(c.id):sel.add(c.id);updSel();loadList();}else openThread(c.id);};box.appendChild(b);
   });
+  shownIds=j.conversations.map(c=>c.id);
 }
+// tick several chats and delete them in one go (two taps to confirm)
+let selMode=false,sel=new Set(),shownIds=[],selArmed=false;
+const updSel=()=>{const d=$('#selDel');d.disabled=!sel.size;selArmed=false;d.textContent=`Delete (${sel.size})`;};
+$('#selToggle').onclick=()=>{selMode=!selMode;sel.clear();$('#selTools').hidden=!selMode;$('#selToggle').textContent=selMode?'✕ Cancel':'☑️ Select';updSel();loadList();};
+$('#selAll').onclick=()=>{const all=shownIds.every(x=>sel.has(x));shownIds.forEach(x=>all?sel.delete(x):sel.add(x));updSel();loadList();};
+$('#selDel').onclick=async()=>{const d=$('#selDel');if(!sel.size)return;
+  if(!selArmed){selArmed=true;d.textContent=`Tap again: delete ${sel.size} chat${sel.size>1?'s':''} forever`;setTimeout(()=>{if(selArmed)updSel();},4000);return;}
+  d.disabled=true;d.textContent='Deleting…';
+  try{const j=await api({action:'delete_many',ids:[...sel]});if(sel.has(cur)){cur=null;clearInterval(thTimer);$('#main').classList.remove('reading');}sel.clear();selMode=false;$('#selTools').hidden=true;$('#selToggle').textContent=`☑️ Select · deleted ${j.deleted}`;}
+  catch(e){alert(e.message);}
+  updSel();loadList();};
 
 function addMsg(m){
   if($(`.m[data-id="${m.id}"]`))return;

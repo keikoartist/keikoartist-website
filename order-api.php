@@ -116,11 +116,13 @@ function mime_of(string $ext): string {
   return ['jpg' => 'image/jpeg', 'jpeg' => 'image/jpeg', 'png' => 'image/png', 'webp' => 'image/webp', 'gif' => 'image/gif',
           'pdf' => 'application/pdf', 'psd' => 'image/vnd.adobe.photoshop', 'clip' => 'application/octet-stream', 'heic' => 'image/heic'][$ext] ?? 'application/octet-stream';
 }
-function paypal_link(float $amount, string $id, string $label, string $site): string {
+function paypal_link(float $amount, string $id, string $label, string $site, string $key = '', float $before = 0): string {
   if ($amount <= 0 || !filter_var(PAYPAL_EMAIL, FILTER_VALIDATE_EMAIL)) return '';
+  $amt = number_format($amount, 2, '.', '');
   return 'https://www.paypal.com/cgi-bin/webscr?' . http_build_query([
     'cmd' => '_xclick', 'business' => PAYPAL_EMAIL, 'item_name' => mb_substr("KeikoArts commission – $label [$id]", 0, 127),
-    'item_number' => $id, 'amount' => number_format($amount, 2, '.', ''), 'currency_code' => 'USD', 'no_shipping' => '1', 'rm' => '1',
+    'item_number' => $id, 'amount' => $amt, 'currency_code' => 'USD', 'no_shipping' => '1', 'rm' => '1',
+    'custom' => $key !== '' ? ($c = $amt . '|' . number_format($before, 2, '.', '')) . '|' . substr(hash_hmac('sha256', "exp|$id|$c", $key), 0, 16) : '',   // signed: amount asked + amount already paid when the link was made
     'return' => $site . '?paid=1&rid=' . rawurlencode($id), 'cancel_return' => $site, 'notify_url' => $site . 'order-api.php?a=ipn']);
 }
 function order_label(array $o): string {
@@ -324,7 +326,7 @@ if (($_GET['a'] ?? '') === 'pay') {
   if (in_array($o['status'], ['cancelled'], true)) page('Order cancelled', '<h1>This order was cancelled</h1><p>No payment is needed. Questions? Just reply to my email.</p>', true);
   $amt = pay_amount($o, $t);
   if ($amt <= 0) page('Already paid', '<h1>Already paid ♡</h1><p>Thank you! This invoice (' . htmlspecialchars($id) . ') is fully paid.</p>', true);
-  $url = paypal_link($amt, $id, order_label($o) . ((float)$o['paid'] > 0 ? ', remaining balance' : ''), $SITE);
+  $url = paypal_link($amt, $id, order_label($o) . ((float)$o['paid'] > 0 ? ', remaining balance' : ''), $SITE, (string)$o['view_key'], (float)$o['paid']);
   if ($url === '') page('Sorry', '<h1>Sorry</h1><p>Online payment is not available right now. Please reply to my email and I will help you.</p>', true);
   header('Location: ' . $url, true, 302); exit;
 }
@@ -389,14 +391,21 @@ if (($_GET['a'] ?? '') === 'ipn') {
   $ins->execute([$txn, $id, $amt, $cur, mb_substr((string)($p['payer_email'] ?? ''), 0, 120), $ps, time()]);
   if ($ins->rowCount() === 0) { $log(1, "duplicate notice $txn"); http_response_code(200); exit; }
   $sum = $db->prepare("SELECT COALESCE(SUM(amount),0) FROM payments WHERE order_id = ? AND currency = 'USD'"); $sum->execute([$id]); $paid = round((float)$sum->fetchColumn(), 2);
-  $status = ($ps === 'Completed' && $o['status'] === 'new') ? 'paid' : $o['status'];
+  // how much was asked: the signed amount from our pay link, else what the order says is due now
+  $exp = null; $cu = explode('|', (string)($p['custom'] ?? ''));
+  if (count($cu) === 3 && preg_match('/^\d{1,6}\.\d{2}$/', $cu[0]) && preg_match('/^\d{1,6}\.\d{2}$/', $cu[1])
+      && hash_equals(substr(hash_hmac('sha256', "exp|$id|{$cu[0]}|{$cu[1]}", (string)$o['view_key']), 0, 16), $cu[2])) $exp = (float)$cu[0] + (float)$cu[1];
+  if ($exp === null) $exp = pay_amount(array_merge($o, ['paid' => 0]));
+  $full = $cur === 'USD' && $paid + 0.01 >= $exp;
+  $status = ($ps === 'Completed' && $o['status'] === 'new' && $full) ? 'paid' : $o['status'];
   $db->prepare('UPDATE orders SET paid = ?, status = ?, updated = ? WHERE id = ?')->execute([$paid, $status, time(), $id]);
-  $log(1, "$ps $amt $cur for $id ($txn)");
+  $log(1, "$ps $amt $cur for $id ($txn)" . ($ps === 'Completed' && !$full ? " LOW, expected $exp" : ''));
   $hook = discord_hook($cfg);
   if ($hook) discord_post($hook, ['username' => 'KeikoArts Orders', 'allowed_mentions' => ['parse' => []], 'embeds' => [[
-    'title' => ($ps === 'Completed' ? '💰 Payment received · ' : '↩️ Payment ' . strtolower($ps) . ' · ') . $id,
+    'title' => ($ps === 'Completed' ? ($full ? '💰 Payment received · ' : '⚠️ Payment too low, please check · ') : '↩️ Payment ' . strtolower($ps) . ' · ') . $id,
     'description' => money2($amt) . " $cur" . ($cur !== 'USD' ? ' (not USD, please check)' : '') . ' via PayPal', 'color' => $ps === 'Completed' ? 0x1D9A55 : 0xC22B52,
-    'fields' => [['name' => 'Client', 'value' => (string)($o['name'] ?: '-'), 'inline' => true], ['name' => 'Paid so far', 'value' => money2($paid) . ' of ' . money2((float)$o['total']), 'inline' => true]],
+    'fields' => [['name' => 'Client', 'value' => (string)($o['name'] ?: '-'), 'inline' => true], ['name' => 'Paid so far', 'value' => money2($paid) . ' of ' . money2((float)$o['total']), 'inline' => true],
+                 ['name' => 'Status', 'value' => $status === 'paid' ? 'Marked Paid ✓' : ($ps === 'Completed' && !$full ? 'NOT marked paid: expected ' . money2($exp) . ' USD' : $status), 'inline' => false]],
     'footer' => ['text' => 'keikoartist.com/admin → Orders']]]]);
   http_response_code(200); exit;
 }

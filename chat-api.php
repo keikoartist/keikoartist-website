@@ -270,6 +270,15 @@ switch ($action) {
     db()->prepare('DELETE FROM conversations WHERE id = ?')->execute([$id]);
     out(200);
   }
+  case 'delete_many': {   // admin: delete several chats at once (ticked in the list)
+    require_admin($cfg);
+    $ids = array_values(array_unique(array_filter((array)($in['ids'] ?? []), function ($x) { return is_string($x) && preg_match('/^[a-f0-9]{24}$/', $x); })));
+    if (!$ids || count($ids) > 200) fail(400, 'Nothing selected');
+    $db = db(); $db->beginTransaction(); $del = $db->prepare('DELETE FROM conversations WHERE id = ?'); $n = 0;
+    foreach ($ids as $x) { $del->execute([$x]); $n += $del->rowCount(); }
+    $db->commit();
+    out(200, ['deleted' => $n]);
+  }
   default: fail(400, 'unknown action');
 }
 } catch (Throwable $e) {
