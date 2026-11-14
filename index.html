@@ -132,6 +132,7 @@ section:nth-of-type(even):not(.hero){background:linear-gradient(180deg,#fff,#fff
 .card h3{font-family:"DM Serif Display",serif;font-weight:400;font-size:19px}
 .card p{font-size:12.5px;color:var(--muted);margin:4px 0 14px;flex:1}
 .price{display:flex;justify-content:space-between;align-items:center}
+.price .ptax{font-size:.62em;font-weight:500;color:var(--muted);white-space:nowrap}
 .price b{font-family:"DM Serif Display",serif;font-weight:400;color:var(--pink);font-size:20px}
 .price a{width:30px;height:30px;border-radius:50%;background:var(--pink);color:#fff;display:grid;place-items:center;font-size:14px}
 
@@ -1145,17 +1146,17 @@ footer{margin-top:24px}
     </div>
     <p class="svc-empty" id="svcEmpty" hidden>No service matches “<span></span>”. Try another word, or <a href="#order" data-order="Custom Inquiry">make a custom order</a> ♡</p>
     <div class="services">
-      <div class="card"><div class="img art" style="--src:url(images/vtuber-witch.webp)"></div><h3>VTuber</h3><p>Live2D VTuber model: bust, half or full body.</p><div class="price"><b>From $100</b></div><button class="btn btn-pink req" data-order="VTuber">Order now</button></div>
-      <div class="card"><div class="img" style="--src:url(images/pkg-keikomi.webp)"></div><h3>VTuber Packages</h3><p>All-in-one debut bundle: model, rig, emotes and stream assets.</p><div class="price"><b>From $250</b></div><button class="btn btn-pink req" data-order="VTuber Packages">Order now</button></div>
-      <div class="card"><div class="img"></div><h3>PNGTuber</h3><p>Simple avatar with talking and idle states, ready for streaming.</p><div class="price"><b>From $60</b></div><button class="btn btn-pink req" data-order="PNGTuber">Order now</button></div>
-      <div class="card"><div class="img art" style="--src:url(images/mascot-pet.webp);background-position:center 30%"></div><h3>VTuber Pet</h3><p>A cute companion pet for your VTuber.</p><div class="price"><b>From $62.60</b></div><button class="btn btn-pink req" data-order="VTuber Pet">Order now</button></div>
-      <div class="card"><div class="img art" style="--src:url(images/emotes-witch.webp);background-color:#f7f7f7;background-position:center"></div><h3>Emotes</h3><p>Static or animated emotes tailored to your character.</p><div class="price"><b>From $5</b></div><button class="btn btn-pink req" data-order="Emotes">Order now</button></div>
-      <div class="card"><div class="img art" style="--src:url(images/pfp-glasses.webp);background-position:center 35%"></div><h3>Custom PFP</h3><p>Profile picture of your character for socials.</p><div class="price"><b>From $36</b></div><button class="btn btn-pink req" data-order="Custom PFP">Order now</button></div>
-      <div class="card extra"><div class="img"></div><h3>Banner</h3><p>Eye or mouth banner for your stream, static or animated.</p><div class="price"><b>From $45</b></div><button class="btn btn-pink req" data-order="Banner">Order now</button></div>
-      <div class="card extra"><div class="img art" style="--src:url(images/chibi-witch.webp);background-position:center 20%"></div><h3>Chibi VTuber</h3><p>Cute chibi version of your VTuber character.</p><div class="price"><b>From $45</b></div><button class="btn btn-pink req" data-order="Chibi VTuber">Order now</button></div>
-      <div class="card extra"><div class="img"></div><h3>VTuber Logo</h3><p>Custom name logo that matches your character and brand.</p><div class="price"><b>From $30</b></div><button class="btn btn-pink req" data-order="VTuber Logo">Order now</button></div>
-      <div class="card extra"><div class="img" style="--src:url(images/overlay-keikomi.webp)"></div><h3>Stream Overlay</h3><p>Matching stream screens, layouts and panels for your channel.</p><div class="price"><b>From $45</b></div><button class="btn btn-pink req" data-order="Stream Overlay">Order now</button></div>
-      <div class="card extra"><div class="img" style="--src:url(images/bg-stream-room.webp)"></div><h3>Background</h3><p>Original background for your stream layout.</p><div class="price"><b>From $100</b></div><button class="btn btn-pink req" data-order="Background">Order now</button></div>
+      <div class="card"><div class="img art" style="--src:url(images/vtuber-witch.webp)"></div><h3>VTuber</h3><p>Live2D VTuber model: bust, half or full body.</p><div class="price"><b>From $100 <small class="ptax">+ tax</small></b></div><button class="btn btn-pink req" data-order="VTuber">Order now</button></div>
+      <div class="card"><div class="img" style="--src:url(images/pkg-keikomi.webp)"></div><h3>VTuber Packages</h3><p>All-in-one debut bundle: model, rig, emotes and stream assets.</p><div class="price"><b>From $250 <small class="ptax">+ tax</small></b></div><button class="btn btn-pink req" data-order="VTuber Packages">Order now</button></div>
+      <div class="card"><div class="img"></div><h3>PNGTuber</h3><p>Simple avatar with talking and idle states, ready for streaming.</p><div class="price"><b>From $60 <small class="ptax">+ tax</small></b></div><button class="btn btn-pink req" data-order="PNGTuber">Order now</button></div>
+      <div class="card"><div class="img art" style="--src:url(images/mascot-pet.webp);background-position:center 30%"></div><h3>VTuber Pet</h3><p>A cute companion pet for your VTuber.</p><div class="price"><b>From $62.60 <small class="ptax">+ tax</small></b></div><button class="btn btn-pink req" data-order="VTuber Pet">Order now</button></div>
+      <div class="card"><div class="img art" style="--src:url(images/emotes-witch.webp);background-color:#f7f7f7;background-position:center"></div><h3>Emotes</h3><p>Static or animated emotes tailored to your character.</p><div class="price"><b>From $5 <small class="ptax">+ tax</small></b></div><button class="btn btn-pink req" data-order="Emotes">Order now</button></div>
+      <div class="card"><div class="img art" style="--src:url(images/pfp-glasses.webp);background-position:center 35%"></div><h3>Custom PFP</h3><p>Profile picture of your character for socials.</p><div class="price"><b>From $36 <small class="ptax">+ tax</small></b></div><button class="btn btn-pink req" data-order="Custom PFP">Order now</button></div>
+      <div class="card extra"><div class="img"></div><h3>Banner</h3><p>Eye or mouth banner for your stream, static or animated.</p><div class="price"><b>From $45 <small class="ptax">+ tax</small></b></div><button class="btn btn-pink req" data-order="Banner">Order now</button></div>
+      <div class="card extra"><div class="img art" style="--src:url(images/chibi-witch.webp);background-position:center 20%"></div><h3>Chibi VTuber</h3><p>Cute chibi version of your VTuber character.</p><div class="price"><b>From $45 <small class="ptax">+ tax</small></b></div><button class="btn btn-pink req" data-order="Chibi VTuber">Order now</button></div>
+      <div class="card extra"><div class="img"></div><h3>VTuber Logo</h3><p>Custom name logo that matches your character and brand.</p><div class="price"><b>From $30 <small class="ptax">+ tax</small></b></div><button class="btn btn-pink req" data-order="VTuber Logo">Order now</button></div>
+      <div class="card extra"><div class="img" style="--src:url(images/overlay-keikomi.webp)"></div><h3>Stream Overlay</h3><p>Matching stream screens, layouts and panels for your channel.</p><div class="price"><b>From $45 <small class="ptax">+ tax</small></b></div><button class="btn btn-pink req" data-order="Stream Overlay">Order now</button></div>
+      <div class="card extra"><div class="img" style="--src:url(images/bg-stream-room.webp)"></div><h3>Background</h3><p>Original background for your stream layout.</p><div class="price"><b>From $100 <small class="ptax">+ tax</small></b></div><button class="btn btn-pink req" data-order="Background">Order now</button></div>
       <div class="card extra"><div class="img" style="--src:url(images/illustration-cottage.webp);background-position:center 30%"></div><h3>Custom Inquiry</h3><p>Have an idea that is not listed? Describe it and name your price ♡</p><div class="price"><b>Your price</b></div><button class="btn btn-pink req" data-order="Custom Inquiry">Send inquiry</button></div>
     </div>
     <div class="sec-more"><button type="button" class="btn btn-ghost" id="svcAll" aria-expanded="false">View all services (12)</button><a href="/vtuber-pricing/" class="link arrow">Compare all prices </a></div>
@@ -1251,7 +1252,7 @@ footer{margin-top:24px}
     <div class="sec-head"><h2 class="serif">Questions &amp; answers</h2><a href="#tos" class="link arrow">Terms of Service </a></div>
     <p class="about-line" id="about"><b>Hi, I'm Keiko ♡</b> Digital artist &amp; Live2D studio making original VTuber models, chibi art, emotes and stream assets. Cute meets gothic, made from scratch with updates at every stage.</p>
     <div class="faq-grid">
-      <details><summary>How long does a commission take?</summary><p>VTuber models usually take 25–40 days, depending on complexity and the queue. Smaller pieces like PFPs, emotes and banners take about 3–7 days. Each service shows its estimate in the order form.</p></details>
+      <details><summary>How long does a commission take?</summary><p>VTuber models take 2–3 weeks (3 weeks at most), depending on complexity and the queue. Smaller pieces like PFPs, emotes and banners take about 3–7 days. Each service shows its estimate in the order form.</p></details>
       <details><summary>How do I pay?</summary><p>Send the order form. I review your order and email you your invoice (PDF) with a one-click PayPal link: card or PayPal balance, in USD. Larger projects can be split into installments (50% upfront, 50% before delivery).</p></details>
       <details><summary>Can I use the art commercially?</summary><p>Yes — streaming, monetized videos and social media are included. Merch / commercial rights are a $30 add-on for any service.</p></details>
       <details><summary>Will my model work in VTube Studio?</summary><p>Yes. Art + Rig and Rig only orders include a VTube Studio file, ready to stream with webcam or iPhone tracking. Art only orders get a layered PSD that's ready to rig.</p></details>
@@ -1567,13 +1568,13 @@ const VTUBERS = [   // VTuber yang pernah kamu buat. name & link opsional (link:
   { img:"av-vtuber-rocker", name:"Raven", link:"" },
 ];
 const SERVICES = {
-  "VTuber": { from: 100, eta: "25–40 days",
+  "VTuber": { from: 100, eta: "2–3 weeks",
     packages: [ ["Bust · Art only",100,"Ready-to-rig PSD"], ["Half body · Art only",150,"Ready-to-rig PSD"], ["Full body · Art only",250,"Ready-to-rig PSD"],
                 ["Bust · Art + Rig",150,"Live2D model + VTS file"], ["Half body · Art + Rig",250,"Live2D model + VTS file"], ["Full body · Art + Rig",400,"Live2D model + VTS file"],
                 ["Bust · Rig only",100,"Send me your PSD"], ["Half body · Rig only",150,"Send me your PSD"], ["Full body · Rig only",250,"Send me your PSD"] ],
     table: { cols:["Bust","Half","Full"], rows:[["Art only",[0,1,2]],["Art + Rig",[3,4,5]],["Rig only",[6,7,8]]] },
     addons:   [ ["Extra expression / toggle", 20], ["VBridger", 50], ["Extra outfit", 100], ["Extra hairstyle", 100], ["Commercial / merch rights", 30] ] },
-  "VTuber Packages": { from: 250, eta: "30–45 days",
+  "VTuber Packages": { from: 250, eta: "2–3 weeks",
     packages: [ ["Starter", 250, "Model art + Live2D rig + 3 expressions"],
                 ["Debut", 380, "Starter + 6 emotes + 1 background + overlay"],
                 ["Full Debut", 520, "Debut + PFP + VTuber logo + stream screens"] ],
