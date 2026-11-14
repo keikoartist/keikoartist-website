@@ -97,7 +97,7 @@ jobs:
                   await pg.wait_for_selector('#tyModal.show',timeout=90000)
                   await pg.wait_for_timeout(500)
                   st=await pg.evaluate("({t:$('#tyTitle').textContent,w:$('#tyWarn').textContent,id:$('#tyRefId').textContent,pay:!$('#tyPay').hidden,sum:$('#tySummary').innerText})")
-                  if st['pay'] or not isinstance(last.get('pdf'),int): raise Exception('request summary wrong: '+str(st)+' pdf '+str(last.get('pdf')))
+                  if not st['pay'] or not isinstance(last.get('pdf'),int): raise Exception('request summary wrong (PayPal button missing): '+str(st)+' pdf '+str(last.get('pdf')))
                   out.append(f"REQUEST OK {st['t']} {st['id']} {st['sum'].split(chr(10))[-1]} pdf {last.get('pdf')} [{st['w']}]")
               except Exception as e:
                   et=''

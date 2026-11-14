@@ -423,12 +423,23 @@ async function openOrder(id){
     const pl=o.paid>0?'remaining balance':k===.5?'50% deposit':k<.5?'1st of 3 installments':'';
     const body=`Hi ${o.name||'there'},\n\nThank you for your order at KeikoArts! ♡\n\nTotal: ${usd(tt)} USD${pl?`\nTo pay now (${pl}): ${usd(now)}`:''}\n\nPay with PayPal (one click, the amount is already filled in):\n${pay}\n\nYour invoice (PDF): ${url}\n\nI start as soon as the payment comes in. Just reply to this email if you have any questions!\n\nKeiko, KeikoArts`;
     return {subject:`Your KeikoArts invoice ${id}`,body};};
-  const gm=el('button','btn small','✉️ Email invoice (Gmail)');gm.type='button';
+  // one tap: the invoice email goes straight to the client (sent through FormSubmit; Keiko gets a copy)
+  const snd=el('button','btn small','📨 Send invoice to client');snd.type='button';
+  if(!o.email){snd.disabled=true;snd.title='This client did not leave an email';}
+  snd.onclick=async()=>{snd.disabled=true;snd.textContent='Sending…';
+    try{const m=await invMsg();const ctl=new AbortController(),to=setTimeout(()=>ctl.abort(),20000);
+      const r=await fetch('https://formsubmit.co/ajax/keikoarts22@gmail.com',{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},signal:ctl.signal,
+        body:JSON.stringify({_subject:`Invoice ${id} sent to ${o.name||'client'}`,_template:'box',_captcha:'false',name:o.name||'Client',email:o.email,Order:id,'Sent to the client':m.body,_autoresponse:m.body})});
+      clearTimeout(to);const jj=await r.json().catch(()=>null);
+      if(!(r.ok&&jj&&String(jj.success)==='true'))throw new Error('not sent');
+      snd.textContent='Sent to '+o.email+' ✓';}
+    catch(e){snd.disabled=false;snd.textContent='📨 Send invoice to client';if(e.message!=='login')alert('The email could not be sent right now. Please use "Email invoice (Gmail)" instead.');}};
+  const gm=el('button','btn ghost small','✉️ Email invoice (Gmail)');gm.type='button';
   if(!o.email){gm.disabled=true;gm.title='This client did not leave an email';}
   gm.onclick=async()=>{const w=window.open('','_blank');try{const m=await invMsg();const u='https://mail.google.com/mail/?view=cm&fs=1&to='+encodeURIComponent(o.email)+'&su='+encodeURIComponent(m.subject)+'&body='+encodeURIComponent(m.body);if(w)w.location.href=u;else location.href=u;}catch(e){if(w)w.close();if(e.message!=='login')alert(e.message);}};
   const cp=el('button','btn ghost small','📋 Copy message');cp.type='button';
   cp.onclick=async()=>{try{const m=await invMsg();try{await navigator.clipboard.writeText(m.body);cp.textContent='Copied ✓';}catch(_){prompt('Invoice message',m.body);}setTimeout(()=>cp.textContent='📋 Copy message',2500);}catch(e){if(e.message!=='login')alert(e.message);}};
-  links.append(tl,tot,gm,cp,pdfB,dcB);mc.appendChild(links);
+  links.append(tl,tot,snd,gm,cp,pdfB,dcB);mc.appendChild(links);
   // client
   const cc=el('div','card');cc.appendChild(el('h3',null,'Client'));const dl=el('dl','kv');
   kvRow(dl,'Name',o.name);kvRow(dl,'Discord',o.discord);kvRow(dl,'Email',o.email,o.email?'mailto:'+o.email+'?subject='+encodeURIComponent('Your KeikoArts order '+o.id):null);

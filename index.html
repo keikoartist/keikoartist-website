@@ -1464,7 +1464,7 @@ footer{margin-top:24px}
         <div class="ty-pay-top"><div><b id="tyPayT">Pay now to secure your slot</b><span id="tyPayInfo"></span></div><strong id="tyPayAmt"></strong></div>
         <a class="btn btn-paypal" id="tyPayBtn" href="#" target="_blank" rel="noopener"><span id="tyPayLabel">Pay with PayPal</span></a>
         <small id="tyPaySm">Secure checkout on PayPal (card or PayPal balance). Full refund if I can't take your request.</small>
-        <small class="ty-kofi">No PayPal? Pay via <a href="https://ko-fi.com/keikoarts" target="_blank" rel="noopener">Ko-fi</a> and put your <span id="tyKofiRef">Request ID</span> in the message.</small>
+        <small class="ty-kofi" hidden>Questions about paying? Email me at keikoarts22@gmail.com with your <span id="tyKofiRef">Request ID</span>.</small>
       </div>
       <div class="inv-actions" id="invActions" hidden><button type="button" class="btn btn-ghost" id="invSave">💾 Save invoice (PDF)</button><button type="button" class="btn btn-ghost" id="invCopy">🔗 Copy payment link</button></div>
       <h4 class="ty-h">What happens next</h4>
@@ -1969,7 +1969,9 @@ ORDER ${id} · ${dateStr}
 ${lineTxt}
 TOTAL: ${money2(invTotal)} USD${cmOn?' (incl. 13% tax)':' (estimate)'}
 
-I review your order and email you your invoice (PDF) within 6 hours, with a one-click PayPal link.
+${payUrl?`Pay ${money2(due)} now with PayPal (one click, the amount is already filled in):
+${payUrl}
+Full refund if I can't take your order.`:'I review your order and email you your invoice (PDF) within 6 hours, with a one-click PayPal link.'}
 Want to chat on Discord? Join my server and message me with your order ID:
 https://discord.gg/FbgWxMPjf
 
@@ -2007,7 +2009,7 @@ https://discord.gg/FbgWxMPjf
       const copy=(!j.dry_run&&!j.notified)?buildCopy(j.id,j.pay_url||'',j.date,j.files?j.files+' file(s) uploaded: see admin → Orders':''):null;
       if(copy&&j.pdf_url)copy['Invoice PDF (send to client)']=j.pdf_url;
       if(copy&&j.emailed)delete copy._autoresponse;
-      const lastInv={id:j.id,due:j.due,plan:j.plan,payUrl:'',rows,emailed:!!j.emailed,warn,key:j.key||''};
+      const lastInv={id:j.id,due:j.due,plan:j.plan,payUrl:j.pay_url||'',rows,emailed:!!j.emailed,warn,key:j.key||''};
       if(copy){$('#sendBtn').textContent='Almost done…';await Promise.race([sendCopy(copy),new Promise(z=>setTimeout(z,9000))]);}   // the email to Keiko goes out before the page can be closed
       done(lastInv);
       return;}
