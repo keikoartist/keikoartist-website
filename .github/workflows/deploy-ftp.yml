@@ -32,7 +32,21 @@ jobs:
         run: sleep 45
 
       - name: Upload changed files via FTP (retry)
+        id: ftp2
+        continue-on-error: true
         if: env.FTP_SERVER != '' && steps.ftp1.outcome == 'failure'
+        env:
+          FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
+          FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
+          FTP_DIR: ${{ secrets.FTP_DIR || 'public_html/' }}
+        run: python3 tools/ftp_deploy.py
+
+      - name: Wait before last retry
+        if: env.FTP_SERVER != '' && steps.ftp1.outcome == 'failure' && steps.ftp2.outcome == 'failure'
+        run: sleep 180
+
+      - name: Upload changed files via FTP (last retry)
+        if: env.FTP_SERVER != '' && steps.ftp1.outcome == 'failure' && steps.ftp2.outcome == 'failure'
         env:
           FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
           FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
