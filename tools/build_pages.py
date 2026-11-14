@@ -201,7 +201,7 @@ def service_ld(name, url, desc, low):
 V, P = SERVICES['VTuber'], SERVICES['PNGTuber']
 vp = {p[0]: p[1] for p in V['packages']}
 vadd = {a[0]: a[1] for a in V['addons']}
-PAY = 'Pay with a one-click PayPal link (card or PayPal balance) in USD: in full, 50/50 (half upfront, half before final files), or in 3 installments for orders above $150.'
+PAY = 'Pay with a one-click PayPal link (card or PayPal balance) in USD: in full, 50/50 (half upfront, half before final files), or in 3 installments for orders above $150. 13% tax is added on every invoice.'
 
 # ---------------------------------------------------------------- 1. custom VTuber model
 def custom_vtuber():
@@ -513,7 +513,7 @@ def pricing():
     faq = [
         ('How much does a custom VTuber model cost?', f'Art only starts at {money(vp["Bust · Art only"])} (bust); art + rig at {money(vp["Bust · Art + Rig"])}. A full-body model with rigging is {money(vp["Full body · Art + Rig"])}. See <a href="/custom-vtuber-model/">custom VTuber models</a>.'),
         ('Can I pay in installments?', 'Yes: 50/50 (half upfront, half before final files), or 3 installments for orders above $150.'),
-        ('Which currency do you use?', 'All prices are in US dollars (USD). You pay with a one-click PayPal link (card or PayPal balance).'),
+        ('Which currency do you use?', 'All prices are in US dollars (USD), before 13% tax, which is added on the invoice. You pay with a one-click PayPal link (card or PayPal balance).'),
         ('Why do some prices say "from"?', 'It is the starting price of the smallest package. The final price depends on the options and add-ons you choose, and is confirmed on your invoice.'),
         ('What does a VTuber debut package include?', '; '.join(f'{e(p[0])} ({money(p[1])}): {e(p[2])}' for p in SERVICES["VTuber Packages"]["packages"]) + '.'),
     ]

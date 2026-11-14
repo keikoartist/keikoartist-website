@@ -318,6 +318,7 @@ body:has(.modal.show) .fab-order{display:none}
 #orderForm>*,#sheet>*,.sec>*{min-width:0}#orderModal .mnav{min-width:0}#orderModal .mnav>.btn{flex-shrink:0}.mtot{min-width:0;overflow:hidden}.mtot b,.mtot small{display:block;overflow:hidden;text-overflow:ellipsis}
 .c-intro{font-size:13.5px;color:var(--muted);margin:-6px 0 0}
 .c-use{display:flex;flex-direction:column;gap:4px}
+.c-use label small{margin-left:5px;font-weight:500}
 .c-use>span{font-size:11.5px;color:var(--muted);font-weight:500;margin:-2px 0 0 4px}
 .chips{display:flex;gap:8px;min-height:46px;position:relative}
 .chips input{position:absolute;opacity:0;pointer-events:none;width:auto}
@@ -1267,7 +1268,7 @@ footer{margin-top:24px}
       <summary><span class="serif">Terms of Service</span><small>By ordering you agree to these terms. Tap to read.</small></summary>
       <div class="tos">
       <div><h4>1. Ordering</h4><p>Send the order form. I reply by email within 6 hours to confirm details and the final price. Your slot is secured once payment is received.</p></div>
-      <div><h4>2. Payment</h4><p>Once the details are confirmed, I send your invoice as a PDF with a one-click PayPal link (card or PayPal balance, USD). Choose full payment, 50/50 (50% upfront, 50% before final files), or 3× installments for orders above $150. Custom orders: you name the price and pay the full invoice upfront; 13% tax is added on the invoice.</p></div>
+      <div><h4>2. Payment</h4><p>Once the details are confirmed, I send your invoice as a PDF with a one-click PayPal link (card or PayPal balance, USD). Choose full payment, 50/50 (50% upfront, 50% before final files), or 3× installments for orders above $150. 13% tax is added on every invoice. Custom orders: you name the price and pay the full invoice upfront.</p></div>
       <div><h4>3. Process &amp; timeline</h4><p>Sketch → lineart → coloring → (rigging) → delivery. You get progress updates at every stage. Estimated time is shown in the form; rush delivery is available.</p></div>
       <div><h4>4. Revisions</h4><p>Unlimited small revisions during sketch. Up to 2 minor revisions after coloring; major changes after approval may have extra fees.</p></div>
       <div><h4>5. Refunds</h4><p>Full refund before work starts. After the sketch, refunds are based on completed work. No refund after final files are delivered.</p></div>
@@ -1413,7 +1414,7 @@ footer{margin-top:24px}
             </div>
             <div class="row">
               <label class="date-f" id="dateF"><span>Deadline / debut date <small>(optional)</small></span><input type="date" name="Deadline" id="fDeadline"></label>
-              <div class="c-use" id="useBox" hidden><span>Usage</span><div class="chips"><input type="radio" name="Usage" id="u1" value="Personal" checked disabled><label for="u1">Personal</label><input type="radio" name="Usage" id="u2" value="Commercial" disabled><label for="u2">Commercial</label></div></div>
+              <div class="c-use" id="useBox" hidden><span>Usage</span><div class="chips"><input type="radio" name="Usage" id="u1" value="Personal" checked disabled><label for="u1">Personal</label><input type="radio" name="Usage" id="u2" value="Commercial" disabled><label for="u2">Commercial <small>+$30</small></label></div></div>
             </div>
           </div>
 
@@ -1557,7 +1558,7 @@ const DETAILS = {   // deskripsi lengkap tiap service (muncul saat kartu diklik)
     notes:"Add toggles, hairstyles or outfits as needed." },
   "Custom Inquiry": { about:"Have an idea that isn't listed? Illustrations, stream assets or something new: just describe it.",
     includes:["Full illustrations and scenes","Stream screens, overlays and alerts","Anything else, priced to your budget"],
-    notes:"Name your price (+13% tax). I confirm the details and email you your invoice with a one-click PayPal link." },
+    notes:"Name your price (+13% tax; commercial use +$30). I confirm the details and email you your invoice with a one-click PayPal link." },
 };
 const VTUBERS = [   // VTuber yang pernah kamu buat. name & link opsional (link: Twitch/YouTube/X)
   { img:"av-vtuber-witch",  name:"Mirabelle", link:"" },
@@ -1758,7 +1759,7 @@ const sizeName=c=>c==='Half'?'Half body':c==='Full'?'Full body':c;
 function pickService(k){
   svc=SERVICES[k]; svcName=k; cmOn=!!svc.quote;
   $('#shName').textContent=k;
-  $('#shMeta').textContent=cmOn?'You name the price · 13% tax added':`From ${money(svc.from)} · ${svc.eta}`;
+  $('#shMeta').textContent=cmOn?'You name the price · 13% tax added':`From ${money(svc.from)} + 13% tax · ${svc.eta}`;
   $('#shThumb').style.backgroundImage=`url("${svcThumb(k)}")`;
   $('#shIntro').textContent=cmOn?'Tell me your idea and name your price ♡':'Choose your options and tell me your idea ♡';
   const mx=!!svc.table; $('#mx').hidden=!mx; $('#pkgOpts').hidden=mx;
@@ -1829,23 +1830,23 @@ function calc(){
   if(cmOn){
     const iv=invoice(), bud=iv.sub;
     $('#fService').value=svcName;$('#fPackage').value=svc.packages[0][0];$('#fQty').value=1;$('#fAddons').value='-';
-    $('#fTotal').value=bud?`${money2(iv.total)} (client's price ${money2(bud)} + 13% tax ${money2(iv.tax)})`:'-';
+    $('#fTotal').value=bud?`${money2(iv.total)} (client's price ${money2(bud)}${iv.com?' + commercial rights '+money2(iv.com):''} + 13% tax ${money2(iv.tax)})`:'-';
     $('#fSubject').value=`New custom order — ${bud?money2(iv.total)+' incl. tax':'no price'}`;
-    ORDER={lines:[[`Custom commission (${usageVal()} use)`,bud],['Tax (13%)',iv.tax]],total:iv.total,due:iv.total,plan:'Full payment',custom:true};
+    ORDER={lines:[[`Custom commission (${usageVal()} use)`,bud],...(iv.com?[['Commercial / merch rights',iv.com]]:[]),['Tax (13%)',iv.tax]],total:iv.total,due:iv.total,plan:'Full payment',custom:true};
     renderInv();return bud;
   }
   const pk=svc.packages[selIndex()], qty=svc.qty?Math.min(50,Math.max(1,parseInt($('#qty').value,10)||1)):1;
   const adds=$$('input[name=add]:checked').map(x=>svc.addons[+x.value]);
-  const base=r2(pk[1]*qty), sub=r2(base+adds.reduce((a,x)=>a+x[1],0)), rush=$('#rush').checked, rushAmt=rush?r2(sub*.25):0, t=r2(sub+rushAmt);
+  const base=r2(pk[1]*qty), sub=r2(base+adds.reduce((a,x)=>a+x[1],0)), rush=$('#rush').checked, rushAmt=rush?r2(sub*.25):0, pre=r2(sub+rushAmt), taxAmt=r2(pre*TAX), t=r2(pre+taxAmt);
   if(svc.table){const r=radioVal('mxType');
     $$('#mxSize label').forEach((l,i)=>{const sm=l.querySelector('small');if(sm)sm.textContent=money(svc.packages[svc.table.rows[r][1][i]][1]);});
     $('#mxPick').innerHTML=`You picked <b>${esc(pk[0])}</b> · ${money(pk[1])} · ${esc(pk[2])}`;}
-  const p3=$('#pp3'); p3.disabled=t<150; if(p3.disabled&&p3.checked)$('#pp1').checked=true;
+  const p3=$('#pp3'); p3.disabled=pre<150; if(p3.disabled&&p3.checked)$('#pp1').checked=true;
   const plan=$('input[name="Payment plan"]:checked').value, due=dueNow(t,plan);
   $('#fService').value=svcName;$('#fPackage').value=pk[0];$('#fQty').value=qty;
   $('#fAddons').value=[...adds.map(a=>a[0]),rush?'Rush delivery (+25%)':''].filter(Boolean).join(', ')||'-';
-  $('#fTotal').value=money(t);$('#fSubject').value=`New request: ${svcName} (${pk[0]}${svc.qty?' × '+qty:''}) — ${money(t)}`;
-  ORDER={lines:[[`${svcName} · ${pk[0]}${svc.qty?' × '+qty:''}`,base],...adds.map(a=>[a[0],a[1]]),...(rush?[['Rush delivery (+25%)',rushAmt]]:[])],total:t,due,plan,custom:false,rush};
+  $('#fTotal').value=money2(t)+' (incl. 13% tax)';$('#fSubject').value=`New request: ${svcName} (${pk[0]}${svc.qty?' × '+qty:''}) — ${money2(t)}`;
+  ORDER={lines:[[`${svcName} · ${pk[0]}${svc.qty?' × '+qty:''}`,base],...adds.map(a=>[a[0],a[1]]),...(rush?[['Rush delivery (+25%)',rushAmt]]:[]),['Tax (13%)',taxAmt]],total:t,due,plan,custom:false,rush};
   renderInv();return t;
 }
 function renderInv(){
@@ -1859,7 +1860,7 @@ function renderInv(){
 }
 
 // ===== PayPal =====
-function dueNow(total,plan){if(!(total>0))return 0;const k=/50\/50/.test(plan)?.5:/3x|3×/i.test(plan)?1/3:1;return Math.ceil(total*k*100)/100;}
+function dueNow(total,plan){if(!(total>0))return 0;const k=/50\/50/.test(plan)?.5:/3x|3×/i.test(plan)?1/3:1;return Math.ceil(+(total*k*100).toFixed(6))/100;}
 function planLabel(plan){return /50\/50/.test(plan)?'50% deposit':/3x|3×/i.test(plan)?'1st of 3 installments':'full payment';}
 function paypalLink(amount,id,label){
   if(!(amount>0))return '';
@@ -1875,13 +1876,14 @@ const PAY_ON=()=>!!((PAYPAL.email&&/@/.test(PAYPAL.email))||PAYPAL.me);
 // ===== invoice helpers =====
 const TAX=0.13, r2=n=>Math.round(n*100)/100;
 const money2=n=>'$'+(+n).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
-function invoice(){const sub=budget(),tax=r2(sub*TAX);return {sub,tax,total:r2(sub+tax)};}
+const COMMERCIAL_FEE=30;
+function invoice(){const sub=budget(),com=sub&&usageVal()==='Commercial'?COMMERCIAL_FEE:0,tax=r2((sub+com)*TAX);return {sub,com,tax,total:r2(sub+com+tax)};}
 const usageVal=()=>($('input[name=Usage]:checked')||{value:'Personal'}).value;
 function orderRows(){
   const refs=(refFiles.length?refFiles.length+' file(s)':'')+(form['Reference links'].value?(refFiles.length?' + links':'Links'):'')||'-';
   return [['Service',svcName],...(cmOn?[['Usage',usageVal()+' use']]:[['Package',$('#fPackage').value],['Add-ons',$('#fAddons').value],['Payment plan',$('input[name="Payment plan"]:checked').value]]),
     ['Deadline',$('#fDeadline').value||'-'],['Name',$('#fName').value],['Email',$('#fEmail').value||'-'],['Discord',$('#fDiscord').value||'-'],['References',refs],
-    ['Total',ORDER.total?money2(ORDER.total)+(ORDER.custom?' incl. 13% tax':' (estimate)'):'-']];
+    ['Total',ORDER.total?money2(ORDER.total)+' incl. 13% tax':'-']];
 }
 function err(m){const e=$('#err');e.textContent=m;e.style.display=m?'block':'none';}
 function valid(n){
@@ -1890,7 +1892,7 @@ function valid(n){
     const list=[$('#fDetails'),...(cmOn?[$('#budget')]:[]),$('#fDeadline'),$('#fName'),$('#fEmail'),$('#fDiscord')];
     for(const f of list)if(!f.checkValidity()){f.reportValidity();f.focus();return err(f.id==='budget'?'Please enter your price ($5 – $10,000).':f.id==='fDeadline'?'Please pick a deadline that is today or later.':f.id==='fEmail'?'Please enter your email, so I can send you your invoice.':'Please fill in the highlighted field.'),false;}
     if(cmOn&&!budget())return $('#budget').focus(),err('Please enter your price ($5 – $10,000).'),false;
-    if(!cmOn&&$('#pp3').checked&&calc()<150)return err('3 payments are available for orders above $150.'),false;
+    if(!cmOn&&$('#pp3').checked&&calc()/(1+TAX)<149.99)return err('3 payments are available for orders above $150.'),false;
   }
   err('');return true;
 }
@@ -1967,7 +1969,7 @@ form.addEventListener('submit',async e=>{
 
 ORDER ${id} · ${dateStr}
 ${lineTxt}
-TOTAL: ${money2(invTotal)} USD${cmOn?' (incl. 13% tax)':' (estimate)'}
+TOTAL: ${money2(invTotal)} USD (incl. 13% tax)
 
 ${payUrl?`Pay ${money2(due)} now with PayPal (one click, the amount is already filled in):
 ${payUrl}
@@ -1996,7 +1998,7 @@ https://discord.gg/FbgWxMPjf
     ['_next','_autoresponse','_subject','_captcha','_template','mxType','mxSize'].forEach(k=>fd.delete(k));
     [...fd.keys()].filter(k=>/^attachment\d+$/.test(k)).forEach(k=>fd.delete(k));
     fd.set('_up_token',upToken);fd.set('_up_files',upOk.map(f=>upState.get(f).fid).join(','));
-    fd.set('_lines',JSON.stringify(lines));fd.set('_price',cmOn?String(iv.sub):'0');fd.set('_total',String(totalNum||0));fd.set('_t',String(Math.max(0,Math.round((Date.now()-(sheetStart||Date.now()))/1000))));
+    fd.set('_lines',JSON.stringify(lines));fd.set('_taxed','1');fd.set('_price',cmOn?String(iv.sub):'0');fd.set('_total',String(totalNum||0));fd.set('_t',String(Math.max(0,Math.round((Date.now()-(sheetStart||Date.now()))/1000))));
     if(/[?&]dryrun=1/.test(location.search))fd.set('_dryrun','1');
     const prog=p=>{if(refFiles.length&&$('#sendBtn').dataset.busy)$('#sendBtn').textContent=p<.995?`Uploading… ${Math.round(p*100)}%`:'Sending…';};
     let res=await postOrder(fd,prog);
@@ -2313,7 +2315,7 @@ function showThanks(last){
   if(last){$('#tyRefId').textContent=last.id;$('#tyRef').hidden=false;
     $('#tySummary').innerHTML=last.rows.filter(r=>!(r[0]==='Discord'&&r[1]==='-')).map(([a,b])=>`<div><span>${esc(a)}</span><b>${esc(b)}</b></div>`).join('');$('#tySummary').hidden=false;}
   const payNow=last&&last.payUrl&&last.due>0;
-  if(payNow){$('#tyPay').hidden=false;$('#tyPayAmt').textContent=money(last.due);$('#tyPayInfo').textContent=planLabel(last.plan)+' · Request '+last.id;$('#tyPayBtn').href=last.payUrl;$('#tyPayLabel').textContent='Pay '+money(last.due)+' with PayPal';}
+  if(payNow){$('#tyPay').hidden=false;$('#tyPayAmt').textContent=money2(last.due);$('#tyPayInfo').textContent=planLabel(last.plan)+' · Request '+last.id;$('#tyPayBtn').href=last.payUrl;$('#tyPayLabel').textContent='Pay '+money2(last.due)+' with PayPal';}
   const inv=last&&last.inv;
   if(inv){
     const custom=inv.custom!==undefined?!!inv.custom:true;
