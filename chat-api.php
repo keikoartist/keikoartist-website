@@ -103,7 +103,27 @@ function discord_ping(array $cfg, array $c, string $text, bool $isNew): void {
 }
 
 /* ---------- admin auth (stateless signed token, no PHP sessions needed) ---------- */
-function admin_pw(array $cfg): string { return trim((string)($cfg['chat_admin_password'] ?? '')); }
+function ka_settings(): array { $j = json_decode((string)@file_get_contents(data_dir() . '/settings.json'), true); return is_array($j) ? $j : []; }
+function ka_save_settings(array $s): bool { $f = data_dir() . '/settings.json'; $ok = @file_put_contents($f, json_encode($s, JSON_UNESCAPED_SLASHES), LOCK_EX) !== false; @chmod($f, 0600); return $ok; }
+/* the admin secret: a password set with "Forgot password?" (stored hashed in settings.json) wins over the one in keikoarts-config.php */
+function admin_pw(array $cfg): string { $h = (string)(ka_settings()['admin_pw_hash'] ?? ''); return $h !== '' ? $h : trim((string)($cfg['chat_admin_password'] ?? '')); }
+function admin_pw_ok(array $cfg, string $try): bool {
+  $h = (string)(ka_settings()['admin_pw_hash'] ?? '');
+  if ($h !== '') return password_verify($try, $h);
+  $pw = trim((string)($cfg['chat_admin_password'] ?? ''));
+  return $pw !== '' && hash_equals(hash('sha256', $pw), hash('sha256', $try));
+}
+function ka_hook(array $cfg): string {
+  $re = '#^https://(?:ptb\.|canary\.)?(?:discord|discordapp)\.com/api/webhooks/\d+/[\w-]+$#';
+  $h = (string)($cfg['discord_webhook'] ?? ''); if (!preg_match($re, $h)) $h = (string)(ka_settings()['discord_webhook'] ?? '');
+  return preg_match($re, $h) ? $h : '';
+}
+function ka_post_json(string $url, array $payload, array $headers = []): int {
+  if (!function_exists('curl_init')) return 0;
+  $ch = curl_init($url);
+  curl_setopt_array($ch, [CURLOPT_POST => true, CURLOPT_POSTFIELDS => json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES), CURLOPT_HTTPHEADER => array_merge(['Content-Type: application/json', 'Accept: application/json'], $headers), CURLOPT_RETURNTRANSFER => true, CURLOPT_TIMEOUT => 12, CURLOPT_CONNECTTIMEOUT => 6]);
+  curl_exec($ch); $code = (int)curl_getinfo($ch, CURLINFO_HTTP_CODE); curl_close($ch); return $code;
+}
 function admin_key(array $cfg): string { return hash_hmac('sha256', 'keikoarts-admin-v1', admin_pw($cfg)); }
 function make_token(array $cfg): string { $exp = time() + 60 * 60 * 24 * 14; return $exp . '.' . hash_hmac('sha256', (string)$exp, admin_key($cfg)); }
 function require_admin(array $cfg): void {
@@ -168,10 +188,42 @@ switch ($action) {
     $st = $db->prepare('SELECT COUNT(*) FROM hits WHERE k = ? AND t > ?'); $st->execute([hash('sha256', $k), $now - 600]);
     if ((int)$st->fetchColumn() >= 10) fail(429, 'Too many wrong attempts. Please wait 10 minutes and try again.');
     usleep(300000);
-    if (!hash_equals(hash('sha256', $pw), hash('sha256', trim((string)($in['password'] ?? ''))))) {
+    if (!admin_pw_ok($cfg, trim((string)($in['password'] ?? '')))) {
       $db->prepare('INSERT INTO hits(k,t) VALUES(?,?)')->execute([hash('sha256', $k), $now]);
       fail(401, 'Wrong password.');
     }
+    out(200, ['token' => make_token($cfg)]);
+  }
+  case 'reset_request': {   // "Forgot password?": a one-time link (30 min) goes to Keiko's Discord and email
+    rate_limit('reset:' . client_ip(), 3, 3600); rate_limit('reset:all', 8, 3600);
+    $tok = bin2hex(random_bytes(24));
+    $s = ka_settings(); $s['reset_hash'] = hash('sha256', $tok); $s['reset_exp'] = time() + 1800;
+    if (!ka_save_settings($s)) fail(500, 'Could not create a reset link right now. Please try again later.');
+    $link = 'https://keikoartist.com/admin/#reset=' . $tok;
+    $sent = [];
+    $hook = ka_hook($cfg);
+    if ($hook && ka_post_json($hook, ['username' => 'KeikoArts Admin', 'allowed_mentions' => ['parse' => []], 'embeds' => [[
+        'title' => '🔑 Admin password reset', 'color' => 0xF2628F,
+        'description' => "Someone asked to reset the admin password on keikoartist.com.\n\n**[Tap here to set a new password]($link)**\n\nThe link works once, for 30 minutes. If this was not you, just ignore this message.",
+      ]]]) < 300) $sent[] = 'discord';
+    $mc = ka_post_json('https://formsubmit.co/ajax/keikoarts22@gmail.com', ['_subject' => 'KeikoArts admin: reset your password', '_template' => 'box', '_captcha' => 'false',
+      'Message' => "Someone asked to reset the admin password on keikoartist.com. Open this link to set a new password (works once, for 30 minutes):", 'Reset link' => $link,
+      'Not you?' => 'Just ignore this email. Your password stays the same.'], ['Origin: https://keikoartist.com', 'Referer: https://keikoartist.com/admin/']);
+    if ($mc >= 200 && $mc < 300) $sent[] = 'email';
+    if (!$sent) fail(502, 'The reset link could not be sent. Please try again in a few minutes.');
+    out(200, ['sent' => $sent]);
+  }
+  case 'reset_set': {
+    rate_limit('resetset:' . client_ip(), 10, 3600);
+    $tok = (string)($in['token'] ?? ''); $new = (string)($in['password'] ?? '');
+    $s = ka_settings();
+    if (!preg_match('/^[a-f0-9]{48}$/', $tok) || empty($s['reset_hash']) || (int)($s['reset_exp'] ?? 0) < time() || !hash_equals((string)$s['reset_hash'], hash('sha256', $tok)))
+      fail(400, 'This reset link has expired or was already used. Please tap "Forgot password?" again.');
+    if (mb_strlen(trim($new)) < 8 || mb_strlen($new) > 200) fail(400, 'Please use at least 8 characters.');
+    $s['admin_pw_hash'] = password_hash(trim($new), PASSWORD_DEFAULT); unset($s['reset_hash'], $s['reset_exp']); $s['admin_pw_changed'] = time();
+    if (!ka_save_settings($s)) fail(500, 'Could not save the new password. Please try again.');
+    $hook = ka_hook($cfg);
+    if ($hook) ka_post_json($hook, ['username' => 'KeikoArts Admin', 'allowed_mentions' => ['parse' => []], 'embeds' => [['title' => '✅ Admin password changed', 'color' => 0x1D9A55, 'description' => 'The admin password for keikoartist.com/admin was just changed. Other devices need to log in again.']]]);
     out(200, ['token' => make_token($cfg)]);
   }
   case 'me': { require_admin($cfg); out(200); }

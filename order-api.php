@@ -255,7 +255,7 @@ function after_response(callable $job): void {
 }
 
 /* ---------- admin auth (same login/token as the chat inbox) ---------- */
-function admin_pw(array $cfg): string { return trim((string)($cfg['chat_admin_password'] ?? '')); }
+function admin_pw(array $cfg): string { $h = (string)(settings()['admin_pw_hash'] ?? ''); return $h !== '' ? $h : trim((string)($cfg['chat_admin_password'] ?? '')); }   // same secret as chat-api.php (password set via "Forgot password?" wins)
 function admin_key(array $cfg): string { return hash_hmac('sha256', 'keikoarts-admin-v1', admin_pw($cfg)); }
 function require_admin(array $cfg, array $in): void {
   if (strlen(admin_pw($cfg)) < 8) fail(401, 'login required');

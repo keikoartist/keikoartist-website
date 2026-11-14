@@ -29,6 +29,8 @@ input:focus,textarea:focus{border-color:var(--pink-2);box-shadow:0 0 0 3px rgba(
 .login img{width:56px;height:56px;border-radius:50%;border:2px solid var(--pink);justify-self:center}
 .login h1{font-size:26px;text-align:center}
 .login p{font-size:12.5px;color:var(--muted);text-align:center}
+.login .linkbtn{background:none;border:0;color:var(--pink);font:inherit;font-size:13px;font-weight:600;cursor:pointer;padding:6px;justify-self:center;text-decoration:underline}
+.login .okmsg{font-size:13px;line-height:1.5;color:#1d7a4a;background:#effaf3;border:1px solid #bfe8cf;border-radius:12px;padding:10px 12px;text-align:center}
 .err{color:#c22b52;font-size:12.5px;min-height:1em}
 /* app */
 .app{height:100%;display:grid;grid-template-rows:auto 1fr}
@@ -149,6 +151,17 @@ select{padding:7px 10px;border:1px solid var(--line);border-radius:999px;backgro
     <input type="password" id="pw" placeholder="Admin password" autocomplete="current-password" required>
     <button class="btn" type="submit">Log in</button>
     <div class="err" id="loginErr" role="alert"></div>
+    <button type="button" class="linkbtn" id="forgotBtn">Forgot password?</button>
+    <div class="okmsg" id="forgotMsg" role="status" hidden></div>
+  </form>
+  <form id="resetForm" action="javascript:void(0)" hidden>
+    <img src="../images/pfp.webp" alt="">
+    <h1 class="serif">New password</h1>
+    <p>Choose a new admin password (at least 8 characters).</p>
+    <input type="password" id="npw" placeholder="New password" autocomplete="new-password" minlength="8" required>
+    <input type="password" id="npw2" placeholder="Type it again" autocomplete="new-password" minlength="8" required>
+    <button class="btn" type="submit">Save &amp; log in</button>
+    <div class="err" id="resetErr" role="alert"></div>
   </form>
 </div>
 
@@ -238,6 +251,19 @@ $('#loginForm').addEventListener('submit',async e=>{
   e.preventDefault();$('#loginErr').textContent='';
   try{const j=await api({action:'login',password:$('#pw').value});auth=j.token;store.set('ka_auth',auth);$('#pw').value='';showApp();}
   catch(err){$('#loginErr').textContent=err.message;}
+});
+$('#forgotBtn').onclick=async()=>{const b=$('#forgotBtn'),m=$('#forgotMsg');b.disabled=true;b.textContent='Sending…';$('#loginErr').textContent='';
+  try{const j=await api({action:'reset_request'});const w=(j.sent||[]).map(x=>x==='discord'?'your Discord (order notifications channel)':'keikoarts22@gmail.com');
+    m.textContent='✅ Reset link sent to '+w.join(' and ')+'. Tap it to set a new password (valid 30 minutes).';m.hidden=false;b.textContent='Send again';}
+  catch(e){$('#loginErr').textContent=e.message;b.textContent='Forgot password?';}
+  b.disabled=false;};
+const RESET_TOK=(location.hash.match(/^#reset=([a-f0-9]{48})$/)||[])[1]||'';
+if(RESET_TOK){$('#loginForm').hidden=true;$('#resetForm').hidden=false;}
+$('#resetForm').addEventListener('submit',async e=>{e.preventDefault();$('#resetErr').textContent='';
+  if($('#npw').value!==$('#npw2').value){$('#resetErr').textContent='The two passwords are not the same.';return;}
+  try{const j=await api({action:'reset_set',token:RESET_TOK,password:$('#npw').value});auth=j.token;store.set('ka_auth',auth);
+    history.replaceState(null,'',location.pathname);$('#resetForm').hidden=true;$('#loginForm').hidden=false;$('#npw').value=$('#npw2').value='';showApp();}
+  catch(err){$('#resetErr').textContent=err.message;}
 });
 $('#logout').onclick=()=>{auth='';store.set('ka_auth','');cur=null;showLogin();};
 
@@ -448,7 +474,7 @@ $('#hookDel').onclick=async()=>{try{await oapi({action:'settings_set',discord_we
 
 function alertBox(t){const p=el('div','err',t);$('#thread').appendChild(p);setTimeout(()=>p.remove(),4000);}
 
-(async()=>{auth=store.get('ka_auth','')||'';if(!auth){showLogin();return;}try{await api({action:'me'});showApp();}catch(_){showLogin();}})();
+(async()=>{auth=store.get('ka_auth','')||'';if(RESET_TOK){$('#loginView').hidden=false;$('#npw').focus();return;}if(!auth){showLogin();return;}try{await api({action:'me'});showApp();}catch(_){showLogin();}})();
 </script>
 </body>
 </html>
