@@ -215,8 +215,8 @@ const CANNED=[
 async function api(data){
   const r=await fetch(API,{method:'POST',headers:{'Content-Type':'application/json','X-Auth':auth},body:JSON.stringify(Object.assign({_auth:auth},data)),cache:'no-store'});
   let j={};try{j=await r.json()}catch(_){}
-  if(r.status===401&&data.action!=='login'&&data.action!=='me'){auth='';store.set('ka_auth','');showLogin();$('#loginErr').textContent='Session expired, please log in again.';throw new Error('login');}
-  if(!r.ok)throw new Error(j.error||'Connection problem');
+  if((r.status===401||j.error==='login required')&&data.action!=='login'&&data.action!=='me'){auth='';store.set('ka_auth','');showLogin();$('#loginErr').textContent='Session expired, please log in again.';throw new Error('login');}
+  if(!r.ok||j.ok===false)throw new Error(j.error||'Connection problem');
   return j;
 }
 const fmt=ts=>{const d=new Date(ts*1000),n=new Date();return d.toDateString()===n.toDateString()?d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}):d.toLocaleDateString([],{day:'numeric',month:'short'})+' '+d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})};
@@ -309,9 +309,10 @@ const usd=n=>(Number(n)<0?'-':'')+'$'+Math.abs(Number(n||0)).toLocaleString('en-
 async function oapi(data,raw){
   const r=await fetch(OAPI,{method:'POST',headers:{'Content-Type':'application/json','X-Auth':auth},body:JSON.stringify(Object.assign({_auth:auth},data)),cache:'no-store'});
   if(r.status===401){auth='';store.set('ka_auth','');showLogin();$('#loginErr').textContent='Session expired, please log in again.';throw new Error('login');}
-  if(raw){if(!r.ok)throw new Error('File not found');return r.blob();}
-  let j={};try{j=await r.json()}catch(_){}
-  if(!r.ok)throw new Error(j.error||'Connection problem');
+  if(raw&&r.ok&&!/json/.test(r.headers.get('content-type')||''))return r.blob();
+  let j={};try{j=await r.clone().json()}catch(_){if(raw){if(!r.ok)throw new Error('File not found');return r.blob();}}
+  if(j.error==='login required'){auth='';store.set('ka_auth','');showLogin();$('#loginErr').textContent='Session expired, please log in again.';throw new Error('login');}
+  if(!r.ok||j.ok===false)throw new Error(j.error||'Connection problem');
   return j;
 }
 function setMode(m){
@@ -326,7 +327,7 @@ function badge(n){const i=$('#newOrders');i.hidden=!n;i.textContent=n;
   if(lastNew>=0&&n>lastNew){beep();if('Notification' in window&&Notification.permission==='granted'&&document.visibilityState!=='visible'){try{new Notification('New order!',{body:'Someone placed an order on KeikoArts',icon:'../images/pfp.webp'})}catch(_){}}}
   lastNew=n;}
 async function pollOrders(){try{const j=await oapi({action:'count'});badge(Number(j.new)||0);if(mode==='orders')loadOrders();}catch(_){}}
-async function loadStorage(){try{const j=await oapi({action:'storage'});const mb=j.bytes/1048576;$('#storage').textContent=`💾 ${mb<10?mb.toFixed(1):Math.round(mb)} MB of files · ${j.orders} orders`;}catch(_){}}
+async function loadStorage(){try{const j=await oapi({action:'storage'});if(typeof j.bytes!=='number')return;const mb=j.bytes/1048576;$('#storage').textContent=`💾 ${mb<10?mb.toFixed(1):Math.round(mb)} MB of files · ${j.orders} orders`;}catch(_){}}
 $('#exportBtn').onclick=async()=>{const b=$('#exportBtn');b.disabled=true;b.textContent='Preparing…';
   try{const blob=await oapi({action:'export'},true);const u=URL.createObjectURL(blob),a=document.createElement('a');a.href=u;a.download='keikoarts-orders-'+new Date().toISOString().slice(0,10)+'.csv';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),5000);}
   catch(e){if(e.message!=='login')alert(e.message);}
@@ -335,7 +336,7 @@ async function loadOrders(){
   let j;try{j=await oapi({action:'list',status:ostatus})}catch(_){return}
   badge(Number(j.new)||0);
   const box=$('#oitems');box.innerHTML='';
-  if(!j.orders.length){box.appendChild(el('div','empty','No orders here yet ♡'));return;}
+  if(!Array.isArray(j.orders)||!j.orders.length){box.appendChild(el('div','empty','No orders here yet ♡'));return;}
   j.orders.forEach(o=>{
     const b=el('button','item'+(o.status==='new'?' unread':'')+(ocur===o.id?' on':''));b.type='button';
     b.appendChild(el('b',null,o.name||'Client'));b.appendChild(el('time',null,fmt(o.created)));
