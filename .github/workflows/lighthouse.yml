@@ -18,3 +18,13 @@ jobs:
           done; done
           jq -r '.audits["network-requests"].details.items|sort_by(-.transferSize)|.[0:12][]|"\(.transferSize/1024|round)KB \(.resourceType) \(.url|.[0:110])"' lh-mobile-.json | sed 's/^/::notice::heavy: /'
           jq -r '.audits["render-blocking-resources"].details.items[]?|"\(.wastedMs)ms \(.url|.[0:120])"' lh-mobile-.json | sed 's/^/::notice::blocking: /'
+          echo "=== DETAILS (homepage, mobile) ==="
+          for a in color-contrast heading-order target-size image-aspect-ratio; do
+            echo "--- $a"; jq -r --arg a "$a" '.audits[$a].details.items[]? | "\(.node.snippet // .url // "" | .[0:170]) || \(.node.explanation // .subItems.items[0].relatedNode.snippet // "" | .[0:230])"' lh-mobile-.json | head -25
+          done
+          echo "--- heavy"; jq -r '.audits["network-requests"].details.items|sort_by(-.transferSize)|.[0:14][]|"\(.transferSize/1024|round)KB \(.resourceType) \(.url|.[0:110])"' lh-mobile-.json
+          echo "--- heavy desktop"; jq -r '.audits["network-requests"].details.items|sort_by(-.transferSize)|.[0:8][]|"\(.transferSize/1024|round)KB \(.resourceType) \(.url|.[0:110])"' lh-desktop-.json
+          echo "--- blocking"; jq -r '.audits["render-blocking-resources"].details.items[]?|"\(.wastedMs)ms \(.url|.[0:120])"' lh-mobile-.json
+          echo "--- lcp phases"; jq -c '.audits["largest-contentful-paint-element"].details.items[1].items' lh-mobile-.json
+          echo "--- service page mobile blocking"; jq -r '.audits["render-blocking-resources"].details.items[]?|"\(.wastedMs)ms \(.url|.[0:120])"' lh-mobile-customvtubermodel.json
+          echo "--- service page a11y"; jq -r '.audits["color-contrast"].details.items[]? | "\(.node.snippet|.[0:150]) || \(.node.explanation|.[0:200])"' lh-mobile-customvtubermodel.json | head -8
