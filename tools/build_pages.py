@@ -68,12 +68,17 @@ ALT = {
 def img_size(name):
     with Image.open(os.path.join(ROOT, 'images', name + '.webp')) as im:
         return im.size
-def img(name, cls='', eager=False, sizes='(max-width:560px) 50vw, 260px'):
+def img(name, cls='', eager=False, sizes='(max-width:560px) 46vw, 260px', thumb=False):
     w, h = img_size(name)
     load = 'fetchpriority="high"' if eager else 'loading="lazy"'
-    return f'<img src="/images/{name}.webp" alt="{e(ALT.get(name, name))}" width="{w}" height="{h}" {load} decoding="async"{(" class=" + chr(34) + cls + chr(34)) if cls else ""}>'
+    ss = ''
+    tp = os.path.join(ROOT, 'images', 't', name + '.webp')
+    if thumb and os.path.exists(tp):   # small version for grids; the full image opens on click
+        with Image.open(tp) as ti: tw = ti.size[0]
+        if tw < w: ss = f' srcset="/images/t/{name}.webp {tw}w, /images/{name}.webp {w}w" sizes="{sizes}"'
+    return f'<img src="/images/{name}.webp"{ss} alt="{e(ALT.get(name, name))}" width="{w}" height="{h}" {load} decoding="async"{(" class=" + chr(34) + cls + chr(34)) if cls else ""}>'
 def fig(name, caption, wide=False):
-    return f'<figure{" class=\"wide\"" if wide else ""}><a href="/images/{name}.webp">{img(name)}</a><figcaption>{e(caption)}</figcaption></figure>'
+    return f'<figure{" class=\"wide\"" if wide else ""}><a href="/images/{name}.webp">{img(name, thumb=True, sizes="(max-width:560px) 94vw, 540px" if wide else "(max-width:560px) 46vw, 260px")}</a><figcaption>{e(caption)}</figcaption></figure>'
 RIG_VIDEO = ('<figure class="wide"><video src="/images/rigging-showcase.mp4" poster="/images/rigging-poster.webp" controls muted loop playsinline preload="none" '
              'width="1280" height="720" aria-label="Live2D rigging showcase: head turns, blinking and hair physics"></video><figcaption>Live2D rigging showcase</figcaption></figure>')
 
