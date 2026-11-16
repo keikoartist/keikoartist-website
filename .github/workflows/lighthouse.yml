@@ -1,0 +1,20 @@
+name: Speed test (Lighthouse, manual)
+on: workflow_dispatch
+permissions:
+  contents: read
+jobs:
+  lighthouse:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Run Lighthouse (phone + desktop)
+        run: |
+          npm i -g lighthouse@12 > /dev/null 2>&1
+          for u in "" "custom-vtuber-model/"; do for m in mobile desktop; do
+            f="lh-$m-$(echo "$u" | tr -dc a-z).json"
+            lighthouse "https://keikoartist.com/$u" $([ $m = desktop ] && echo --preset=desktop) --only-categories=performance,accessibility,best-practices,seo --chrome-flags="--headless=new --no-sandbox" --output=json --output-path="$f" --quiet || { echo "::warning::lighthouse failed for /$u $m"; continue; }
+            echo "::notice::/$u $m $(jq -c '{perf:(.categories.performance.score*100|round),a11y:(.categories.accessibility.score*100|round),bp:(.categories["best-practices"].score*100|round),seo:(.categories.seo.score*100|round),FCP:.audits["first-contentful-paint"].displayValue,LCP:.audits["largest-contentful-paint"].displayValue,TBT:.audits["total-blocking-time"].displayValue,CLS:.audits["cumulative-layout-shift"].displayValue,weight:.audits["total-byte-weight"].displayValue,ttfb:.audits["server-response-time"].displayValue}' "$f")"
+            echo "::notice::/$u $m LCP element: $(jq -r '[.audits["largest-contentful-paint-element"].details.items[0].items[0].node.snippet // "?"]|.[0]' "$f" | cut -c1-200)"
+            echo "::notice::/$u $m to fix: $(jq -r '[.audits[]|select(.score!=null and .score<0.9 and (.scoreDisplayMode=="metricSavings" or .scoreDisplayMode=="binary" or .scoreDisplayMode=="numeric"))|"\(.id)=\(.displayValue // (.score|tostring))"]|join(" | ")' "$f" | cut -c1-900)"
+          done; done
+          jq -r '.audits["network-requests"].details.items|sort_by(-.transferSize)|.[0:12][]|"\(.transferSize/1024|round)KB \(.resourceType) \(.url|.[0:110])"' lh-mobile-.json | sed 's/^/::notice::heavy: /'
+          jq -r '.audits["render-blocking-resources"].details.items[]?|"\(.wastedMs)ms \(.url|.[0:120])"' lh-mobile-.json | sed 's/^/::notice::blocking: /'
