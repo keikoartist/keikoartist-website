@@ -95,7 +95,7 @@ def addons_line(name):
 # ---------------------------------------------------------------- layout
 NAV = [('/', 'Home'), ('/custom-vtuber-model/', 'VTuber Models'), ('/live2d-rigging/', 'Live2D Rigging'),
        ('/custom-pngtuber-model/', 'PNGTuber'), ('/vtuber-pricing/', 'Pricing'), ('/vtuber-portfolio/', 'Portfolio')]
-FOOT = [('/custom-vtuber-model/', 'Custom VTuber Model'), ('/live2d-rigging/', 'Live2D Rigging'), ('/custom-pngtuber-model/', 'Custom PNGTuber Model'),
+FOOT = [('/custom-vtuber-model/', 'Custom VTuber Model'), ('/live2d-rigging/', 'Live2D Rigging'), ('/custom-pngtuber-model/', 'Custom PNGTuber Model'), ('/custom-twitch-emotes/', 'Custom Twitch Emotes'),
         ('/vtuber-pricing/', 'VTuber Pricing'), ('/vtuber-portfolio/', 'VTuber Portfolio'), ('/#faq', 'FAQ'), ('/#tos', 'Terms of Service')]
 
 def page(path, title, desc, h1, crumb, body, faq, og_image, order='', extra_ld=None, eyebrow='KeikoArts · VTuber art & Live2D studio'):
@@ -180,6 +180,7 @@ def related(exclude):
     items = [('/custom-vtuber-model/', 'Custom VTuber Model', 'Original Live2D model, bust to full body'),
              ('/live2d-rigging/', 'Live2D Rigging', 'Rig your art for VTube Studio'),
              ('/custom-pngtuber-model/', 'Custom PNGTuber Model', 'Idle + talking avatar, from $60'),
+             ('/custom-twitch-emotes/', 'Custom Twitch Emotes', 'Static and animated, from $5 each'),
              ('/vtuber-pricing/', 'VTuber Pricing', 'Every service and add-on'),
              ('/vtuber-portfolio/', 'VTuber Portfolio', 'Models, pets, emotes and more')]
     cards = ''.join(f'<a href="{u}"><b>{t}</b><span>{d}</span></a>' for u, t, d in items if u != exclude)
@@ -414,6 +415,70 @@ def pngtuber():
     return page('custom-pngtuber-model', 'Custom PNGTuber Model Commission | KeikoArtist', desc, 'Custom PNGTuber Model', 'Custom PNGTuber Model',
                 body, faq, imgs[0], 'PNGTuber', service_ld('Custom PNGTuber model', SITE + 'custom-pngtuber-model/', desc, P['from']))
 
+# ---------------------------------------------------------------- 3b. custom Twitch emotes
+def emotes():
+    E = SERVICES['Emotes']; D = DETAILS['Emotes']
+    pk = {p[0]: p[1] for p in E['packages']}; ad = {a[0]: a[1] for a in E['addons']}
+    imgs = GALLERY['Emotes']
+    body = f"""  <section class="wrap phero">
+    <div>
+      <p class="eyebrow">Emote commission</p>
+      <h1 class="serif">Custom Twitch Emotes</h1>
+      <p class="lead">{e(D["about"])} Hand-drawn static or animated emotes of your own character or VTuber, delivered in Twitch and Discord sizes.</p>
+      <div class="btns"><a class="btn btn-pink arrow" rel="nofollow" href="/?order=Emotes">Order your emotes</a><a class="btn btn-ghost" href="/vtuber-pricing/">See all prices</a></div>
+      <div class="facts"><span>Static <b>{money(pk["Static emote"])}</b> each</span><span>Animated <b>{money(pk["Animated emote"])}</b> each</span><span>About <b>{e(E["eta"])}</b></span></div>
+    </div>
+    <figure>{img(imgs[0], eager=True)}</figure>
+  </section>
+
+  <section class="sec"><div class="wrap">
+    <h2>Emote prices</h2>
+    {svc_table("Emotes")}
+    {addons_line("Emotes")}
+    <p class="note">{e(D["notes"])} Order as many as you like in one form; the total updates as you change the quantity.</p>
+  </div></section>
+
+  <section class="sec"><div class="wrap">
+    <h2>What you get</h2>
+    <div class="grid">{"".join(f'<div class="box"><p>{e(x)}</p></div>' for x in D["includes"])}</div>
+  </div></section>
+
+  <section class="sec"><div class="wrap">
+    <h2>Static or animated?</h2>
+    <div class="grid two">
+      <div class="box"><h3>Static emotes</h3><p>One clear expression per emote, as a transparent PNG. {money(pk["Static emote"])} per emote. Good for a first set: love, cry, hype, laugh.</p></div>
+      <div class="box"><h3>Animated emotes</h3><p>A short looping animation as a GIF, for reactions that need movement. {money(pk["Animated emote"])} per emote.</p></div>
+    </div>
+  </div></section>
+
+  <section class="sec"><div class="wrap">
+    <h2>Emote examples</h2>
+    <div class="gallery">{"".join(fig(x, "Animated emote set" if "animated" in x else "Twitch emotes", wide="animated" in x) for x in imgs)}</div>
+  </div></section>
+
+  <section class="sec"><div class="wrap">
+    <h2>How ordering works</h2>
+    <ol class="steps">
+      <li><b>Send the order form</b><span>Choose static or animated, set how many, and list the expressions you want (for example love, cry, hype, sleepy). Attach a reference of your character.</span></li>
+      <li><b>Get your invoice</b><span>I email you an invoice (PDF). {e(PAY)}</span></li>
+      <li><b>Drawing</b><span>Sketch first, then lineart and coloring, with updates along the way.</span></li>
+      <li><b>Upload and use</b><span>You receive transparent PNG or GIF files in 112, 56 and 28 px, ready to upload to Twitch or Discord.</span></li>
+    </ol>
+  </div></section>
+{related("/custom-twitch-emotes/")}
+{cta("Give your chat its own emotes", "Send your list of expressions and get your invoice by email.", "Emotes", "Order your emotes")}"""
+    faq = [
+        ('How much do custom Twitch emotes cost?', f'Static emotes are {money(pk["Static emote"])} each and animated emotes are {money(pk["Animated emote"])} each. A sub badge set (3 badges) is +{money(ad["Sub badge set (3)"])}. 13% tax is added on the invoice.'),
+        ('What sizes and files do I get?', 'Transparent PNG files for static emotes and GIF files for animated emotes, in 112, 56 and 28 px. Twitch-ready resizing is included.'),
+        ('How long do emotes take?', f'About {e(E["eta"])}, depending on how many you order and the queue. Rush delivery (+25%) is available in the order form.'),
+        ('Can you draw emotes of my VTuber or original character?', 'Yes. Attach a reference of your character in the order form and list the expressions you want.'),
+        ('Can I use the emotes on Discord too?', 'Yes. The files are sized for Twitch and Discord.'),
+        ('Can I use them on monetized streams?', 'Yes. Personal use, streaming, monetized content and social media are allowed. Merch / commercial rights are a $30 add-on.'),
+    ]
+    desc = f'Custom Twitch emotes of your character or VTuber: static {money(pk["Static emote"])} and animated {money(pk["Animated emote"])} per emote, in Twitch and Discord sizes. Sub badges available.'
+    return page('custom-twitch-emotes', 'Custom Twitch Emotes Commission | KeikoArtist', desc, 'Custom Twitch Emotes', 'Custom Twitch Emotes',
+                body, faq, imgs[0], 'Emotes', service_ld('Custom Twitch emotes', SITE + 'custom-twitch-emotes/', desc, E['from']))
+
 # ---------------------------------------------------------------- 4. portfolio
 def portfolio():
     cats = [('vtuber-models', 'VTuber models', 'VTuber', '/custom-vtuber-model/', 'Custom VTuber model', 'VTuber model'),
@@ -536,7 +601,7 @@ def not_found():
     out = re.sub(r'<script type="application/ld\+json">.*?</script>\n', '', out)
     return out
 
-PAGES = {'custom-vtuber-model': custom_vtuber, 'live2d-rigging': rigging, 'custom-pngtuber-model': pngtuber,
+PAGES = {'custom-vtuber-model': custom_vtuber, 'live2d-rigging': rigging, 'custom-pngtuber-model': pngtuber, 'custom-twitch-emotes': emotes,
          'vtuber-portfolio': portfolio, 'vtuber-pricing': pricing}
 for slug_, fn in PAGES.items():
     os.makedirs(os.path.join(ROOT, slug_), exist_ok=True)
