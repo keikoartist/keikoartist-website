@@ -16,4 +16,4 @@ jobs:
             done
           done
           c=$(curl -s -o r.txt -w "%{http_code} %{content_type}" -m 40 -A "$UA" "https://keikoartist.com/admin/"); echo "::notice::GET /admin/ -> $c | $(grep -o "OAPI='[^']*'" r.txt)"
-          echo "::notice::PING $(curl -s -m 30 -X POST -H 'Origin: https://keikoartist.com' 'https://keikoartist.com/order-api.php?a=ping')"
+          echo "::notice::PING $(curl -s -m 30 -X POST -H 'Origin: https://keikoartist.com' 'https://keikoartist.com/order-api.php?a=ping&net=1')"

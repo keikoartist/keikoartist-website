@@ -281,6 +281,7 @@ if (($_GET['a'] ?? '') === 'ping') {
              'mail' => function_exists('mail'), 'mail_in_disabled_list' => stripos((string)ini_get('disable_functions'), 'mail') !== false,
              'pdf' => !empty($_GET['pdf']) ? (function () { try { $s = order_pdf(['id' => 'INV-0000-0000', 'kind' => 'custom', 'name' => 'Test Ünïcode 名前', 'discord' => 'test', 'email' => '', 'service' => 'Custom Inquiry', 'package' => '', 'plan' => 'Full payment', 'price' => 100, 'tax' => 13, 'total' => 113, 'due' => 113, 'created' => time(), 'files' => '[]', 'fields' => json_encode(['Details' => "Line one ♡ 🎀\nCafé – “quotes”", 'Usage' => 'Personal'])]); return substr($s, 0, 5) === '%PDF-' ? strlen($s) : 'bad output'; } catch (Throwable $e) { return 'error: ' . $e->getMessage(); } })() : null,
              'php' => PHP_MAJOR_VERSION . '.' . PHP_MINOR_VERSION, 'sqlite' => in_array('sqlite', PDO::getAvailableDrivers(), true), 'data_writable' => is_writable(data_dir()),
+             'discord_set' => discord_hook($cfg) !== '',   // yes/no only, never the link
              'discord_reachable' => !empty($_GET['net']) ? (function () { rate_limit('net:' . client_ip(), 5, 3600); if (!function_exists('curl_init')) return 'no curl';
                  $ch = curl_init('https://discord.com/api/v10/gateway'); curl_setopt_array($ch, [CURLOPT_RETURNTRANSFER => true, CURLOPT_TIMEOUT => 6, CURLOPT_CONNECTTIMEOUT => 4]);
                  curl_exec($ch); $c = (int)curl_getinfo($ch, CURLINFO_HTTP_CODE); $e = curl_error($ch); curl_close($ch); return $c ? "HTTP $c" : "failed: $e"; })() : null,
