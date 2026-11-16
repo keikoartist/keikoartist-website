@@ -27,10 +27,11 @@
 {"@context":"https://schema.org","@graph":[{"@type":"WebSite","@id":"https://keikoartist.com/#website","url":"https://keikoartist.com/","name":"KeikoArtist","alternateName":["KeikoArts","keikoartist.com"],"inLanguage":"en","publisher":{"@id":"https://keikoartist.com/#studio"}},{"@type":"ProfessionalService","@id":"https://keikoartist.com/#studio","name":"KeikoArts","alternateName":"KeikoArtist","url":"https://keikoartist.com/","image":"https://keikoartist.com/images/hero.webp","logo":"https://keikoartist.com/images/pfp.webp","description":"Custom VTuber models, Live2D rigging, PNGTuber models, emotes, banners, logos and stream assets, drawn from scratch for streamers worldwide.","priceRange":"$5 - $520","areaServed":"Worldwide","currenciesAccepted":"USD","makesOffer":[{"@type":"Offer","url":"https://keikoartist.com/custom-vtuber-model/","priceCurrency":"USD","price":"100","itemOffered":{"@type":"Service","name":"Custom VTuber model"}},{"@type":"Offer","url":"https://keikoartist.com/live2d-rigging/","priceCurrency":"USD","price":"100","itemOffered":{"@type":"Service","name":"Live2D rigging"}},{"@type":"Offer","url":"https://keikoartist.com/custom-pngtuber-model/","priceCurrency":"USD","price":"60","itemOffered":{"@type":"Service","name":"Custom PNGTuber model"}}]},{"@type":"WebPage","@id":"https://keikoartist.com/#webpage","url":"https://keikoartist.com/","name":"Custom VTuber Model & Live2D Rigging | KeikoArtist","isPartOf":{"@id":"https://keikoartist.com/#website"},"about":{"@id":"https://keikoartist.com/#studio"},"primaryImageOfPage":"https://keikoartist.com/images/hero.webp","inLanguage":"en"}]}
 </script>
 <link rel="icon" href="images/pfp.webp">
-<link rel="preload" as="image" href="images/hero.webp" fetchpriority="high">
+<link rel="preload" as="image" href="images/hero.webp" imagesrcset="images/hero-800.webp 800w, images/hero-1200.webp 1200w, images/hero.webp 1600w" imagesizes="(max-width:1023px) 94vw, 46vw" fetchpriority="high">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Poppins:wght@400;500;600&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet"></noscript>
 <style>
 :root{
   --pink:#f2628f; --pink-2:#ff8fb1; --pink-soft:#ffe3ec; --pink-bg:#ffffff;
@@ -1092,7 +1093,7 @@ footer{margin-top:24px}
       </div>
     </div>
     <figure class="hero-art">
-      <img src="images/hero.webp" alt="Pink-haired witch VTuber character sitting on a crescent moon under a purple starry sky, illustrated by KeikoArts" width="1600" height="900" fetchpriority="high" decoding="async">
+      <img src="images/hero.webp" srcset="images/hero-800.webp 800w, images/hero-1200.webp 1200w, images/hero.webp 1600w" sizes="(max-width:1023px) 94vw, 46vw" alt="Pink-haired witch VTuber character sitting on a crescent moon under a purple starry sky, illustrated by KeikoArts" width="1600" height="900" fetchpriority="high" decoding="async">
       <figcaption>✦ Original art by KeikoArts</figcaption>
     </figure>
   </div>
@@ -2049,11 +2050,12 @@ $$('.card').forEach(card=>{
 });
 
 // service galleries (swipe / arrows / dots)
+const NOTHUMB=["emotes-animated-witch", "eye-banner-silver-animated"];   // animated images have no small version
 $$('.card').forEach(card=>{
   const name=card.querySelector('h3')?.textContent.trim(), list=GALLERY[name]; if(!list||!list.length)return;
   const old=card.querySelector('.img');
   const g=document.createElement('div'); g.className='gal';
-  g.innerHTML=`<div class="gal-track">${list.map(f=>`<div class="gal-slide${WIDE.includes(f)?' wide':''}${CONTAIN.includes(f)?' contain':''}" data-bg="images/${f}.webp" role="img" aria-label="${name} example"></div>`).join('')}</div>`+
+  g.innerHTML=`<div class="gal-track">${list.map(f=>`<div class="gal-slide${WIDE.includes(f)?' wide':''}${CONTAIN.includes(f)?' contain':''}" data-bg="images/${NOTHUMB.includes(f)?'':'t/'}${f}.webp" role="img" aria-label="${name} example"></div>`).join('')}</div>`+
     (list.length>1?`<button class="gal-btn prev" type="button" aria-label="Previous">‹</button><button class="gal-btn next" type="button" aria-label="Next">›</button><div class="gal-dots">${list.map((_,i)=>`<i class="${i?'':'on'}"></i>`).join('')}</div>`:'');
   old.replaceWith(g);
   if(list.length<2)return;
@@ -2144,7 +2146,9 @@ $$('.card').forEach(card=>{
   const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){const t=e.target;
     const first=t.querySelector('.gal-slide[data-bg]');if(first)loadSlide(first);
     // load the rest after first is shown
-    setTimeout(()=>t.querySelectorAll('.gal-slide[data-bg]').forEach(loadSlide),400);io.unobserve(t);}}),{rootMargin:'200px'});
+    const rest=()=>t.querySelectorAll('.gal-slide[data-bg]').forEach(loadSlide);
+    ['pointerenter','touchstart','focusin'].forEach(ev=>t.addEventListener(ev,rest,{once:true,passive:true}));
+    const tk=t.querySelector('.gal-track');if(tk)tk.addEventListener('scroll',rest,{once:true,passive:true});io.unobserve(t);}}),{rootMargin:'200px'});
   $$('.gal').forEach(g=>io.observe(g));
   const v=$('#rigVid');if(!v)return;
   const anyModal=()=>!!document.querySelector('.modal.show,.sd.show,.lb.show');
