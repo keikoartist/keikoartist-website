@@ -1,0 +1,29 @@
+name: Speed A/B (manual, compares commits on the test runner)
+on:
+  workflow_dispatch:
+    inputs:
+      shas:
+        description: 'Commits to compare (space separated)'
+        required: true
+permissions:
+  contents: read
+jobs:
+  ab:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v5
+        with: { fetch-depth: 0 }
+      - name: Lighthouse phone test, 5 runs per commit, same local server
+        env:
+          SHAS: ${{ inputs.shas }}
+        run: |
+          npm i -g lighthouse@12 serve@14 > /dev/null 2>&1
+          port=8100
+          for sha in $SHAS; do
+            port=$((port+1)); git worktree add -q "../v-$sha" "$sha"
+            (serve -l $port "../v-$sha" > /dev/null 2>&1 &); sleep 3
+            for i in 1 2 3 4 5; do
+              lighthouse "http://localhost:$port/" --only-categories=performance --chrome-flags="--headless=new --no-sandbox" --output=json --output-path="r-$sha-$i.json" --quiet || true
+            done
+            echo "::notice::$sha perf $(jq -s -c '[.[].categories.performance.score*100|round]|sort' r-$sha-*.json) FCP $(jq -s -c '[.[].audits["first-contentful-paint"].numericValue|round]|sort' r-$sha-*.json) LCP $(jq -s -c '[.[].audits["largest-contentful-paint"].numericValue|round]|sort' r-$sha-*.json) TBT $(jq -s -c '[.[].audits["total-blocking-time"].numericValue|round]|sort' r-$sha-*.json) weightKB $(jq -s -c '[.[].audits["total-byte-weight"].numericValue/1024|round]|sort|.[2]' r-$sha-*.json)"
+          done
