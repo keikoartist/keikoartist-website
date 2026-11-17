@@ -136,10 +136,47 @@ function prune_files(): void {   // reference files of finished orders are remov
   foreach ($st->fetchAll() as $r) { rrmdir(data_dir() . '/order-files/' . $r['id']); $db->prepare('UPDATE orders SET files_removed = 1 WHERE id = ?')->execute([$r['id']]); }
 }
 function dir_bytes(string $d): int { $n = 0; if (!is_dir($d)) return 0; foreach (new RecursiveIteratorIterator(new RecursiveDirectoryIterator($d, FilesystemIterator::SKIP_DOTS)) as $f) $n += $f->getSize(); return $n; }
+/* ---- email through the studio's own Gmail (address + App Password saved in admin -> Settings, kept in settings.json outside the public folder) ---- */
+function smtp_cfg(): array { $s = settings(); $u = (string)($s['gmail_user'] ?? ''); $p = (string)($s['gmail_pass'] ?? ''); return ($u !== '' && $p !== '') ? [$u, $p] : []; }
+function smtp_cmd($fp, ?string $cmd, array $ok): string {
+  if ($cmd !== null) fwrite($fp, $cmd . "\r\n");
+  $resp = '';
+  while (($l = fgets($fp, 600)) !== false) { $resp .= $l; if (strlen($l) < 4 || $l[3] === ' ') break; }
+  if (!in_array((int)substr($resp, 0, 3), $ok, true)) throw new RuntimeException(trim(substr($resp, 0, 160)) ?: 'no answer from the mail server');
+  return $resp;
+}
+function smtp_open(string $user, string $pass) {
+  $e = 0; $m = '';
+  $fp = @stream_socket_client('ssl://smtp.gmail.com:465', $e, $m, 8);
+  if (!$fp) throw new RuntimeException('could not connect to Gmail' . ($m ? " ($m)" : ''));
+  stream_set_timeout($fp, 15);
+  smtp_cmd($fp, null, [220]); smtp_cmd($fp, 'EHLO keikoartist.com', [250]);
+  smtp_cmd($fp, 'AUTH LOGIN', [334]); smtp_cmd($fp, base64_encode($user), [334]); smtp_cmd($fp, base64_encode($pass), [235]);
+  return $fp;
+}
+function smtp_send(string $to, string $raw): bool {
+  $c = smtp_cfg(); if (!$c || !filter_var($to, FILTER_VALIDATE_EMAIL)) { $GLOBALS['mail_err'] = 'email is not set up'; return false; }
+  try {
+    if (empty($GLOBALS['smtp_fp'])) {   // one connection per request, reused for every email of that request
+      $GLOBALS['smtp_fp'] = smtp_open($c[0], $c[1]);
+      register_shutdown_function(function () { if (!empty($GLOBALS['smtp_fp'])) { @fwrite($GLOBALS['smtp_fp'], "QUIT\r\n"); @fclose($GLOBALS['smtp_fp']); $GLOBALS['smtp_fp'] = null; } });
+    }
+    $fp = $GLOBALS['smtp_fp'];
+    smtp_cmd($fp, 'MAIL FROM:<' . $c[0] . '>', [250]); smtp_cmd($fp, 'RCPT TO:<' . $to . '>', [250, 251]); smtp_cmd($fp, 'DATA', [354]);
+    $raw = preg_replace('/^\./m', '..', str_replace(["\r\n", "\r", "\n"], ["\n", "\n", "\r\n"], $raw));
+    fwrite($fp, $raw . "\r\n.\r\n"); smtp_cmd($fp, null, [250]);
+    return true;
+  } catch (Throwable $ex) {
+    $GLOBALS['mail_err'] = $ex->getMessage();
+    if (!empty($GLOBALS['smtp_fp'])) { @fclose($GLOBALS['smtp_fp']); } $GLOBALS['smtp_fp'] = null;
+    return false;
+  }
+}
 function send_mail(string $to, string $subject, string $html, string $text, string $replyTo = '', array $attach = []): bool {
-  if (!function_exists('mail')) return false;
+  $smtp = smtp_cfg();
+  if (!$smtp && !function_exists('mail')) return false;
   $b1 = 'mix_' . bin2hex(random_bytes(8)); $b2 = 'alt_' . bin2hex(random_bytes(8));
-  $headers = ['From: KeikoArts <' . MAIL_FROM . '>', 'MIME-Version: 1.0', 'X-Mailer: KeikoArts'];
+  $headers = ['From: KeikoArts <' . ($smtp ? $smtp[0] : MAIL_FROM) . '>', 'MIME-Version: 1.0', 'X-Mailer: KeikoArts'];
   if ($replyTo !== '' && filter_var($replyTo, FILTER_VALIDATE_EMAIL)) $headers[] = 'Reply-To: ' . $replyTo;
   $alt = "--$b2\r\nContent-Type: text/plain; charset=UTF-8\r\nContent-Transfer-Encoding: base64\r\n\r\n" . chunk_split(base64_encode($text))
        . "--$b2\r\nContent-Type: text/html; charset=UTF-8\r\nContent-Transfer-Encoding: base64\r\n\r\n" . chunk_split(base64_encode($html)) . "--$b2--\r\n";
@@ -154,6 +191,7 @@ function send_mail(string $to, string $subject, string $html, string $text, stri
   } else { $headers[] = "Content-Type: multipart/alternative; boundary=\"$b2\""; $body = $alt; }
   $subj = '=?UTF-8?B?' . base64_encode($subject) . '?=';
   $hdr = implode("\r\n", $headers);
+  if ($smtp) return smtp_send($to, "To: <$to>\r\nSubject: $subj\r\nDate: " . date('r') . "\r\nMessage-ID: <" . bin2hex(random_bytes(12)) . "@keikoartist.com>\r\n" . $hdr . "\r\n\r\n" . $body);
   $ok = @mail($to, $subj, $body, $hdr, '-f' . MAIL_FROM);
   if (!$ok) $ok = @mail($to, $subj, $body, $hdr);
   return (bool)$ok;
@@ -285,6 +323,7 @@ if (($_GET['a'] ?? '') === 'ping') {
              'discord_reachable' => !empty($_GET['net']) ? (function () { rate_limit('net:' . client_ip(), 5, 3600); if (!function_exists('curl_init')) return 'no curl';
                  $ch = curl_init('https://discord.com/api/v10/gateway'); curl_setopt_array($ch, [CURLOPT_RETURNTRANSFER => true, CURLOPT_TIMEOUT => 6, CURLOPT_CONNECTTIMEOUT => 4]);
                  curl_exec($ch); $c = (int)curl_getinfo($ch, CURLINFO_HTTP_CODE); $e = curl_error($ch); curl_close($ch); return $c ? "HTTP $c" : "failed: $e"; })() : null,
+             'mail_set' => (bool)smtp_cfg(),
              'smtp_gmail' => !empty($_GET['net']) ? (function () { $e = 0; $m = ''; $fp = @fsockopen('ssl://smtp.gmail.com', 465, $e, $m, 6); if (!$fp) return "blocked ($e $m)"; $l = (string)fgets($fp, 200); fclose($fp); return 'open ' . substr(trim($l), 0, 3); })() : null,
              'paypal_reachable' => !empty($_GET['net']) && function_exists('curl_init') ? (function () {
                  $ch = curl_init('https://ipnpb.paypal.com/cgi-bin/webscr'); curl_setopt_array($ch, [CURLOPT_POST => true, CURLOPT_POSTFIELDS => 'cmd=_notify-validate', CURLOPT_RETURNTRANSFER => true, CURLOPT_TIMEOUT => 10, CURLOPT_CONNECTTIMEOUT => 6]);
@@ -576,6 +615,7 @@ if (($_GET['a'] ?? '') === 'submit') {
   $text = $titleTxt . "\n\n";
   foreach ($sum + $fields as $k => $v) $text .= "$k: $v\n";
   $text .= "\n$fileNote\nAdmin: {$SITE}admin/\n";
+  if (smtp_cfg() && $bytes > 3 * 1048576) { $attach = []; $text .= "(Reference files: open the admin inbox.)\n"; }   // big files stay in the admin, so the order form answers quickly
   $mailed = send_mail(OWNER_EMAIL, $titleTxt, $html, $text, $email, $attach);
   if ($attach && !$mailed) $mailed = send_mail(OWNER_EMAIL, $titleTxt, $html, $text . "\n(Files were too big for email — see the admin inbox.)", $email);
 
@@ -598,8 +638,15 @@ if (($_GET['a'] ?? '') === 'submit') {
       $body = "<p>Hi $cn, thank you for your commission request at KeikoArts! ♡</p><p>Request ID: <b style=\"color:#f2628f\">" . h($id) . '</b><br>Service: ' . h($service . ' (' . $o['package'] . ')') . '<br>Estimated total: ' . money2($total) . '<br>Payment plan: ' . h($plan) . '</p>';
       $txt = "Hi " . (no_links($name) ?: 'there') . ", thank you for your commission request at KeikoArts!\n\nRequest ID: $id\nService: $service ({$o['package']})\nEstimated total: " . money2($total) . "\nPayment plan: $plan\n\n";
     }
-    $body .= '<p>I review your order and email you your invoice (PDF) within 6 hours. You pay securely with PayPal (one click, card or PayPal balance).</p><p>Want to chat on Discord? <a href="' . DISCORD_USER . '">Join my server</a> and send your order ID <b>' . h($id) . '</b>.</p><p>— Keiko, KeikoArts</p>';
-    $txt .= "I review your order and email you your invoice (PDF) within 6 hours. You pay securely with PayPal (one click, card or PayPal balance).\nWant to chat on Discord? Join my server and send your order ID $id:\n" . DISCORD_USER . "\n\n— Keiko, KeikoArts";
+    $pdfUrl = pdf_link(['id' => $id, 'view_key' => $vkey], $SITE);
+    if ($payUrl !== '') {
+      $body .= '<p style="margin:16px 0"><a href="' . h($payUrl) . '" style="display:inline-block;background:#ffc439;color:#003087;font-weight:bold;text-decoration:none;padding:12px 22px;border-radius:999px">Pay ' . money2($due) . ' with PayPal</a></p>'
+             . '<p>One click, the amount is already filled in (card or PayPal balance). ' . ($due < $total ? 'This is your first payment (' . h($plan) . '). ' : '') . "Full refund if I can't take your order.</p>"
+             . '<p>Your invoice (PDF): <a href="' . h($pdfUrl) . '">open invoice</a></p>';
+      $txt .= "Pay " . money2($due) . " with PayPal (one click, the amount is already filled in):\n$payUrl\n" . ($due < $total ? "This is your first payment ($plan).\n" : '') . "Full refund if I can't take your order.\n\nYour invoice (PDF): $pdfUrl\n\n";
+    }
+    $body .= '<p>' . ($payUrl !== '' ? 'I start as soon as the payment comes in.' : 'I review your order and email you your invoice (PDF) within 6 hours. You pay securely with PayPal (one click, card or PayPal balance).') . '</p><p>Want to chat on Discord? <a href="' . DISCORD_USER . '">Join my server</a> and send your order ID <b>' . h($id) . '</b>.</p><p>— Keiko, KeikoArts</p>';
+    $txt .= ($payUrl !== '' ? "I start as soon as the payment comes in." : "I review your order and email you your invoice (PDF) within 6 hours. You pay securely with PayPal (one click, card or PayPal balance).") . "\nWant to chat on Discord? Join my server and send your order ID $id:\n" . DISCORD_USER . "\n\n— Keiko, KeikoArts";
     $clientMailed = send_mail($email, $subj, '<div style="font-family:Arial,sans-serif;color:#7a2846;font-size:14px">' . $body . '</div>', $txt, OWNER_EMAIL);
   }
   $db->prepare('UPDATE orders SET mailed = ? WHERE id = ?')->execute([$mailed ? 1 : 0, $id]);
@@ -733,7 +780,9 @@ switch ($action) {
   }
   case 'settings_get': {
     $h = discord_hook($cfg);
-    jout(200, ['discord_set' => $h !== '', 'discord_hint' => $h ? substr($h, 0, 40) . '…' . substr($h, -4) : '', 'from_config' => preg_match(HOOK_RE, (string)($cfg['discord_webhook'] ?? '')) === 1]);
+    $mc = smtp_cfg();
+    jout(200, ['discord_set' => $h !== '', 'discord_hint' => $h ? substr($h, 0, 40) . '…' . substr($h, -4) : '', 'from_config' => preg_match(HOOK_RE, (string)($cfg['discord_webhook'] ?? '')) === 1,
+               'mail_set' => (bool)$mc, 'mail_user' => $mc ? $mc[0] : '']);   // the App Password itself is never sent back
   }
   case 'settings_set': {
     $h = trim((string)($in['discord_webhook'] ?? ''));
@@ -741,6 +790,35 @@ switch ($action) {
     $s = settings(); if ($h === '') unset($s['discord_webhook']); else $s['discord_webhook'] = $h;
     if (!save_settings($s)) fail(500, 'Could not save the setting on the server.');
     jout(200, ['discord_set' => $h !== '']);
+  }
+  case 'mail_set': {   // Gmail address + App Password for sending emails to clients; checked with Gmail before it is saved
+    $u = strtolower(trim((string)($in['gmail_user'] ?? ''))); $pw = preg_replace('/\s+/', '', (string)($in['gmail_pass'] ?? ''));
+    $s = settings();
+    if ($u === '' && $pw === '') { unset($s['gmail_user'], $s['gmail_pass']); if (!save_settings($s)) fail(500, 'Could not save the setting on the server.'); jout(200, ['mail_set' => false]); }
+    if (!filter_var($u, FILTER_VALIDATE_EMAIL) || !preg_match('/@(gmail|googlemail)\.com$/', $u)) fail(400, 'Please enter your Gmail address.');
+    if (strlen($pw) !== 16 || !ctype_alpha($pw)) fail(400, 'That does not look like an App Password. It is 16 letters, made at myaccount.google.com/apppasswords (not your normal Gmail password).');
+    try { $fp = smtp_open($u, $pw); @fwrite($fp, "QUIT\r\n"); @fclose($fp); }
+    catch (Throwable $ex) { fail(400, strpos($ex->getMessage(), '535') !== false ? 'Gmail did not accept this App Password. Please create a new one and paste it again.' : 'Could not sign in to Gmail: ' . $ex->getMessage()); }
+    $s['gmail_user'] = $u; $s['gmail_pass'] = $pw;
+    if (!save_settings($s)) fail(500, 'Could not save the setting on the server.');
+    jout(200, ['mail_set' => true]);
+  }
+  case 'mail_test': {
+    $mc = smtp_cfg(); if (!$mc) fail(400, 'Email is not set up yet.');
+    $ok = send_mail($mc[0], 'KeikoArts website: email is working', '<p>✅ Emails from keikoartist.com are now sent from this Gmail address.</p>', "Emails from keikoartist.com are now sent from this Gmail address.");
+    if ($ok) jout(200, ['sent' => true, 'to' => $mc[0]]);
+    fail(502, 'The test email could not be sent: ' . ($GLOBALS['mail_err'] ?? 'unknown error'));
+  }
+  case 'mail_client': {   // "Send invoice to client": the message written in the admin goes out from the studio's Gmail
+    if (!smtp_cfg()) fail(409, 'mail not set up');
+    $o = order_row((string)($in['id'] ?? ''));
+    if (!filter_var((string)$o['email'], FILTER_VALIDATE_EMAIL)) fail(400, 'This client did not leave a valid email.');
+    $subj = trim(preg_replace('/[\r\n]+/', ' ', mb_substr((string)($in['subject'] ?? ''), 0, 150))) ?: 'Your KeikoArts invoice ' . $o['id'];
+    $msg = mb_substr((string)($in['body'] ?? ''), 0, 6000); if (trim($msg) === '') fail(400, 'The message is empty.');
+    $html = preg_replace('#(https?://[^\s<]+)#', '<a href="$1">$1</a>', nl2br(h($msg)));
+    $ok = send_mail((string)$o['email'], $subj, '<div style="font-family:Arial,sans-serif;color:#7a2846;font-size:14px;line-height:1.55">' . $html . '</div>', $msg, OWNER_EMAIL);
+    if ($ok) jout(200, ['sent' => true, 'to' => $o['email']]);
+    fail(502, 'The email could not be sent: ' . ($GLOBALS['mail_err'] ?? 'unknown error'));
   }
   case 'settings_test': {
     $h = discord_hook($cfg); if ($h === '') fail(400, 'No Discord webhook saved yet.');

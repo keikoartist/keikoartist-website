@@ -153,6 +153,9 @@ select{padding:7px 10px;border:1px solid var(--line);border-radius:999px;backgro
 .set-status.on{background:#e3f6e9;color:#1d7a43}
 .set-status small{display:block;font-weight:400;color:var(--muted);word-break:break-all}
 .set-steps{font-size:13px;padding-left:18px;display:grid;gap:4px}
+.set-hr{border:0;border-top:1px solid var(--line);margin:18px 0 14px}
+.set-box input+input{margin-top:8px}
+.set-box{max-height:92vh;overflow-y:auto}
 .set-btns{display:flex;gap:8px;flex-wrap:wrap}
 .set-msg{font-size:12.5px;min-height:1em;color:#c22b52}
 .set-msg.ok{color:#1d7a43}
@@ -249,6 +252,19 @@ select{padding:7px 10px;border:1px solid var(--line);border-radius:999px;backgro
     <input id="hookUrl" placeholder="https://discord.com/api/webhooks/…" autocomplete="off" spellcheck="false">
     <div class="set-btns"><button class="btn" type="button" id="hookSave">Save</button><button class="btn ghost" type="button" id="hookTest">Send test</button><button class="btn ghost" type="button" id="hookDel" hidden>Remove</button></div>
     <div class="set-msg" id="setMsg" role="status"></div>
+    <hr class="set-hr">
+    <h3>✉️ Emails to clients (from your Gmail)</h3>
+    <p class="muted">Order confirmations and invoices are sent from your own Gmail, so they reach the client's inbox instead of spam.</p>
+    <div class="set-status" id="mailStatus">Checking…</div>
+    <ol class="set-steps">
+      <li>Open <a href="https://myaccount.google.com/apppasswords" target="_blank" rel="noopener">myaccount.google.com/apppasswords</a> with your Gmail (2-Step Verification must be on).</li>
+      <li>Type a name, for example <b>KeikoArts website</b>, and tap <b>Create</b>.</li>
+      <li>Copy the 16 letters, paste them below, tap <b>Save</b>, then <b>Send test</b>.</li>
+    </ol>
+    <input id="mailUser" type="email" placeholder="Your Gmail address" value="keikoarts22@gmail.com" autocomplete="off" spellcheck="false">
+    <input id="mailPass" type="password" placeholder="16-letter App Password (not your Gmail password)" autocomplete="new-password" spellcheck="false">
+    <div class="set-btns"><button class="btn" type="button" id="mailSave">Save</button><button class="btn ghost" type="button" id="mailTest" hidden>Send test</button><button class="btn ghost" type="button" id="mailDel" hidden>Remove</button></div>
+    <div class="set-msg" id="mailMsg" role="status"></div>
   </div>
 </div>
 
@@ -538,13 +554,17 @@ async function openOrder(id){
   const snd=el('button','btn small','📨 Send invoice to client');snd.type='button';
   if(!o.email){snd.disabled=true;snd.title='This client did not leave an email';}
   snd.onclick=async()=>{snd.disabled=true;snd.textContent='Sending…';
-    try{const m=await invMsg();const ctl=new AbortController(),to=setTimeout(()=>ctl.abort(),20000);
+    try{const m=await invMsg();
+      // first choice: straight from the studio's Gmail (Settings); backup: the form service
+      let viaGmail=false;try{await oapi({action:'mail_client',id,subject:m.subject,body:m.body});viaGmail=true;}catch(e){if(e.message==='login')throw e;if(e.message!=='mail not set up')throw new Error('gmail:'+e.message);}
+      if(viaGmail){snd.textContent='Sent to '+o.email+' ✓';return;}
+      const ctl=new AbortController(),to=setTimeout(()=>ctl.abort(),20000);
       const r=await fetch('https://formsubmit.co/ajax/keikoarts22@gmail.com',{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},signal:ctl.signal,
         body:JSON.stringify({_subject:`Invoice ${id} sent to ${o.name||'client'}`,_template:'box',_captcha:'false',name:o.name||'Client',email:o.email,Order:id,'Sent to the client':m.body,_autoresponse:m.body})});
       clearTimeout(to);const jj=await r.json().catch(()=>null);
       if(!(r.ok&&jj&&String(jj.success)==='true'))throw new Error('not sent');
       snd.textContent='Sent to '+o.email+' ✓';}
-    catch(e){snd.disabled=false;snd.textContent='📨 Send invoice to client';if(e.message!=='login')alert('The email could not be sent right now. Please use "Email invoice (Gmail)" instead.');}};
+    catch(e){snd.disabled=false;snd.textContent='📨 Send invoice to client';if(e.message!=='login')alert(e.message.startsWith('gmail:')?e.message.slice(6)+'\n\nPlease use "Email invoice (Gmail)" or "Copy message" instead.':'The email could not be sent right now. Please use "Email invoice (Gmail)" instead.');}};
   const gm=el('button','btn ghost small','✉️ Email invoice (Gmail)');gm.type='button';
   if(!o.email){gm.disabled=true;gm.title='This client did not leave an email';}
   gm.onclick=async()=>{const w=window.open('','_blank');try{const m=await invMsg();const u='https://mail.google.com/mail/?view=cm&fs=1&to='+encodeURIComponent(o.email)+'&su='+encodeURIComponent(m.subject)+'&body='+encodeURIComponent(m.body);if(w)w.location.href=u;else location.href=u;}catch(e){if(w)w.close();if(e.message!=='login')alert(e.message);}};
@@ -584,6 +604,8 @@ async function loadSettings(){
     st.className='set-status'+(j.discord_set?' on':'');st.textContent=j.discord_set?'✅ Connected':'⚪ Not connected yet';
     if(j.discord_set){const sm=el('small',null,j.discord_hint);st.appendChild(sm);}
     $('#hookDel').hidden=!j.discord_set||j.from_config;$('#hookTest').hidden=!j.discord_set;
+    const ms=$('#mailStatus');ms.className='set-status'+(j.mail_set?' on':'');ms.textContent=j.mail_set?'✅ Sending from '+j.mail_user:'⚪ Not set up yet (emails go through a backup service and may land in spam)';
+    $('#mailTest').hidden=$('#mailDel').hidden=!j.mail_set;if(j.mail_user)$('#mailUser').value=j.mail_user;
   }catch(e){if(e.message!=='login')st.textContent=e.message;}
 }
 $('#setBtn').onclick=()=>{$('#setPanel').hidden=false;setMsg('');loadSettings();};
@@ -593,6 +615,12 @@ $('#hookSave').onclick=async()=>{const v=$('#hookUrl').value.trim();if(!v){setMs
   setMsg('Saving…',true);try{await oapi({action:'settings_set',discord_webhook:v});$('#hookUrl').value='';setMsg('Saved ✓ Now tap "Send test".',true);loadSettings();}catch(e){if(e.message!=='login')setMsg(e.message);}};
 $('#hookTest').onclick=async()=>{setMsg('Sending a test message…',true);try{await oapi({action:'settings_test'});setMsg('Test message sent ✓ Check your Discord channel.',true);}catch(e){if(e.message!=='login')setMsg(e.message);}};
 $('#hookDel').onclick=async()=>{try{await oapi({action:'settings_set',discord_webhook:''});setMsg('Removed.',true);loadSettings();}catch(e){if(e.message!=='login')setMsg(e.message);}};
+
+function mailMsg(t,ok){const m=$('#mailMsg');m.textContent=t||'';m.classList.toggle('ok',!!ok);}
+$('#mailSave').onclick=async()=>{const u=$('#mailUser').value.trim(),pw=$('#mailPass').value.trim();if(!u||!pw){mailMsg('Enter your Gmail address and the 16-letter App Password.');return;}
+  mailMsg('Checking with Gmail…',true);try{await oapi({action:'mail_set',gmail_user:u,gmail_pass:pw});$('#mailPass').value='';mailMsg('Saved ✓ Now tap "Send test".',true);loadSettings();}catch(e){if(e.message!=='login')mailMsg(e.message);}};
+$('#mailTest').onclick=async()=>{mailMsg('Sending a test email…',true);try{const j=await oapi({action:'mail_test'});mailMsg('Test email sent to '+j.to+' ✓ Check your inbox.',true);}catch(e){if(e.message!=='login')mailMsg(e.message);}};
+$('#mailDel').onclick=async()=>{try{await oapi({action:'mail_set',gmail_user:'',gmail_pass:''});mailMsg('Removed.',true);loadSettings();}catch(e){if(e.message!=='login')mailMsg(e.message);}};
 
 function alertBox(t){const p=el('div','err',t);$('#thread').appendChild(p);setTimeout(()=>p.remove(),4000);}
 
