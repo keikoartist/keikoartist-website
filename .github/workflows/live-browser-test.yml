@@ -87,7 +87,7 @@ jobs:
                   await pg.wait_for_timeout(500)
                   st=await pg.evaluate("({t:$('#tyTitle').textContent,w:$('#tyWarn').textContent,id:$('#tyRefId').textContent,pay:!$('#tyPay').hidden,sum:$('#tySummary').innerText})")
                   out.append('refs uploaded: '+str(last.get('files'))+' | pdf '+str(last.get('pdf')))
-                  if st['pay'] or '$113.00' not in st['sum'] or not isinstance(last.get('pdf'),int): raise Exception('custom summary wrong: '+str(st)+' pdf '+str(last.get('pdf')))
+                  if not st['pay'] or '$113.00' not in st['sum'] or not isinstance(last.get('pdf'),int): raise Exception('custom summary wrong: '+str(st)+' pdf '+str(last.get('pdf')))
                   out.append(f"CUSTOM OK {st['t']} {st['id']} {st['sum'].split(chr(10))[-1]} [{st['w']}]")
                   await pg.locator('#tyModal [data-tyclose]').first.click()
                   if 'dryrun=1' not in pg.url: raise Exception('test mode lost after closing: '+pg.url)

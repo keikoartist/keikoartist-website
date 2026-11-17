@@ -542,7 +542,7 @@ if (($_GET['a'] ?? '') === 'submit') {
             'fields' => json_encode($fields, JSON_UNESCAPED_UNICODE), 'files' => json_encode($files), 'lines' => json_encode($lines, JSON_UNESCAPED_UNICODE)])); }
     catch (Throwable $e) { $pdfInfo = 'error: ' . $e->getMessage(); }
     jout(200, ['id' => $id, 'kind' => $kind, 'price' => $price, 'tax' => $tax, 'total' => $total, 'due' => $due, 'plan' => $plan,
-               'pay_url' => $kind === 'custom' ? '' : $SITE . 'order-api.php?a=pay&id=' . $id . '&k=dryrun0000000000', 'date' => date('M j, Y'), 'emailed' => false, 'notified' => false, 'pdf' => $pdfInfo,
+               'pay_url' => $total > 0 ? $SITE . 'order-api.php?a=pay&id=' . $id . '&k=dryrun0000000000' : '', 'date' => date('M j, Y'), 'emailed' => false, 'notified' => false, 'pdf' => $pdfInfo,
                'files' => count($files), 'skipped_files' => $skipped, 'skipped_names' => $skippedNames, 'dry_run' => true, 'file_report' => $report]);
   }
 
@@ -554,8 +554,8 @@ if (($_GET['a'] ?? '') === 'submit') {
                 VALUES(?,?,\'new\',?,?,?,?,?,?,?,?,?,?,?,?,?,?,0,?,?)')
      ->execute([$id, $kind, $name, $email, $o['discord'], $service, $o['package'], $plan, $price, $tax, $total, $due, $o['fields'], $o['files'], $now, $now, $vkey, json_encode($lines, JSON_UNESCAPED_UNICODE)]);
 
-  // fixed-price services: the client can pay right away (PayPal, amount filled in). Custom Inquiry: Keiko reviews first, then sends the invoice.
-  $payUrl = $kind === 'custom' ? '' : pay_link(['id' => $id, 'view_key' => $vkey], $SITE);
+  // the client can pay right away with PayPal (amount filled in); Keiko refunds in full if she cannot take the order
+  $payUrl = $total > 0 ? pay_link(['id' => $id, 'view_key' => $vkey], $SITE) : '';   // every order (Custom Inquiry too) can be paid right after it is sent
   $dateStr = date('M j, Y');
 
   // ---- email to Keiko ----
