@@ -329,10 +329,24 @@ document.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>{document.que
 
 function beep(){try{const a=new (window.AudioContext||window.webkitAudioContext)(),o=a.createOscillator(),g=a.createGain();o.frequency.value=880;g.gain.setValueAtTime(.08,a.currentTime);g.gain.exponentialRampToValueAtTime(.0001,a.currentTime+.35);o.connect(g);g.connect(a.destination);o.start();o.stop(a.currentTime+.35);}catch(_){}}
 
+// red dot on the browser tab icon + "(n)" in the tab title while something is unread
+const tabDot=(()=>{let base=null,img=null,on=null;const link=document.querySelector('link[rel="icon"]');const title0=document.title.replace(/^\(\d+\+?\) /,'');
+  function draw(show){try{const c=document.createElement('canvas');c.width=c.height=64;const x=c.getContext('2d');
+      x.save();x.beginPath();x.arc(32,32,32,0,Math.PI*2);x.clip();x.drawImage(img,0,0,64,64);x.restore();
+      if(show){x.beginPath();x.arc(48,16,15,0,Math.PI*2);x.fillStyle='#fff';x.fill();x.beginPath();x.arc(48,16,11.5,0,Math.PI*2);x.fillStyle='#e8173c';x.fill();}
+      link.href=c.toDataURL('image/png');}catch(_){if(base)link.href=base;}}
+  return function(n,label){n=Number(n)||0;const t=(label||title0);document.title=(n?`(${n>9?'9+':n}) `:'')+t;
+    if(!link||on===!!n)return;on=!!n;
+    if(!base)base=link.getAttribute('href');
+    if(!n&&!img){return;}
+    if(img&&img.complete){draw(!!n);return;}
+    img=new Image();img.onload=()=>draw(on);img.onerror=()=>{};img.src=base;};
+})();
+let newOrdersN=0,lastChatN=0;
 async function loadList(){
   let j;try{j=await api({action:'list',status})}catch(_){return}
   const tot=Number(j.unread_total)||0;$('#unreadTot').textContent=tot?`· ${tot} unread`:'';
-  document.title=(tot?`(${tot}) `:'')+'KeikoArts Inbox';
+  lastChatN=tot;tabDot(tot+newOrdersN,'KeikoArts Inbox');
   if(lastUnread>=0&&tot>lastUnread){beep();if('Notification' in window&&Notification.permission==='granted'&&document.visibilityState!=='visible'){try{new Notification('New chat message',{body:'Someone messaged KeikoArts',icon:'../images/pfp.webp'})}catch(_){}}}
   lastUnread=tot;
   const box=$('#items');box.innerHTML='';
@@ -428,7 +442,8 @@ function setMode(m){
 }
 document.querySelectorAll('.modes button').forEach(b=>b.onclick=()=>setMode(b.dataset.mode));
 document.querySelectorAll('.otabs button').forEach(b=>b.onclick=()=>{document.querySelectorAll('.otabs button').forEach(x=>x.classList.toggle('on',x===b));ostatus=b.dataset.os;loadOrders();});
-function badge(n){const i=$('#newOrders');i.hidden=!n;i.textContent=n;
+
+function badge(n){const i=$('#newOrders');i.hidden=!n;i.textContent=n;newOrdersN=Number(n)||0;tabDot(lastChatN+newOrdersN,'KeikoArts Inbox');
   if(lastNew>=0&&n>lastNew){beep();if('Notification' in window&&Notification.permission==='granted'&&document.visibilityState!=='visible'){try{new Notification('New order!',{body:'Someone placed an order on KeikoArts',icon:'../images/pfp.webp'})}catch(_){}}}
   lastNew=n;}
 async function pollOrders(){try{const j=await oapi({action:'count'});badge(Number(j.new)||0);if(mode==='orders')loadOrders();}catch(_){}}
