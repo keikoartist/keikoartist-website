@@ -14,6 +14,7 @@ header('X-Content-Type-Options: nosniff');
 header('Cache-Control: no-store');
 header('Referrer-Policy: same-origin');
 
+const SMTP_HOST = 'ssl://smtp.gmail.com:465';
 const MAX_MSG = 2000;
 const MAX_NAME = 60;
 
@@ -52,6 +53,9 @@ function db(): PDO {
       sender TEXT NOT NULL, agent TEXT, body TEXT NOT NULL, created INTEGER NOT NULL)');
   $pdo->exec('CREATE INDEX IF NOT EXISTS idx_msg_conv ON messages(conv_id, id)');
   $pdo->exec('CREATE TABLE IF NOT EXISTS hits(k TEXT, t INTEGER)');
+  $cols = array_column($pdo->query('PRAGMA table_info(conversations)')->fetchAll(), 'name');
+  if (!in_array('discord', $cols, true)) $pdo->exec('ALTER TABLE conversations ADD COLUMN discord TEXT');
+  if (!in_array('notify', $cols, true)) $pdo->exec('ALTER TABLE conversations ADD COLUMN notify INTEGER NOT NULL DEFAULT 1');
   return $pdo;
 }
 
@@ -82,6 +86,27 @@ function msgs(string $conv, int $since): array {
   $st->execute([$conv, $since]);
   return array_map(function ($m) { $m['id'] = (int)$m['id']; $m['created'] = (int)$m['created']; return $m; }, $st->fetchAll());
 }
+/* ---- email to a visitor when Keiko replies (sent from the studio Gmail saved in admin -> Settings) ---- */
+function chat_mail(string $to, string $subject, string $text, string $html): bool {
+  $s = ka_settings(); $u = (string)($s['gmail_user'] ?? ''); $p = (string)($s['gmail_pass'] ?? '');
+  if ($u === '' || $p === '' || !filter_var($to, FILTER_VALIDATE_EMAIL)) return false;
+  $say = function ($fp, ?string $c, array $ok) { if ($c !== null) fwrite($fp, $c . "\r\n"); $r = ''; while (($l = fgets($fp, 600)) !== false) { $r .= $l; if (strlen($l) < 4 || $l[3] === ' ') break; } if (!in_array((int)substr($r, 0, 3), $ok, true)) throw new RuntimeException(trim(substr($r, 0, 120))); };
+  try {
+    $e = 0; $m = ''; $fp = @stream_socket_client(SMTP_HOST, $e, $m, 8); if (!$fp) return false; stream_set_timeout($fp, 15);
+    $say($fp, null, [220]); $say($fp, 'EHLO keikoartist.com', [250]); $say($fp, 'AUTH LOGIN', [334]); $say($fp, base64_encode($u), [334]); $say($fp, base64_encode($p), [235]);
+    $say($fp, "MAIL FROM:<$u>", [250]); $say($fp, "RCPT TO:<$to>", [250, 251]); $say($fp, 'DATA', [354]);
+    $bd = 'alt_' . bin2hex(random_bytes(8));
+    $raw = "From: KeikoArts <$u>\r\nTo: <$to>\r\nReply-To: <$u>\r\nSubject: =?UTF-8?B?" . base64_encode($subject) . "?=\r\nDate: " . date('r') . "\r\nMessage-ID: <" . bin2hex(random_bytes(12)) . "@keikoartist.com>\r\nMIME-Version: 1.0\r\nContent-Type: multipart/alternative; boundary=\"$bd\"\r\n\r\n"
+         . "--$bd\r\nContent-Type: text/plain; charset=UTF-8\r\nContent-Transfer-Encoding: base64\r\n\r\n" . chunk_split(base64_encode($text))
+         . "--$bd\r\nContent-Type: text/html; charset=UTF-8\r\nContent-Transfer-Encoding: base64\r\n\r\n" . chunk_split(base64_encode($html)) . "--$bd--\r\n";
+    fwrite($fp, preg_replace('/^\./m', '..', $raw) . "\r\n.\r\n"); $say($fp, null, [250]);
+    @fwrite($fp, "QUIT\r\n"); @fclose($fp); return true;
+  } catch (Throwable $ex) { if (!empty($fp)) @fclose($fp); return false; }
+}
+function clean_discord(string $v): string {   // a Discord username: letters, numbers, _ and . (old style name#1234 allowed)
+  $v = trim(ltrim(trim($v), '@'));
+  return preg_match('/^[a-zA-Z0-9_.]{2,32}(#\d{4})?$/', $v) ? $v : '';
+}
 function discord_ping(array $cfg, array $c, string $text, bool $isNew): void {
   $hook = (string)($cfg['discord_webhook'] ?? '');
   if (!preg_match('#^https://(?:ptb\.|canary\.)?(?:discord|discordapp)\.com/api/webhooks/\d+/[\w-]+$#', $hook)) { $st = json_decode((string)@file_get_contents(data_dir() . '/settings.json'), true); $hook = is_array($st) ? (string)($st['discord_webhook'] ?? '') : ''; }
@@ -94,7 +119,7 @@ function discord_ping(array $cfg, array $c, string $text, bool $isNew): void {
     'title' => ($isNew ? '💬 New chat from ' : '💬 New message from ') . $safe($c['name'] ?: 'Visitor'),
     'description' => $safe(mb_substr($text, 0, 500)),
     'color' => 0xF2628F,
-    'fields' => array_values(array_filter([$c['email'] ? ['name' => 'Email', 'value' => $safe($c['email']), 'inline' => true] : null])),
+    'fields' => array_values(array_filter([$c['email'] ? ['name' => 'Email', 'value' => $safe($c['email']), 'inline' => true] : null, !empty($c['discord']) ? ['name' => 'Discord', 'value' => $safe($c['discord']), 'inline' => true] : null])),
     'footer' => ['text' => 'Reply at keikoartist.com/admin'],
   ]]];
   $ch = curl_init($hook);
@@ -153,10 +178,11 @@ switch ($action) {
     if ($text === '') fail(400, 'Please type a message.');
     if ($name === '') $name = 'Visitor ' . strtoupper(substr(bin2hex(random_bytes(2)), 0, 4));
     if ($email !== '' && !filter_var($email, FILTER_VALIDATE_EMAIL)) fail(400, 'Please check your email address.');
+    $dc = clean_discord((string)($in['discord'] ?? ''));
     $id = bin2hex(random_bytes(12)); $tok = bin2hex(random_bytes(24)); $now = time();
     $db = db(); $db->beginTransaction();
-    $db->prepare('INSERT INTO conversations(id, token_hash, name, email, page, created, updated, unread_admin) VALUES(?,?,?,?,?,?,?,1)')
-       ->execute([$id, hash('sha256', $tok), $name, $email, clean((string)($in['page'] ?? ''), 200), $now, $now]);
+    $db->prepare('INSERT INTO conversations(id, token_hash, name, email, discord, page, created, updated, unread_admin) VALUES(?,?,?,?,?,?,?,?,1)')
+       ->execute([$id, hash('sha256', $tok), $name, $email, $dc, clean((string)($in['page'] ?? ''), 200), $now, $now]);
     $db->prepare('INSERT INTO messages(conv_id, sender, body, created) VALUES(?,?,?,?)')->execute([$id, 'visitor', $text, $now]);
     $db->commit();
     $st = $db->prepare('SELECT * FROM conversations WHERE id = ?'); $st->execute([$id]);
@@ -174,10 +200,24 @@ switch ($action) {
     discord_ping($cfg, $c, $text, false);
     out(200, ['messages' => msgs($c['id'], (int)($in['since'] ?? 0))]);
   }
+  case 'contact': {   // visitor leaves (or changes) an email / Discord username so Keiko can reach them outside the website
+    $c = visitor_conv($in);
+    rate_limit('contact:' . client_ip(), 10, 3600);
+    $email = clean((string)($in['email'] ?? ''), 120); $rawDc = trim((string)($in['discord'] ?? ''));
+    if ($email !== '' && !filter_var($email, FILTER_VALIDATE_EMAIL)) fail(400, 'Please check your email address.');
+    $dc = clean_discord($rawDc); if ($rawDc !== '' && $dc === '') fail(400, 'Please check your Discord username.');
+    if ($email === '' && $dc === '') fail(400, 'Please enter your email or Discord username.');
+    $now = time(); $db = db();
+    $db->prepare('UPDATE conversations SET email = ?, discord = ?, updated = ?, unread_admin = unread_admin + 1 WHERE id = ?')->execute([$email ?: (string)$c['email'], $dc ?: (string)($c['discord'] ?? ''), $now, $c['id']]);
+    $db->prepare('INSERT INTO messages(conv_id, sender, body, created) VALUES(?,?,?,?)')->execute([$c['id'], 'visitor', '📇 Contact: ' . implode(' · ', array_filter([$email ? "email $email" : '', $dc ? "Discord $dc" : ''])), $now]);
+    $st = $db->prepare('SELECT * FROM conversations WHERE id = ?'); $st->execute([$c['id']]); $c2 = $st->fetch(); $c2['last_ping'] = 0;
+    discord_ping($cfg, $c2, '📇 Left contact details: ' . implode(' · ', array_filter([$email, $dc ? "Discord $dc" : ''])), false);
+    out(200, ['email' => $c2['email'], 'discord' => $c2['discord'], 'messages' => msgs($c['id'], (int)($in['since'] ?? 0))]);
+  }
   case 'poll': {
     $c = visitor_conv($in);
     if (!empty($in['open'])) db()->prepare('UPDATE conversations SET unread_visitor = 0 WHERE id = ?')->execute([$c['id']]);
-    out(200, ['messages' => msgs($c['id'], (int)($in['since'] ?? 0)), 'unread' => empty($in['open']) ? (int)$c['unread_visitor'] : 0, 'status' => $c['status']]);
+    out(200, ['messages' => msgs($c['id'], (int)($in['since'] ?? 0)), 'unread' => empty($in['open']) ? (int)$c['unread_visitor'] : 0, 'status' => $c['status'], 'has_contact' => ($c['email'] ?? '') !== '' || ($c['discord'] ?? '') !== '']);
   }
 
   /* ===== admin ===== */
@@ -244,9 +284,10 @@ switch ($action) {
     require_admin($cfg);
     $id = (string)($in['id'] ?? ''); if (!preg_match('/^[a-f0-9]{24}$/', $id)) fail(400, 'bad id');
     db()->prepare('UPDATE conversations SET unread_admin = 0 WHERE id = ?')->execute([$id]);
-    $st = db()->prepare('SELECT id, name, email, page, status, created FROM conversations WHERE id = ?'); $st->execute([$id]);
+    $st = db()->prepare('SELECT id, name, email, discord, page, status, created FROM conversations WHERE id = ?'); $st->execute([$id]);
     $c = $st->fetch(); if (!$c) fail(404, 'not found');
-    out(200, ['conversation' => $c, 'messages' => msgs($id, (int)($in['since'] ?? 0))]);
+    $ks = ka_settings();
+    out(200, ['conversation' => $c, 'messages' => msgs($id, (int)($in['since'] ?? 0)), 'mail_ready' => !empty($ks['gmail_user']) && !empty($ks['gmail_pass'])]);
   }
   case 'reply': {
     require_admin($cfg);
@@ -256,7 +297,18 @@ switch ($action) {
     $now = time(); $db = db();
     $db->prepare('INSERT INTO messages(conv_id, sender, agent, body, created) VALUES(?,?,?,?,?)')->execute([$id, 'admin', $agent, $text, $now]);
     $db->prepare('UPDATE conversations SET updated = ?, unread_visitor = unread_visitor + 1, unread_admin = 0 WHERE id = ?')->execute([$now, $id]);
-    out(200, ['messages' => msgs($id, (int)($in['since'] ?? 0))]);
+    $emailed = false;
+    $st = $db->prepare('SELECT name, email FROM conversations WHERE id = ?'); $st->execute([$id]); $cv = $st->fetch();
+    if ($cv && ($cv['email'] ?? '') !== '' && empty($in['no_email'])) {
+      $nm = (string)($cv['name'] ?: 'there'); if (preg_match('/^Visitor [0-9A-F]{4}$/', $nm)) $nm = 'there';
+      $link = 'https://keikoartist.com/#chat';
+      $emailed = chat_mail((string)$cv['email'], "$agent from KeikoArts replied to your message",
+        "Hi $nm,\n\n$agent replied to your chat on keikoartist.com:\n\n$text\n\nJust reply to this email, or continue the chat on the website (same device): $link\n\nKeikoArts",
+        '<div style="font-family:Arial,sans-serif;color:#7a2846;font-size:14px;line-height:1.55"><p>Hi ' . htmlspecialchars($nm) . ',</p><p>' . htmlspecialchars($agent) . ' replied to your chat on keikoartist.com:</p>'
+        . '<blockquote style="margin:12px 0;padding:10px 14px;background:#fff0f5;border-left:3px solid #f2628f;border-radius:6px">' . nl2br(htmlspecialchars($text)) . '</blockquote>'
+        . '<p>Just reply to this email, or <a href="' . $link . '">continue the chat on the website</a>.</p><p>KeikoArts</p></div>');
+    }
+    out(200, ['messages' => msgs($id, (int)($in['since'] ?? 0)), 'emailed' => $emailed]);
   }
   case 'close': case 'reopen': {
     require_admin($cfg);

@@ -66,6 +66,10 @@ input:focus,textarea:focus{border-color:var(--pink-2);box-shadow:0 0 0 3px rgba(
 .th-head .who{flex:1;min-width:160px}
 .th-head .who b{display:block;font-size:15px}
 .th-head .who span{font-size:12px;color:var(--muted)}
+.th-contact{display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:8px 16px;background:#fff8fb;border-bottom:1px solid var(--line)}
+.th-contact a.btn{text-decoration:none}
+.th-contact small{font-size:12px;color:var(--muted);flex:1 1 220px}
+.th-note{align-self:center;font-size:12px;color:#1d7a43;background:#effaf3;border-radius:999px;padding:4px 12px}
 .back{display:none;border:0;background:none;font-size:22px;color:var(--pink);cursor:pointer;padding:0 6px}
 .msgs{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:8px}
 .m{max-width:72%;display:flex;flex-direction:column;gap:2px}
@@ -272,7 +276,7 @@ select{padding:7px 10px;border:1px solid var(--line);border-radius:999px;backgro
 const $=q=>document.querySelector(q), API='../chat-api.php';
 let auth='', status='open', cur=null, last=0, lastUnread=-1, listTimer, thTimer;
 const store={get(k,d){try{return localStorage.getItem(k)??d}catch(_){return d}},set(k,v){try{localStorage.setItem(k,v)}catch(_){}}};
-const CANNED=[
+const CANNED=['Could you leave your email or Discord username in the chat (tap “Leave contact” above the message box), so I can reach you if you leave the website? ♡',
   "Hi! Thank you for reaching out ♡ How can I help?",
   "You can see all prices and examples in Our Services on the website. Which one are you interested in?",
   "Could you share your character references (images or links)?",
@@ -379,7 +383,8 @@ async function openThread(id){
   ta.addEventListener('input',()=>{ta.style.height='auto';ta.style.height=Math.min(ta.scrollHeight,140)+'px';});
   ta.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey&&!e.isComposing){e.preventDefault();form.requestSubmit();}});
   form.addEventListener('submit',async e=>{e.preventDefault();const text=ta.value.trim();if(!text)return;send.disabled=true;
-    try{const j=await api({action:'reply',id,message:text,agent:$('#agent').value.trim()||'Keiko',since:last});ta.value='';ta.style.height='auto';j.messages.forEach(addMsg);msgs.scrollTop=msgs.scrollHeight;loadList();}
+    try{const j=await api({action:'reply',id,message:text,agent:$('#agent').value.trim()||'Keiko',since:last});ta.value='';ta.style.height='auto';j.messages.forEach(addMsg);msgs.scrollTop=msgs.scrollHeight;loadList();
+      if(j.emailed){const n=el('div','th-note','✉️ Also emailed to the visitor');msgs.appendChild(n);msgs.scrollTop=msgs.scrollHeight;setTimeout(()=>n.remove(),5000);}}
     catch(err){if(err.message!=='login')alertBox(err.message);}
     send.disabled=false;ta.focus();});
   let delArmed=false;
@@ -387,7 +392,14 @@ async function openThread(id){
     await api({action:'delete',id});back.onclick();};
   const j=await api({action:'thread',id,since:0});
   const c=j.conversation;who.firstChild.textContent=c.name||'Visitor';
-  who.lastChild.textContent=[c.email,'started '+fmt(c.created)].filter(Boolean).join(' · ');
+  who.lastChild.textContent='started '+fmt(c.created);
+  // how to reach this visitor outside the website
+  const ct=el('div','th-contact');
+  if(c.email){const a=el('a','btn small','✉️ Email '+c.email);a.href='mailto:'+encodeURIComponent(c.email)+'?subject='+encodeURIComponent('Your message to KeikoArts');ct.appendChild(a);}
+  if(c.discord){const d=el('button','btn small ghost','💬 Discord: '+c.discord);d.type='button';d.title='Copy the username, then add them as a friend in Discord';
+    d.onclick=async()=>{try{await navigator.clipboard.writeText(c.discord);d.textContent='Copied ✓ add them in Discord';}catch(_){prompt('Discord username',c.discord);}};ct.appendChild(d);}
+  ct.appendChild(el('small',null,c.email?(j.mail_ready?'Your replies here are also emailed to them ✓':'Replies are emailed once Gmail is set up in Settings.'):c.discord?'Add them as a friend in Discord, or reply here.':'No email or Discord left yet. They only see your reply if they come back to the website. Ask them for one ↓'));
+  head.after(ct);
   closeB.textContent=c.status==='open'?'Close chat':'Reopen';
   closeB.onclick=async()=>{await api({action:c.status==='open'?'close':'reopen',id});back.onclick();};
   j.messages.forEach(addMsg);msgs.scrollTop=msgs.scrollHeight;ta.focus();loadList();
