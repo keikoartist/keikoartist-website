@@ -16,7 +16,7 @@ import ftplib, hashlib, io, json, os, posixpath, subprocess, sys, time
 
 STATE = '.deploy-state.json'
 EXCLUDE_PREFIX = ('.github/', 'docs/', 'tools/')
-EXCLUDE_FILES = {'README.md', '.gitignore', '.gitattributes'}
+EXCLUDE_FILES = {'README.md', 'CLAUDE.md', '.gitignore', '.gitattributes'}
 
 HOST = os.environ['FTP_SERVER']
 USER = os.environ['FTP_USERNAME']
