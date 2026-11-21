@@ -80,6 +80,6 @@ Run the site with `php -S 127.0.0.1:8830` in a copy of the repo that has a test 
 - A possible move of the site to the studio standard (Next.js on Bu Mella's server) is not decided. Do not start it unless asked.
 - Commission status badge in the hero: `SLOTS` in `index.html` (open/closed).
 - `VTUBERS` (section "Original VTuber Characters"): Keiko's own original characters, not clients. No names; never present them as client VTubers.
-- The owner's VGen account (vgen.co/keikoarts) is suspended; reviews there cannot be read publicly.
+- The owner's VGen account (vgen.co/keikoarts) is suspended; reviews there cannot be read publicly. The owner will not appeal: do not suggest it.
 - Owner time zone: WIB (GMT+7).
 - Reviews: one VGen review (PNGTuber, Mar 2025, "the art keiko made was soo beautiful!...") is waiting for the reviewer's name.
