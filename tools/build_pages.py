@@ -426,6 +426,8 @@ def emotes():
     E = SERVICES['Emotes']; D = DETAILS['Emotes']
     pk = {p[0]: p[1] for p in E['packages']}; ad = {a[0]: a[1] for a in E['addons']}
     imgs = GALLERY['Emotes']
+    # still image on top (fast, works as a link preview); the animated set stays in the gallery below (lazy, small version)
+    hero = next((x for x in imgs if 'animated' not in x), imgs[0])
     body = f"""  <section class="wrap phero">
     <div>
       <p class="eyebrow">Emote commission</p>
@@ -434,7 +436,7 @@ def emotes():
       <div class="btns"><a class="btn btn-pink arrow" rel="nofollow" href="/?order=Emotes">Order your emotes</a><a class="btn btn-ghost" href="/vtuber-pricing/">See all prices</a></div>
       <div class="facts"><span>Static <b>{money(pk["Static emote"])}</b> each</span><span>Animated <b>{money(pk["Animated emote"])}</b> each</span><span>About <b>{e(E["eta"])}</b></span></div>
     </div>
-    <figure>{img(imgs[0], eager=True)}</figure>
+    <figure>{img(hero, eager=True)}</figure>
   </section>
 
   <section class="sec"><div class="wrap">
@@ -483,7 +485,7 @@ def emotes():
     ]
     desc = f'Custom Twitch emotes of your character or VTuber: static {money(pk["Static emote"])} and animated {money(pk["Animated emote"])} per emote, in Twitch and Discord sizes. Sub badges available.'
     return page('custom-twitch-emotes', 'Custom Twitch Emotes Commission | KeikoArtist', desc, 'Custom Twitch Emotes', 'Custom Twitch Emotes',
-                body, faq, imgs[0], 'Emotes', service_ld('Custom Twitch emotes', SITE + 'custom-twitch-emotes/', desc, E['from']))
+                body, faq, hero, 'Emotes', service_ld('Custom Twitch emotes', SITE + 'custom-twitch-emotes/', desc, E['from']))
 
 # ---------------------------------------------------------------- 4. portfolio
 def portfolio():
@@ -614,7 +616,19 @@ for slug_, fn in PAGES.items():
     open(os.path.join(ROOT, slug_, 'index.html'), 'w', encoding='utf-8').write(fn())
 open(os.path.join(ROOT, '404.html'), 'w', encoding='utf-8').write(not_found())
 urls = [('', '1.0')] + [(s + '/', '0.8') for s in PAGES]
-sm = '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' + ''.join(
-    f'  <url><loc>{SITE}{u}</loc><lastmod>{TODAY}</lastmod><priority>{p}</priority></url>\n' for u, p in urls) + '</urlset>\n'
+def page_images(u):   # artwork shown on a page, for the image sitemap (Google Images)
+    src = open(os.path.join(ROOT, u, 'index.html') if u else os.path.join(ROOT, 'index.html'), encoding='utf-8').read()
+    names = re.findall(r'images/([a-z0-9-]+)\.webp', src)
+    if not u: names += [n for v in GALLERY.values() for n in v]
+    out = []
+    for n in names:
+        if n.startswith(('keikoarts-logo', 'keikoarts-team', 'vtuber-avatar')) or n in out: continue
+        if os.path.exists(os.path.join(ROOT, 'images', n + '.webp')): out.append(n)
+    return out
+def sm_url(u, p):
+    ims = ''.join(f'<image:image><image:loc>{SITE}images/{n}.webp</image:loc></image:image>' for n in page_images(u))
+    return f'  <url><loc>{SITE}{u}</loc><lastmod>{TODAY}</lastmod><priority>{p}</priority>{ims}</url>\n'
+sm = ('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" '
+      'xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">\n' + ''.join(sm_url(u, p) for u, p in urls) + '</urlset>\n')
 open(os.path.join(ROOT, 'sitemap.xml'), 'w', encoding='utf-8').write(sm)
 print('built', ', '.join(PAGES), '+ 404.html + sitemap.xml')
