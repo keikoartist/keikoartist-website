@@ -112,6 +112,6 @@ footer{margin-top:60px;background:linear-gradient(135deg,#f2628f,#ff8fb1);color:
 @media (max-width:560px){.phero h1{font-size:34px}.phero .lead{font-size:15px}.sec{padding:28px 0}.cta{padding:24px}.btn{padding:13px 22px}}
 
 /* readable small pink text (4.7:1); brand pink stays on buttons, headings and decoration */
-:root{--pink-text:#cc3d6e}
+:root{--pink-text:#c23a69}
 .crumbs a,.eyebrow,.facts b,.box a,.prose a,.faq a,.note a,.svc .meta a,.btn-ghost{color:var(--pink-text)}
 @media (hover:hover){.btn-ghost:hover{color:#fff}}
