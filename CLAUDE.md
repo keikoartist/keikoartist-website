@@ -82,5 +82,5 @@ Run the site with `php -S 127.0.0.1:8830` in a copy of the repo that has a test 
 - `VTUBERS` (section "Original VTuber Characters"): Keiko's own original characters, not clients. No names; never present them as client VTubers.
 - The owner's VGen account (vgen.co/keikoarts) is suspended; reviews there cannot be read publicly. The owner will not appeal: do not suggest it.
 - Owner time zone: WIB (GMT+7).
-- Christmas edition (`SEASON` in `index.html`, ends 7 Jan 2027): snow, Santa hat, candy-cane line and a "find 5 hidden gifts" game. Prizes (`GIFTS`, set by the owner): free emotes, free Christmas badges, free source files, free skeb, 10% off. Winners get a code (XMAS-xxxxx, made in the browser) and claim it on Discord; Keiko applies it by hand. Nothing changes in PayPal or the order prices.
+- Christmas edition (`SEASON` in `index.html`, ends 7 Jan 2027): snow, Santa hat, candy-cane line and a "find 5 hidden gifts" game. Prizes (`GIFTS`, set by the owner): free emotes, free Christmas badges, free source files, free skeb, free sketch, 10% off. Winners get a code (XMAS-xxxxx, made in the browser) and claim it on Discord; Keiko applies it by hand. Nothing changes in PayPal or the order prices.
 - Reviews: one VGen review (PNGTuber, Mar 2025, "the art keiko made was soo beautiful!...") is waiting for the reviewer's name.

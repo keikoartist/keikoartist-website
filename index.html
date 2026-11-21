@@ -2463,7 +2463,7 @@ document.addEventListener('click',e=>{const a=e.target.closest('.menu-chat');if(
   let cnt=null;const count=()=>{if(!cnt){cnt=document.createElement('div');cnt.className='gift-count';cnt.setAttribute('aria-live','polite');document.body.appendChild(cnt);}
     cnt.innerHTML=`🎁 ${got.length}/${spots.length}`;cnt.classList.add('bump');setTimeout(()=>cnt.classList.remove('bump'),300);};
   if(got.length&&got.length<spots.length)count();
-  const GIFTS=['Free emotes','Free Christmas badges','Free source files','Free skeb','10% off your next commission'];   // hadiah game Natal (dari pemilik)
+  const GIFTS=['Free emotes','Free Christmas badges','Free source files','Free skeb','Free sketch','10% off your next commission'];   // hadiah game Natal (dari pemilik)
   const confetti=()=>{if(matchMedia('(prefers-reduced-motion:reduce)').matches)return;const cols=['#f2628f','#ff8fb1','#c9a7ff','#ffd166','#9be7c4'];
     for(let i=0;i<60;i++){const c=document.createElement('i');c.className='confetti';c.style.left=(Math.random()*100)+'vw';c.style.background=cols[i%5];
       c.style.setProperty('--d',(2+Math.random()*2).toFixed(2)+'s');c.style.setProperty('--x',(Math.random()*160-80).toFixed(0)+'px');c.style.setProperty('--r',(Math.random()*720).toFixed(0)+'deg');c.style.animationDelay=(Math.random()*.6).toFixed(2)+'s';
