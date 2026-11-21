@@ -265,7 +265,7 @@ def custom_vtuber():
     <h2>How ordering works</h2>
     <ol class="steps">
       <li><b>Send the order form</b><span>Pick the size and option, describe your character and attach references.</span></li>
-      <li><b>Get your invoice</b><span>I review your request and email you an invoice (PDF), usually within 6 hours. {e(PAY)}</span></li>
+      <li><b>Get your invoice</b><span>I review your request and email you an invoice (PDF), usually within 6 hours (WIB, GMT+7). {e(PAY)}</span></li>
       <li><b>Sketch to rig</b><span>Sketch, lineart, coloring and rigging, with progress updates at every stage.</span></li>
       <li><b>Go live</b><span>You receive your files and VTube Studio model. Estimated time: {e(V["eta"])}; rush delivery (+25%) is available.</span></li>
     </ol>

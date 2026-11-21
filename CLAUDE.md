@@ -78,4 +78,8 @@ Run the site with `php -S 127.0.0.1:8830` in a copy of the repo that has a test 
 - Gmail App Password not set up yet (admin → Settings → Emails to clients).
 - Cloudflare: the owner's colleague (Bu Mella) may ask to switch the nameservers. Before that, check that deploys use the hosting's FTP address, not the domain name.
 - A possible move of the site to the studio standard (Next.js on Bu Mella's server) is not decided. Do not start it unless asked.
+- Commission status badge in the hero: `SLOTS` in `index.html` (open/closed).
+- VTuber Children (`VTUBERS`): names confirmed real by the owner (Nov 2026); links still missing.
+- The owner's VGen account (vgen.co/keikoarts) is suspended; reviews there cannot be read publicly.
+- Owner time zone: WIB (GMT+7).
 - Reviews: one VGen review (PNGTuber, Mar 2025, "the art keiko made was soo beautiful!...") is waiting for the reviewer's name.
