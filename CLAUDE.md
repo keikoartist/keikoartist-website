@@ -31,7 +31,7 @@ The owner writes in Indonesian and wants short, direct answers in Indonesian. Do
 | `admin/index.html` | Admin inbox at /admin/: Chats, Orders (board view like VGen, plus list view), Settings (Discord webhook, Gmail App Password). |
 | `tools/build_pages.py` | Generates the service pages (`custom-vtuber-model/`, `live2d-rigging/`, `custom-pngtuber-model/`, `custom-twitch-emotes/`, `vtuber-portfolio/`, `vtuber-pricing/`), `404.html` and `sitemap.xml` from the data in `index.html`. Run `python3 tools/build_pages.py` after changing prices, services or the gallery. |
 | `assets/site.css` | Shared styles for the service pages. |
-| `images/` | Artwork (WebP). `images/t/` = small versions for grids (520 px wide), made from the originals. |
+| `images/` | Artwork (WebP). `images/t/` = small versions for grids (520 px wide) and `images/s/` = 360 px versions for phones, both made from the originals. |
 | `tools/ftp_deploy.py` | Deploy script (uploads changed files only). |
 | `tools/seo_audit.py`, `tools/htaccess_*` | SEO check and the managed `.htaccess` block. |
 

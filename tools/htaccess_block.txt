@@ -59,9 +59,9 @@ RewriteRule ^images/(t/)?vtuber\-witch\.webp$ /images/$1custom-vtuber-model-witc
 </IfModule>
 <IfModule mod_expires.c>
 ExpiresActive On
-ExpiresByType image/webp "access plus 7 days"
-ExpiresByType image/svg+xml "access plus 7 days"
-ExpiresByType video/mp4 "access plus 7 days"
+ExpiresByType image/webp "access plus 30 days"
+ExpiresByType image/svg+xml "access plus 30 days"
+ExpiresByType video/mp4 "access plus 30 days"
 ExpiresByType text/css "access plus 7 days"
 </IfModule>
 # END KeikoArts SEO
