@@ -1100,6 +1100,18 @@ body.fab-off .fab-order{opacity:0;pointer-events:none}
   .gal-btn{position:absolute}.gal-btn::after,.rv-dots button::after{content:"";position:absolute;inset:-6px}
   .rv-dots button{position:relative;height:44px}
 }
+
+/* Christmas edition (toggle: SEASON in the script). Light touches only; brand pink, fonts and layout unchanged */
+body.xmas header{border-bottom:0;box-shadow:none}
+body.xmas header::after{content:"";position:absolute;left:0;right:0;bottom:-3px;height:3px;background:repeating-linear-gradient(-45deg,#f2628f 0 8px,#ffe3ec 8px 16px);opacity:.85;pointer-events:none}
+body.xmas header .logo{position:relative}
+body.xmas header .logo::before{content:"";position:absolute;left:-7px;top:-11px;width:30px;height:26px;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 34'%3E%3Cpath d='M4 26 C8 12 18 4 30 6 C34 7 36 12 33 16 C30 12 26 12 24 14 C30 18 34 22 36 26 Z' fill='%23e8476f'/%3E%3Crect x='2' y='24' width='36' height='8' rx='4' fill='%23fff' stroke='%23fbd3e0'/%3E%3Ccircle cx='34' cy='17' r='4.5' fill='%23fff' stroke='%23fbd3e0'/%3E%3C/svg%3E") no-repeat center/contain;transform:rotate(-18deg);pointer-events:none;z-index:2}
+body.xmas .sec-head h2::before{content:"\2744\FE0E"}
+.xmas-snow{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:0}
+.xmas-snow i{position:absolute;top:-12px;width:var(--s);height:var(--s);border-radius:50%;background:var(--c);opacity:.75;animation:xsnow var(--d) linear var(--l) infinite}
+@keyframes xsnow{to{transform:translate(var(--x),calc(100vh + 24px))}}
+body.xmas .hero .wrap{position:relative;z-index:1}
+@media (prefers-reduced-motion:reduce){.xmas-snow{display:none}}
 </style>
 </head>
 <body>
@@ -1592,6 +1604,7 @@ body.fab-off .fab-order{opacity:0;pointer-events:none}
 /* ==========================================================
    EDIT DI SINI — slot, antrian, harga & add-on
    ========================================================== */
+const SEASON = { christmas: true, until: "2027-01-07" };   // tema Natal: salju, topi Santa di logo, garis permen. Matikan: christmas:false (mati otomatis setelah tanggal until)
 const SLOTS = { open: true, text: "Commissions open" };   // status komisi di hero. Tutup: { open: false, text: "Commissions closed" }
 const PAYPAL = {          // kosong: link PayPal dikirim lewat email invoice setelah order dicek (bukan langsung di website)
   email: "",
@@ -2405,6 +2418,12 @@ let tabVisitorN=0,tabAdminN=0;const tabSync=()=>tabDot(tabVisitorN+tabAdminN);
 // "Chat with us" in the phone menu opens the chat
 document.addEventListener('click',e=>{const a=e.target.closest('.menu-chat');if(!a)return;e.preventDefault();$('#menu').classList.remove('open');const b=$('#kcBubble');if(b)b.click();});
 // the floating "Order now" button appears once the hero buttons are scrolled away
+(function(){if(typeof SEASON==='undefined'||!SEASON.christmas||new Date()>=new Date(SEASON.until))return;document.body.classList.add('xmas');
+  const h=document.querySelector('.hero');if(!h||matchMedia('(prefers-reduced-motion:reduce)').matches)return;
+  const box=document.createElement('div');box.className='xmas-snow';box.setAttribute('aria-hidden','true');
+  const n=innerWidth<700?14:26,cols=['#f7b6cc','#fbd3e0','#e9dcff','#ffd9e6'];let html='';
+  for(let i=0;i<n;i++){const r=Math.random;html+=`<i style="left:${(r()*100).toFixed(1)}%;--s:${(4+r()*6).toFixed(1)}px;--c:${cols[i%4]};--d:${(9+r()*9).toFixed(1)}s;--l:-${(r()*18).toFixed(1)}s;--x:${(r()*60-30).toFixed(0)}px"></i>`;}
+  box.innerHTML=html;h.prepend(box);})();
 (function(){const b=$('#slotBadge');if(b&&typeof SLOTS!=='undefined'){b.textContent=SLOTS.text;b.className='slot-badge '+(SLOTS.open?'open':'closed');}})();
 (function(){const t=[...document.querySelectorAll('#start,footer')];if(!t.length||!('IntersectionObserver' in window))return;const on=new Set();const io=new IntersectionObserver(es=>{es.forEach(e=>e.isIntersecting?on.add(e.target):on.delete(e.target));document.body.classList.toggle('fab-off',on.size>0);});t.forEach(x=>io.observe(x));})();
 (function(){const hb=document.querySelector('.hero .btns');if(!hb||!('IntersectionObserver' in window)){document.body.classList.add('past-hero');return;}
