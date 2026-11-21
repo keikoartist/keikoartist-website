@@ -1051,7 +1051,7 @@ main>section#faq{padding-bottom:28px!important}
 .final-cta{padding-top:8px!important}
 .fc-box{background:var(--blush);border:1px solid var(--line);padding:36px 40px;display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap}
 .fc-box h2{font-size:clamp(26px,3vw,36px);line-height:1.15;margin-bottom:8px}
-.fc-box p{color:var(--muted);font-size:15px;max-width:560px}
+.fc-box p{color:#9a5670;font-size:15px;max-width:560px}
 .fc-btns{display:flex;gap:12px;flex-wrap:wrap}
 @media (max-width:767px){.fc-box{padding:26px 22px}.fc-btns{width:100%;flex-direction:column}.fc-btns .btn{width:100%;justify-content:center;min-height:52px}}
 footer{margin-top:24px}
@@ -1603,7 +1603,7 @@ const GALLERY = {   // contoh karya per service (geser di kartu Services). Tamba
   "VTuber Packages": ["vtuber-debut-package-keikomi","custom-vtuber-model-dragon","custom-vtuber-model-witch","chibi-vtuber-model-witch","custom-twitch-emotes-witch","vtuber-stream-background-room"],
   "Background":      ["vtuber-stream-background-room"],
   "Custom PFP":      ["custom-vtuber-pfp-wolf","custom-vtuber-pfp-glasses","custom-vtuber-pfp-leaf"],
-  "Emotes":          ["animated-twitch-emotes-witch","custom-twitch-emotes-witch","custom-twitch-emote-witch"],
+  "Emotes":          ["custom-twitch-emotes-witch","animated-twitch-emotes-witch","custom-twitch-emote-witch"],
   "Stream Overlay":  ["vtuber-stream-overlay-keikomi","vtuber-stream-background-room"],
   "Banner":          ["vtuber-twitch-banner-eyes-blue","animated-vtuber-banner-eyes-silver","vtuber-twitch-banner-mouth","vtuber-twitch-banner-eyes-fire","vtuber-twitch-banner-eyes-sakura"],
   "VTuber Pet":      ["vtuber-pet-mascot-anglercat","vtuber-pet-mascot-cat","vtuber-pet-mascot-tiger","vtuber-pet-mascot-snow-leopard","vtuber-pet-mascot-peach","vtuber-pet-mascot-bear"],
@@ -1652,11 +1652,11 @@ const DETAILS = {   // deskripsi lengkap tiap service (muncul saat kartu diklik)
     includes:["Full illustrations and scenes","Stream screens, overlays and alerts","Anything else, priced to your budget"],
     notes:"Name your price (+13% tax; commercial use +$30). I confirm the details and email you your invoice with a one-click PayPal link." },
 };
-const VTUBERS = [   // VTuber yang pernah kamu buat. name & link opsional (link: Twitch/YouTube/X)
-  { img:"vtuber-avatar-witch",  name:"Mirabelle", link:"" },
-  { img:"vtuber-avatar-dragon", name:"Seraphine", link:"" },
-  { img:"vtuber-avatar-maid",   name:"Lucie", link:"" },
-  { img:"vtuber-avatar-rocker", name:"Raven", link:"" },
+const VTUBERS = [   // VTuber yang pernah kamu buat. Isi name & link HANYA dengan nama klien asli (link: Twitch/YouTube/X). Nama dikosongkan Nov 2026 sampai dikonfirmasi pemilik
+  { img:"vtuber-avatar-witch",  name:"", link:"" },
+  { img:"vtuber-avatar-dragon", name:"", link:"" },
+  { img:"vtuber-avatar-maid",   name:"", link:"" },
+  { img:"vtuber-avatar-rocker", name:"", link:"" },
 ];
 const SERVICES = {
   "VTuber": { from: 100, eta: "2–3 weeks",
