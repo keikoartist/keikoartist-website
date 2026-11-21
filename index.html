@@ -1223,8 +1223,8 @@ body.fab-off .fab-order{opacity:0;pointer-events:none}
 <!-- VTUBERS I'VE MADE -->
 <section id="clients">
   <div class="wrap">
-    <div class="sec-head"><h2 class="serif">VTuber Children</h2></div>
-    <div class="vt-marquee" aria-label="VTuber Children by KeikoArts"><div class="vt-track" id="vtTrack"></div></div>
+    <div class="sec-head"><h2 class="serif">Original VTuber Characters</h2></div>
+    <div class="vt-marquee" aria-label="Original VTuber characters by KeikoArts"><div class="vt-track" id="vtTrack"></div></div>
   </div>
 </section>
 
@@ -1652,11 +1652,11 @@ const DETAILS = {   // deskripsi lengkap tiap service (muncul saat kartu diklik)
     includes:["Full illustrations and scenes","Stream screens, overlays and alerts","Anything else, priced to your budget"],
     notes:"Name your price (+13% tax; commercial use +$30). I confirm the details and email you your invoice with a one-click PayPal link." },
 };
-const VTUBERS = [   // VTuber yang pernah kamu buat. Isi name & link HANYA dengan nama klien asli (link: Twitch/YouTube/X). Nama dikonfirmasi asli oleh pemilik (Nov 2026)
-  { img:"vtuber-avatar-witch",  name:"Mirabelle", link:"" },
-  { img:"vtuber-avatar-dragon", name:"Seraphine", link:"" },
-  { img:"vtuber-avatar-maid",   name:"Lucie", link:"" },
-  { img:"vtuber-avatar-rocker", name:"Raven", link:"" },
+const VTUBERS = [   // VTuber yang pernah kamu buat. Isi name & link HANYA dengan nama klien asli (link: Twitch/YouTube/X). Karakter orisinal portofolio pribadi Keiko (bukan klien): jangan diberi nama klien
+  { img:"vtuber-avatar-witch",  name:"", link:"" },
+  { img:"vtuber-avatar-dragon", name:"", link:"" },
+  { img:"vtuber-avatar-maid",   name:"", link:"" },
+  { img:"vtuber-avatar-rocker", name:"", link:"" },
 ];
 const SERVICES = {
   "VTuber": { from: 100, eta: "2–3 weeks",
@@ -2223,7 +2223,7 @@ $$('.card').forEach(card=>{
 // VTubers marquee
 (function(){
   const t=$('#vtTrack');if(!VTUBERS.length){$('#clients').hidden=true;return;}
-  const item=v=>{const inner=`<img src="images/${v.img}.webp" alt="${esc(v.name||'VTuber by KeikoArts')}" loading="lazy">${v.name?`<span>${esc(v.name)}</span>`:''}`;
+  const item=v=>{const inner=`<img src="images/${v.img}.webp" alt="${esc(v.name||'Original VTuber character by KeikoArts')}" loading="lazy">${v.name?`<span>${esc(v.name)}</span>`:''}`;
     return v.link&&/^https:\/\//.test(v.link)?`<a class="vt" href="${esc(v.link)}" target="_blank" rel="noopener">${inner}</a>`:`<div class="vt">${inner}</div>`;};
   const one=VTUBERS.map(item).join('');
   t.innerHTML=one+`<span aria-hidden="true" class="vt-dup">${one}</span>`;
