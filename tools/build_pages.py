@@ -65,6 +65,42 @@ ALT = {
     'custom-illustration-cottage-garden': 'Illustration of a woman reading with a cat in a cottage garden',
     'live2d-rigging-showcase-poster': 'Live2D rigging showcase of a white-haired VTuber model',
 }
+# short caption under each artwork (what it is, from the picture itself; no claims about rigging or clients)
+CAPTION = {
+    'custom-vtuber-model-kitsune-gown': 'Kitsune in a layered gown · full‑body model art',
+    'custom-vtuber-model-witch': 'Pink-haired witch · full‑body model art',
+    'custom-vtuber-model-maid': 'Cat-eared maid · full‑body model art',
+    'custom-vtuber-model-rocker': 'Silver-haired rocker · full‑body model art',
+    'custom-vtuber-model-dragon': 'Dragon girl in a frilled dress · full‑body model art',
+    'vtuber-debut-package-keikomi': 'Debut package: model, logo, banner, expressions',
+    'vtuber-stream-overlay-keikomi': 'Starting Soon, BRB and Ending screens',
+    'vtuber-stream-background-room': 'Night-time streamer room background',
+    'chibi-vtuber-model-witch': 'Chibi witch · full‑body chibi art',
+    'custom-twitch-emotes-witch': 'Blush and surprised emotes',
+    'animated-twitch-emotes-witch': 'Set of 8 animated emotes',
+    'custom-twitch-emote-witch': 'Tongue-out emote',
+    'vtuber-twitch-banner-eyes-blue': 'Glowing blue eye banner',
+    'animated-vtuber-banner-eyes-silver': 'Animated eye banner',
+    'vtuber-twitch-banner-mouth': 'Fanged smile mouth banner',
+    'vtuber-twitch-banner-eyes-fire': 'Fire eye banner',
+    'vtuber-twitch-banner-eyes-sakura': 'Sakura eye banner',
+    'vtuber-pet-mascot-anglercat': 'Fluffy cat on an anglerfish',
+    'vtuber-pet-mascot-cat': 'Leaf cat with a flower collar',
+    'vtuber-pet-mascot-tiger': 'Tiger cub with a red crest',
+    'vtuber-pet-mascot-snow-leopard': 'Snow leopard with a flame tail',
+    'vtuber-pet-mascot-peach': 'Peach creature with a leaf hat',
+    'vtuber-pet-mascot-bear': 'Teddy bear in a top hat',
+    'vtuber-logo-mosswing': 'Mosswing logo in mossy lettering',
+    'custom-pngtuber-model-cat-mask': 'Cat-helmet girl · PNGTuber',
+    'custom-pngtuber-model-violet': 'Violet on a suitcase · PNGTuber',
+    'custom-vtuber-pfp-wolf': 'Wolf girl · profile picture',
+    'custom-vtuber-pfp-glasses': 'Man with glasses · profile picture',
+    'custom-vtuber-pfp-leaf': 'Leaf-collar character · profile picture',
+    'custom-illustration-calico-cat': 'Calico cat in a meadow',
+    'custom-illustration-tabby-kitten': 'Tabby kitten with mushrooms',
+    'custom-illustration-couple-selfie': 'Couple selfie illustration',
+    'custom-illustration-cottage-garden': 'Reading in a cottage garden',
+}
 def img_size(name):
     with Image.open(os.path.join(ROOT, 'images', name + '.webp')) as im:
         return im.size
@@ -257,7 +293,7 @@ def custom_vtuber():
   <section class="sec"><div class="wrap">
     <h2>Custom character design</h2>
     <p>You don't need a finished character sheet. Send a description, a few references or an existing design, and I work out the outfit, colors and details with you. Small changes are unlimited during the sketch stage, so the design can settle before coloring starts.</p>
-    <div class="gallery">{"".join(fig(x, "VTuber model art") for x in vtubers)}</div>
+    <div class="gallery">{"".join(fig(x, CAPTION.get(x, "VTuber model art")) for x in vtubers)}</div>
     <p class="note">More work in the <a href="/vtuber-portfolio/">VTuber portfolio</a>.</p>
   </div></section>
 
@@ -396,7 +432,7 @@ def pngtuber():
 
   <section class="sec"><div class="wrap">
     <h2>PNGTuber examples</h2>
-    <div class="gallery">{"".join(fig(x, "PNGTuber model") for x in imgs)}</div>
+    <div class="gallery">{"".join(fig(x, CAPTION.get(x, "PNGTuber model")) for x in imgs)}</div>
   </div></section>
 
   <section class="sec"><div class="wrap">
@@ -461,7 +497,7 @@ def emotes():
 
   <section class="sec"><div class="wrap">
     <h2>Emote examples</h2>
-    <div class="gallery">{"".join(fig(x, "Animated emote set" if "animated" in x else "Twitch emotes", wide="animated" in x) for x in imgs)}</div>
+    <div class="gallery">{"".join(fig(x, CAPTION.get(x, "Twitch emotes"), wide="animated" in x) for x in imgs)}</div>
   </div></section>
 
   <section class="sec"><div class="wrap">
@@ -509,7 +545,7 @@ def portfolio():
         if not names and cid != 'vtuber-models': continue
         seen.update(names)
         wide = lambda n: Image.open(os.path.join(ROOT, 'images', n + '.webp')).size[0] > 1.4 * Image.open(os.path.join(ROOT, 'images', n + '.webp')).size[1]
-        figs = (RIG_VIDEO if cid == 'vtuber-models' else '') + ''.join(fig(n, cap, wide(n)) for n in names)
+        figs = (RIG_VIDEO if cid == 'vtuber-models' else '') + ''.join(fig(n, CAPTION.get(n, cap), wide(n)) for n in names)
         toc.append(f'<a href="#{cid}">{title}</a>')
         secs.append(f'''  <section class="sec" id="{cid}"><div class="wrap">
     <h2>{title}</h2>
