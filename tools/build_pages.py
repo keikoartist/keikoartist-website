@@ -30,40 +30,40 @@ def money(n):
 
 # descriptive alt text for every portfolio image (what is actually in the picture)
 ALT = {
-    'vtuber-kitsune-gown': 'Full-body VTuber model art of a fox-eared girl in a pink and black layered gown with gold armor details',
-    'vtuber-witch': 'Full-body VTuber model art of a pink-haired witch in a purple outfit holding a pink flame',
-    'vtuber-maid': 'Full-body VTuber model art of a pink-haired maid with cat ears holding playing cards',
-    'vtuber-rocker': 'Full-body VTuber model art of a silver-haired rocker girl in a black jacket with a guitar case',
-    'vtuber-dragon': 'Full-body VTuber model art of a dragon girl with horns in a pink and black frilled dress',
-    'pkg-keikomi': 'VTuber debut package sheet with full-body model, rigging, logo, eye banner, expressions and PSD files',
-    'overlay-keikomi': 'Stream overlay set with Starting Soon, Be Right Back and Ending Soon screens in purple and pink',
-    'bg-stream-room': 'Night-time streamer bedroom background with gaming chair, desk and window',
-    'chibi-witch': 'Full-body chibi VTuber art of a pink-haired witch in a black and pink outfit',
-    'emotes-witch': 'Two Twitch emotes of a pink-haired witch: blushing and surprised',
-    'emotes-animated-witch': 'Set of 8 animated Twitch emotes of a pink-haired witch: surprised, tongue out, smug, nervous, crying, giggling with phone, blowing a kiss and holding money',
-    'emote-witch-1': 'Twitch emote of a pink-haired witch sticking out her tongue',
-    'eye-banner-blue': 'Eye banner of glowing blue eyes framed by purple hair',
-    'eye-banner-silver-animated': 'Animated eye banner of silver-haired character with glasses',
-    'mouth-banner': 'Mouth banner of a smiling character with fangs and purple nails',
-    'eye-banner-fire': 'Eye banner of orange eyes surrounded by flames',
-    'eye-banner-sakura': 'Eye banner of pink eyes with round glasses and cherry blossoms',
-    'mascot-anglercat': 'VTuber pet: fluffy blue cat sitting on a glowing anglerfish',
-    'mascot-pet': 'VTuber pet: green leaf cat with flower collar',
-    'mascot-tiger': 'VTuber pet: orange tiger cub with a red crest',
-    'mascot-snowleopard': 'VTuber pet: lavender snow leopard with purple flame tail',
-    'mascot-peach': 'VTuber pet: peach creature with leaf hat and green eyes',
-    'mascot-bear': 'VTuber pet: brown teddy bear with a top hat and green sash',
-    'logo-mosswing': 'Custom VTuber logo "Mosswing" in mossy green lettering with leaves',
-    'pngtuber-catmask': 'PNGTuber model of a girl wearing a black cat helmet with glowing eyes',
-    'pngtuber-violet': 'PNGTuber model of a purple-haired woman in a corset dress sitting on a suitcase',
-    'pfp-wolf': 'Profile picture of a silver-haired wolf girl in a red off-shoulder dress',
-    'pfp-glasses': 'Profile picture of a long-haired man with glasses',
-    'pfp-leaf': 'Profile picture of a green-haired character with leaf collar and antlers',
-    'illustration-calico': 'Illustration of a fluffy calico cat sitting in a flower meadow',
-    'illustration-tabby': 'Illustration of a tabby kitten with mushrooms in a meadow',
-    'illustration-couple-selfie': 'Couple illustration of two students taking a selfie on a phone',
-    'illustration-cottage': 'Illustration of a woman reading with a cat in a cottage garden',
-    'rigging-poster': 'Live2D rigging showcase of a white-haired VTuber model',
+    'custom-vtuber-model-kitsune-gown': 'Full-body VTuber model art of a fox-eared girl in a pink and black layered gown with gold armor details',
+    'custom-vtuber-model-witch': 'Full-body VTuber model art of a pink-haired witch in a purple outfit holding a pink flame',
+    'custom-vtuber-model-maid': 'Full-body VTuber model art of a pink-haired maid with cat ears holding playing cards',
+    'custom-vtuber-model-rocker': 'Full-body VTuber model art of a silver-haired rocker girl in a black jacket with a guitar case',
+    'custom-vtuber-model-dragon': 'Full-body VTuber model art of a dragon girl with horns in a pink and black frilled dress',
+    'vtuber-debut-package-keikomi': 'VTuber debut package sheet with full-body model, rigging, logo, eye banner, expressions and PSD files',
+    'vtuber-stream-overlay-keikomi': 'Stream overlay set with Starting Soon, Be Right Back and Ending Soon screens in purple and pink',
+    'vtuber-stream-background-room': 'Night-time streamer bedroom background with gaming chair, desk and window',
+    'chibi-vtuber-model-witch': 'Full-body chibi VTuber art of a pink-haired witch in a black and pink outfit',
+    'custom-twitch-emotes-witch': 'Two Twitch emotes of a pink-haired witch: blushing and surprised',
+    'animated-twitch-emotes-witch': 'Set of 8 animated Twitch emotes of a pink-haired witch: surprised, tongue out, smug, nervous, crying, giggling with phone, blowing a kiss and holding money',
+    'custom-twitch-emote-witch': 'Twitch emote of a pink-haired witch sticking out her tongue',
+    'vtuber-twitch-banner-eyes-blue': 'Eye banner of glowing blue eyes framed by purple hair',
+    'animated-vtuber-banner-eyes-silver': 'Animated eye banner of silver-haired character with glasses',
+    'vtuber-twitch-banner-mouth': 'Mouth banner of a smiling character with fangs and purple nails',
+    'vtuber-twitch-banner-eyes-fire': 'Eye banner of orange eyes surrounded by flames',
+    'vtuber-twitch-banner-eyes-sakura': 'Eye banner of pink eyes with round glasses and cherry blossoms',
+    'vtuber-pet-mascot-anglercat': 'VTuber pet: fluffy blue cat sitting on a glowing anglerfish',
+    'vtuber-pet-mascot-cat': 'VTuber pet: green leaf cat with flower collar',
+    'vtuber-pet-mascot-tiger': 'VTuber pet: orange tiger cub with a red crest',
+    'vtuber-pet-mascot-snow-leopard': 'VTuber pet: lavender snow leopard with purple flame tail',
+    'vtuber-pet-mascot-peach': 'VTuber pet: peach creature with leaf hat and green eyes',
+    'vtuber-pet-mascot-bear': 'VTuber pet: brown teddy bear with a top hat and green sash',
+    'vtuber-logo-mosswing': 'Custom VTuber logo "Mosswing" in mossy green lettering with leaves',
+    'custom-pngtuber-model-cat-mask': 'PNGTuber model of a girl wearing a black cat helmet with glowing eyes',
+    'custom-pngtuber-model-violet': 'PNGTuber model of a purple-haired woman in a corset dress sitting on a suitcase',
+    'custom-vtuber-pfp-wolf': 'Profile picture of a silver-haired wolf girl in a red off-shoulder dress',
+    'custom-vtuber-pfp-glasses': 'Profile picture of a long-haired man with glasses',
+    'custom-vtuber-pfp-leaf': 'Profile picture of a green-haired character with leaf collar and antlers',
+    'custom-illustration-calico-cat': 'Illustration of a fluffy calico cat sitting in a flower meadow',
+    'custom-illustration-tabby-kitten': 'Illustration of a tabby kitten with mushrooms in a meadow',
+    'custom-illustration-couple-selfie': 'Couple illustration of two students taking a selfie on a phone',
+    'custom-illustration-cottage-garden': 'Illustration of a woman reading with a cat in a cottage garden',
+    'live2d-rigging-showcase-poster': 'Live2D rigging showcase of a white-haired VTuber model',
 }
 def img_size(name):
     with Image.open(os.path.join(ROOT, 'images', name + '.webp')) as im:
@@ -79,7 +79,7 @@ def img(name, cls='', eager=False, sizes='(max-width:560px) 46vw, 260px', thumb=
     return f'<img src="/images/{name}.webp"{ss} alt="{e(ALT.get(name, name))}" width="{w}" height="{h}" {load} decoding="async"{(" class=" + chr(34) + cls + chr(34)) if cls else ""}>'
 def fig(name, caption, wide=False):
     return f'<figure{" class=\"wide\"" if wide else ""}><a href="/images/{name}.webp">{img(name, thumb=True, sizes="(max-width:560px) 94vw, 540px" if wide else "(max-width:560px) 46vw, 260px")}</a><figcaption>{e(caption)}</figcaption></figure>'
-RIG_VIDEO = ('<figure class="wide"><video src="/images/rigging-showcase.mp4" poster="/images/rigging-poster.webp" controls muted loop playsinline preload="none" '
+RIG_VIDEO = ('<figure class="wide"><video src="/images/live2d-rigging-showcase.mp4" poster="/images/live2d-rigging-showcase-poster.webp" controls muted loop playsinline preload="none" '
              'width="1280" height="720" aria-label="Live2D rigging showcase: head turns, blinking and hair physics"></video><figcaption>Live2D rigging showcase</figcaption></figure>')
 
 def svc_table(name, show_includes=True):
@@ -139,7 +139,7 @@ def page(path, title, desc, h1, crumb, body, faq, og_image, order='', extra_ld=N
 <meta property="og:image:height" content="{h}">
 <meta property="og:image:alt" content="{e(ALT.get(og_image, ''))}">
 <meta name="twitter:card" content="summary_large_image">
-<link rel="icon" href="/images/pfp.webp">
+<link rel="icon" href="/images/keikoarts-logo.webp">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Poppins:wght@400;500;600&display=swap" onload="this.onload=null;this.rel='stylesheet'">
@@ -149,7 +149,7 @@ def page(path, title, desc, h1, crumb, body, faq, og_image, order='', extra_ld=N
 <body>
 <header>
   <div class="wrap nav">
-    <a href="/" class="logo"><img src="/images/pfp.webp" alt="KeikoArts logo" width="40" height="40"><span><b>KeikoArts</b><small>Illustration &amp; Live2D Studio</small></span></a>
+    <a href="/" class="logo"><img src="/images/keikoarts-logo.webp" alt="KeikoArts logo" width="40" height="40"><span><b>KeikoArts</b><small>Illustration &amp; Live2D Studio</small></span></a>
     <nav class="menu" id="menu" aria-label="Main">{nav}</nav>
     <a href="{order_url}" rel="nofollow" class="btn btn-pink nav-cta arrow">Start a Project</a>
     <button class="burger" type="button" aria-label="Menu" aria-controls="menu" aria-expanded="false">☰</button>
@@ -166,7 +166,7 @@ def page(path, title, desc, h1, crumb, body, faq, og_image, order='', extra_ld=N
 <footer>
   <div class="wrap">
     <div class="foot">
-      <a href="/" class="logo"><img src="/images/pfp.webp" alt="" width="40" height="40"><span><b>KeikoArts</b><small>Illustration &amp; Live2D Studio</small></span></a>
+      <a href="/" class="logo"><img src="/images/keikoarts-logo.webp" alt="" width="40" height="40"><span><b>KeikoArts</b><small>Illustration &amp; Live2D Studio</small></span></a>
       <span><a href="https://discord.gg/FbgWxMPjf" target="_blank" rel="noopener"><b>Join Keiko's Discord</b></a></span>
     </div>
     <nav class="foot-links" aria-label="Services">{"".join(f'<a href="{u}">{t}</a>' for u, t in FOOT)}</nav>
@@ -300,7 +300,7 @@ def rigging():
       <div class="btns"><a class="btn btn-pink arrow" rel="nofollow" href="/?order=VTuber">Order rigging</a><a class="btn btn-ghost" href="/custom-vtuber-model/">Need the art too?</a></div>
       <div class="facts"><span>Rig only from <b>{money(vp["Bust · Rig only"])}</b></span><span>Art + rig from <b>{money(vp["Bust · Art + Rig"])}</b></span><span>VTube Studio <b>ready</b></span></div>
     </div>
-    <figure class="cover"><video src="/images/rigging-showcase.mp4" poster="/images/rigging-poster.webp" controls muted loop playsinline preload="none" width="1280" height="720" aria-label="Live2D rigging showcase: head turns, blinking and hair physics"></video></figure>
+    <figure class="cover"><video src="/images/live2d-rigging-showcase.mp4" poster="/images/live2d-rigging-showcase-poster.webp" controls muted loop playsinline preload="none" width="1280" height="720" aria-label="Live2D rigging showcase: head turns, blinking and hair physics"></video></figure>
   </section>
 
   <section class="sec"><div class="wrap">
@@ -357,7 +357,7 @@ def rigging():
     ]
     desc = f'Live2D rigging for your VTuber art: head turns, blinking, lip-sync and hair & clothing physics, delivered with a VTube Studio file. Rig only from {money(vp["Bust · Rig only"])}.'
     return page('live2d-rigging', 'Live2D Rigging Commission for VTuber Models | KeikoArtist', desc, 'Live2D Rigging for VTuber Models', 'Live2D Rigging',
-                body, faq, 'rigging-poster', 'VTuber', service_ld('Live2D rigging', SITE + 'live2d-rigging/', desc, vp["Bust · Rig only"]))
+                body, faq, 'live2d-rigging-showcase-poster', 'VTuber', service_ld('Live2D rigging', SITE + 'live2d-rigging/', desc, vp["Bust · Rig only"]))
 
 # ---------------------------------------------------------------- 3. PNGTuber
 def pngtuber():
@@ -501,8 +501,8 @@ def portfolio():
     seen = set(); secs = []
     toc = []
     for cid, title, key, link, linktext, cap in cats:
-        names = ['overlay-keikomi', 'bg-stream-room'] if key is None else [n for n in GALLERY.get(key, []) if n != 'bg-stream-room' or key == 'Background']
-        if key == 'VTuber Packages': names = ['pkg-keikomi']
+        names = ['vtuber-stream-overlay-keikomi', 'vtuber-stream-background-room'] if key is None else [n for n in GALLERY.get(key, []) if n != 'vtuber-stream-background-room' or key == 'Background']
+        if key == 'VTuber Packages': names = ['vtuber-debut-package-keikomi']
         names = [n for n in names if n not in seen and os.path.exists(os.path.join(ROOT, 'images', n + '.webp'))]
         if not names and cid != 'vtuber-models': continue
         seen.update(names)
@@ -593,7 +593,7 @@ def pricing():
                  "itemListElement": [{"@type": "Offer", "price": str(SERVICES[n]["from"]), "priceCurrency": "USD",
                                       "itemOffered": {"@type": "Service", "name": n, "provider": {"@type": "ProfessionalService", "name": "KeikoArts", "url": SITE}}} for n in order]}
     return page('vtuber-pricing', 'VTuber Commission Prices & Packages | KeikoArtist', desc, 'VTuber Commission Prices', 'VTuber Pricing',
-                body, faq, 'pkg-keikomi', '', offers_ld)
+                body, faq, 'vtuber-debut-package-keikomi', '', offers_ld)
 
 # ---------------------------------------------------------------- 404
 def not_found():
@@ -601,7 +601,7 @@ def not_found():
                '''  <section class="wrap phero" style="grid-template-columns:1fr">
     <div><h1 class="serif">Page not found</h1><p class="lead">This page doesn't exist (anymore). Try one of these:</p>
     <div class="btns"><a class="btn btn-pink" href="/">Home</a><a class="btn btn-ghost" href="/custom-vtuber-model/">Custom VTuber models</a><a class="btn btn-ghost" href="/vtuber-pricing/">Prices</a></div></div>
-  </section>''', [('How do I order?', 'Go to the <a href="/">homepage</a> and click "Start a Project".')], 'vtuber-witch')
+  </section>''', [('How do I order?', 'Go to the <a href="/">homepage</a> and click "Start a Project".')], 'custom-vtuber-model-witch')
     out = out.replace('<meta name="robots" content="index, follow, max-image-preview:large">', '<meta name="robots" content="noindex">')
     out = re.sub(r'<link rel="canonical"[^>]*>\n', '', out)
     out = re.sub(r'<script type="application/ld\+json">.*?</script>\n', '', out)

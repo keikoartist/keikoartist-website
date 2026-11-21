@@ -8,7 +8,7 @@
 <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <title>KeikoArts Inbox</title>
-<link rel="icon" href="../images/pfp.webp">
+<link rel="icon" href="../images/keikoarts-logo.webp">
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 :root{--pink:#f2628f;--pink-2:#ff8fb1;--soft:#fff4f8;--line:#fbd3e0;--ink:#7a2846;--muted:#a8607a;--bg:#fff}
@@ -188,7 +188,7 @@ select{padding:7px 10px;border:1px solid var(--line);border-radius:999px;backgro
 <body>
 <div class="login" id="loginView" hidden>
   <form id="loginForm" action="javascript:void(0)">
-    <img src="../images/pfp.webp" alt="">
+    <img src="../images/keikoarts-logo.webp" alt="">
     <h1 class="serif">KeikoArts Inbox</h1>
     <p>Website chats &amp; orders <small style="opacity:.6">v4</small></p>
     <input type="password" id="pw" placeholder="Admin password" autocomplete="current-password" required>
@@ -198,7 +198,7 @@ select{padding:7px 10px;border:1px solid var(--line);border-radius:999px;backgro
     <div class="okmsg" id="forgotMsg" role="status" hidden></div>
   </form>
   <form id="resetForm" action="javascript:void(0)" hidden>
-    <img src="../images/pfp.webp" alt="">
+    <img src="../images/keikoarts-logo.webp" alt="">
     <h1 class="serif">New password</h1>
     <p>Choose a new admin password (at least 8 characters).</p>
     <input type="password" id="npw" placeholder="New password" autocomplete="new-password" minlength="8" required>
@@ -210,7 +210,7 @@ select{padding:7px 10px;border:1px solid var(--line);border-radius:999px;backgro
 
 <div class="app" id="appView" hidden>
   <div class="top">
-    <img src="../images/pfp.webp" alt="">
+    <img src="../images/keikoarts-logo.webp" alt="">
     <h1 class="serif">Inbox <small id="unreadTot"></small></h1>
     <div class="modes" role="tablist"><button type="button" class="on" data-mode="chat">💬 Chats</button><button type="button" data-mode="orders">🧾 Orders <i id="newOrders" hidden></i></button></div>
     <label class="agent"><span>Reply as</span><input id="agent" maxlength="30" placeholder="Keiko"></label>
@@ -347,7 +347,7 @@ async function loadList(){
   let j;try{j=await api({action:'list',status})}catch(_){return}
   const tot=Number(j.unread_total)||0;$('#unreadTot').textContent=tot?`· ${tot} unread`:'';
   lastChatN=tot;tabDot(tot+newOrdersN,'KeikoArts Inbox');
-  if(lastUnread>=0&&tot>lastUnread){beep();if('Notification' in window&&Notification.permission==='granted'&&document.visibilityState!=='visible'){try{new Notification('New chat message',{body:'Someone messaged KeikoArts',icon:'../images/pfp.webp'})}catch(_){}}}
+  if(lastUnread>=0&&tot>lastUnread){beep();if('Notification' in window&&Notification.permission==='granted'&&document.visibilityState!=='visible'){try{new Notification('New chat message',{body:'Someone messaged KeikoArts',icon:'../images/keikoarts-logo.webp'})}catch(_){}}}
   lastUnread=tot;
   const box=$('#items');box.innerHTML='';
   if(!j.conversations.length){box.appendChild(el('div','empty',status==='open'?'No open chats yet ♡':'No closed chats'));return;}
@@ -444,7 +444,7 @@ document.querySelectorAll('.modes button').forEach(b=>b.onclick=()=>setMode(b.da
 document.querySelectorAll('.otabs button').forEach(b=>b.onclick=()=>{document.querySelectorAll('.otabs button').forEach(x=>x.classList.toggle('on',x===b));ostatus=b.dataset.os;loadOrders();});
 
 function badge(n){const i=$('#newOrders');i.hidden=!n;i.textContent=n;newOrdersN=Number(n)||0;tabDot(lastChatN+newOrdersN,'KeikoArts Inbox');
-  if(lastNew>=0&&n>lastNew){beep();if('Notification' in window&&Notification.permission==='granted'&&document.visibilityState!=='visible'){try{new Notification('New order!',{body:'Someone placed an order on KeikoArts',icon:'../images/pfp.webp'})}catch(_){}}}
+  if(lastNew>=0&&n>lastNew){beep();if('Notification' in window&&Notification.permission==='granted'&&document.visibilityState!=='visible'){try{new Notification('New order!',{body:'Someone placed an order on KeikoArts',icon:'../images/keikoarts-logo.webp'})}catch(_){}}}
   lastNew=n;}
 async function pollOrders(){try{const j=await oapi({action:'count'});badge(Number(j.new)||0);if(mode==='orders')loadOrders();}catch(_){}}
 async function loadStorage(){try{const j=await oapi({action:'storage'});if(typeof j.bytes!=='number')return;const mb=j.bytes/1048576;$('#storage').textContent=`💾 ${mb<10?mb.toFixed(1):Math.round(mb)} MB of files · ${j.orders} orders`;}catch(_){}}
