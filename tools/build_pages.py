@@ -101,7 +101,7 @@ def addons_line(name):
 NAV = [('/', 'Home'), ('/custom-vtuber-model/', 'VTuber Models'), ('/live2d-rigging/', 'Live2D Rigging'),
        ('/custom-pngtuber-model/', 'PNGTuber'), ('/vtuber-pricing/', 'Pricing'), ('/vtuber-portfolio/', 'Portfolio')]
 FOOT = [('/custom-vtuber-model/', 'Custom VTuber Model'), ('/live2d-rigging/', 'Live2D Rigging'), ('/custom-pngtuber-model/', 'Custom PNGTuber Model'), ('/custom-twitch-emotes/', 'Custom Twitch Emotes'),
-        ('/vtuber-pricing/', 'VTuber Pricing'), ('/vtuber-portfolio/', 'VTuber Portfolio'), ('/#faq', 'FAQ'), ('/#tos', 'Terms of Service')]
+        ('/vtuber-pricing/', 'VTuber Pricing'), ('/vtuber-portfolio/', 'VTuber Portfolio'), ('/#faq', 'FAQ'), ('/#tos', 'Terms of Service'), ('/#privacy', 'Privacy')]
 
 def page(path, title, desc, h1, crumb, body, faq, og_image, order='', extra_ld=None, eyebrow='KeikoArts · VTuber art & Live2D studio'):
     url = SITE + path.strip('/') + '/'

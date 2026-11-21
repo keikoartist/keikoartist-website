@@ -1078,6 +1078,26 @@ footer{margin-top:24px}
 @media (max-width:1100px){.menu.open .menu-dc{display:inline-flex;align-items:center;gap:8px}}
 .menu .menu-dc svg{width:18px;height:18px}
 .kc-welcome a{color:var(--pink);font-weight:600}
+
+/* polish 2026-11: readable small pink text (4.7:1), same brand pink for buttons, headings and decoration */
+:root{--pink-text:#cc3d6e}
+.eyebrow,.btn-ghost,.card .more,.price b,.member .ig,.q-ask a,.tiers li b,.tiers td,.tiers .addons summary,.svc-note a,.vm-card a,.vm-links a,.kc-welcome a,.svc-empty a,.st,.drop b,.ty-pay .ty-kofi a,.ty-soc a{color:var(--pink-text)}
+.btn-ghost{border-color:var(--pink)}
+@media (hover:hover){.btn-ghost:hover{color:#fff}}
+.hero-top{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.hero-top .slot-badge{font-size:12px;padding:4px 12px}
+body.fab-off .fab-order{opacity:0;pointer-events:none}
+#privacy{scroll-margin-top:96px}
+@media (max-width:820px){
+  .hero-grid{display:flex;flex-direction:column;align-items:stretch;gap:0}
+  .hero-copy{display:contents}
+  .hero-top{order:1}.hero h1{order:2}.hero-copy>p{order:3}.hero .btns{order:4}
+  .hero-art{order:5;width:100%;margin:6px 0 4px}.hero-dc{order:6}.perks{order:7}
+  .hero-top{row-gap:8px}
+  .hero-art img{max-height:260px;width:100%;object-fit:cover}
+  .gal-btn{position:absolute}.gal-btn::after,.rv-dots button::after{content:"";position:absolute;inset:-6px}
+  .rv-dots button{position:relative;height:44px}
+}
 </style>
 </head>
 <body>
@@ -1110,9 +1130,9 @@ footer{margin-top:24px}
 <section class="hero" id="home">
   <div class="wrap hero-grid">
     <div class="hero-copy">
-      <div class="eyebrow">VTuber Artist &amp; Live2D Studio</div>
+      <div class="hero-top"><div class="eyebrow">VTuber Artist &amp; Live2D Studio</div><span class="slot-badge open" id="slotBadge">Commissions open</span></div>
       <h1 class="serif">Custom <em>VTuber</em> Models &amp; Live2D Rigging</h1>
-      <p>Create your own custom VTuber model with personalized anime artwork, expressive Live2D rigging, and a design tailored to your character.</p>
+      <p>Original anime VTuber models where cute meets gothic, drawn from scratch and rigged in Live2D, ready for VTube Studio.</p>
       <div class="btns">
         <a href="#order" data-order class="btn btn-pink arrow">Start a Project</a>
         <a href="/custom-vtuber-model/" class="btn btn-ghost">Explore VTuber Models</a>
@@ -1209,7 +1229,7 @@ footer{margin-top:24px}
 <!-- REVIEWS (real client reviews; add new ones by copying a <figure>) -->
 <section id="reviews" class="tint-pink">
   <div class="wrap">
-    <div class="sec-head"><h2 class="serif">Kind words from clients</h2><p class="rv-score"><span aria-hidden="true">★★★★★</span> 5.0 from 12 reviews · verified VGen commissions</p></div>
+    <div class="sec-head"><h2 class="serif">Kind words from clients</h2><p class="rv-score"><span aria-hidden="true">★★★★★</span> 5.0 from 12 client reviews</p></div>
     <div class="rv-grid">
       <figure class="rv-card">
         <div class="rv-stars" role="img" aria-label="5 out of 5 stars">★★★★★</div>
@@ -1336,6 +1356,7 @@ footer{margin-top:24px}
       <div><h3>6. Usage rights</h3><ul><li>Personal and streaming use, monetized content and socials are allowed.</li><li>Merch / commercial rights: $30 add-on for any service.</li><li>The artist keeps copyright. No reselling, no NFT, no AI training.</li></ul></div>
       <div><h3>7. Portfolio</h3><p>I may share finished work on my portfolio and socials unless you request a private or delayed reveal.</p></div>
       <div><h3>8. Agreement</h3><p>By placing an order, you agree to these terms.</p></div>
+      <div id="privacy"><h3>9. Privacy</h3><p>I keep only what your order or chat needs: your name, email, Discord or other contact, your brief and files, and our messages. I use them to make your commission, send invoices and updates, and reply to you. Payments go through PayPal; I never see your card. Your details are never sold or shared for marketing. To have your data deleted, message me on Discord or email.</p></div>
     </div>
     </details>
   </div>
@@ -1506,7 +1527,7 @@ footer{margin-top:24px}
             <dl id="invLines"></dl>
             <p id="invNote">After sending, I review your order and email you your invoice (PDF) with a one-click PayPal link. Nothing is charged now.</p>
           </div>
-          <label class="check" id="agreeRow"><input type="checkbox" id="agree"><span>I have read and agree to the <a href="#tos" data-close style="color:var(--pink);font-weight:600">Terms of Service</a>.</span></label>
+          <label class="check" id="agreeRow"><input type="checkbox" id="agree"><span>I have read and agree to the <a href="#tos" data-close style="color:var(--pink-text);font-weight:600">Terms of Service and Privacy</a>.</span></label>
         </div>
 
         <p class="err" id="err"></p>
@@ -1560,7 +1581,7 @@ footer{margin-top:24px}
         <a href="https://discord.gg/FbgWxMPjf" target="_blank" rel="noopener" class="foot-dc">Join Keiko's Discord</a>
       </div>
     </div>
-    <nav class="foot-links" aria-label="Services"><a href="#process">How it works</a><a href="#faq">FAQ</a><a href="#tos">Terms of Service</a><a href="#reviews">Reviews</a><a href="/custom-vtuber-model/">Custom VTuber Model</a><a href="/live2d-rigging/">Live2D Rigging</a><a href="/custom-pngtuber-model/">Custom PNGTuber Model</a><a href="/custom-twitch-emotes/">Twitch Emotes</a><a href="/vtuber-pricing/">VTuber Pricing</a><a href="/vtuber-portfolio/">Portfolio</a></nav>
+    <nav class="foot-links" aria-label="Services"><a href="#process">How it works</a><a href="#faq">FAQ</a><a href="#tos">Terms of Service</a><a href="#privacy">Privacy</a><a href="#reviews">Reviews</a><a href="/custom-vtuber-model/">Custom VTuber Model</a><a href="/live2d-rigging/">Live2D Rigging</a><a href="/custom-pngtuber-model/">Custom PNGTuber Model</a><a href="/custom-twitch-emotes/">Twitch Emotes</a><a href="/vtuber-pricing/">VTuber Pricing</a><a href="/vtuber-portfolio/">Portfolio</a></nav>
     <div class="copy">© <span id="yr"></span> KeikoArts · keikoartist.com</div>
   </div>
 </footer>
@@ -1569,6 +1590,7 @@ footer{margin-top:24px}
 /* ==========================================================
    EDIT DI SINI — slot, antrian, harga & add-on
    ========================================================== */
+const SLOTS = { open: true, text: "Commissions open" };   // status komisi di hero. Tutup: { open: false, text: "Commissions closed" }
 const PAYPAL = {          // kosong: link PayPal dikirim lewat email invoice setelah order dicek (bukan langsung di website)
   email: "",
   me: "",
@@ -2217,6 +2239,7 @@ $$('.card').forEach(card=>{
     const tk=t.querySelector('.gal-track');if(tk)tk.addEventListener('scroll',rest,{once:true,passive:true});io.unobserve(t);}}),{rootMargin:'200px'});
   $$('.gal').forEach(g=>io.observe(g));
   const v=$('#rigVid');if(!v)return;
+  if(matchMedia('(max-width:820px)').matches){v.controls=true;return;}   // phones: poster only, tap play (saves 2.4 MB)
   const anyModal=()=>!!document.querySelector('.modal.show,.sd.show,.lb.show');
   let vis=false;
   const sync=()=>{if(vis&&!anyModal()&&document.visibilityState==='visible'){v.play().catch(()=>{});}else v.pause();};
@@ -2380,6 +2403,8 @@ let tabVisitorN=0,tabAdminN=0;const tabSync=()=>tabDot(tabVisitorN+tabAdminN);
 // "Chat with us" in the phone menu opens the chat
 document.addEventListener('click',e=>{const a=e.target.closest('.menu-chat');if(!a)return;e.preventDefault();$('#menu').classList.remove('open');const b=$('#kcBubble');if(b)b.click();});
 // the floating "Order now" button appears once the hero buttons are scrolled away
+(function(){const b=$('#slotBadge');if(b&&typeof SLOTS!=='undefined'){b.textContent=SLOTS.text;b.className='slot-badge '+(SLOTS.open?'open':'closed');}})();
+(function(){const t=[...document.querySelectorAll('#start,footer')];if(!t.length||!('IntersectionObserver' in window))return;const on=new Set();const io=new IntersectionObserver(es=>{es.forEach(e=>e.isIntersecting?on.add(e.target):on.delete(e.target));document.body.classList.toggle('fab-off',on.size>0);});t.forEach(x=>io.observe(x));})();
 (function(){const hb=document.querySelector('.hero .btns');if(!hb||!('IntersectionObserver' in window)){document.body.classList.add('past-hero');return;}
   new IntersectionObserver(es=>es.forEach(e=>document.body.classList.toggle('past-hero',!e.isIntersecting&&e.boundingClientRect.top<0))).observe(hb);})();
 // services: 6 main ones, the rest behind "View all services"
@@ -2388,7 +2413,8 @@ document.addEventListener('click',e=>{const a=e.target.closest('.menu-chat');if(
   b.onclick=()=>{const open=g.classList.toggle('all');b.setAttribute('aria-expanded',open);b.textContent=open?'Show fewer services':'View all services ('+n+')';
     if(!open)$('#services').scrollIntoView({behavior:'smooth',block:'start'});};})();
 // open Terms when a TOS link is used
-document.addEventListener('click',e=>{const a=e.target.closest('a[href="#tos"]');if(a){const d=$('.tos-box');if(d)d.open=true;}});
+document.addEventListener('click',e=>{const a=e.target.closest('a[href="#tos"],a[href="#privacy"]');if(a){const d=$('.tos-box');if(d)d.open=true;}});
+if(/^#(tos|privacy)$/.test(location.hash)){const d=$('.tos-box');if(d){d.open=true;setTimeout(()=>document.querySelector(location.hash).scrollIntoView(),50);}}
 // nav
 const links=$$('.menu a[href^="#"]');
 addEventListener('scroll',()=>{let cur='home';links.forEach(l=>{const s=document.querySelector(l.getAttribute('href'));if(s&&s.getBoundingClientRect().top<120)cur=s.id});
