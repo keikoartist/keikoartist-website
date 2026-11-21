@@ -273,8 +273,8 @@ def custom_vtuber():
 
   <section class="sec"><div class="wrap">
     <h2>Usage rights</h2>
-    <p>Personal use, streaming, monetized videos and social media are included. Merch and other commercial rights are an add-on (+{money(vadd["Commercial / merch rights"])}). The artist keeps the copyright; reselling, NFTs and AI training are not allowed. Read the full <a href="/#tos" style="color:var(--pink);font-weight:600">Terms of Service</a>.</p>
-    <p>Preparing a debut? <a href="/vtuber-pricing/#vtuber-packages" style="color:var(--pink);font-weight:600">VTuber packages</a> start at {money(SERVICES["VTuber Packages"]["from"])} and bundle the model with emotes, a background, an overlay and more.</p>
+    <p>Personal use, streaming, monetized videos and social media are included. Merch and other commercial rights are an add-on (+{money(vadd["Commercial / merch rights"])}). The artist keeps the copyright; reselling, NFTs and AI training are not allowed. Read the full <a href="/#tos" style="color:var(--pink-text);font-weight:600">Terms of Service</a>.</p>
+    <p>Preparing a debut? <a href="/vtuber-pricing/#vtuber-packages" style="color:var(--pink-text);font-weight:600">VTuber packages</a> start at {money(SERVICES["VTuber Packages"]["from"])} and bundle the model with emotes, a background, an overlay and more.</p>
   </div></section>
 {related("/custom-vtuber-model/")}
 {cta("Ready to design your VTuber?", "Send your idea and get your invoice by email. Nothing is charged until you pay it.", "VTuber", "Start your VTuber model")}'''

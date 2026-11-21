@@ -115,3 +115,4 @@ footer{margin-top:60px;background:linear-gradient(135deg,#f2628f,#ff8fb1);color:
 :root{--pink-text:#c23a69}
 .crumbs a,.eyebrow,.facts b,.box a,.prose a,.faq a,.note a,.svc .meta a,.btn-ghost{color:var(--pink-text)}
 @media (hover:hover){.btn-ghost:hover{color:#fff}}
+.tbl thead th{color:#9a5670}
