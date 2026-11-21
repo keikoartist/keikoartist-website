@@ -1126,7 +1126,7 @@ header a.tap,header button.tap{transform:scale(.93)}
 .gift.found{animation:giftpop .45s ease-out forwards;pointer-events:none}
 @keyframes giftbob{0%,100%{transform:translateY(0) rotate(-6deg)}50%{transform:translateY(-3px) rotate(6deg)}}
 @keyframes giftpop{50%{transform:scale(1.5)}100%{transform:scale(0);opacity:0}}
-.gift-hunt{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:var(--pink-text);background:#fff4f8;border:1px solid var(--line);border-radius:999px;padding:4px 12px}
+.gift-hunt{font:inherit;cursor:pointer;animation:huntglow 2.4s ease-in-out infinite;display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:var(--pink-text);background:#fff4f8;border:1px solid var(--line);border-radius:999px;padding:4px 12px}
 .gift-count{position:fixed;left:14px;top:84px;z-index:60;background:#fff;border:1px solid var(--line);box-shadow:0 6px 18px rgba(242,98,143,.18);border-radius:999px;padding:6px 12px;font-size:13px;font-weight:600;color:var(--pink-text);display:flex;align-items:center;gap:6px;transition:transform .3s}
 .gift-count.bump{transform:scale(1.12)}
 body:has(.gift-win) .fab-order,body:has(.gift-win) .gift-count{display:none}
@@ -1138,6 +1138,14 @@ body:has(.gift-win) .fab-order,body:has(.gift-win) .gift-count{display:none}
 .confetti{position:fixed;top:-12px;z-index:201;width:8px;height:12px;border-radius:2px;pointer-events:none;animation:conf var(--d) linear forwards}
 @keyframes conf{to{transform:translate(var(--x),105vh) rotate(var(--r))}}
 .gw-box.shake{animation:gwshake .3s ease-in-out 3}@keyframes gwshake{25%{transform:rotate(-12deg)}75%{transform:rotate(12deg)}}
+.gw-list{list-style:none;padding:0;margin:0 0 14px;display:grid;gap:6px;text-align:left;font-size:14.5px;color:var(--ink)}
+.gw-list li{background:#fff4f8;border:1px solid var(--line);border-radius:12px;padding:8px 12px}
+@keyframes huntglow{0%,100%{box-shadow:0 0 0 0 rgba(242,98,143,0)}50%{box-shadow:0 0 0 5px rgba(242,98,143,.16)}}
+.wh{position:relative;width:min(280px,72vw);aspect-ratio:1;margin:4px auto 18px}
+.wh-rot{width:100%;height:100%;border-radius:50%;box-shadow:0 10px 30px rgba(242,98,143,.25),0 0 0 6px #fff,0 0 0 8px #fbd3e0}
+.wh-svg{width:100%;height:100%;display:block}
+.wh-pin{position:absolute;left:50%;top:-10px;transform:translateX(-50%);width:0;height:0;border-left:13px solid transparent;border-right:13px solid transparent;border-top:24px solid #c23a69;z-index:2;filter:drop-shadow(0 2px 3px rgba(122,40,70,.3))}
+.gift-win .wh-go:disabled{opacity:.6}
 .gw-code{color:var(--pink-text);letter-spacing:.08em;font-size:18px}
 .gift-win small{display:block;margin-top:8px;font-size:12.5px}
 @media (prefers-reduced-motion:reduce){.gift{animation:none}.confetti{display:none}}
@@ -2455,39 +2463,41 @@ document.addEventListener('click',e=>{const a=e.target.closest('.menu-chat');if(
   for(let i=0;i<n;i++){const r=Math.random;html+=`<i style="left:${(r()*100).toFixed(1)}%;--s:${(4+r()*6).toFixed(1)}px;--c:${cols[i%4]};--d:${(9+r()*9).toFixed(1)}s;--l:-${(r()*18).toFixed(1)}s;--x:${(r()*60-30).toFixed(0)}px"></i>`;}
   box.innerHTML=html;h.prepend(box);})();
 (function(){if(!document.body.classList.contains('xmas'))return;
-  const KEY='ka-gifts-2026',spots=['#portfolio .sec-head h2','#services .sec-head h2','#reviews .sec-head h2','#process .sec-head h2','#faq .sec-head h2'];
-  const svg='<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="9" width="18" height="12" rx="2" fill="#f2628f"/><rect x="2" y="6" width="20" height="5" rx="1.5" fill="#ff8fb1"/><rect x="10.5" y="6" width="3" height="15" fill="#e9dcff"/><path d="M12 6c-2-4-6-4-6-1.5S10 6 12 6Zm0 0c2-4 6-4 6-1.5S14 6 12 6Z" fill="#c9a7ff"/></svg>';
-  let got=[];try{got=JSON.parse(localStorage.getItem(KEY)||'[]')}catch(_){}
-  const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(got))}catch(_){}};
-  const top=document.querySelector('.hero-top');if(top&&got.length<spots.length){const h=document.createElement('span');h.className='gift-hunt';h.innerHTML='🎁 Find 5 hidden gifts';top.appendChild(h);}
-  let cnt=null;const count=()=>{if(!cnt){cnt=document.createElement('div');cnt.className='gift-count';cnt.setAttribute('aria-live','polite');document.body.appendChild(cnt);}
-    cnt.innerHTML=`🎁 ${got.length}/${spots.length}`;cnt.classList.add('bump');setTimeout(()=>cnt.classList.remove('bump'),300);};
-  if(got.length&&got.length<spots.length)count();
-  const GIFTS=['Free emotes','Free Christmas badges','Free source files','Free skeb','Free sketch','10% off your next commission'];   // hadiah game Natal (dari pemilik)
-  const confetti=()=>{if(matchMedia('(prefers-reduced-motion:reduce)').matches)return;const cols=['#f2628f','#ff8fb1','#c9a7ff','#ffd166','#9be7c4'];
-    for(let i=0;i<60;i++){const c=document.createElement('i');c.className='confetti';c.style.left=(Math.random()*100)+'vw';c.style.background=cols[i%5];
+  // Christmas spin wheel: one spin per visitor, prize + claim code for Discord (prizes set by the owner; Keiko applies them by hand)
+  const KEY='ka-wheel-2026';
+  const GIFTS=['Free emotes','Free Christmas badges','Free source files','Free skeb','Free sketch','10% off your next commission'];
+  const SHORT=['Free emotes','Xmas badges','Source files','Free skeb','Free sketch','10% off'];
+  const n=GIFTS.length,cols=['#f2628f','#ffd1df','#c9a7ff','#ffe3ec','#ff8fb1','#efe6ff'],ink=['#fff','#7a2846','#fff','#7a2846','#fff','#7a2846'];
+  let res=null;try{res=JSON.parse(localStorage.getItem(KEY)||'null')}catch(_){}
+  const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(res))}catch(_){}};
+  const top=document.querySelector('.hero-top');if(!top)return;
+  const chip=document.createElement('button');chip.type='button';chip.className='gift-hunt';top.appendChild(chip);
+  const label=()=>{chip.innerHTML=res?'🎁 Your prize: '+GIFTS[res.g]+' · '+res.c:'🎡 Spin the Christmas wheel';};label();
+  const confetti=()=>{if(matchMedia('(prefers-reduced-motion:reduce)').matches)return;const cs=['#f2628f','#ff8fb1','#c9a7ff','#ffd166','#9be7c4'];
+    for(let i=0;i<60;i++){const c=document.createElement('i');c.className='confetti';c.style.left=(Math.random()*100)+'vw';c.style.background=cs[i%5];
       c.style.setProperty('--d',(2+Math.random()*2).toFixed(2)+'s');c.style.setProperty('--x',(Math.random()*160-80).toFixed(0)+'px');c.style.setProperty('--r',(Math.random()*720).toFixed(0)+'deg');c.style.animationDelay=(Math.random()*.6).toFixed(2)+'s';
       document.body.appendChild(c);setTimeout(()=>c.remove(),4800);}};
-  const prize=()=>{let r=null;try{r=JSON.parse(localStorage.getItem(KEY+'-prize')||'null')}catch(_){}
-    if(!r){const a='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';let c='';for(let i=0;i<5;i++)c+=a[Math.floor(Math.random()*a.length)];r={g:Math.floor(Math.random()*GIFTS.length),c:'XMAS-'+c};try{localStorage.setItem(KEY+'-prize',JSON.stringify(r))}catch(_){}}
-    return r;};
-  const win=()=>{if(cnt)cnt.remove();const w=document.createElement('div');w.className='gift-win';
-    w.innerHTML='<div role="dialog" aria-modal="true" aria-label="You found all gifts"><div class="gw-box" style="font-size:44px">🎁</div><h3>You found all 5 gifts!</h3><p class="gw-msg">Merry Christmas ♡ Open your present from Keiko.</p><div class="btns"><button class="btn btn-pink gw-open" type="button">Open my gift</button><button class="btn btn-ghost gw-close" type="button">Close</button></div></div>';
-    document.body.appendChild(w);const close=()=>w.remove();w.querySelector('.gw-close').onclick=close;w.addEventListener('click',e=>{if(e.target===w)close();});
-    const box=w.querySelector('.gw-box');
-    w.querySelector('.gw-open').onclick=()=>{box.classList.add('shake');setTimeout(()=>{const r=prize();box.classList.remove('shake');box.textContent='🎉';
-      w.querySelector('h3').textContent=GIFTS[r.g]+'!';
-      w.querySelector('.gw-msg').innerHTML='Your claim code: <b class="gw-code">'+r.c+'</b><br><small>Send this code (or a screenshot) to Keiko on Discord to claim it with your next commission. One gift per person, valid until 6 Jan 2027.</small>';
-      w.querySelector('.btns').innerHTML='<a class="btn btn-pink" href="https://discord.gg/FbgWxMPjf" target="_blank" rel="noopener">Claim on Discord</a><button class="btn btn-ghost" type="button">Close</button>';
-      w.querySelector('.btns button').onclick=close;confetti();},900);};
-    confetti();};
-  const shown=()=>{let r=null;try{r=JSON.parse(localStorage.getItem(KEY+'-prize')||'null')}catch(_){}return r;};
-  if(got.length>=spots.length){const r=shown();if(r&&top){const h=document.createElement('span');h.className='gift-hunt';h.innerHTML='🎁 Your gift: '+GIFTS[r.g]+' · '+r.c;top.appendChild(h);}}
-  spots.forEach((sel,i)=>{if(got.includes(i))return;const h=document.querySelector(sel);if(!h)return;
-    const b=document.createElement('button');b.type='button';b.className='gift';b.setAttribute('aria-label','Hidden gift');b.innerHTML=svg;
-    b.addEventListener('click',()=>{if(got.includes(i))return;got.push(i);save();b.classList.add('found');setTimeout(()=>b.remove(),460);
-      const hunt=document.querySelector('.gift-hunt');if(got.length>=spots.length){if(hunt)hunt.remove();win();}else count();});
-    h.appendChild(b);});
+  const wheelSVG=()=>{let g='';const R=100,seg=360/n,rad=d=>(d-90)*Math.PI/180;
+    for(let i=0;i<n;i++){const a0=i*seg,a1=a0+seg,x0=R+R*Math.cos(rad(a0)),y0=R+R*Math.sin(rad(a0)),x1=R+R*Math.cos(rad(a1)),y1=R+R*Math.sin(rad(a1)),m=a0+seg/2;
+      g+=`<path d="M${R} ${R} L${x0.toFixed(2)} ${y0.toFixed(2)} A${R} ${R} 0 0 1 ${x1.toFixed(2)} ${y1.toFixed(2)} Z" fill="${cols[i]}" stroke="#fff" stroke-width="2"/>`+
+         `<text x="${R+21}" y="${R+3.5}" transform="rotate(${m-90} ${R} ${R})" font-size="10" font-weight="600" font-family="Poppins,sans-serif" fill="${ink[i]}">${SHORT[i]}</text>`;}
+    return `<svg viewBox="0 0 200 200" class="wh-svg" aria-hidden="true">${g}<circle cx="100" cy="100" r="16" fill="#fff" stroke="#fbd3e0" stroke-width="3"/><text x="100" y="105" text-anchor="middle" font-size="14">🎁</text></svg>`;};
+  const result=(w)=>{w.querySelector('h3').textContent=GIFTS[res.g]+'!';
+    w.querySelector('.gw-msg').innerHTML='Your claim code: <b class="gw-code">'+res.c+'</b><small>Send this code (or a screenshot) to Keiko on Discord to claim it with your next commission. One prize per person, valid until 6 Jan 2027.</small>';
+    w.querySelector('.btns').innerHTML='<a class="btn btn-pink" href="https://discord.gg/FbgWxMPjf" target="_blank" rel="noopener">Claim on Discord</a><button class="btn btn-ghost" type="button">Close</button>';
+    w.querySelector('.btns button').onclick=()=>w.remove();};
+  chip.onclick=()=>{const w=document.createElement('div');w.className='gift-win';
+    w.innerHTML='<div role="dialog" aria-modal="true" aria-label="Christmas spin wheel"><h3>Christmas spin wheel</h3><p class="gw-msg">One free spin per person. Every slice is a prize from Keiko ♡</p><div class="wh"><div class="wh-pin"></div><div class="wh-rot">'+wheelSVG()+'</div></div><div class="btns"><button class="btn btn-pink wh-go" type="button">Spin!</button><button class="btn btn-ghost wh-x" type="button">Close</button></div></div>';
+    document.body.appendChild(w);w.addEventListener('click',e=>{if(e.target===w)w.remove();});w.querySelector('.wh-x').onclick=()=>w.remove();
+    const rot=w.querySelector('.wh-rot'),seg=360/n;
+    if(res){rot.style.transform=`rotate(${360-(res.g+.5)*seg}deg)`;result(w);return;}
+    w.querySelector('.wh-go').onclick=e=>{e.target.disabled=true;
+      const A='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';let c='';for(let i=0;i<5;i++)c+=A[Math.floor(Math.random()*A.length)];
+      res={g:Math.floor(Math.random()*n),c:'XMAS-'+c};save();
+      const calm=matchMedia('(prefers-reduced-motion:reduce)').matches,jit=(Math.random()-.5)*seg*.6;
+      rot.style.transition=calm?'none':'transform 4.2s cubic-bezier(.17,.67,.12,1)';
+      rot.style.transform=`rotate(${(calm?0:360*6)+360-(res.g+.5)*seg+jit}deg)`;
+      setTimeout(()=>{result(w);label();confetti();},calm?50:4300);};};
 })();
 (function(){const hd=document.querySelector('header');if(!hd)return;const calm=matchMedia('(prefers-reduced-motion:reduce)');
   hd.addEventListener('pointerdown',e=>{const el=e.target.closest('a,button');if(!el||!hd.contains(el))return;
