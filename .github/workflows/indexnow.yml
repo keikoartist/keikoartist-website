@@ -15,14 +15,24 @@ jobs:
     steps:
       - uses: actions/checkout@v5
       - name: Wait for the deploy to put the key file online
+        timeout-minutes: 6
         run: |
-          for i in $(seq 1 20); do
-            k=$(curl -s https://keikoartist.com/4578f2324956634018c29c1d4d2a4d28.txt || true)
-            [ "$k" = "4578f2324956634018c29c1d4d2a4d28" ] && { echo "key file online"; exit 0; }
-            sleep 15
-          done
-          echo "key file not online yet"; exit 1
+          python3 - <<'PY'
+          import time, urllib.request
+          url = "https://keikoartist.com/4578f2324956634018c29c1d4d2a4d28.txt"
+          for i in range(20):
+              try:
+                  r = urllib.request.urlopen(urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0 (IndexNow check)"}), timeout=15)
+                  body = r.read(200).decode("utf-8", "replace").strip()
+                  print("try", i + 1, "HTTP", r.status, repr(body[:40]))
+                  if body == "4578f2324956634018c29c1d4d2a4d28": print("key file online"); raise SystemExit(0)
+              except SystemExit: raise
+              except Exception as e: print("try", i + 1, "error:", str(e)[:120])
+              time.sleep(15)
+          print("key file not confirmed; submitting anyway")
+          PY
       - name: Submit the sitemap URLs
+        timeout-minutes: 3
         run: |
           python3 - <<'PY'
           import json, re, urllib.request
