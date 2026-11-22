@@ -2487,6 +2487,13 @@ document.addEventListener('click',e=>{const a=e.target.closest('.menu-chat');if(
   const top=document.querySelector('.hero-top');if(!top)return;
   const chip=document.createElement('button');chip.type='button';chip.className='gift-hunt';top.appendChild(chip);
   const label=()=>{chip.innerHTML=res?'🎁 Your prize':'<span class="gh-l">🎡 Spin the Christmas wheel</span><span class="gh-s">🎡 Spin &amp; win</span>';};label();
+  // open from links like /?spin=1 (service pages), or once by itself for a new visitor (not during order tests)
+  const busy=()=>!!document.querySelector('.modal.show,.gift-win,.lb.show,.sd.show,#tyModal.show,.kc-panel:not([hidden])');
+  const q=new URLSearchParams(location.search);
+  if(q.get('spin')==='1'){q.delete('spin');history.replaceState(null,'',location.pathname+(q.toString()?'?'+q:'')+location.hash);setTimeout(()=>{if(!busy())chip.click();},600);}
+  else if(!res&&!/dryrun=1/.test(location.search)&&!navigator.webdriver){let seen=false;try{seen=!!localStorage.getItem(KEY+'-seen')}catch(_){seen=true}
+    if(!seen){let fired=false;const fire=()=>{if(fired||res||busy())return;fired=true;try{localStorage.setItem(KEY+'-seen','1')}catch(_){}chip.click();removeEventListener('scroll',onScroll);};
+      const onScroll=()=>{if(scrollY>innerHeight*1.2)fire();};addEventListener('scroll',onScroll,{passive:true});setTimeout(fire,12000);}}
   const confetti=()=>{if(matchMedia('(prefers-reduced-motion:reduce)').matches)return;const cs=['#f2628f','#ff8fb1','#c9a7ff','#ffd166','#9be7c4'];
     for(let i=0;i<60;i++){const c=document.createElement('i');c.className='confetti';c.style.left=(Math.random()*100)+'vw';c.style.background=cs[i%5];
       c.style.setProperty('--d',(2+Math.random()*2).toFixed(2)+'s');c.style.setProperty('--x',(Math.random()*160-80).toFixed(0)+'px');c.style.setProperty('--r',(Math.random()*720).toFixed(0)+'deg');c.style.animationDelay=(Math.random()*.6).toFixed(2)+'s';

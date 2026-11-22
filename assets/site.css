@@ -117,3 +117,11 @@ footer{margin-top:60px;background:linear-gradient(135deg,#f2628f,#ff8fb1);color:
 @media (hover:hover){.btn-ghost:hover{color:#fff}}
 .tbl thead th{color:#9a5670}
 .related a span,.gallery figcaption{color:#9a5670}
+
+/* Christmas edition (until SEASON.until in index.html) */
+body.xmas header{border-bottom:0}
+body.xmas header::after{content:"";position:absolute;left:0;right:0;bottom:-3px;height:3px;background:repeating-linear-gradient(-45deg,#f2628f 0 8px,#ffe3ec 8px 16px);opacity:.85;pointer-events:none}
+body.xmas header .logo{position:relative}
+body.xmas header .logo::before{content:"";position:absolute;left:-7px;top:-11px;width:28px;height:24px;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 34'%3E%3Cpath d='M4 26 C8 12 18 4 30 6 C34 7 36 12 33 16 C30 12 26 12 24 14 C30 18 34 22 36 26 Z' fill='%23e8476f'/%3E%3Crect x='2' y='24' width='36' height='8' rx='4' fill='%23fff' stroke='%23fbd3e0'/%3E%3Ccircle cx='34' cy='17' r='4.5' fill='%23fff' stroke='%23fbd3e0'/%3E%3C/svg%3E") no-repeat center/contain;transform:rotate(-18deg);pointer-events:none;z-index:2}
+.xmas-pill{display:inline-flex;align-items:center;gap:6px;margin:10px 0 0;font-size:13px;font-weight:600;color:var(--pink-text);background:#fff4f8;border:1px solid var(--line);border-radius:999px;padding:5px 12px}
+.xmas-pill:hover{background:#ffe9f1}

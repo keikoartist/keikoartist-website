@@ -778,6 +778,21 @@ switch ($action) {
     }
     fail(404, 'file not found');
   }
+  case 'stats': {   // website visits (from stats-api.php) and Christmas spins, last 14 days
+    $sd = data_dir() . '/stats'; $tz = new DateTimeZone('Asia/Jakarta'); $days = []; $src = [];
+    for ($i = 0; $i < 14; $i++) {
+      $day = (new DateTime("-$i day", $tz))->format('Y-m-d');
+      $d = json_decode((string)@file_get_contents("$sd/$day.json"), true);
+      if (!is_array($d)) { $days[] = ['day' => $day, 'visitors' => 0, 'views' => 0, 'order_open' => 0, 'order_sent' => 0, 'spin' => 0]; continue; }
+      $days[] = ['day' => $day, 'visitors' => count($d['visitors'] ?? []), 'views' => (int)($d['views'] ?? 0), 'order_open' => (int)($d['order_open'] ?? 0), 'order_sent' => (int)($d['order_sent'] ?? 0), 'spin' => (int)($d['spin'] ?? 0)];
+      if ($i < 7) foreach (($d['sources'] ?? []) as $k => $v) $src[$k] = ($src[$k] ?? 0) + (int)$v;
+    }
+    arsort($src);
+    $spins = [];
+    $lines = @file(data_dir() . '/spins.csv', FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES) ?: [];
+    foreach (array_reverse(array_slice($lines, -30)) as $ln) { $c = explode(',', $ln); if (count($c) >= 4) $spins[] = ['t' => $c[0], 'code' => $c[1], 'prize' => $c[2], 'visitor' => $c[3]]; }
+    jout(200, ['days' => $days, 'sources' => array_slice($src, 0, 8, true), 'spins' => $spins]);
+  }
   case 'settings_get': {
     $h = discord_hook($cfg);
     $mc = smtp_cfg();

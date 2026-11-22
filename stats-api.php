@@ -35,6 +35,7 @@ if (preg_match('/(^|\.)google\./', $src)) $src = 'google';
 $tz = new DateTimeZone('Asia/Jakarta');
 $today = (new DateTime('now', $tz))->format('Y-m-d');
 $dir = dirname(__DIR__, 2) . '/keikoarts-data';
+if (!is_dir($dir)) @mkdir($dir, 0700, true);   // same folder as order-api.php data_dir()
 if (!is_dir($dir) || !is_writable($dir)) $dir = __DIR__ . '/chat-data';
 if (!is_dir($dir) || !is_writable($dir)) done();
 $sd = $dir . '/stats'; if (!is_dir($sd)) @mkdir($sd, 0700);

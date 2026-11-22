@@ -32,6 +32,7 @@ $visitor = substr(hash('sha256', 'keikoarts-spin|' . $ip), 0, 6);   // short vis
 
 // record on the server (outside the public folder when possible)
 $dir = dirname(__DIR__, 2) . '/keikoarts-data';
+if (!is_dir($dir)) @mkdir($dir, 0700, true);   // same folder as order-api.php data_dir()
 if (!is_dir($dir) || !is_writable($dir)) $dir = __DIR__ . '/chat-data';
 if (is_dir($dir) && is_writable($dir)) {
   @file_put_contents($dir . '/spins.csv', gmdate('c') . ",$code," . GIFTS[$g] . ",$visitor\n", FILE_APPEND | LOCK_EX);

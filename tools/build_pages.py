@@ -212,6 +212,7 @@ def page(path, title, desc, h1, crumb, body, faq, og_image, order='', extra_ld=N
   </div>
 </footer>
 <script>
+(function(){{if(new Date()>=new Date('2027-01-07T00:00:00+07:00'))return;document.body.classList.add('xmas');var e=document.querySelector('.phero .eyebrow');if(e){{var a=document.createElement('a');a.href='/?spin=1';a.className='xmas-pill';a.textContent='\U0001F3A1 Spin the Christmas wheel';e.insertAdjacentElement('afterend',a);}}}})();
 (function(){{try{{var q=new URLSearchParams(location.search),r=document.referrer?new URL(document.referrer).hostname:'';var s=q.get('ref')||q.get('utm_source')||(r&&r!==location.hostname?r:'');navigator.sendBeacon('/stats-api.php',new Blob([JSON.stringify({{e:'view',p:location.pathname,s:s}})],{{type:'application/json'}}));}}catch(_){{}}}})();
 (function(){{var b=document.querySelector('.burger'),m=document.getElementById('menu');
 b.addEventListener('click',function(){{var o=m.classList.toggle('open');b.setAttribute('aria-expanded',o)}});

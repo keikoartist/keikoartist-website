@@ -183,6 +183,9 @@ select{padding:7px 10px;border:1px solid var(--line);border-radius:999px;backgro
   .m{max-width:86%}
   .top h1 small{display:none}
 }
+.stats-box{font-size:14px}.st-sum{background:#fff4f8;border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin-bottom:10px}.st-sum small{color:var(--muted)}
+.st-tbl{width:100%;border-collapse:collapse;font-size:13px;margin:6px 0 10px}.st-tbl th,.st-tbl td{padding:6px 8px;border-bottom:1px solid var(--line);text-align:left}.st-tbl th{font-size:11.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
+.st-spins summary{cursor:pointer;font-weight:600;font-size:13.5px;margin:4px 0}
 </style>
 </head>
 <body>
@@ -245,6 +248,10 @@ select{padding:7px 10px;border:1px solid var(--line);border-radius:999px;backgro
 <div class="set-bg" id="setPanel" hidden>
   <div class="set-box" role="dialog" aria-modal="true" aria-labelledby="setTitle">
     <div class="set-head"><h2 class="serif" id="setTitle">Settings</h2><button type="button" id="setClose" aria-label="Close">✕</button></div>
+    <h3>📊 Website stats</h3>
+    <p class="muted">Visitors counted anonymously (no cookies). Share links like keikoartist.com/?ref=reddit to see which place brings people.</p>
+    <div id="statsBox" class="stats-box">Loading…</div>
+    <hr class="set-hr">
     <h3>🔔 Discord notifications</h3>
     <p class="muted">Get a Discord message for every new order and website chat, so you see them on your phone right away.</p>
     <div class="set-status" id="hookStatus">Checking…</div>
@@ -625,7 +632,16 @@ async function openOrder(id){
 }
 /* ===================== SETTINGS ===================== */
 function setMsg(t,ok){const m=$('#setMsg');m.textContent=t||'';m.classList.toggle('ok',!!ok);}
+async function loadStats(){const b=$('#statsBox');if(!b)return;const esc=v=>String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  try{const j=await oapi({action:'stats'});const d=j.days||[];const sum=k=>d.slice(0,7).reduce((a,x)=>a+(x[k]||0),0);
+    const fmt=s=>new Date(s+'T12:00:00').toLocaleDateString('en-GB',{day:'numeric',month:'short'});
+    let h='<div class="st-sum"><b>'+sum('visitors')+'</b> visitors · <b>'+sum('order_open')+'</b> opened the order form · <b>'+sum('order_sent')+'</b> orders sent · <b>'+sum('spin')+'</b> spins <small>(last 7 days)</small></div>';
+    h+='<table class="st-tbl"><thead><tr><th>Day</th><th>Visitors</th><th>Order form</th><th>Orders</th><th>Spins</th></tr></thead><tbody>'+d.slice(0,7).map(x=>'<tr><td>'+fmt(x.day)+'</td><td>'+x.visitors+'</td><td>'+x.order_open+'</td><td>'+x.order_sent+'</td><td>'+x.spin+'</td></tr>').join('')+'</tbody></table>';
+    const src=Object.entries(j.sources||{});h+='<p class="muted"><b>Where visitors came from:</b> '+(src.length?src.map(([k,v])=>esc(k)+' '+v).join(' · '):'no visits yet')+'</p>';
+    const sp=j.spins||[];if(sp.length)h+='<details class="st-spins"><summary>Christmas spins ('+sp.length+')</summary><table class="st-tbl"><thead><tr><th>Code</th><th>Prize</th><th>Visitor</th></tr></thead><tbody>'+sp.map(x=>'<tr><td><b>'+esc(x.code)+'</b></td><td>'+esc(x.prize)+'</td><td>'+esc(x.visitor)+'</td></tr>').join('')+'</tbody></table></details>';
+    b.innerHTML=h;}catch(e){if(e.message!=='login')b.textContent='Could not load stats.';}}
 async function loadSettings(){
+  loadStats();
   const st=$('#hookStatus');
   try{const j=await oapi({action:'settings_get'});
     st.className='set-status'+(j.discord_set?' on':'');st.textContent=j.discord_set?'✅ Connected':'⚪ Not connected yet';
