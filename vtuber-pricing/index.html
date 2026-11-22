@@ -147,13 +147,14 @@
   <div class="wrap">
     <div class="foot">
       <a href="/" class="logo"><img src="/images/keikoarts-logo.webp" alt="" width="40" height="40"><span><b>KeikoArts</b><small>Illustration &amp; Live2D Studio</small></span></a>
-      <span><a href="https://discord.gg/FbgWxMPjf" target="_blank" rel="noopener"><b>Join Keiko's Discord</b></a></span>
+      <span class="foot-socs"><a href="https://discord.gg/FbgWxMPjf" target="_blank" rel="noopener"><b>Join Keiko's Discord</b></a> · <a href="https://x.com/IamKeikoArt" target="_blank" rel="noopener me">X</a> · <a href="https://www.instagram.com/iamkeikoarts/" target="_blank" rel="noopener me">Instagram</a> · <a href="https://ko-fi.com/keikoarts" target="_blank" rel="noopener me">Ko-fi</a></span>
     </div>
     <nav class="foot-links" aria-label="Services"><a href="/custom-vtuber-model/">Custom VTuber Model</a><a href="/live2d-rigging/">Live2D Rigging</a><a href="/custom-pngtuber-model/">Custom PNGTuber Model</a><a href="/custom-twitch-emotes/">Custom Twitch Emotes</a><a href="/vtuber-pricing/">VTuber Pricing</a><a href="/vtuber-portfolio/">VTuber Portfolio</a><a href="/#faq">FAQ</a><a href="/#tos">Terms of Service</a><a href="/#privacy">Privacy</a></nav>
     <div class="copy">© 2026 KeikoArts · keikoartist.com</div>
   </div>
 </footer>
 <script>
+(function(){try{var q=new URLSearchParams(location.search),r=document.referrer?new URL(document.referrer).hostname:'';var s=q.get('ref')||q.get('utm_source')||(r&&r!==location.hostname?r:'');navigator.sendBeacon('/stats-api.php',new Blob([JSON.stringify({e:'view',p:location.pathname,s:s})],{type:'application/json'}));}catch(_){}})();
 (function(){var b=document.querySelector('.burger'),m=document.getElementById('menu');
 b.addEventListener('click',function(){var o=m.classList.toggle('open');b.setAttribute('aria-expanded',o)});
 var v=document.querySelector('video');if(v&&'IntersectionObserver'in window){new IntersectionObserver(function(es){es.forEach(function(x){if(!x.isIntersecting&&!v.paused)v.pause()})}).observe(v)}})();

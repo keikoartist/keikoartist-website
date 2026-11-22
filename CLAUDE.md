@@ -28,6 +28,8 @@ The owner writes in Indonesian and wants short, direct answers in Indonesian. Do
 | `order-pdf.php` + `lib/fpdf/` | Invoice and brief PDF (FPDF, Helvetica). |
 | `chat-api.php` | Website live chat: visitors, admin replies, contact details, reply emails, admin login and "Forgot password?". |
 | `notify-discord.php` | Helper for Discord notifications. |
+| `stats-api.php` | Anonymous visit counter (no cookies, IP never stored): page views, sources (`?ref=` / `utm_source` / referrer), order form opened, orders sent, spins. Daily files in `keikoarts-data/stats/`; yesterday's summary is posted to Discord once a day. |
+| `spin-api.php` | Christmas spin wheel draw (see Open items). |
 | `admin/index.html` | Admin inbox at /admin/: Chats, Orders (board view like VGen, plus list view), Settings (Discord webhook, Gmail App Password). |
 | `tools/build_pages.py` | Generates the service pages (`custom-vtuber-model/`, `live2d-rigging/`, `custom-pngtuber-model/`, `custom-twitch-emotes/`, `vtuber-portfolio/`, `vtuber-pricing/`), `404.html` and `sitemap.xml` from the data in `index.html`. Run `python3 tools/build_pages.py` after changing prices, services or the gallery. |
 | `assets/site.css` | Shared styles for the service pages. |
@@ -82,5 +84,6 @@ Run the site with `php -S 127.0.0.1:8830` in a copy of the repo that has a test 
 - `VTUBERS` (section "Original VTuber Characters"): Keiko's own original characters, not clients. No names; never present them as client VTubers.
 - The owner's VGen account (vgen.co/keikoarts) is suspended; reviews there cannot be read publicly. The owner will not appeal: do not suggest it.
 - Owner time zone: WIB (GMT+7).
+- Goal (Nov 2026): $2000 from the site with new clients only (no past clients reachable). Promote links with `?ref=` (e.g. keikoartist.com/?ref=reddit) so the daily stats show which channel works.
 - Christmas edition (`SEASON` in `index.html`, ends 7 Jan 2027): snow, Santa hat, candy-cane line and a Christmas spin wheel (one spin per visitor, button in the hero). Prizes (`GIFTS`, set by the owner): free emotes, free Christmas badges, free source files, free skeb, free sketch, 10% off. The server (`spin-api.php`, same prize order as `GIFTS`) draws the prize and code (XMAS-xxxxx), posts every spin to Discord and logs it in `spins.csv`; winners claim on Discord and Keiko applies it by hand. Nothing changes in PayPal or the order prices.
 - Reviews: one VGen review (PNGTuber, Mar 2025, "the art keiko made was soo beautiful!...") is waiting for the reviewer's name.

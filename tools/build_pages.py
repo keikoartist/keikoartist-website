@@ -205,13 +205,14 @@ def page(path, title, desc, h1, crumb, body, faq, og_image, order='', extra_ld=N
   <div class="wrap">
     <div class="foot">
       <a href="/" class="logo"><img src="/images/keikoarts-logo.webp" alt="" width="40" height="40"><span><b>KeikoArts</b><small>Illustration &amp; Live2D Studio</small></span></a>
-      <span><a href="https://discord.gg/FbgWxMPjf" target="_blank" rel="noopener"><b>Join Keiko's Discord</b></a></span>
+      <span class="foot-socs"><a href="https://discord.gg/FbgWxMPjf" target="_blank" rel="noopener"><b>Join Keiko's Discord</b></a> · <a href="https://x.com/IamKeikoArt" target="_blank" rel="noopener me">X</a> · <a href="https://www.instagram.com/iamkeikoarts/" target="_blank" rel="noopener me">Instagram</a> · <a href="https://ko-fi.com/keikoarts" target="_blank" rel="noopener me">Ko-fi</a></span>
     </div>
     <nav class="foot-links" aria-label="Services">{"".join(f'<a href="{u}">{t}</a>' for u, t in FOOT)}</nav>
     <div class="copy">© {datetime.date.today().year} KeikoArts · keikoartist.com</div>
   </div>
 </footer>
 <script>
+(function(){{try{{var q=new URLSearchParams(location.search),r=document.referrer?new URL(document.referrer).hostname:'';var s=q.get('ref')||q.get('utm_source')||(r&&r!==location.hostname?r:'');navigator.sendBeacon('/stats-api.php',new Blob([JSON.stringify({{e:'view',p:location.pathname,s:s}})],{{type:'application/json'}}));}}catch(_){{}}}})();
 (function(){{var b=document.querySelector('.burger'),m=document.getElementById('menu');
 b.addEventListener('click',function(){{var o=m.classList.toggle('open');b.setAttribute('aria-expanded',o)}});
 var v=document.querySelector('video');if(v&&'IntersectionObserver'in window){{new IntersectionObserver(function(es){{es.forEach(function(x){{if(!x.isIntersecting&&!v.paused)v.pause()}})}}).observe(v)}}}})();
