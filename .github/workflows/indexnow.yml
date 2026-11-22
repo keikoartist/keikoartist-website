@@ -1,0 +1,36 @@
+name: IndexNow (Bing and others)
+
+# Tells Bing, Yandex, Seznam and Naver (and through Bing: DuckDuckGo, Yahoo, ChatGPT search) about every page in sitemap.xml.
+# The key file 4578f2324956634018c29c1d4d2a4d28.txt in the site root proves the site is ours (it is public by design, not a secret).
+# Google does not use IndexNow: submit the sitemap in Google Search Console instead.
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['sitemap.xml']
+
+jobs:
+  submit:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v5
+      - name: Wait for the deploy to put the key file online
+        run: |
+          for i in $(seq 1 20); do
+            k=$(curl -s https://keikoartist.com/4578f2324956634018c29c1d4d2a4d28.txt || true)
+            [ "$k" = "4578f2324956634018c29c1d4d2a4d28" ] && { echo "key file online"; exit 0; }
+            sleep 15
+          done
+          echo "key file not online yet"; exit 1
+      - name: Submit the sitemap URLs
+        run: |
+          python3 - <<'PY'
+          import json, re, urllib.request
+          urls = re.findall(r'<loc>(https://keikoartist\.com/[^<]*)</loc>', open('sitemap.xml', encoding='utf-8').read())
+          body = json.dumps({"host": "keikoartist.com", "key": "4578f2324956634018c29c1d4d2a4d28", "keyLocation": "https://keikoartist.com/4578f2324956634018c29c1d4d2a4d28.txt", "urlList": urls}).encode()
+          req = urllib.request.Request("https://api.indexnow.org/indexnow", data=body, headers={"Content-Type": "application/json; charset=utf-8"})
+          try:
+              r = urllib.request.urlopen(req, timeout=30); print("IndexNow:", r.status, "for", len(urls), "URLs")
+          except urllib.error.HTTPError as e:
+              print("IndexNow:", e.code, e.read()[:200]); raise SystemExit(0 if e.code in (200, 202) else 1)
+          PY

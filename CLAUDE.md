@@ -50,6 +50,7 @@ The owner writes in Indonesian and wants short, direct answers in Indonesian. Do
 - `seo-audit.yml` — titles, descriptions, links, sitemap.
 - `diag-admin.yml` — server ping (Discord set, Gmail set, database OK). Never prints secrets.
 - `lighthouse.yml`, `lighthouse-ab.yml` — speed tests.
+- `indexnow.yml` — sends every sitemap URL to Bing and other IndexNow search engines (runs when `sitemap.xml` changes; key file `4578f2324956634018c29c1d4d2a4d28.txt` in the root, public by design). Google is not part of IndexNow: the owner submits the sitemap in Search Console.
 
 ## Order and payment flow
 
