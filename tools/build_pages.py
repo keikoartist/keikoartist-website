@@ -139,7 +139,7 @@ def addons_line(name):
 NAV = [('/', 'Home'), ('/custom-vtuber-model/', 'VTuber Models'), ('/live2d-rigging/', 'Live2D Rigging'),
        ('/custom-pngtuber-model/', 'PNGTuber'), ('/vtuber-pricing/', 'Pricing'), ('/vtuber-portfolio/', 'Portfolio')]
 FOOT = [('/custom-vtuber-model/', 'Custom VTuber Model'), ('/live2d-rigging/', 'Live2D Rigging'), ('/custom-pngtuber-model/', 'Custom PNGTuber Model'), ('/custom-twitch-emotes/', 'Custom Twitch Emotes'),
-        ('/vtuber-pricing/', 'VTuber Pricing'), ('/vtuber-portfolio/', 'VTuber Portfolio'), ('/#faq', 'FAQ'), ('/#tos', 'Terms of Service'), ('/#privacy', 'Privacy')]
+        ('/vtuber-pricing/', 'VTuber Pricing'), ('/vtuber-portfolio/', 'VTuber Portfolio'), ('/vtuber-model-cost/', 'VTuber Model Cost'), ('/how-to-commission-a-vtuber-model/', 'How to Commission'), ('/live2d-vs-pngtuber/', 'Live2D vs PNGTuber'), ('/#faq', 'FAQ'), ('/#tos', 'Terms of Service'), ('/#privacy', 'Privacy')]
 
 def page(path, title, desc, h1, crumb, body, faq, og_image, order='', extra_ld=None, eyebrow='KeikoArts · VTuber art & Live2D studio'):
     url = SITE + path.strip('/') + '/'
@@ -316,6 +316,7 @@ def custom_vtuber():
     <p>Personal use, streaming, monetized videos and social media are included. Merch and other commercial rights are an add-on (+{money(vadd["Commercial / merch rights"])}). The artist keeps the copyright; reselling, NFTs and AI training are not allowed. Read the full <a href="/#tos" style="color:var(--pink-text);font-weight:600">Terms of Service</a>.</p>
     <p>Preparing a debut? <a href="/vtuber-pricing/#vtuber-packages" style="color:var(--pink-text);font-weight:600">VTuber packages</a> start at {money(SERVICES["VTuber Packages"]["from"])} and bundle the model with emotes, a background, an overlay and more.</p>
   </div></section>
+{guides_block("")}
 {related("/custom-vtuber-model/")}
 {cta("Ready to design your VTuber?", "Send your idea and get your invoice by email. Nothing is charged until you pay it.", "VTuber", "Start your VTuber model")}'''
     faq = [
@@ -649,8 +650,201 @@ def not_found():
     out = re.sub(r'<script type="application/ld\+json">.*?</script>\n', '', out)
     return out
 
+
+# ---------------------------------------------------------------- guides (long-tail search pages)
+GUIDES = [('/vtuber-model-cost/', 'How much does a VTuber model cost?', 'Prices by size, extras and packages'),
+          ('/how-to-commission-a-vtuber-model/', 'How to commission a VTuber model', 'Step by step, from idea to stream'),
+          ('/live2d-vs-pngtuber/', 'Live2D vs PNGTuber', 'Which avatar fits you and your budget')]
+
+def guides_block(exclude):
+    cards = ''.join(f'<a href="{u}"><b>{t}</b><span>{d}</span></a>' for u, t, d in GUIDES if u != exclude)
+    return ('  <section class="sec"><div class="wrap">\n    <h2>VTuber commission guides</h2>\n'
+            f'    <div class="related">{cards}</div>\n  </div></section>')
+
+def article_ld(path, title, desc, image):
+    return {"@context": "https://schema.org", "@type": "Article", "headline": title, "description": desc,
+            "url": SITE + path + '/', "inLanguage": "en", "dateModified": TODAY,
+            "author": {"@type": "Person", "name": "Keiko", "url": SITE},
+            "publisher": {"@type": "Organization", "name": "KeikoArts", "logo": {"@type": "ImageObject", "url": SITE + "images/keikoarts-logo.webp"}},
+            "image": SITE + "images/" + image + ".webp"}
+
+def guide_cost():
+    pk = SERVICES['VTuber Packages']['packages']; P = SERVICES['PNGTuber']; C = SERVICES['Chibi VTuber']
+    row = lambda name: ''.join(f'<td class="num">{money(vp[s + " · " + name])}</td>' for s in ('Bust', 'Half body', 'Full body'))
+    detail = e(DETAILS["VTuber"]["notes"]).split(". ", 1)[-1]
+    addons = "".join(f"<li>{e(a[0])}: <b>+{money(a[1])}</b></li>" for a in V["addons"])
+    pkgs = "".join(f'<div class="box"><h3>{e(n)}</h3><p>{e(d)}</p><p class="price">{money(pr)}</p></div>' for n, pr, d in pk)
+    body = f'''  <section class="wrap phero">
+    <div>
+      <p class="eyebrow">VTuber commission guide</p>
+      <h1 class="serif">How Much Does a Custom VTuber Model Cost?</h1>
+      <p class="lead">At KeikoArts a custom Live2D VTuber model costs {money(vp["Bust · Art + Rig"])} to {money(vp["Full body · Art + Rig"])} with rigging, or {money(vp["Bust · Art only"])} to {money(vp["Full body · Art only"])} for the art alone. This page shows what changes the price, what the extras cost and how to pay.</p>
+      <div class="btns"><a class="btn btn-pink arrow" rel="nofollow" href="/?order=VTuber">Get your exact price</a><a class="btn btn-ghost" href="/vtuber-pricing/">All prices</a></div>
+    </div>
+    <figure>{img("custom-vtuber-model-dragon", eager=True)}</figure>
+  </section>
+
+  <section class="sec"><div class="wrap">
+    <h2>VTuber model prices at a glance</h2>
+    <div class="tblwrap"><table class="tbl"><thead><tr><th>Option</th><th class="num">Bust</th><th class="num">Half body</th><th class="num">Full body</th></tr></thead><tbody>
+      <tr><td>Art only (layered PSD, ready to rig)</td>{row("Art only")}</tr>
+      <tr><td>Art + Rig (Live2D model + VTube Studio file)</td>{row("Art + Rig")}</tr>
+      <tr><td>Rig only (you send the PSD)</td>{row("Rig only")}</tr>
+    </tbody></table></div>
+    <p class="note">Prices in USD. 13% tax is added on every invoice. The final price is confirmed on your invoice before you pay.</p>
+  </div></section>
+
+  <section class="sec"><div class="wrap">
+    <h2>What changes the price</h2>
+    <div class="grid">
+      <div class="box"><h3>Size</h3><p>Bust shows your character to the chest, half body to the waist, full body from head to toe. More of the character means more parts to draw and rig.</p></div>
+      <div class="box"><h3>Art, rig or both</h3><p>Art only is the drawing split into layers. Rigging makes it move in VTube Studio. Art + Rig gives you a model that is ready to stream.</p></div>
+      <div class="box"><h3>Design details</h3><p>{detail}</p></div>
+    </div>
+  </div></section>
+
+  <section class="sec"><div class="wrap">
+    <h2>Extras and add-ons</h2>
+    <div class="grid two">
+      <div class="box"><h3>Model add-ons</h3><ul>{addons}</ul></div>
+      <div class="box"><h3>Other costs to plan for</h3><ul><li>13% tax on every invoice</li><li>Rush delivery: +25%</li><li>Merch / commercial rights: +{money(vadd["Commercial / merch rights"])} (streaming and monetized videos are already included)</li></ul></div>
+    </div>
+  </div></section>
+
+  <section class="sec"><div class="wrap">
+    <h2>Debut packages</h2>
+    <p>If you are preparing a debut, a package bundles the model with the other assets you need, in one matching style.</p>
+    <div class="grid">{pkgs}</div>
+  </div></section>
+
+  <section class="sec"><div class="wrap">
+    <h2>Smaller budget?</h2>
+    <div class="grid two">
+      <div class="box"><h3>PNGTuber</h3><p>An idle and a talking image with blinking, no rigging. From {money(P["from"])}, about {e(P["eta"])}. Read <a href="/live2d-vs-pngtuber/">Live2D vs PNGTuber</a>.</p></div>
+      <div class="box"><h3>Chibi VTuber</h3><p>A cute full-body chibi with 3 expressions, ready to rig. From {money(C["from"])}, about {e(C["eta"])}.</p></div>
+    </div>
+  </div></section>
+
+  <section class="sec"><div class="wrap">
+    <h2>How payment works</h2>
+    <p>{e(PAY)} Nothing is charged until you pay the invoice.</p>
+  </div></section>
+{guides_block("/vtuber-model-cost/")}
+{cta("Want your exact price?", "Send your idea with the order form and get your invoice by email, usually within 6 hours (WIB, GMT+7).", "VTuber", "Get your price")}'''
+    faq = [
+        ('How much is a cheap VTuber model?', f'The lowest-cost option here is a PNGTuber from {money(P["from"])}. For a Live2D model, a bust with art and rigging starts at {money(vp["Bust · Art + Rig"])}.'),
+        ('How much does a full-body Live2D VTuber model cost?', f'{money(vp["Full body · Art only"])} for the art only, or {money(vp["Full body · Art + Rig"])} with rigging and a VTube Studio file, plus 13% tax.'),
+        ('Is rigging included in the price?', f'Only in Art + Rig. Art only gives you a layered PSD that is ready to rig. Rig only for your own art starts at {money(vp["Bust · Rig only"])}.'),
+        ('Can I pay in parts?', 'Yes: 50/50 (half upfront, half before final files), or 3 installments for orders above $150.'),
+        ('Are there hidden costs?', f'No. The order form and your invoice show the total: the package, any add-ons you choose, 13% tax, and optional rush (+25%) or commercial rights (+{money(vadd["Commercial / merch rights"])}).'),
+    ]
+    desc = f'Custom VTuber model prices: Live2D art + rig from {money(vp["Bust · Art + Rig"])} to {money(vp["Full body · Art + Rig"])}, art only from {money(vp["Bust · Art only"])}. Sizes, add-ons, debut packages and payment options.'
+    title = 'How Much Does a Custom VTuber Model Cost?'
+    return page('vtuber-model-cost', title + ' | KeikoArtist', desc, title, 'VTuber Model Cost', body, faq,
+                'custom-vtuber-model-dragon', 'VTuber', article_ld('vtuber-model-cost', title, desc, 'custom-vtuber-model-dragon'),
+                eyebrow='KeikoArts · VTuber commission guides')
+
+def guide_howto():
+    body = f'''  <section class="wrap phero">
+    <div>
+      <p class="eyebrow">VTuber commission guide</p>
+      <h1 class="serif">How to Commission a Custom VTuber Model</h1>
+      <p class="lead">Commissioning your first VTuber model is easier than it looks. Here is the whole process at KeikoArts, from your first idea to going live in VTube Studio, with what to prepare at each step.</p>
+      <div class="btns"><a class="btn btn-pink arrow" rel="nofollow" href="/?order=VTuber">Start your commission</a><a class="btn btn-ghost" href="/vtuber-model-cost/">See the costs</a></div>
+    </div>
+    <figure>{img("custom-vtuber-model-witch", eager=True)}</figure>
+  </section>
+
+  <section class="sec"><div class="wrap">
+    <h2>Step by step</h2>
+    <ol class="steps">
+      <li><b>Decide what you need</b><span>Art only (a layered PSD), Art + Rig (a model ready to stream) or Rig only (for art you already have). Then pick bust, half body or full body.</span></li>
+      <li><b>Prepare your character</b><span>A character sheet helps, but it is not required. A description, a few reference pictures and the mood you want are enough to start.</span></li>
+      <li><b>Send the order form</b><span>Choose the options and extras, describe your character and attach your references. The total updates as you choose.</span></li>
+      <li><b>Get your invoice</b><span>I review your request and email an invoice (PDF), usually within 6 hours (WIB, GMT+7). Your slot is secured once payment is received.</span></li>
+      <li><b>Sketch and revisions</b><span>Small revisions are unlimited during the sketch, so the design can settle. Up to 2 minor revisions after coloring.</span></li>
+      <li><b>Lineart, coloring and rigging</b><span>Progress updates at every stage. For Art + Rig I set up head turns, blinking, lip-sync and hair and clothing physics.</span></li>
+      <li><b>Go live</b><span>You receive your files and a VTube Studio model. Every commission takes 3 weeks at most; rush delivery (+25%) is available.</span></li>
+    </ol>
+  </div></section>
+
+  <section class="sec"><div class="wrap">
+    <h2>What to send with your order</h2>
+    <div class="grid two">
+      <div class="box"><h3>Helpful to include</h3><ul><li>A front view of your character (a sketch, sheet or picrew is fine)</li><li>Colors you want and colors to avoid</li><li>Personality and stream style</li><li>Outfit details and accessories</li></ul></div>
+      <div class="box"><h3>Good to know</h3><ul><li>Extra expressions and toggles are +{money(vadd["Extra expression / toggle"])} each</li><li>Extra outfits or hairstyles can be added later</li><li>Questions first? Ask on <a href="https://discord.gg/FbgWxMPjf" target="_blank" rel="noopener">Discord</a></li></ul></div>
+    </div>
+  </div></section>
+
+  <section class="sec"><div class="wrap">
+    <h2>Payment and rights</h2>
+    <p>{e(PAY)}</p>
+    <p>Streaming, monetized videos and social media use are included. Merch and other commercial rights are +{money(vadd["Commercial / merch rights"])}. Read the full <a href="/#tos">Terms of Service</a>.</p>
+  </div></section>
+{guides_block("/how-to-commission-a-vtuber-model/")}
+{cta("Ready to start?", "Send your idea and get your invoice by email. Nothing is charged until you pay it.", "VTuber", "Start your commission")}'''
+    faq = [
+        ('Do I need a finished character design?', 'No. A description and a few references are enough. The design is worked out together during the sketch stage.'),
+        ('How long does a VTuber commission take?', f'VTuber models take about {e(V["eta"])}, and every commission takes 3 weeks at most. Rush delivery (+25%) is available.'),
+        ('When do I pay?', 'After you send the order form you get an invoice. You can pay in full, 50/50, or in 3 installments for orders above $150. Your slot is secured once payment is received.'),
+        ('Can I ask for changes?', 'Yes. Small revisions are unlimited during the sketch. After coloring, up to 2 minor revisions are included; major changes after approval may have extra fees.'),
+        ('What software do I need to stream?', 'VTube Studio. It tracks your face with a webcam or an iPhone. Art + Rig orders include a VTube Studio file, ready to stream.'),
+    ]
+    desc = 'How to commission a custom VTuber model step by step: what to prepare, how ordering, payment and revisions work, and how long it takes until you go live.'
+    title = 'How to Commission a Custom VTuber Model'
+    return page('how-to-commission-a-vtuber-model', 'How to Commission a VTuber Model (Step by Step) | KeikoArtist', desc, title, 'How to Commission', body, faq,
+                'custom-vtuber-model-witch', 'VTuber', article_ld('how-to-commission-a-vtuber-model', title, desc, 'custom-vtuber-model-witch'),
+                eyebrow='KeikoArts · VTuber commission guides')
+
+def guide_compare():
+    P = SERVICES['PNGTuber']
+    body = f'''  <section class="wrap phero">
+    <div>
+      <p class="eyebrow">VTuber commission guide</p>
+      <h1 class="serif">Live2D vs PNGTuber: Which One Should You Get?</h1>
+      <p class="lead">Both let you stream as your own character. A Live2D model follows your face; a PNGTuber switches images when you talk. Here is how they compare in price, time, setup and feel.</p>
+      <div class="btns"><a class="btn btn-pink arrow" href="/custom-vtuber-model/">Live2D models</a><a class="btn btn-ghost" href="/custom-pngtuber-model/">PNGTuber models</a></div>
+    </div>
+    <figure>{img("custom-pngtuber-model-cat-mask", eager=True)}</figure>
+  </section>
+
+  <section class="sec"><div class="wrap">
+    <h2>Side by side</h2>
+    <div class="tblwrap"><table class="tbl"><thead><tr><th></th><th>Live2D VTuber</th><th>PNGTuber</th></tr></thead><tbody>
+      <tr><td>Price</td><td>From {money(vp["Bust · Art + Rig"])} with rigging</td><td>From {money(P["from"])}</td></tr>
+      <tr><td>Time</td><td>About {e(V["eta"])}</td><td>About {e(P["eta"])}</td></tr>
+      <tr><td>Movement</td><td>Head turns, blinking, lip-sync, hair and clothing physics</td><td>Idle and talking images, blinking</td></tr>
+      <tr><td>Tracking</td><td>Face tracking with a webcam or iPhone</td><td>Reacts to your voice</td></tr>
+      <tr><td>Software</td><td>VTube Studio</td><td>PNGTuber Plus or Veadotube</td></tr>
+      <tr><td>Files</td><td>Live2D model + VTube Studio file</td><td>Transparent PNGs</td></tr>
+    </tbody></table></div>
+  </div></section>
+
+  <section class="sec"><div class="wrap">
+    <h2>Which one fits you?</h2>
+    <div class="grid two">
+      <div class="box"><h3>Pick a PNGTuber if…</h3><ul><li>You want to start streaming soon on a small budget</li><li>You mostly chat, play games or make videos</li><li>You want something simple to set up</li></ul><p class="price">from {money(P["from"])}</p></div>
+      <div class="box"><h3>Pick Live2D if…</h3><ul><li>You want your character to move with you</li><li>Expressions and reactions matter for your content</li><li>You are planning a debut</li></ul><p class="price">from {money(vp["Bust · Art + Rig"])}</p></div>
+    </div>
+    <p class="note">Many streamers start as a PNGTuber and move to Live2D later. Your PNGTuber design can be the base for a future Live2D model.</p>
+  </div></section>
+{guides_block("/live2d-vs-pngtuber/")}
+{cta("Not sure yet?", "Tell me about your stream on Discord or in the order form, and I'll suggest the best fit.", "", "Start a project")}'''
+    faq = [
+        ('Is a PNGTuber cheaper than a Live2D VTuber?', f'Yes. A PNGTuber starts at {money(P["from"])}; a Live2D model with rigging starts at {money(vp["Bust · Art + Rig"])}.'),
+        ('Can a PNGTuber become a Live2D model later?', 'Yes. The same character design can be redrawn in layers and rigged for Live2D when you are ready.'),
+        ('Do I need a webcam?', 'For Live2D, a webcam or an iPhone is used for face tracking in VTube Studio. A PNGTuber only needs your microphone.'),
+        ('Which is better for a debut?', 'Most debuts use a Live2D model because it moves with you. A debut package bundles the model with emotes, a background and an overlay.'),
+    ]
+    desc = f'Live2D VTuber vs PNGTuber compared: price (from {money(vp["Bust · Art + Rig"])} vs from {money(P["from"])}), time, movement, tracking and software, and which one fits your stream.'
+    title = 'Live2D vs PNGTuber: Which One Should You Get?'
+    return page('live2d-vs-pngtuber', title + ' | KeikoArtist', desc, 'Live2D vs PNGTuber', 'Live2D vs PNGTuber', body, faq,
+                'custom-pngtuber-model-cat-mask', 'PNGTuber', article_ld('live2d-vs-pngtuber', title, desc, 'custom-pngtuber-model-cat-mask'),
+                eyebrow='KeikoArts · VTuber commission guides')
+
 PAGES = {'custom-vtuber-model': custom_vtuber, 'live2d-rigging': rigging, 'custom-pngtuber-model': pngtuber, 'custom-twitch-emotes': emotes,
-         'vtuber-portfolio': portfolio, 'vtuber-pricing': pricing}
+         'vtuber-portfolio': portfolio, 'vtuber-pricing': pricing,
+         'vtuber-model-cost': guide_cost, 'how-to-commission-a-vtuber-model': guide_howto, 'live2d-vs-pngtuber': guide_compare}
 for slug_, fn in PAGES.items():
     os.makedirs(os.path.join(ROOT, slug_), exist_ok=True)
     open(os.path.join(ROOT, slug_, 'index.html'), 'w', encoding='utf-8').write(fn())
