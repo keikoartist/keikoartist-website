@@ -2493,7 +2493,7 @@ document.addEventListener('click',e=>{const a=e.target.closest('.menu-chat');if(
   if(q.get('spin')==='1'){q.delete('spin');history.replaceState(null,'',location.pathname+(q.toString()?'?'+q:'')+location.hash);setTimeout(()=>{if(!busy())chip.click();},600);}
   else if(!res&&!/dryrun=1/.test(location.search)&&!navigator.webdriver){let seen=false;try{seen=!!localStorage.getItem(KEY+'-seen')}catch(_){seen=true}
     if(!seen){let fired=false;const fire=()=>{if(fired||res||busy())return;fired=true;try{localStorage.setItem(KEY+'-seen','1')}catch(_){}chip.click();removeEventListener('scroll',onScroll);};
-      const onScroll=()=>{if(scrollY>innerHeight*1.2)fire();};addEventListener('scroll',onScroll,{passive:true});setTimeout(fire,12000);}}
+      const t0=Date.now();const onScroll=()=>{if(scrollY>innerHeight*2.5&&Date.now()-t0>20000)fire();};addEventListener('scroll',onScroll,{passive:true});setTimeout(fire,35000);}}   // not before 20 s of browsing, so it never interrupts the first look
   const confetti=()=>{if(matchMedia('(prefers-reduced-motion:reduce)').matches)return;const cs=['#f2628f','#ff8fb1','#c9a7ff','#ffd166','#9be7c4'];
     for(let i=0;i<60;i++){const c=document.createElement('i');c.className='confetti';c.style.left=(Math.random()*100)+'vw';c.style.background=cs[i%5];
       c.style.setProperty('--d',(2+Math.random()*2).toFixed(2)+'s');c.style.setProperty('--x',(Math.random()*160-80).toFixed(0)+'px');c.style.setProperty('--r',(Math.random()*720).toFixed(0)+'deg');c.style.animationDelay=(Math.random()*.6).toFixed(2)+'s';
