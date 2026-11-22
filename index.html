@@ -1146,8 +1146,9 @@ body:has(.gift-win) .fab-order,body:has(.gift-win) .gift-count{display:none}
 .wh-svg{width:100%;height:100%;display:block}
 .wh-pin{position:absolute;left:50%;top:-10px;transform:translateX(-50%);width:0;height:0;border-left:13px solid transparent;border-right:13px solid transparent;border-top:24px solid #c23a69;z-index:2;filter:drop-shadow(0 2px 3px rgba(122,40,70,.3))}
 .gift-win .wh-go:disabled{opacity:.6}
-.gift-hunt .gh-s{display:none}
-@media (max-width:820px){.hero-top .eyebrow{flex-basis:100%}.gift-hunt .gh-l{display:none}.gift-hunt .gh-s{display:inline}}
+.gift-hunt .gh-s,.slot-badge .gh-s{display:none}
+.hero-top .eyebrow{flex-basis:100%}
+@media (max-width:820px){.gift-hunt .gh-l,.slot-badge .gh-l{display:none}.gift-hunt .gh-s,.slot-badge .gh-s{display:inline}}
 .gw-code{color:var(--pink-text);letter-spacing:.08em;font-size:18px}
 .gift-win small{display:block;margin-top:8px;font-size:12.5px}
 @media (prefers-reduced-motion:reduce){.gift{animation:none}.confetti{display:none}}
@@ -2485,7 +2486,7 @@ document.addEventListener('click',e=>{const a=e.target.closest('.menu-chat');if(
   const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(res))}catch(_){}};
   const top=document.querySelector('.hero-top');if(!top)return;
   const chip=document.createElement('button');chip.type='button';chip.className='gift-hunt';top.appendChild(chip);
-  const label=()=>{chip.innerHTML=res?'<span class="gh-l">🎁 Your prize: '+GIFTS[res.g]+' · '+res.c+'</span><span class="gh-s">🎁 Your prize: '+res.c+'</span>':'<span class="gh-l">🎡 Spin the Christmas wheel</span><span class="gh-s">🎡 Spin &amp; win</span>';};label();
+  const label=()=>{chip.innerHTML=res?'🎁 Your prize':'<span class="gh-l">🎡 Spin the Christmas wheel</span><span class="gh-s">🎡 Spin &amp; win</span>';};label();
   const confetti=()=>{if(matchMedia('(prefers-reduced-motion:reduce)').matches)return;const cs=['#f2628f','#ff8fb1','#c9a7ff','#ffd166','#9be7c4'];
     for(let i=0;i<60;i++){const c=document.createElement('i');c.className='confetti';c.style.left=(Math.random()*100)+'vw';c.style.background=cs[i%5];
       c.style.setProperty('--d',(2+Math.random()*2).toFixed(2)+'s');c.style.setProperty('--x',(Math.random()*160-80).toFixed(0)+'px');c.style.setProperty('--r',(Math.random()*720).toFixed(0)+'deg');c.style.animationDelay=(Math.random()*.6).toFixed(2)+'s';
@@ -2528,8 +2529,9 @@ document.addEventListener('click',e=>{const a=e.target.closest('.menu-chat');if(
       s.style.setProperty('--dx',(Math.cos(a)*d).toFixed(1)+'px');s.style.setProperty('--dy',(Math.sin(a)*d).toFixed(1)+'px');s.style.setProperty('--r',(Math.random()*120-60).toFixed(0)+'deg');
       document.body.appendChild(s);setTimeout(()=>s.remove(),650);}
   },{passive:true});})();
-(function(){if(!document.body.classList.contains('xmas')||!SEASON.orderBy||new Date()>new Date(SEASON.orderBy+'T23:59:59+07:00'))return;const b=document.querySelector('.hero .btns');if(!b)return;const d=new Date(SEASON.orderBy+'T12:00:00+07:00').toLocaleDateString('en-GB',{day:'numeric',month:'short'});const p=document.createElement('p');p.className='xmas-by';p.textContent='🎄 Order by '+d+' for delivery before Christmas';b.after(p);})();
-(function(){const b=$('#slotBadge');if(b&&typeof SLOTS!=='undefined'){b.textContent=SLOTS.text;b.className='slot-badge '+(SLOTS.open?'open':'closed');}})();
+(function(){const b=$('#slotBadge');if(b&&typeof SLOTS!=='undefined'){b.textContent=SLOTS.text;b.className='slot-badge '+(SLOTS.open?'open':'closed');
+  const xm=typeof SEASON!=='undefined'&&SEASON.christmas&&SEASON.orderBy&&SLOTS.open&&new Date()<new Date(SEASON.until)&&new Date()<=new Date(SEASON.orderBy+'T23:59:59+07:00');
+  if(xm){const d=new Date(SEASON.orderBy+'T12:00:00+07:00').toLocaleDateString('en-GB',{day:'numeric',month:'short'});b.innerHTML='<span class="gh-l">'+SLOTS.text+' · 🎄 order by '+d+'</span><span class="gh-s">Open · 🎄 by '+d+'</span>';b.title='Order by '+d+' for delivery before Christmas';}}})();
 (function(){const t=[...document.querySelectorAll('#start,footer')];if(!t.length||!('IntersectionObserver' in window))return;const on=new Set();const io=new IntersectionObserver(es=>{es.forEach(e=>e.isIntersecting?on.add(e.target):on.delete(e.target));document.body.classList.toggle('fab-off',on.size>0);});t.forEach(x=>io.observe(x));})();
 (function(){const hb=document.querySelector('.hero .btns');if(!hb||!('IntersectionObserver' in window)){document.body.classList.add('past-hero');return;}
   new IntersectionObserver(es=>es.forEach(e=>document.body.classList.toggle('past-hero',!e.isIntersecting&&e.boundingClientRect.top<0))).observe(hb);})();
