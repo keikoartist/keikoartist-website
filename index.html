@@ -1481,6 +1481,8 @@ html.has-book .book-wrap{display:block}
 .book-nav button:hover:not(:disabled){transform:scale(1.08)}
 .book-nav span{font-family:"DM Serif Display",serif;font-size:16px!important;color:var(--ink)!important}
 .book-nav span::before{content:"✦ ";color:var(--pink)}.book-nav span::after{content:" ✦";color:var(--pink)}
+/* phones: smoke stays still (saves battery and keeps scrolling smooth) */
+@media (max-width:820px){.smk{animation:none!important;will-change:auto!important}.orb i{animation:none}}
 </style>
 </head>
 <body>
@@ -1489,7 +1491,7 @@ html.has-book .book-wrap{display:block}
 <script>(function(){var L=document.getElementById('kaLoader'),t0=Date.now(),seen=false;
   try{seen=sessionStorage.getItem('ka_ld')==='1';sessionStorage.setItem('ka_ld','1')}catch(e){}
   if(seen||navigator.webdriver||/dryrun=1/.test(location.search)){L.remove();return;}   // once per visit, never in tests
-  var smoke=function(){if(matchMedia('(prefers-reduced-motion:reduce)').matches)return;var S=document.createElement('div');S.id='kaSmoke';S.setAttribute('aria-hidden','true');var B=[[12,20,'-30vw','-25vh',0,'rgba(123,44,191,.9)','rgba(157,78,221,.55)'],[85,18,'30vw','-30vh',.05,'rgba(157,78,221,.85)','rgba(199,125,255,.5)'],[50,55,'0vw','10vh',0,'rgba(199,125,255,.9)','rgba(242,98,143,.45)'],[10,85,'-35vw','30vh',.1,'rgba(157,78,221,.85)','rgba(199,125,255,.5)'],[90,88,'35vw','30vh',.08,'rgba(123,44,191,.85)','rgba(242,98,143,.4)'],[48,8,'5vw','-40vh',.12,'rgba(214,150,255,.8)','rgba(157,78,221,.45)']];S.innerHTML=B.map(function(b){return '<i style="--x:'+b[0]+'%;--y:'+b[1]+'%;--tx:'+b[2]+';--ty:'+b[3]+';--d:'+b[4]+'s;--c:'+b[5]+';--c2:'+b[6]+'"></i>'}).join('');document.body.appendChild(S);setTimeout(function(){S.remove()},2800)};
+  var smoke=function(){if(matchMedia('(prefers-reduced-motion:reduce)').matches)return;var S=document.createElement('div');S.id='kaSmoke';S.setAttribute('aria-hidden','true');var B=[[12,20,'-30vw','-25vh',0,'rgba(123,44,191,.9)','rgba(157,78,221,.55)'],[85,18,'30vw','-30vh',.05,'rgba(157,78,221,.85)','rgba(199,125,255,.5)'],[50,55,'0vw','10vh',0,'rgba(199,125,255,.9)','rgba(242,98,143,.45)'],[10,85,'-35vw','30vh',.1,'rgba(157,78,221,.85)','rgba(199,125,255,.5)'],[90,88,'35vw','30vh',.08,'rgba(123,44,191,.85)','rgba(242,98,143,.4)'],[48,8,'5vw','-40vh',.12,'rgba(214,150,255,.8)','rgba(157,78,221,.45)']];if(innerWidth<700)B=B.filter(function(b,i){return i%2===0});S.innerHTML=B.map(function(b){return '<i style="--x:'+b[0]+'%;--y:'+b[1]+'%;--tx:'+b[2]+';--ty:'+b[3]+';--d:'+b[4]+'s;--c:'+b[5]+';--c2:'+b[6]+'"></i>'}).join('');document.body.appendChild(S);setTimeout(function(){S.remove()},2800)};
   var hide=function(){if(!L.parentNode)return;var w=Math.max(0,500-(Date.now()-t0));setTimeout(function(){L.classList.add('gone');smoke();setTimeout(function(){L.remove()},500)},w)};
   addEventListener('load',hide);setTimeout(hide,2500);})();</script>
 
