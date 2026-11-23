@@ -63,5 +63,12 @@ ExpiresByType image/webp "access plus 30 days"
 ExpiresByType image/svg+xml "access plus 30 days"
 ExpiresByType video/mp4 "access plus 30 days"
 ExpiresByType text/css "access plus 7 days"
+ExpiresByType text/html "access plus 0 seconds"
+</IfModule>
+# Pages: browsers check for a newer version on every visit (new changes show right away); images stay cached
+<IfModule mod_headers.c>
+<FilesMatch "\.html$">
+Header set Cache-Control "no-cache"
+</FilesMatch>
 </IfModule>
 # END KeikoArts SEO
