@@ -561,35 +561,54 @@ def portfolio():
             ('pfp', 'Profile pictures', 'Custom PFP', '/vtuber-pricing/#custom-pfp', 'PFP prices', 'Profile picture'),
             ('overlays', 'Stream overlays and backgrounds', None, '/vtuber-pricing/#stream-overlay', 'Overlay prices', 'Stream asset'),
             ('illustrations', 'Illustrations', 'Custom Inquiry', '/?order=Custom%20Inquiry', 'Request a custom piece', 'Illustration')]
-    seen = set(); secs = []
-    toc = []
+    seen = set(); cards = []; counts = []
+    order_key = {'overlays': 'Stream Overlay', 'illustrations': 'Custom Inquiry'}
+    short = {'vtuber-models': 'VTuber model', 'vtuber-packages': 'Debut package', 'pngtuber': 'PNGTuber', 'chibi': 'Chibi VTuber', 'pets': 'VTuber pet',
+             'emotes': 'Emotes', 'banners': 'Banner', 'logos': 'VTuber logo', 'pfp': 'Profile picture', 'overlays': 'Stream asset', 'illustrations': 'Illustration'}
     for cid, title, key, link, linktext, cap in cats:
         names = ['vtuber-stream-overlay-keikomi', 'vtuber-stream-background-room'] if key is None else [n for n in GALLERY.get(key, []) if n != 'vtuber-stream-background-room' or key == 'Background']
         if key == 'VTuber Packages': names = ['vtuber-debut-package-keikomi']
         names = [n for n in names if n not in seen and os.path.exists(os.path.join(ROOT, 'images', n + '.webp'))]
         if not names and cid != 'vtuber-models': continue
         seen.update(names)
-        wide = lambda n: Image.open(os.path.join(ROOT, 'images', n + '.webp')).size[0] > 1.4 * Image.open(os.path.join(ROOT, 'images', n + '.webp')).size[1]
-        figs = (RIG_VIDEO if cid == 'vtuber-models' else '') + ''.join(fig(n, CAPTION.get(n, cap), wide(n)) for n in names)
-        toc.append(f'<a href="#{cid}">{title}</a>')
-        secs.append(f'''  <section class="sec" id="{cid}"><div class="wrap">
-    <h2>{title}</h2>
-    <div class="gallery">{figs}</div>
-    <p class="note"><a href="{link}">{linktext} →</a></p>
-  </div></section>''')
-    body = f'''  <section class="wrap phero">
-    <div>
-      <p class="eyebrow">Portfolio</p>
-      <h1 class="serif">VTuber &amp; Live2D Art Portfolio</h1>
-      <p class="lead">VTuber models, Live2D rigging, PNGTubers, pets, emotes, banners, logos and illustrations made by Team Keiko. Every piece was drawn from scratch. Tap an image to see it full size.</p>
-      <div class="btns"><a class="btn btn-pink arrow" rel="nofollow" href="/?order">Start a project</a><a class="btn btn-ghost" href="/vtuber-pricing/">See prices</a></div>
-      <div class="facts">{"".join(f"<span>{t}</span>" for t in toc[:6])}</div>
-    </div>
-    <figure>{img(GALLERY["VTuber"][0], eager=True)}</figure>
-  </section>
-{chr(10).join(secs)}
-{related("/vtuber-portfolio/")}
-{cta("Want something like this?", "Tell me your idea and get your invoice by email.", "", "Start a project")}'''
+        okey = order_key.get(cid, key)
+        go = '/?order=' + okey.replace(' ', '%20')
+        n_here = len(names)
+        if cid == 'vtuber-models':
+            n_here += 1
+            cards.append('<article class="wcard wide" data-cat="vtuber-models"><div class="wimg"><video src="/images/live2d-rigging-showcase.mp4" poster="/images/live2d-rigging-showcase-poster.webp" controls muted loop playsinline preload="none" width="1280" height="720" aria-label="Live2D rigging showcase: head turns, blinking and hair physics"></video></div>'
+                         '<div class="wbody"><div class="wtags"><span class="wtag">Live2D rigging</span><span class="wtag soft">Showcase</span></div><h3>Live2D rigging showcase</h3><a class="wgo" href="/live2d-rigging/">About rigging →</a></div></article>')
+        for n in names:
+            w, h = img_size(n)
+            wide = w > 1.4 * h
+            capt = CAPTION.get(n, cap)
+            parts = capt.split(' · ')
+            sub = f'<span class="wtag soft">{e(parts[1])}</span>' if len(parts) > 1 else ''
+            sizes = "(max-width:560px) 94vw, 560px" if wide else "(max-width:560px) 94vw, (max-width:900px) 46vw, 380px"
+            cards.append(f'<article class="wcard{" wide" if wide else ""}" data-cat="{cid}"><a class="wimg" href="/images/{n}.webp">{img(n, thumb=True, sizes=sizes)}</a>'
+                         f'<div class="wbody"><div class="wtags"><span class="wtag">{e(short[cid])}</span>{sub}</div><h3>{e(parts[0])}</h3><a class="wgo" rel="nofollow" href="{go}">Order similar →</a></div></article>')
+        counts.append((cid, title, n_here))
+    total = sum(c for _, _, c in counts)
+    chips = f'<button type="button" class="wf on" data-f="all" aria-pressed="true">All <b>{total}</b></button>' + ''.join(
+        f'<button type="button" class="wf" data-f="{cid}" aria-pressed="false">{e(title)} <b>{c}</b></button>' for cid, title, c in counts)
+    filter_js = ("(function(){var g=document.getElementById('wgrid'),cs=[].slice.call(g.children),bs=[].slice.call(document.querySelectorAll('.wf')),out=document.getElementById('wcount');"
+                 "function set(f){var n=0;cs.forEach(function(c){var on=f==='all'||c.getAttribute('data-cat')===f;c.hidden=!on;if(on)n++;});"
+                 "bs.forEach(function(b){var on=b.getAttribute('data-f')===f;b.classList.toggle('on',on);b.setAttribute('aria-pressed',on);});out.textContent='Showing '+n+(n===1?' work':' works');}"
+                 "bs.forEach(function(b){b.addEventListener('click',function(){var f=b.getAttribute('data-f');set(f);history.replaceState(null,'',f==='all'?location.pathname:'#'+f);});});"
+                 "var h=location.hash.slice(1);if(h&&bs.some(function(b){return b.getAttribute('data-f')===h;})){set(h);setTimeout(function(){document.getElementById('works').scrollIntoView();var o=document.querySelector('.wf.on'),w=o&&o.parentNode;if(w)w.scrollLeft=o.offsetLeft-(w.clientWidth-o.offsetWidth)/2;},50);}})();")
+    hero_img = img(GALLERY["VTuber"][0], eager=True)
+    body = ('  <section class="wrap phero">\n    <div>\n      <p class="eyebrow">Portfolio</p>\n'
+            '      <h1 class="serif">VTuber &amp; Live2D Art Portfolio</h1>\n'
+            '      <p class="lead">VTuber models, Live2D rigging, PNGTubers, pets, emotes, banners, logos and illustrations made by Team Keiko. Every piece was drawn from scratch. Tap an image to see it full size.</p>\n'
+            '      <div class="btns"><a class="btn btn-pink arrow" rel="nofollow" href="/?order">Start a project</a><a class="btn btn-ghost" href="/vtuber-pricing/">See prices</a></div>\n'
+            f'    </div>\n    <figure>{hero_img}</figure>\n  </section>\n\n'
+            '  <section class="sec" id="works"><div class="wrap">\n    <h2>All works</h2>\n'
+            f'    <div class="wfilters" role="toolbar" aria-label="Filter works">{chips}</div>\n'
+            f'    <p class="wcount" id="wcount" aria-live="polite">Showing {total} works</p>\n'
+            f'    <div class="wgrid" id="wgrid">{"".join(cards)}</div>\n  </div></section>\n'
+            f'  <script>{filter_js}</script>\n'
+            + related("/vtuber-portfolio/") + '\n'
+            + cta("Want something like this?", "Tell me your idea and get your invoice by email.", "", "Start a project"))
     faq = [
         ('Who made these artworks?', 'Team Keiko: Keiko (artist), Zhopio (illustrator) and Tomy (rigger). Every piece here is original work, drawn from scratch.'),
         ('Can I order something in a similar style?', 'Yes. Mention the piece you like in the order form, and attach it as a reference if you want.'),
