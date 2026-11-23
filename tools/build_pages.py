@@ -624,29 +624,63 @@ def portfolio():
 # ---------------------------------------------------------------- 5. pricing
 def pricing():
     slug = lambda n: re.sub(r'[^a-z0-9]+', '-', n.lower()).strip('-')
-    pages = {'VTuber': '/custom-vtuber-model/', 'PNGTuber': '/custom-pngtuber-model/'}
+    pages = {'VTuber': '/custom-vtuber-model/', 'PNGTuber': '/custom-pngtuber-model/', 'Emotes': '/custom-twitch-emotes/'}
     order = ['VTuber', 'VTuber Packages', 'PNGTuber', 'Chibi VTuber', 'VTuber Pet', 'Emotes', 'Custom PFP', 'Banner', 'VTuber Logo', 'Stream Overlay', 'Background']
+    opt_help = {'Art only': 'Layered PSD, ready to rig', 'Art + Rig': 'Moving Live2D model + VTube Studio file', 'Rig only': 'You send your PSD, I rig it'}
+
+    def thumb(n):
+        g = GALLERY.get(n) or []
+        if not g: return ''
+        f = g[0]
+        src = f'/images/s/{f}.webp' if os.path.exists(os.path.join(ROOT, 'images', 's', f + '.webp')) else f'/images/t/{f}.webp'
+        return f'<img class="pr-thumb" src="{src}" alt="{e(ALT.get(f, n))}" width="96" height="96" loading="lazy" decoding="async">'
+
+    def addon_chips(n):
+        ad = SERVICES[n]['addons']
+        if not ad: return ''
+        return '<div class="pr-adds"><span class="pr-adds-l">Add-ons</span>' + ''.join(
+            f'<span class="pr-add">{e(a[0])} <b>{"+" + money(a[1]) if a[1] else "included"}</b></span>' for a in ad) + '</div>'
+
     blocks = []
     for n in order:
         s = SERVICES[n]
-        more = f' · <a href="{pages[n]}">Details</a>' if n in pages else ''
-        blocks.append(f'''    <div class="svc" id="{slug(n)}">
-      <h3>{e(n)}</h3>
-      <p class="meta">From {money(s["from"])}{" per emote" if s.get("qty") else ""} · about {e(s["eta"])} · <a rel="nofollow" href="/?order={n.replace(" ", "%20")}">Order</a>{more}</p>
-      {svc_table(n)}
-      {addons_line(n)}
+        about = DETAILS.get(n, {}).get('about', '')
+        more = f'<a class="pr-more" href="{pages[n]}">Details →</a>' if n in pages else ''
+        go = '/?order=' + n.replace(' ', '%20')
+        if s.get('table'):
+            cols = s['table']['cols']
+            sizes = {'Bust': 'Up to the chest', 'Half': 'Up to the waist', 'Full': 'Head to toe'}
+            cards = ''
+            for ci, col in enumerate(cols):
+                lines = ''.join(f'<li><span>{e(r)}<small>{e(opt_help.get(r, ""))}</small></span><b>{money(s["packages"][ix[ci]][1])}</b></li>' for r, ix in s['table']['rows'])
+                label = 'Half body' if col == 'Half' else 'Full body' if col == 'Full' else col
+                cards += f'<div class="pr-card"><h4>{e(label)}</h4><p class="pr-sub">{e(sizes.get(col, ""))}</p><ul class="pr-lines">{lines}</ul><a class="btn btn-pink pr-btn" rel="nofollow" href="{go}">Order {e(label.lower())}</a></div>'
+        else:
+            per = ' <small>per emote</small>' if s.get('qty') else ''
+            cards = ''.join(f'<div class="pr-card"><h4>{e(p[0])}</h4><p class="pr-price">{money(p[1])}{per}</p><p class="pr-sub">{e(p[2])}</p><a class="btn btn-ghost pr-btn" rel="nofollow" href="{go}">Order</a></div>' for p in s['packages'])
+        blocks.append(f'''    <div class="pr-svc" id="{slug(n)}">
+      <div class="pr-head">{thumb(n)}<div><h3>{e(n)}</h3><p>{e(about)}</p><p class="pr-meta">From <b>{money(s["from"])}</b> · about {e(s["eta"])} {more}</p></div></div>
+      <div class="pr-cards">{cards}</div>
+      {addon_chips(n)}
     </div>''')
+    jump = ''.join(f'<a class="wf" href="#{slug(n)}">{e(n)} <b>{money(SERVICES[n]["from"])}</b></a>' for n in order)
+    steps = ''.join(f'<li><b>{i}</b><span><strong>{t}</strong>{d}</span></li>' for i, (t, d) in enumerate([
+        ('Pick a service', 'Model, PNGTuber, emotes, banner and more.'),
+        ('Choose size and option', 'The card shows the price for each choice.'),
+        ('Add extras if you like', 'Expressions, outfits, commercial rights and so on.'),
+        ('Pay your way', '13% tax is added. Pay in full, 50/50 or in 3 parts (orders above $150).')], 1))
     body = f'''  <section class="wrap phero" style="grid-template-columns:1fr">
     <div>
       <p class="eyebrow">Prices in USD</p>
       <h1 class="serif">VTuber Commission Prices</h1>
-      <p class="lead">Current prices for every service: custom VTuber models, Live2D rigging, PNGTubers, emotes, banners, logos and stream assets. These are the same prices you see in the order form.</p>
-      <div class="facts">{"".join(f'<span><a href="#{slug(n)}">{e(n)}</a> from <b>{money(SERVICES[n]["from"])}</b></span>' for n in order)}</div>
+      <p class="lead">Every service and its price on one page. These are the same prices as in the order form, and your final total is shown before you send it.</p>
+      <ol class="pr-steps">{steps}</ol>
     </div>
   </section>
 
-  <section class="sec"><div class="wrap">
+  <section class="sec" id="prices"><div class="wrap">
     <h2>Price list</h2>
+    <nav class="wfilters pr-jump" aria-label="Jump to a service">{jump}</nav>
 {chr(10).join(blocks)}
   </div></section>
 
@@ -662,7 +696,7 @@ def pricing():
     </div>
   </div></section>
 {related("/vtuber-pricing/")}
-{cta("Found what you need?", "Send the order form and get your invoice by email.", "", "Start a project")}'''
+{cta("Found what you need?", "Send the order form and I'll email your invoice.", "", "Start a project")}'''
     faq = [
         ('How much does a custom VTuber model cost?', f'Art only starts at {money(vp["Bust · Art only"])} (bust); art + rig at {money(vp["Bust · Art + Rig"])}. A full-body model with rigging is {money(vp["Full body · Art + Rig"])}. See <a href="/custom-vtuber-model/">custom VTuber models</a>.'),
         ('Can I pay in installments?', 'Yes: 50/50 (half upfront, half before final files), or 3 installments for orders above $150.'),
