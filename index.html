@@ -1227,6 +1227,12 @@ a.slot-badge:focus-visible{outline:2px solid var(--pink-text);outline-offset:3px
 @keyframes ldsh{0%,100%{transform:scaleX(1);opacity:.9}50%{transform:scaleX(.7);opacity:.5}}
 @keyframes lddot{0%,100%{opacity:.2}50%{opacity:1}}
 @media (prefers-reduced-motion:reduce){#kaLoader img,#kaLoader .ld-shadow,#kaLoader p i{animation:none}}
+
+.start-pill{display:inline-flex;align-items:center;gap:6px;margin-left:12px;vertical-align:middle;font:700 12.5px/1 Poppins,sans-serif;color:#17703d;background:linear-gradient(135deg,#eafaf1,#d6f5e3);border:1px solid #bfe8cf;border-radius:999px;padding:6px 12px}
+.start-pill[hidden],.c-start[hidden]{display:none}
+.sec-head .start-pill{margin-right:auto}
+.c-start{display:block;margin-top:6px;font-weight:700;color:#17703d}
+@media (max-width:560px){.start-pill{margin:8px 0 0}}
 </style>
 </head>
 <body>
@@ -1330,7 +1336,7 @@ a.slot-badge:focus-visible{outline:2px solid var(--pink-text);outline-offset:3px
 <section id="services">
   <div class="wrap">
     <div class="sec-head">
-      <h2 class="serif">Our Services</h2>
+      <h2 class="serif">Our Services</h2><span class="start-pill" id="startPill" hidden></span>
       <label class="svc-search"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2"/><path d="m20 20-4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
         <input type="search" id="svcSearch" placeholder="Search services… e.g. emotes, logo, rig" aria-label="Search services" autocomplete="off"></label>
     </div>
@@ -1588,7 +1594,7 @@ a.slot-badge:focus-visible{outline:2px solid var(--pink-text);outline-offset:3px
         <input type="hidden" name="Amount due now (USD)" id="fDue">
 
         <div class="ostep on" data-s="1">
-          <p class="c-intro">What would you like to order? Pick one to see its options ♡</p>
+          <p class="c-intro">What would you like to order? Pick one to see its options ♡<span class="c-start" id="cStart" hidden></span></p>
           <div class="opts" id="svcOpts"></div>
         </div>
 
@@ -1729,7 +1735,7 @@ a.slot-badge:focus-visible{outline:2px solid var(--pink-text);outline-offset:3px
 const KA_STAT=e=>{try{if(/dryrun=1/.test(location.search)||!location.protocol.startsWith('http'))return;const q=new URLSearchParams(location.search),r=document.referrer?new URL(document.referrer).hostname:'';const s=q.get('ref')||q.get('utm_source')||(r&&r!==location.hostname?r:'');navigator.sendBeacon('stats-api.php',new Blob([JSON.stringify({e,p:location.pathname,s})],{type:'application/json'}));}catch(_){}};   // anonymous visit counter (no cookies), daily summary in Discord
 KA_STAT('view');
 const SEASON = { christmas: true, until: "2027-01-07", orderBy: "2026-12-04" };   // orderBy: last day to order for delivery before Christmas (max 3 weeks)   // tema Natal: salju, topi Santa di logo, garis permen. Matikan: christmas:false (mati otomatis setelah tanggal until)
-const SLOTS = { open: true, text: "Commissions open" };   // status komisi di hero. Tutup: { open: false, text: "Commissions closed" }
+const SLOTS = { open: true, text: "Commissions open", start: "I can start right away" };   // status komisi di hero. Tutup: { open: false, text: "Commissions closed" }
 const PAYPAL = {          // kosong: link PayPal dikirim lewat email invoice setelah order dicek (bukan langsung di website)
   email: "",
   me: "",
@@ -2616,6 +2622,8 @@ document.addEventListener('click',e=>{const a=e.target.closest('.menu-chat');if(
       s.style.setProperty('--dx',(Math.cos(a)*d).toFixed(1)+'px');s.style.setProperty('--dy',(Math.sin(a)*d).toFixed(1)+'px');s.style.setProperty('--r',(Math.random()*120-60).toFixed(0)+'deg');
       document.body.appendChild(s);setTimeout(()=>s.remove(),650);}
   },{passive:true});})();
+(function(){if(typeof SLOTS==='undefined'||!SLOTS.open||!SLOTS.start)return;   // "start now" note (edit SLOTS.start)
+  const p=$('#startPill'),c=$('#cStart');if(p){p.textContent='⚡ '+SLOTS.start;p.hidden=false;}if(c){c.textContent='⚡ '+SLOTS.start+'.';c.hidden=false;}})();
 (function(){const b=$('#slotBadge');if(b&&typeof SLOTS!=='undefined'){b.textContent=SLOTS.text;b.className='slot-badge '+(SLOTS.open?'open':'closed');
   const xm=typeof SEASON!=='undefined'&&SEASON.christmas&&SEASON.orderBy&&SLOTS.open&&new Date()<new Date(SEASON.until)&&new Date()<=new Date(SEASON.orderBy+'T23:59:59+07:00');
   const st=SLOTS.open?'<span class="sb-main"><i class="sb-dot" aria-hidden="true"></i><span class="sb-lbl gh-l">Commissions</span><b class="sb-open">Open</b><i class="sb-spark" aria-hidden="true">✦</i></span>':'';
