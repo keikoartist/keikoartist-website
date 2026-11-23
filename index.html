@@ -3076,7 +3076,8 @@ let tabVisitorN=0,tabAdminN=0;const tabSync=()=>tabDot(tabVisitorN+tabAdminN);
   const upd=()=>{const i=cur();db.forEach((d,k)=>d.setAttribute('aria-current',String(k===i)));prev.disabled=i===0;next.disabled=i===cards.length-1;fit(i);};
   addEventListener('resize',()=>fit(cur()),{passive:true});
   let raf=0;g.addEventListener('scroll',()=>{cancelAnimationFrame(raf);raf=requestAnimationFrame(upd);},{passive:true});
-  db.forEach((d,k)=>d.onclick=()=>go(k));prev.onclick=()=>go(cur()-1);next.onclick=()=>go(cur()+1);upd();
+  db.forEach((d,k)=>d.onclick=()=>go(k));prev.onclick=()=>go(cur()-1);next.onclick=()=>go(cur()+1);
+  if('IntersectionObserver' in window){const io=new IntersectionObserver(es=>{if(es[0].isIntersecting){io.disconnect();upd();}},{rootMargin:'400px'});io.observe(g);}else upd();   // measure only when the reviews come near (saves layout work at load)
   if('IntersectionObserver' in window)new IntersectionObserver(es=>es.forEach(e=>document.body.classList.toggle('in-reviews',e.isIntersecting)),{rootMargin:'-85% 0px 0px 0px'}).observe($('#reviews'));
 })();
 // "Chat with us" in the phone menu opens the chat
