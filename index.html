@@ -2509,8 +2509,14 @@ $$('.services .card').forEach(c=>{const p=c.querySelector(':scope>.price'),b=c.q
   leaves.forEach((l,i)=>l.addEventListener('click',e=>{if(e.target.closest('a,button,video'))return;go(i<cur?-1:1);}));
   book.parentNode.addEventListener('keydown',e=>{if(e.key==='ArrowRight')go(1);if(e.key==='ArrowLeft')go(-1);});book.parentNode.tabIndex=0;
   document.documentElement.classList.add('has-book');grid.remove();draw();
-  // open the cover once when the book comes into view
-  if('IntersectionObserver' in window&&!navigator.webdriver){const io=new IntersectionObserver(es=>{if(es[0].isIntersecting){io.disconnect();setTimeout(()=>{if(cur===0)go(1);},700);}},{threshold:.55});io.observe(book.parentNode);}
+  // turns its own pages while it is on screen (every 3.5 s, then starts again from page 1); stops for good once the visitor turns a page, pauses on hover
+  let vis=false,hover=false,manual=false,timer=0;
+  const tick=()=>{clearTimeout(timer);if(manual||!vis||document.hidden)return;timer=setTimeout(()=>{if(!hover&&!manual&&vis){if(cur>=n-1){cur=0;draw();setTimeout(()=>go(1),900);}else go(1);}tick();},cur===0?700:3500);};
+  const stop=()=>{manual=true;clearTimeout(timer);};
+  [prev,next].forEach(x=>x.addEventListener('click',stop));book.addEventListener('click',stop);book.parentNode.addEventListener('keydown',stop);
+  book.addEventListener('pointerenter',()=>hover=true);book.addEventListener('pointerleave',()=>{hover=false;});
+  document.addEventListener('visibilitychange',tick);
+  if('IntersectionObserver' in window&&!navigator.webdriver&&!matchMedia('(prefers-reduced-motion:reduce)').matches){new IntersectionObserver(es=>{vis=es[0].isIntersecting;tick();},{threshold:.5}).observe(book.parentNode);}
 })();
 // service detail modal
 (function(){
