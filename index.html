@@ -1277,6 +1277,14 @@ html.rv-on .sec-head.rv.in h2::after{transform:scaleX(1)}
 #services .card .card-foot .req{width:auto;margin:0!important;padding:10px 20px!important;font-size:14px!important;flex:none}
 @media (max-width:767px){#services .card>:not(.gal):not(.best-tag){margin-left:12px;margin-right:12px}#services .card>p{margin:2px 12px 6px!important}#services .card .more{margin-bottom:4px}#services .card .gal{margin-bottom:10px!important}
   #services .card .card-foot{flex-direction:column;align-items:stretch;gap:8px;margin-bottom:12px;padding-top:10px}#services .card .card-foot .req{width:100%;padding:9px 10px}}
+/* service cards: every asset sits on the same soft stage (white art backgrounds blend into it); wide pieces fill the frame */
+#services .card .gal{background:linear-gradient(160deg,#fdf1f6,#f3ecff)!important}
+#services .card .gal-slide,#services .card .gal-slide.contain{background-color:#fbeef5!important;background-blend-mode:multiply;background-size:auto 88%!important;background-position:center 60%!important}
+#services .card .gal-slide.wide{background-size:cover!important;background-position:center!important}
+#services .card .gal-slide[style*="banner"]{background-size:92% auto!important;background-color:#2a1d24!important;background-blend-mode:normal}
+#services .card .gal-slide[style*="logo"]{background-size:86% auto!important}
+#services .card .gal-slide[style*="custom-twitch-emote-witch"]{background-size:auto 92%!important}
+#services .card .gal-slide[style*="debut-package"],#services .card .gal-slide[style*="stream-overlay"]{background-size:contain!important;background-color:#33262d!important;background-blend-mode:normal}
 </style>
 </head>
 <body>
@@ -2683,7 +2691,7 @@ document.addEventListener('click',e=>{const a=e.target.closest('.menu-chat');if(
   const xm=typeof SEASON!=='undefined'&&SEASON.christmas&&SEASON.orderBy&&SLOTS.open&&new Date()<new Date(SEASON.until)&&new Date()<=new Date(SEASON.orderBy+'T23:59:59+07:00');
   const st=SLOTS.open?'<span class="sb-main"><i class="sb-dot" aria-hidden="true"></i><span class="sb-lbl gh-l">Commissions</span><b class="sb-open">Open</b><i class="sb-spark" aria-hidden="true">✦</i></span>':'';
   if(st){b.innerHTML=st;b.classList.add('sb-split');}
-  if(xm){const d=new Date(SEASON.orderBy+'T12:00:00+07:00').toLocaleDateString('en-GB',{day:'numeric',month:'short'});b.insertAdjacentHTML('beforeend','<span class="sb-xmas"><span class="gh-l">🎄 order by '+d+'</span><span class="gh-s">🎄 by '+d+'</span></span>');b.title='Order by '+d+' for delivery before Christmas';}
+  // hero badge shows only "Commissions open" (owner, Nov 2026); the Christmas deadline stays in the order form
   if(st)b.insertAdjacentHTML('beforeend','<span class="sb-go" aria-hidden="true">›</span>');}})();
 (function(){const t=[...document.querySelectorAll('#start,footer')];if(!t.length||!('IntersectionObserver' in window))return;const on=new Set();const io=new IntersectionObserver(es=>{es.forEach(e=>e.isIntersecting?on.add(e.target):on.delete(e.target));document.body.classList.toggle('fab-off',on.size>0);});t.forEach(x=>io.observe(x));})();
 (function(){const hb=document.querySelector('.hero .btns');if(!hb||!('IntersectionObserver' in window)){document.body.classList.add('past-hero');return;}
