@@ -2971,11 +2971,13 @@ document.addEventListener('click',e=>{const a=e.target.closest('.menu-chat');if(
 (function(){if(!document.body.classList.contains('xmas'))return;
   // Christmas spin wheel: one spin per visitor, prize + claim code for Discord (prizes set by the owner; Keiko applies them by hand)
   const KEY='ka-wheel-2026';
-  const GIFTS=['Free emotes','Free Christmas badges','Free source files','Free surprise-me art (skeb)','Free sketch','10% off your next commission'];   // same order as GIFTS in spin-api.php (the server draws the prize)
-  const SHORT=['Free emotes','Xmas badges','Source files','Surprise art','Free sketch','10% off'];
-  const n=GIFTS.length,cols=['#f2628f','#ffd1df','#c9a7ff','#ffe3ec','#ff8fb1','#efe6ff'],ink=['#fff','#7a2846','#fff','#7a2846','#fff','#7a2846'];
+  const GIFTS=['Free emotes','Free Christmas badges','Free source files','Free sketch','10% off your next commission'];   // same order as GIFTS in spin-api.php (the server draws the prize)
+  const SHORT=['Free emotes','Xmas badges','Source files','Free sketch','10% off'];
+  const n=GIFTS.length,cols=['#f2628f','#ffd1df','#c9a7ff','#ff8fb1','#efe6ff'],ink=['#fff','#7a2846','#fff','#fff','#7a2846'];
   let res=null;try{res=JSON.parse(localStorage.getItem(KEY)||'null')}catch(_){}
   const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(res))}catch(_){}};
+  // spins from before skeb was removed (6 slices): keep the prize the visitor won, move the others to the new slice numbers
+  if(res&&res.v!==2){if(res.g===3)res.prize='Free surprise-me art (skeb)';else if(res.g>3)res.g-=1;if(res.g>=n)res.g=n-1;res.v=2;save();}
   const top=document.querySelector('.hero-top');if(!top)return;
   const chip=document.createElement('button');chip.type='button';chip.className='gift-hunt';top.appendChild(chip);
   const label=()=>{chip.innerHTML=res?'🎁 Your prize':'<span class="gh-l">🎡 Spin the Christmas wheel</span><span class="gh-s">🎡 Spin &amp; win</span>';};label();
@@ -2996,7 +2998,7 @@ let seen=false;try{seen=!!localStorage.getItem(KEY+'-seen')}catch(_){seen=true}
       g+=`<path d="M${R} ${R} L${x0.toFixed(2)} ${y0.toFixed(2)} A${R} ${R} 0 0 1 ${x1.toFixed(2)} ${y1.toFixed(2)} Z" fill="${cols[i]}" stroke="#fff" stroke-width="2"/>`+
          `<text x="${R+21}" y="${R+3.5}" transform="rotate(${m-90} ${R} ${R})" font-size="10" font-weight="600" font-family="Poppins,sans-serif" fill="${ink[i]}">${SHORT[i]}</text>`;}
     return `<svg viewBox="0 0 200 200" class="wh-svg" aria-hidden="true">${g}<circle cx="100" cy="100" r="16" fill="#fff" stroke="#fbd3e0" stroke-width="3"/><text x="100" y="105" text-anchor="middle" font-size="14">🎁</text></svg>`;};
-  const result=(w)=>{w.querySelector('h3').textContent=GIFTS[res.g]+'!';
+  const result=(w)=>{w.querySelector('h3').textContent=(res.prize||GIFTS[res.g])+'!';
     w.querySelector('.gw-msg').innerHTML='Your claim code: <b class="gw-code">'+res.c+'</b><small>Send this code (or a screenshot) to Keiko on Discord to claim it with your next commission. One prize per person, valid until 6 Jan 2027.</small>';
     w.querySelector('.btns').innerHTML='<a class="btn btn-pink" href="https://discord.gg/FbgWxMPjf" target="_blank" rel="noopener">Claim on Discord</a><button class="btn btn-ghost" type="button">Close</button>';
     w.querySelector('.btns button').onclick=()=>w.remove();};
@@ -3011,7 +3013,7 @@ let seen=false;try{seen=!!localStorage.getItem(KEY+'-seen')}catch(_){seen=true}
       if(!calm){rot.style.transition='transform 1.2s ease-in';rot.style.transform='rotate(720deg)';}   // starts turning while the server draws
       let r=null;try{const ctl=new AbortController(),t=setTimeout(()=>ctl.abort(),6000);
         const q=await fetch('spin-api.php',{method:'POST',headers:{'Content-Type':'application/json'},body:'{}',signal:ctl.signal});clearTimeout(t);
-        const j=await q.json();if(j&&j.ok&&Number.isInteger(j.g)&&j.g>=0&&j.g<n&&/^XMAS-[A-Z0-9]{5}$/.test(j.c))r={g:j.g,c:j.c};}catch(_){}
+        const j=await q.json();if(j&&j.ok&&Number.isInteger(j.g)&&j.g>=0&&j.g<n&&/^XMAS-[A-Z0-9]{5}$/.test(j.c))r={g:j.g,c:j.c,v:2};}catch(_){}
       if(!r){rot.style.transition='none';rot.style.transform='rotate(0deg)';e.target.disabled=false;
         w.querySelector('.gw-msg').textContent='The wheel is stuck for a moment. Please try again in a minute ♡';return;}
       res=r;save();const jit=(Math.random()-.5)*seg*.6;

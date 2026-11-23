@@ -5,7 +5,7 @@ header('Content-Type: application/json');
 header('X-Content-Type-Options: nosniff');
 header('Cache-Control: no-store');
 
-const GIFTS = ['Free emotes', 'Free Christmas badges', 'Free source files', 'Free surprise-me art (skeb)', 'Free sketch', '10% off your next commission'];
+const GIFTS = ['Free emotes', 'Free Christmas badges', 'Free source files', 'Free sketch', '10% off your next commission'];   // skeb removed by the owner (Nov 2026)
 const SEASON_END = '2027-01-07';
 
 function out($code, $data) { http_response_code($code); echo json_encode($data); exit; }
