@@ -1523,7 +1523,7 @@ html.book-open .book-nav span{color:#fff!important}html.book-open .book-nav span
 .gift-hunt{color:var(--pink-text)!important}
 .start-pill{color:#139a62!important}
 
-.start-pill svg,.start-pill>i:first-child{display:none}
+.start-pill>i:first-child{display:none}
 .sec-more .btn-ghost{border:1.5px solid var(--pink-2)!important;background:#fff!important;box-shadow:none!important}
 @media (max-width:820px){.gift-hunt,.start-pill{height:36px;font-size:12.5px!important;padding:0 13px!important}}
 /* services: three main ones first */
@@ -1569,6 +1569,35 @@ html{overflow-x:hidden}
   .hero .hero-dc{order:6!important}
   .hero-fx{z-index:1!important}
 }
+/* ===== Design review (Nov 2026): fewer colours, one main button, one card style, calmer motion, line icons, readable sizes ===== */
+:root{--card-r:18px;--card-b:1px solid #f1d9e3;--card-sh:0 6px 18px rgba(122,40,70,.06);--card-sh-h:0 14px 30px rgba(122,40,70,.12)}
+.ic{display:inline-block;vertical-align:-3px;flex:none}
+/* A. palette: pink (main), plum/lavender (support), green only for "open". Discord buttons use the brand plum instead of Discord blue */
+body.xmas header:not(.kc-head)::after{background:linear-gradient(90deg,#f2628f,#c9a7ff,#f2628f)!important;height:2px!important;bottom:-2px!important;opacity:.9!important}
+.nav-dc,.btn-dc,.hero-dc .hd-ic,.hero-dc .hd-go{background:#6b3a8f!important;border-color:#6b3a8f!important;box-shadow:none!important}
+.hero-dc{background:#f7f1fb!important;border-color:#e6d8f0!important;color:var(--ink)!important}
+.menu-dc{color:#6b3a8f!important}
+.ty-dc{background:linear-gradient(135deg,#6b3a8f,#8f5bb5)!important}.ty-dc .btn{color:#6b3a8f!important}
+/* B. one main button per screen: card buttons become soft, the spellbook button an outline */
+#services .card .req{background:#fff0f5!important;color:var(--pink-text)!important;box-shadow:none!important;border:1.5px solid #f6c3d5!important}
+#services .card .req:hover{background:var(--btn-pink)!important;color:#fff!important;border-color:var(--btn-pink)!important}
+.bk-open{background:#fff!important;color:var(--pink-text)!important;border:1.5px solid var(--pink-2)!important;box-shadow:none!important}
+/* C. one card style */
+#services .card,.works .work,.rv-card,.faq-grid details,.member,.step,.wcard,.tos-box{border-radius:var(--card-r)!important;border:var(--card-b)!important;box-shadow:var(--card-sh)!important}
+#services .card.main{box-shadow:0 0 0 2px var(--pink-2),var(--card-sh)!important;border-color:transparent!important}
+@media (hover:hover){.rv-card:hover,#services .card:hover{box-shadow:var(--card-sh-h)!important}#services .card.main:hover{box-shadow:0 0 0 2px var(--pink-2),var(--card-sh-h)!important}}
+/* D. calmer: emotes stay still, no glow pulses; smoke, orb and the spellbook keep moving */
+.sb-emote,.kc-sticker .kc-emote,.bd-left img,.bd-bubble,.gift-hunt{animation:none!important}
+#services .card{transform:none!important}
+/* E. icons sit nicely in chips */
+.gift-hunt .ic,.start-pill .ic{margin-right:2px}
+.fab-order{display:inline-flex;align-items:center;gap:6px}
+/* F. nothing under 13px on phones */
+@media (max-width:820px){
+  .rv-tags li,.wtag,.works .work .tag,.ptax,.price .pnote,.kc-sticker .kc-label,.hero-art figcaption,.sb-txt,.sb-cute .sb-open,.gift-hunt,.start-pill,.card .more,.foot-links,.copy,.svc-note,.rv-card figcaption small,.rv-card figcaption span,.best-tag,.svc-more-l,.pg-num,.bk-mini span,.eyebrow{font-size:13px!important}
+  .ptax{font-size:13px!important}
+}
+@media (max-width:820px){.hero .sb-cute .sb-lbl,.hero-dc small,#services .sec-head .start-pill,#services .services .card>p,.team .member span,.team .member .ig,.member span,.member small{font-size:13px!important}}
 </style>
 </head>
 <body>
@@ -1593,7 +1622,7 @@ html{overflow-x:hidden}
       <a href="#process" class="nav-2nd">Process</a>
       <a href="#faq" class="nav-2nd">FAQ</a>
       <a href="#tos" class="nav-2nd">TOS</a>
-      <a href="#chat" class="menu-chat">💬 Chat with us</a>
+      <a href="#chat" class="menu-chat"><svg class="ic" viewBox="0 0 24 24" width="17" height="17" aria-hidden="true"><path d="M4 5h16v11H9l-5 4V5Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg> Chat with us</a>
       <a href="https://discord.gg/FbgWxMPjf" target="_blank" rel="noopener" class="nav-2nd menu-dc"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M20.32 4.37A19.8 19.8 0 0 0 15.4 2.85a13.7 13.7 0 0 0-.63 1.29 18.4 18.4 0 0 0-5.5 0 13 13 0 0 0-.64-1.29 19.7 19.7 0 0 0-4.92 1.52C.6 9.05-.24 13.6.18 18.1a19.9 19.9 0 0 0 6.03 3.05c.49-.66.92-1.36 1.29-2.1a12.9 12.9 0 0 1-2.03-.97l.5-.39a14.2 14.2 0 0 0 12.06 0l.5.39c-.65.38-1.33.71-2.04.98.37.73.8 1.43 1.29 2.09a19.8 19.8 0 0 0 6.04-3.05c.5-5.22-.84-9.73-3.5-13.73ZM8.02 15.33c-1.18 0-2.15-1.08-2.15-2.42 0-1.33.95-2.42 2.15-2.42 1.2 0 2.17 1.1 2.15 2.42 0 1.34-.95 2.42-2.15 2.42Zm7.96 0c-1.18 0-2.15-1.08-2.15-2.42 0-1.33.95-2.42 2.15-2.42 1.2 0 2.17 1.1 2.15 2.42 0 1.34-.94 2.42-2.15 2.42Z"/></svg> Join our Discord server</a>
     </nav>
     <button type="button" class="nav-search" id="navSearch" aria-label="Search services"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2"/><path d="m20 20-4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><span class="ns-txt">Search services…</span></button>
@@ -1844,7 +1873,7 @@ html{overflow-x:hidden}
 </section>
 </main>
 
-<a href="#order" data-order class="btn btn-pink fab-order">Order now ♡</a>
+<a href="#order" data-order class="btn btn-pink fab-order"><svg class="ic" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10Z" fill="none" stroke="currentColor" stroke-width="2"/></svg> Order now</a>
 
 <!-- LIVE CHAT -->
 <button class="kc-bubble kc-sticker" id="kcBubble" type="button" aria-label="Contact us: chat with KeikoArts" aria-expanded="false">
@@ -2996,7 +3025,7 @@ document.addEventListener('click',e=>{const a=e.target.closest('.menu-chat');if(
   if(res&&res.v!==3){if(res.prize)res.g=3;delete res.prize;res.g=Math.max(0,Math.min(n-1,res.g|0));res.v=3;save();}
   const top=document.querySelector('.hero-top');if(!top)return;
   const chip=document.createElement('button');chip.type='button';chip.className='gift-hunt';top.appendChild(chip);
-  const label=()=>{chip.innerHTML=res?'🎁 Your prize':'<span class="gh-l">🎡 Spin the Christmas wheel</span><span class="gh-s">🎡 Spin &amp; win</span>';};label();
+  const label=()=>{chip.innerHTML=res?'<svg class="ic" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><rect x="3.5" y="8" width="17" height="4" rx="1" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M5 12v8h14v-8M12 8v12M12 8c-2-3.5-6-3-5-.5.6 1.4 5 .5 5 .5Zm0 0c2-3.5 6-3 5-.5-.6 1.4-5 .5-5 .5Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg> Your prize':'<svg class="ic" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 3v18M3 12h18M5.6 5.6l12.8 12.8M18.4 5.6 5.6 18.4" stroke="currentColor" stroke-width="1.2" opacity=".6"/><circle cx="12" cy="12" r="2.2" fill="currentColor"/></svg><span class="gh-l">Spin the Christmas wheel</span><span class="gh-s">Spin &amp; win</span>';};label();
   // open from links like /?spin=1 (service pages), or once by itself for a new visitor (not during order tests)
   const busy=()=>!!document.querySelector('.modal.show,.gift-win,.lb.show,.sd.show,#tyModal.show,.kc-panel:not([hidden])');
   const q=new URLSearchParams(location.search);
@@ -3048,7 +3077,7 @@ let seen=false;try{seen=!!localStorage.getItem(KEY+'-seen')}catch(_){seen=true}
   const h=document.querySelector('.hero');if(h){const pos=[[54,12,14,4.6,0],[93,18,18,5.4,1.2],[61,78,12,4.2,2.1],[97,72,16,5.8,.6],[48,46,10,4.8,3],[80,6,12,5,2.6]];
     h.insertAdjacentHTML('beforeend',pos.map(([x,y,f,d,de],i)=>`<span class="hero-spark" aria-hidden="true" style="left:${x}%;top:${y}%;--fs:${f}px;--du:${d}s;--de:${de}s;color:${i%2?'#c9a7ff':'#f2628f'}">✦</span>`).join(''));}
   const art=null;if(art){let tk=false;addEventListener('scroll',()=>{if(tk)return;tk=true;requestAnimationFrame(()=>{const y=scrollY;if(y<innerHeight*1.2)art.style.transform=`translateY(${(y*.08).toFixed(1)}px)`;tk=false;});},{passive:true});}
-  if(matchMedia('(hover:hover) and (pointer:fine)').matches)document.querySelectorAll('#services .card').forEach(c=>{
+  if(false)document.querySelectorAll('#services .card').forEach(c=>{   // card tilt off (design review, Nov 2026)
     c.addEventListener('pointermove',e=>{const r=c.getBoundingClientRect(),x=(e.clientX-r.left)/r.width-.5,y=(e.clientY-r.top)/r.height-.5;c.style.transform=`perspective(900px) rotateY(${(x*6).toFixed(2)}deg) rotateX(${(-y*6).toFixed(2)}deg) translateY(-3px)`;});
     c.addEventListener('pointerleave',()=>{c.style.transform='';});});
 })();
@@ -3063,7 +3092,7 @@ let seen=false;try{seen=!!localStorage.getItem(KEY+'-seen')}catch(_){seen=true}
       document.body.appendChild(s);setTimeout(()=>s.remove(),650);}
   },{passive:true});})();
 (function(){if(typeof SLOTS==='undefined'||!SLOTS.open||!SLOTS.start)return;   // "start now" note (edit SLOTS.start)
-  const p=$('#startPill'),c=$('#cStart');if(p){p.textContent='⚡ '+SLOTS.start;p.hidden=false;}if(c){c.textContent='⚡ '+SLOTS.start+'.';c.hidden=false;}})();
+  const p=$('#startPill'),c=$('#cStart');if(p){p.innerHTML='<svg class="ic" viewBox="0 0 24 24" width="14" height="14" aria-hidden="true"><path d="M13 2 5 14h6l-1 8 8-12h-6l1-8Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>'+esc(SLOTS.start);p.hidden=false;}if(c){c.textContent=SLOTS.start+'.';c.hidden=false;}})();
 (function(){const b=$('#slotBadge');if(b&&typeof SLOTS!=='undefined'){b.textContent=SLOTS.text;b.className='slot-badge '+(SLOTS.open?'open':'closed');
   const xm=typeof SEASON!=='undefined'&&SEASON.christmas&&SEASON.orderBy&&SLOTS.open&&new Date()<new Date(SEASON.until)&&new Date()<=new Date(SEASON.orderBy+'T23:59:59+07:00');
   const st=SLOTS.open?'<span class="sb-main sb-cute"><img class="sb-emote" src="images/contact-emote.webp" alt="" width="244" height="258" decoding="async"><span class="sb-txt"><span class="sb-lbl">Commissions</span><b class="sb-open"><i class="sb-live" aria-hidden="true"></i>open</b></span></span>':'';
