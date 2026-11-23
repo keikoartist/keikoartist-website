@@ -1611,6 +1611,7 @@ body.xmas header:not(.kc-head)::after{background:linear-gradient(90deg,#f2628f,#
 .card .price b{font-size:20px!important}
 @media (max-width:820px){.card .price b{font-size:18px!important}}
 .about-line b{font-family:Caveat,"Poppins",cursive;font-weight:700;font-size:1.65em;color:var(--pink-text);margin-right:6px;vertical-align:-2px}
+#sendBtn{display:inline-flex;align-items:center;justify-content:center;gap:7px}
 </style>
 </head>
 <body>
@@ -1946,7 +1947,7 @@ body.xmas header:not(.kc-head)::after{background:linear-gradient(90deg,#f2628f,#
 <!-- ORDER MODAL -->
 <div class="modal" id="orderModal" aria-hidden="true">
   <div class="mbox" role="dialog" aria-modal="true" aria-labelledby="mTitle">
-    <div class="mhead"><h3 id="mTitle">Commission Request ♡</h3><button class="mclose" type="button" data-close aria-label="Close">✕</button></div>
+    <div class="mhead"><h3 id="mTitle">Order Form</h3><button class="mclose" type="button" data-close aria-label="Close">✕</button></div>
     <div class="mbody">
       <div class="iab" id="iabNote" hidden><span>You're browsing inside the <b>app</b> browser. If uploading or paying doesn't work, open <b>keikoartist.com</b> in Chrome or Safari (tap ⋯ → Open in browser).</span><button type="button">Copy link</button></div>
       <form id="orderForm" method="POST" enctype="multipart/form-data" action="order-api.php?a=submit&amp;html=1">
@@ -2006,7 +2007,7 @@ body.xmas header:not(.kc-head)::after{background:linear-gradient(90deg,#f2628f,#
             <div class="refs" id="refsBox">
               <label class="drop" id="refDrop" tabindex="0">
                 <input type="file" id="refFiles" accept="image/*,.pdf,.psd,.clip" multiple>
-                <b>📎 Attach reference images <small style="font-weight:400;color:var(--muted)">(optional)</small></b>
+                <b><svg class="ic" viewBox="0 0 24 24" width="17" height="17" aria-hidden="true"><path d="M20 11.5 12.5 19a5 5 0 0 1-7-7L13 4.5a3.3 3.3 0 0 1 4.7 4.7L10.3 16.6a1.7 1.7 0 0 1-2.4-2.4L14.5 7.6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg> Attach reference images <small style="font-weight:400;color:var(--muted)">(optional)</small></b>
                 <span id="dropHint">Click or drag files here · up to 8 files, 60 MB total · they start uploading right away</span>
               </label>
               <p class="ref-msg" id="refMsg" role="status"></p>
@@ -2047,7 +2048,7 @@ body.xmas header:not(.kc-head)::after{background:linear-gradient(90deg,#f2628f,#
         <div class="mnav" id="mnav">
           <button type="button" class="btn btn-ghost" id="prevBtn" aria-label="Back to the service list">Back</button>
           <div class="mtot" id="navTot"><small id="navLbl">Total (incl. 13% tax)</small><b id="navTotal">$0</b></div>
-          <button type="submit" class="btn btn-pink" id="sendBtn">Send Order ♡</button>
+          <button type="submit" class="btn btn-pink" id="sendBtn">Send Order <svg class="ic" viewBox="0 0 24 24" width="17" height="17" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10Z" fill="none" stroke="currentColor" stroke-width="2"/></svg></button>
         </div>
       </form>
     </div>
@@ -2372,7 +2373,8 @@ function pickService(k){
   const mx=!!svc.table; $('#mx').hidden=!mx; $('#pkgOpts').hidden=mx;
   $('#pkgOpts').innerHTML=svc.packages.map(([n,p,d],i)=>`<div class="opt"><input type="radio" name="pkg" id="p${i}" value="${i}" ${i===0?'checked':''}><label for="p${i}">${esc(n)} <em>${cmOn?'':money(p)+(svc.qty?' each':'')}</em><small>${esc(d)}</small></label></div>`).join('');
   if(mx){
-    $('#mxType').innerHTML=svc.table.rows.map(([r,ix],i)=>`<input type="radio" name="mxType" id="mt${i}" value="${i}" ${i===0?'checked':''}><label for="mt${i}">${esc(r)}<small>from ${money(Math.min(...ix.map(j=>svc.packages[j][1])))}</small></label>`).join('');
+    const mt0=Math.max(0,svc.table.rows.findIndex(([r])=>r==='Art + Rig'));   // most VTubers want a moving model (owner, Nov 2026)
+    $('#mxType').innerHTML=svc.table.rows.map(([r,ix],i)=>`<input type="radio" name="mxType" id="mt${i}" value="${i}" ${i===mt0?'checked':''}><label for="mt${i}">${esc(r)}<small>from ${money(Math.min(...ix.map(j=>svc.packages[j][1])))}</small></label>`).join('');
     $('#mxSize').innerHTML=svc.table.cols.map((c,i)=>`<input type="radio" name="mxSize" id="ms${i}" value="${i}" ${i===0?'checked':''}><label for="ms${i}">${esc(sizeName(c))}<small></small></label>`).join('');
   }else{$('#mxType').innerHTML='';$('#mxSize').innerHTML='';}
   $('#addOpts').innerHTML=svc.addons.map(([n,p],i)=>`<input type="checkbox" name="add" id="a${i}" value="${i}"><label for="a${i}">${esc(n)} <em>${p?'+'+money(p):'Free'}</em></label>`).join('');
@@ -2506,7 +2508,7 @@ function valid(n){
 function go(n){
   step=n; $$('.ostep').forEach(s=>s.classList.toggle('on',+s.dataset.s===n));
   $('#mnav').hidden=n!==2;
-  $('#mTitle').textContent=n===1?'Start an Order ♡':cmOn?'Custom Order ♡':'Order Form ♡';
+  $('#mTitle').textContent=n===1?'Start an Order':cmOn?'Custom Order':'Order Form';
   if(n===2){calc();if(!sheetStart)sheetStart=Date.now();}
   err('');try{modal.scrollTop=0;sessionStorage.setItem('ka_open',n===2?svcName:'__list');sessionStorage.removeItem('ka_open_y');}catch(_){}
 }
@@ -2518,7 +2520,7 @@ function saveInvoice(last){try{if(last&&last.id&&last.payUrl&&!/PREVIEW|0000-000
 function readInvoice(){try{const v=JSON.parse(localStorage.getItem(INV_KEY)||'null');return v&&v.id&&Date.now()-v.savedAt<45*864e5?v:null;}catch(_){return null;}}
 function dropInvoice(id){try{const v=readInvoice();if(!v||!id||v.id===id)localStorage.removeItem(INV_KEY);}catch(_){}}
 function setBusy(on,label){const sb=$('#sendBtn');if(on){sb.dataset.busy='1';sb.textContent=label;sb.style.opacity='.75';$('#prevBtn').style.visibility='hidden';}
-  else{delete sb.dataset.busy;sb.textContent='Send Order ♡';sb.style.opacity='';$('#prevBtn').style.visibility='visible';}}
+  else{delete sb.dataset.busy;sb.innerHTML='Send Order <svg class="ic" viewBox="0 0 24 24" width="17" height="17" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10Z" fill="none" stroke="currentColor" stroke-width="2"/></svg>';sb.style.opacity='';$('#prevBtn').style.visibility='visible';}}
 function resetOrderForm(){form.reset();$('#fEmail').disabled=false;$('#fAuto').disabled=false;upState.forEach(s=>{if(s.url&&s.url.startsWith('blob:'))URL.revokeObjectURL(s.url);});upState.clear();upToken=hex(32);refFiles=[];renderRefs();clearDraft();$('#draftNote').hidden=true;sheetStart=0;$('#refSlots').innerHTML='';const m=$('#refMsg');if(m)m.textContent='';setBusy(false);err('');}
 const LIVE_SITE=/(^|\.)keikoartist\.com$/i.test(location.hostname)||/^(localhost|127\.0\.0\.1)$/.test(location.hostname);
 function postOrder(fd,onProgress){
