@@ -1312,7 +1312,7 @@ html.rv-on .sec-head.rv.in h2::after{transform:scaleX(1)}
   .hero-art img{width:100%!important;height:100%!important;aspect-ratio:auto!important;object-fit:cover;object-position:60% 22%;border:0!important;border-radius:0!important;box-shadow:none!important;animation:none!important}
   .hero-art::after{content:"";position:absolute;inset:0;z-index:1;display:block;background:linear-gradient(90deg,#fff 0,rgba(255,255,255,.97) 32%,rgba(255,255,255,.6) 44%,rgba(255,255,255,0) 58%),linear-gradient(0deg,#fff 0,rgba(255,255,255,0) 14%)}
   .hero-art img{-webkit-mask-image:none;mask-image:none}
-  .hero-art figcaption{left:auto!important;right:32px!important;bottom:max(96px,16%)!important;z-index:2}
+  .hero-art figcaption{left:auto!important;right:32px!important;bottom:auto!important;top:min(calc(100svh - 76px - 150px),calc(100% - 150px))!important;z-index:2}
   body.xmas .hero .xmas-snow{z-index:2}
 }
 @media (max-width:820px){
