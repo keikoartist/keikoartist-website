@@ -1234,6 +1234,21 @@ a.slot-badge:focus-visible{outline:2px solid var(--pink-text);outline-offset:3px
 .c-start{display:block;margin-top:6px;font-weight:700;color:#17703d}
 @media (max-width:560px){.start-pill{margin:8px 0 0}}
 .rv-count{color:var(--pink-text);font-weight:700}
+
+/* more motion (like studio sites): reveal variants, drawn underline, hero sparkles, parallax, card tilt */
+html.rv-on .rv.rv-zoom{transform:scale(.92)}
+html.rv-on .rv.rv-left{transform:translateX(-28px)}
+html.rv-on .rv.rv-right{transform:translateX(28px)}
+html.rv-on .rv.in{transform:none}
+.sec-head h2{position:relative}
+.sec-head h2::after{content:"";position:absolute;left:0;bottom:-8px;width:64px;height:3px;border-radius:3px;background:linear-gradient(90deg,var(--pink),#c9a7ff);transform-origin:left;transition:transform .8s cubic-bezier(.2,.7,.2,1) .25s}
+html.rv-on .sec-head.rv h2::after{transform:scaleX(0)}
+html.rv-on .sec-head.rv.in h2::after{transform:scaleX(1)}
+.hero-spark{position:absolute;z-index:0;pointer-events:none;color:var(--pink);opacity:.0;font-size:var(--fs,16px);animation:hsp var(--du,5s) ease-in-out var(--de,0s) infinite}
+@keyframes hsp{0%,100%{opacity:0;transform:translateY(6px) scale(.6) rotate(0)}40%,60%{opacity:.85;transform:translateY(-8px) scale(1) rotate(25deg)}}
+.hero-art{will-change:transform}
+#services .card{transform-style:preserve-3d}
+@media (prefers-reduced-motion:reduce){.hero-spark{display:none}html.rv-on .sec-head.rv h2::after{transform:none}}
 </style>
 </head>
 <body>
@@ -2610,9 +2625,18 @@ document.addEventListener('click',e=>{const a=e.target.closest('.menu-chat');if(
 (function(){if(navigator.webdriver||matchMedia('(prefers-reduced-motion:reduce)').matches||!('IntersectionObserver' in window))return;   // reveal on scroll (skipped for automated tests)
   const els=[...document.querySelectorAll('.sec-head,.works .work,#services .card,.rv-grid,.step,.member,#faq details,.fc-box')].filter(e=>e.getBoundingClientRect().top>innerHeight);
   if(!els.length)return;document.documentElement.classList.add('rv-on');
-  const groups=new Map();els.forEach(e=>{const k=e.parentElement;const i=groups.get(k)||0;groups.set(k,i+1);e.style.setProperty('--rd',Math.min(i,6)*.07+'s');e.classList.add('rv');});
+  const groups=new Map();els.forEach(e=>{const k=e.parentElement;const i=groups.get(k)||0;groups.set(k,i+1);e.style.setProperty('--rd',Math.min(i,6)*.07+'s');e.classList.add('rv');
+    if(e.matches('#services .card,.member,.fc-box'))e.classList.add('rv-zoom');else if(e.matches('.works .work'))e.classList.add(i%2?'rv-right':'rv-left');});
   const io=new IntersectionObserver(es=>es.forEach(x=>{if(x.isIntersecting){x.target.classList.add('in');io.unobserve(x.target);}}),{rootMargin:'0px 0px -8% 0px'});
   els.forEach(e=>io.observe(e));})();
+(function(){if(matchMedia('(prefers-reduced-motion:reduce)').matches)return;   // hero sparkles, parallax art, card tilt
+  const h=document.querySelector('.hero');if(h){const pos=[[54,12,14,4.6,0],[93,18,18,5.4,1.2],[61,78,12,4.2,2.1],[97,72,16,5.8,.6],[48,46,10,4.8,3],[80,6,12,5,2.6]];
+    h.insertAdjacentHTML('beforeend',pos.map(([x,y,f,d,de],i)=>`<span class="hero-spark" aria-hidden="true" style="left:${x}%;top:${y}%;--fs:${f}px;--du:${d}s;--de:${de}s;color:${i%2?'#c9a7ff':'#f2628f'}">✦</span>`).join(''));}
+  const art=document.querySelector('.hero-art');if(art&&innerWidth>820){let tk=false;addEventListener('scroll',()=>{if(tk)return;tk=true;requestAnimationFrame(()=>{const y=scrollY;if(y<innerHeight*1.2)art.style.transform=`translateY(${(y*.08).toFixed(1)}px)`;tk=false;});},{passive:true});}
+  if(matchMedia('(hover:hover) and (pointer:fine)').matches)document.querySelectorAll('#services .card').forEach(c=>{
+    c.addEventListener('pointermove',e=>{const r=c.getBoundingClientRect(),x=(e.clientX-r.left)/r.width-.5,y=(e.clientY-r.top)/r.height-.5;c.style.transform=`perspective(900px) rotateY(${(x*6).toFixed(2)}deg) rotateX(${(-y*6).toFixed(2)}deg) translateY(-3px)`;});
+    c.addEventListener('pointerleave',()=>{c.style.transform='';});});
+})();
 (function(){const hd=document.querySelector('header');if(!hd)return;const calm=matchMedia('(prefers-reduced-motion:reduce)');
   hd.addEventListener('pointerdown',e=>{const el=e.target.closest('a,button');if(!el||!hd.contains(el))return;
     el.classList.add('tap');setTimeout(()=>el.classList.remove('tap'),160);if(calm.matches)return;
