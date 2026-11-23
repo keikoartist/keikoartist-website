@@ -1241,7 +1241,7 @@ html.rv-on .rv.rv-left{transform:translateX(-28px)}
 html.rv-on .rv.rv-right{transform:translateX(28px)}
 html.rv-on .rv.in{transform:none}
 .sec-head h2{position:relative}
-.sec-head h2::after{content:"";position:absolute;left:0;bottom:-8px;width:64px;height:3px;border-radius:3px;background:linear-gradient(90deg,var(--pink),#c9a7ff);transform-origin:left;transition:transform .8s cubic-bezier(.2,.7,.2,1) .25s}
+.sec-head h2::after{content:"";position:absolute;left:30px;bottom:-8px;width:64px;height:3px;border-radius:3px;background:linear-gradient(90deg,var(--pink),#c9a7ff);transform-origin:left;transition:transform .8s cubic-bezier(.2,.7,.2,1) .25s}
 html.rv-on .sec-head.rv h2::after{transform:scaleX(0)}
 html.rv-on .sec-head.rv.in h2::after{transform:scaleX(1)}
 .hero-spark{position:absolute;z-index:0;pointer-events:none;color:var(--pink);opacity:.0;font-size:var(--fs,16px);animation:hsp var(--du,5s) ease-in-out var(--de,0s) infinite}
@@ -1261,6 +1261,22 @@ html.rv-on .sec-head.rv.in h2::after{transform:scaleX(1)}
 @media (prefers-reduced-motion:reduce){.kc-sticker .kc-emote{animation:none}}
 .sec-head{margin-bottom:22px}
 .team{gap:14px 30px}
+/* service cards: one even layout (image on top, text, price + button in one row) */
+#services .card{padding:0!important;overflow:hidden;border-radius:20px;box-shadow:0 6px 22px rgba(122,40,70,.06)}
+#services .card .gal{aspect-ratio:4/3!important;border-radius:0!important;margin:0 0 16px!important;background:#fff!important;border-bottom:1px solid var(--line)}
+#services .card .gal-slide,#services .card .gal-slide.wide,#services .card .gal-slide.contain{background-size:contain!important;background-position:center!important;background-color:#fff!important}
+#services .card .gal-slide[style*="banner"]{background-color:#1d1418!important}
+#services .card .gal-slide[style*="custom-twitch-emotes-witch"]{background-color:#f7f7f7!important}
+#services .card>:not(.gal):not(.best-tag){margin-left:20px;margin-right:20px}
+#services .card h3{margin-top:0;margin-bottom:6px}
+#services .card>p{margin:4px 20px 8px!important}
+#services .card .more{margin-top:4px;margin-bottom:12px}
+#services .card .card-foot{margin-top:auto;margin-bottom:18px;padding-top:14px;border-top:1px dashed var(--line);display:flex;align-items:center;justify-content:space-between;gap:10px}
+#services .card .card-foot .price{margin:0!important}
+#services .card h3{padding:0!important}
+#services .card .card-foot .req{width:auto;margin:0!important;padding:10px 20px!important;font-size:14px!important;flex:none}
+@media (max-width:767px){#services .card>:not(.gal):not(.best-tag){margin-left:12px;margin-right:12px}#services .card>p{margin:2px 12px 6px!important}#services .card .more{margin-bottom:4px}#services .card .gal{margin-bottom:10px!important}
+  #services .card .card-foot{flex-direction:column;align-items:stretch;gap:8px;margin-bottom:12px;padding-top:10px}#services .card .card-foot .req{width:100%;padding:9px 10px}}
 </style>
 </head>
 <body>
@@ -2328,6 +2344,8 @@ $$('.card').forEach(card=>{
   tr.addEventListener('scroll',()=>{const i=Math.round(tr.scrollLeft/tr.clientWidth);dots.forEach((d,k)=>d.classList.toggle('on',k===i));},{passive:true});
 });
 
+// service cards: price and button share one footer row
+$$('.services .card').forEach(c=>{const p=c.querySelector(':scope>.price'),b=c.querySelector(':scope>.req');if(!p||!b)return;const f=document.createElement('div');f.className='card-foot';p.before(f);f.append(p,b);});
 // lightbox
 (function(){
   const lb=$('#lb'),img=$('#lbImg');let list=[],i=0,svc=null,lastFocus=null;
@@ -2386,7 +2404,7 @@ $$('.card').forEach(card=>{
   $('#sdOrder').onclick=()=>{const n=cur;close();openOrder(n);};
   $$('.card').forEach(card=>{
     const name=card.querySelector('h3')?.textContent.trim();
-    const m=document.createElement('div');m.className='more';m.textContent='View details →';card.querySelector('.price').before(m);
+    const m=document.createElement('div');m.className='more';m.textContent='View details →';(card.querySelector('.card-foot')||card.querySelector('.price')).before(m);
     card.addEventListener('click',e=>{if(e.target.closest('.req,.gal-btn,summary,.addons'))return;openSD(name);});
     card.tabIndex=0;card.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target===card)openSD(name);});
   });
