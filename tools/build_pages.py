@@ -338,7 +338,7 @@ def custom_vtuber():
   </div></section>
 {guides_block("")}
 {related("/custom-vtuber-model/")}
-{cta("Ready to design your VTuber?", "Send your idea and get your invoice by email. Nothing is charged until you pay it.", "VTuber", "Start your VTuber model")}'''
+{cta("Got a VTuber in mind?", "Send me your idea and I'll email your invoice. You only pay after you've checked it.", "VTuber", "Start your VTuber model")}'''
     faq = [
         ('How much does a custom VTuber model cost?', f'Art only costs {money(vp["Bust · Art only"])} (bust), {money(vp["Half body · Art only"])} (half body) or {money(vp["Full body · Art only"])} (full body). Art + rig costs {money(vp["Bust · Art + Rig"])}, {money(vp["Half body · Art + Rig"])} or {money(vp["Full body · Art + Rig"])}. Complex designs with wings or many accessories may cost a bit more; the final price is on your invoice. See <a href="/vtuber-pricing/">all prices</a>.'),
         ('How long does a VTuber model take?', f'About {e(V["eta"])}, depending on the complexity of the design and the queue. Rush delivery (+25%) is available in the order form.'),
@@ -821,7 +821,7 @@ def guide_howto():
     <p>Streaming, monetized videos and social media use are included. Merch and other commercial rights are +{money(vadd["Commercial / merch rights"])}. Read the full <a href="/#tos">Terms of Service</a>.</p>
   </div></section>
 {guides_block("/how-to-commission-a-vtuber-model/")}
-{cta("Ready to start?", "Send your idea and get your invoice by email. Nothing is charged until you pay it.", "VTuber", "Start your commission")}'''
+{cta("Want to start?", "Send me your idea and I'll email your invoice. You only pay after you've checked it.", "VTuber", "Start your commission")}'''
     faq = [
         ('Do I need a finished character design?', 'No. A description and a few references are enough. The design is worked out together during the sketch stage.'),
         ('How long does a VTuber commission take?', f'VTuber models take about {e(V["eta"])}, and every commission takes 3 weeks at most. Rush delivery (+25%) is available.'),
