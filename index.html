@@ -1340,6 +1340,10 @@ html.rv-on .sec-head.rv.in h2::after{transform:scaleX(1)}
   .works .work:hover{transform:scale(1.1)!important;z-index:6;box-shadow:0 26px 54px rgba(122,40,70,.28)!important}
   .works .work.fw-wide:hover{transform:scale(1.05)!important}
 }
+/* section titles: one clean mark (small pink sparkle/snowflake) and no underline bar */
+.sec-head h2::after{display:none!important}
+.sec-head h2{gap:10px!important}
+.sec-head h2::before{font-size:.5em!important;color:var(--pink)!important;opacity:.85;transform:translateY(-.08em)}
 </style>
 </head>
 <body>
@@ -1397,7 +1401,7 @@ html.rv-on .sec-head.rv.in h2::after{transform:scaleX(1)}
       </div>
     </div>
     <figure class="hero-art">
-      <img src="images/custom-vtuber-model-keikoarts.webp" srcset="images/custom-vtuber-model-keikoarts-800.webp 800w, images/custom-vtuber-model-keikoarts-1200.webp 1200w, images/custom-vtuber-model-keikoarts.webp 1600w" sizes="(max-width:1023px) 94vw, 46vw" alt="Pink-haired witch VTuber character sitting on a crescent moon under a purple starry sky, illustrated by KeikoArts" width="1600" height="900" fetchpriority="high" decoding="async">
+      <img src="images/custom-vtuber-model-keikoarts.webp" srcset="images/custom-vtuber-model-keikoarts-800.webp 800w, images/custom-vtuber-model-keikoarts-1200.webp 1200w, images/custom-vtuber-model-keikoarts.webp 1600w" sizes="(max-width:820px) 94vw, 100vw" alt="Pink-haired witch VTuber character sitting on a crescent moon under a purple starry sky, illustrated by KeikoArts" width="1600" height="900" fetchpriority="high" decoding="async">
       <figcaption>✦ Original art by KeikoArts</figcaption>
     </figure>
   </div>
