@@ -102,7 +102,7 @@ Order → https://keikoartist.com/?ref=x
 
 ```
 @everyone 🎄 Christmas spin is live on my website!
-One spin per person, until 7 January. Prizes: free emotes, free Christmas badges, free source files, free skeb, free sketch or 10% off your next commission.
+One spin per person, until 7 January. Prizes: free emotes, free Christmas badges, free source files, free surprise-me art (I draw your character my way), free sketch or 10% off your next commission.
 Spin here → https://keikoartist.com/?spin=1&ref=discord
 Won something? Post your XMAS code in this channel and I'll apply it to your order ♡
 ```

@@ -2971,8 +2971,8 @@ document.addEventListener('click',e=>{const a=e.target.closest('.menu-chat');if(
 (function(){if(!document.body.classList.contains('xmas'))return;
   // Christmas spin wheel: one spin per visitor, prize + claim code for Discord (prizes set by the owner; Keiko applies them by hand)
   const KEY='ka-wheel-2026';
-  const GIFTS=['Free emotes','Free Christmas badges','Free source files','Free skeb','Free sketch','10% off your next commission'];   // same order as GIFTS in spin-api.php (the server draws the prize)
-  const SHORT=['Free emotes','Xmas badges','Source files','Free skeb','Free sketch','10% off'];
+  const GIFTS=['Free emotes','Free Christmas badges','Free source files','Free surprise-me art (skeb)','Free sketch','10% off your next commission'];   // same order as GIFTS in spin-api.php (the server draws the prize)
+  const SHORT=['Free emotes','Xmas badges','Source files','Surprise art','Free sketch','10% off'];
   const n=GIFTS.length,cols=['#f2628f','#ffd1df','#c9a7ff','#ffe3ec','#ff8fb1','#efe6ff'],ink=['#fff','#7a2846','#fff','#7a2846','#fff','#7a2846'];
   let res=null;try{res=JSON.parse(localStorage.getItem(KEY)||'null')}catch(_){}
   const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(res))}catch(_){}};
