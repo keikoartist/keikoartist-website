@@ -142,6 +142,8 @@ FOOT = [('/custom-vtuber-model/', 'Custom VTuber Model'), ('/live2d-rigging/', '
         ('/vtuber-pricing/', 'VTuber Pricing'), ('/vtuber-portfolio/', 'VTuber Portfolio'), ('/vtuber-model-cost/', 'VTuber Model Cost'), ('/how-to-commission-a-vtuber-model/', 'How to Commission'), ('/live2d-vs-pngtuber/', 'Live2D vs PNGTuber'), ('/#faq', 'FAQ'), ('/#tos', 'Terms of Service'), ('/#privacy', 'Privacy')]
 
 def page(path, title, desc, h1, crumb, body, faq, og_image, order='', extra_ld=None, eyebrow='KeikoArts · VTuber art & Live2D studio'):
+    # studio signature line under the intro, in Keiko's own words (same as the homepage)
+    body = re.sub(r'(<p class="lead">.*?</p>)', r'\1\n      <p class="style-line">✦ Cute meets gothic, made from scratch with updates at every stage</p>', body, count=1, flags=re.S)
     url = SITE + path.strip('/') + '/'
     nav = ''.join(f'<a href="{u}"{" aria-current=" + chr(34) + "page" + chr(34) if u == "/" + path + "/" else ""}>{t}</a>' for u, t in NAV)
     order_url = '/?order=' + order.replace(' ', '%20') if order else '/?order'
