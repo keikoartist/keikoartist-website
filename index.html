@@ -1344,6 +1344,45 @@ html.rv-on .sec-head.rv.in h2::after{transform:scaleX(1)}
 .sec-head h2::after{display:none!important}
 .sec-head h2{gap:10px!important}
 .sec-head h2::before{font-size:.5em!important;color:var(--pink)!important;opacity:.85;transform:translateY(-.08em)}
+/* Featured Works as a spellbook: pages turn in 3D (desktop and tablets 760px+; phones keep the grid) */
+.book-wrap{display:none}
+html.has-book .works.fw{display:none}
+html.has-book .book-wrap{display:block}
+.book-wrap{margin:8px auto 0;max-width:min(1000px,calc((100vh - 250px) * 1.5));min-width:min(700px,100%)}
+.book-stage{position:relative;width:100%;aspect-ratio:1.5/1;perspective:2200px;margin:0 auto}
+.book{position:absolute;inset:0;transform-style:preserve-3d;transition:transform .9s cubic-bezier(.3,.7,.2,1)}
+.book.at-start{transform:translateX(-25%)}
+.book.at-end{transform:translateX(25%)}
+.leaf{position:absolute;top:0;left:50%;width:50%;height:100%;transform-style:preserve-3d;transform-origin:left center;transition:transform 1s cubic-bezier(.45,.05,.2,1);cursor:pointer}
+.leaf.flipped{transform:rotateY(-180deg)}
+.face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;overflow:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:26px 26px 20px;background:#fffaf4}
+.face.front{border-radius:4px 16px 16px 4px;box-shadow:inset 18px 0 28px -18px rgba(90,35,64,.35),0 18px 40px rgba(90,35,64,.18)}
+.face.back{transform:rotateY(180deg);border-radius:16px 4px 4px 16px;box-shadow:inset -18px 0 28px -18px rgba(90,35,64,.35),0 18px 40px rgba(90,35,64,.18)}
+.face::after{content:"";position:absolute;inset:10px;border:1px solid rgba(242,98,143,.22);border-radius:10px;pointer-events:none}
+.face .pg-art{flex:1;min-height:0;width:100%;display:flex;align-items:center;justify-content:center}
+.face .work{position:relative;aspect-ratio:auto!important;width:100%;height:100%;border-radius:10px;overflow:hidden;background:#fff!important;display:flex;align-items:center;justify-content:center;box-shadow:none!important;transform:none!important}
+.face .work img{width:100%;height:100%;object-fit:contain;transform:none!important}
+.face .work video{width:100%;height:100%;object-fit:cover;border-radius:10px}
+.face .work .tag{display:none}
+.face .pg-cap{margin:12px 0 0;font-family:"DM Serif Display",serif;font-size:19px;color:var(--ink);text-align:center;line-height:1.2}
+.face .pg-num{margin-top:4px;font-size:11px;letter-spacing:.18em;color:var(--pink-text);opacity:.75}
+.face.cover{background:radial-gradient(120% 90% at 30% 20%,#7a2654 0,#4a1f3a 55%,#2e1a28 100%);color:#ffe9f2;text-align:center}
+.face.cover::after{inset:14px;border:1.5px solid rgba(255,214,230,.45);border-radius:12px}
+.face.cover::before{content:"";position:absolute;inset:22px;border:1px dashed rgba(255,214,230,.25);border-radius:9px;pointer-events:none}
+.cover .cv-moon{width:74px;height:74px;margin-bottom:18px;filter:drop-shadow(0 0 18px rgba(255,170,210,.6))}
+.cover h3{font-family:"DM Serif Display",serif;font-weight:400;font-size:clamp(30px,3.4vw,44px);line-height:1.05;margin:0;color:#fff}
+.cover p{margin:10px 0 0;font-size:13px;letter-spacing:.2em;text-transform:uppercase;color:#ffc6dc}
+.cover .cv-hint{display:inline-block;margin-top:26px;font-size:13px;letter-spacing:.04em;text-transform:none;color:#fff;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.3);padding:7px 16px;border-radius:999px}
+.face.endpage{text-align:center;background:linear-gradient(160deg,#fff7fb,#f6eeff)}
+.endpage h3{font-family:"DM Serif Display",serif;font-weight:400;font-size:30px;margin:0 0 8px;color:var(--ink)}
+.endpage p{margin:0 0 18px;color:var(--muted);font-size:14.5px;max-width:280px}
+.endpage .btn{margin:4px}
+.book-nav{display:flex;align-items:center;justify-content:center;gap:16px;margin-top:20px}
+.book-nav button{width:44px;height:44px;border-radius:50%;border:1.5px solid var(--line);background:#fff;color:var(--pink-text);font-size:20px;cursor:pointer;transition:.2s}
+.book-nav button:hover:not(:disabled){border-color:var(--pink);background:#fff3f8}
+.book-nav button:disabled{opacity:.35;cursor:default}
+.book-nav span{min-width:130px;text-align:center;font-size:13.5px;color:var(--muted)}
+@media (prefers-reduced-motion:reduce){.book,.leaf{transition:none}}
 </style>
 </head>
 <body>
@@ -1426,6 +1465,7 @@ html.rv-on .sec-head.rv.in h2::after{transform:scaleX(1)}
       <a href="images/vtuber-pet-mascot-anglercat.webp" class="work"><img src="images/vtuber-pet-mascot-anglercat.webp" srcset="images/s/vtuber-pet-mascot-anglercat.webp 360w, images/t/vtuber-pet-mascot-anglercat.webp 520w, images/vtuber-pet-mascot-anglercat.webp 1000w" sizes="(max-width:700px) 46vw, (max-width:1050px) 31vw, 290px" alt="VTuber pet: fluffy blue cat sitting on a glowing anglerfish" width="1000" height="1000" loading="lazy" decoding="async"><span class="tag">Anglerfish cat · VTuber pet</span></a>
       <a href="images/custom-illustration-calico-cat.webp" class="work"><img src="images/custom-illustration-calico-cat.webp" srcset="images/s/custom-illustration-calico-cat.webp 360w, images/t/custom-illustration-calico-cat.webp 520w, images/custom-illustration-calico-cat.webp 1000w" sizes="(max-width:700px) 46vw, (max-width:1050px) 31vw, 290px" alt="Illustration of a fluffy calico cat in a flower meadow" width="1000" height="1000" loading="lazy" decoding="async"><span class="tag">Calico cat · illustration</span></a>
     </div>
+    <div class="book-wrap" id="bookWrap" aria-label="Featured works book"><div class="book-stage"><div class="book at-start" id="book"></div></div><div class="book-nav"><button type="button" id="bkPrev" aria-label="Previous page">‹</button><span id="bkCount">Cover</span><button type="button" id="bkNext" aria-label="Next page">›</button></div></div>
     <div class="sec-more"><a href="/vtuber-portfolio/" class="btn btn-ghost arrow">View full portfolio</a></div>
   </div>
 </section>
@@ -2441,6 +2481,37 @@ $$('.services .card').forEach(c=>{const p=c.querySelector(':scope>.price'),b=c.q
   works.forEach((w,k)=>w.addEventListener('click',e=>{e.preventDefault();open(works.map(x=>({src:urlOf(x),cap:x.querySelector('.tag')?.textContent||''})),k,null);}));
 })();
 
+// featured works as a book (pages turn); phones keep the grid. The work items are moved into the pages, so the lightbox and the rigging video keep working.
+(function(){
+  const grid=$('.works.fw'),book=$('#book');if(!grid||!book||innerWidth<760)return;
+  const items=[...grid.children];
+  const moon='<svg class="cv-moon" viewBox="0 0 64 64" aria-hidden="true"><defs><radialGradient id="cvg" cx=".35" cy=".3"><stop offset="0" stop-color="#fff"/><stop offset=".45" stop-color="#ffd1e6"/><stop offset="1" stop-color="#f2628f"/></radialGradient></defs><path d="M40 6a26 26 0 1 0 18 44A22 22 0 0 1 40 6Z" fill="url(#cvg)"/><path d="M50 10l1.6 3.6L55 15l-3.4 1.4L50 20l-1.6-3.6L45 15l3.4-1.4z" fill="#fff"/></svg>';
+  const faces=['<div class="face-in cover-in">'+moon+'<h3>Featured Works</h3><p>KeikoArts · spellbook</p><span class="cv-hint">Open the book ›</span></div>'];
+  items.forEach((w,i)=>faces.push({el:w,cap:(w.querySelector('.tag')||{}).textContent||'',n:i+1}));
+  faces.push('<div class="face-in"><h3>Your character next?</h3><p>Every piece here was drawn from scratch. Tell me your idea and get your invoice by email.</p><a href="#order" data-order class="btn btn-pink arrow">Start a Project</a><a href="/vtuber-portfolio/" class="btn btn-ghost">Full portfolio</a></div>');
+  if(faces.length%2)faces.push('<div class="face-in">'+moon+'</div>');
+  const leaves=[];
+  for(let i=0;i<faces.length;i+=2){
+    const leaf=document.createElement('div');leaf.className='leaf';
+    [faces[i],faces[i+1]].forEach((f,k)=>{const d=document.createElement('div');d.className='face '+(k?'back':'front');
+      if(typeof f==='string'){d.innerHTML=f;if(i===0&&!k)d.classList.add('cover');else if(i+k===faces.length-1)d.classList.add('cover');else d.classList.add('endpage');}
+      else{const a=document.createElement('div');a.className='pg-art';a.appendChild(f.el);d.appendChild(a);d.insertAdjacentHTML('beforeend','<p class="pg-cap">'+esc(f.cap)+'</p><p class="pg-num">'+f.n+' / '+items.length+'</p>');}
+      leaf.appendChild(d);});
+    book.appendChild(leaf);leaves.push(leaf);
+  }
+  let cur=0;const n=leaves.length,prev=$('#bkPrev'),next=$('#bkNext'),count=$('#bkCount');
+  const draw=()=>{leaves.forEach((l,i)=>{const f=i<cur;l.classList.toggle('flipped',f);l.style.zIndex=f?i+1:n-i;});
+    book.classList.toggle('at-start',cur===0);book.classList.toggle('at-end',cur===n);
+    prev.disabled=cur===0;next.disabled=cur===n;
+    count.textContent=cur===0?'Cover':cur===n?'The end':'Pages '+(cur*2-1)+'–'+Math.min(cur*2,faces.length-1);};
+  const go=d=>{cur=Math.max(0,Math.min(n,cur+d));draw();};
+  prev.onclick=()=>go(-1);next.onclick=()=>go(1);
+  leaves.forEach((l,i)=>l.addEventListener('click',e=>{if(e.target.closest('a,button,video'))return;go(i<cur?-1:1);}));
+  book.parentNode.addEventListener('keydown',e=>{if(e.key==='ArrowRight')go(1);if(e.key==='ArrowLeft')go(-1);});book.parentNode.tabIndex=0;
+  document.documentElement.classList.add('has-book');grid.remove();draw();
+  // open the cover once when the book comes into view
+  if('IntersectionObserver' in window&&!navigator.webdriver){const io=new IntersectionObserver(es=>{if(es[0].isIntersecting){io.disconnect();setTimeout(()=>{if(cur===0)go(1);},700);}},{threshold:.55});io.observe(book.parentNode);}
+})();
 // service detail modal
 (function(){
   const sd=$('#sd');let cur=null,last=null;
