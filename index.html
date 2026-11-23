@@ -1531,6 +1531,10 @@ html.book-open .book-nav span{color:#fff!important}html.book-open .book-nav span
 .services.searching .svc-more-l{display:none}
 #services .card.main{box-shadow:0 0 0 2px var(--pink-2),0 14px 30px rgba(194,58,105,.14)!important}
 @media (min-width:900px){#services .card.main h3{font-size:24px!important}}
+/* the page never pans sideways on phones (Android Chrome ignores overflow on body alone) */
+html{overflow-x:hidden}
+@supports (overflow:clip){html,body{overflow-x:clip}}
+@media (max-width:360px){.rv-nav{gap:6px!important;flex-wrap:wrap}.rv-dots{flex-wrap:wrap;justify-content:center;max-width:100%}.kc-sticker{right:8px!important}}
 </style>
 </head>
 <body>
