@@ -2972,8 +2972,9 @@ document.addEventListener('click',e=>{const a=e.target.closest('.menu-chat');if(
   // Christmas spin wheel: one spin per visitor, prize + claim code for Discord (prizes set by the owner; Keiko applies them by hand)
   const KEY='ka-wheel-2026';
   const GIFTS=['Free emotes','Free Christmas badges','Free source files','Free sketch','10% off your next commission'];   // same order as GIFTS in spin-api.php (the server draws the prize)
-  const SHORT=['Free emotes','Xmas badges','Source files','Free sketch','10% off'];
-  const n=GIFTS.length,cols=['#f2628f','#ffd1df','#c9a7ff','#ff8fb1','#efe6ff'],ink=['#fff','#7a2846','#fff','#fff','#7a2846'];
+  const SHORT=['Free emotes','Xmas badges','Source files','Skeb · claimed','Free sketch','10% off'];   // wheel slices; Skeb is shown but all claimed (owner, Nov 2026), the server never draws it
+  const N=SHORT.length,SKEB=3,slice=r=>r.prize?SKEB:(r.g>=SKEB?r.g+1:r.g);
+  const n=GIFTS.length,cols=['#f2628f','#ffd1df','#c9a7ff','#e9e4e8','#ff8fb1','#efe6ff'],ink=['#fff','#7a2846','#fff','#9b8f96','#fff','#7a2846'];
   let res=null;try{res=JSON.parse(localStorage.getItem(KEY)||'null')}catch(_){}
   const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(res))}catch(_){}};
   // spins from before skeb was removed (6 slices): keep the prize the visitor won, move the others to the new slice numbers
@@ -2993,8 +2994,8 @@ let seen=false;try{seen=!!localStorage.getItem(KEY+'-seen')}catch(_){seen=true}
     for(let i=0;i<60;i++){const c=document.createElement('i');c.className='confetti';c.style.left=(Math.random()*100)+'vw';c.style.background=cs[i%5];
       c.style.setProperty('--d',(2+Math.random()*2).toFixed(2)+'s');c.style.setProperty('--x',(Math.random()*160-80).toFixed(0)+'px');c.style.setProperty('--r',(Math.random()*720).toFixed(0)+'deg');c.style.animationDelay=(Math.random()*.6).toFixed(2)+'s';
       document.body.appendChild(c);setTimeout(()=>c.remove(),4800);}};
-  const wheelSVG=()=>{let g='';const R=100,seg=360/n,rad=d=>(d-90)*Math.PI/180;
-    for(let i=0;i<n;i++){const a0=i*seg,a1=a0+seg,x0=R+R*Math.cos(rad(a0)),y0=R+R*Math.sin(rad(a0)),x1=R+R*Math.cos(rad(a1)),y1=R+R*Math.sin(rad(a1)),m=a0+seg/2;
+  const wheelSVG=()=>{let g='';const R=100,seg=360/N,rad=d=>(d-90)*Math.PI/180;
+    for(let i=0;i<N;i++){const a0=i*seg,a1=a0+seg,x0=R+R*Math.cos(rad(a0)),y0=R+R*Math.sin(rad(a0)),x1=R+R*Math.cos(rad(a1)),y1=R+R*Math.sin(rad(a1)),m=a0+seg/2;
       g+=`<path d="M${R} ${R} L${x0.toFixed(2)} ${y0.toFixed(2)} A${R} ${R} 0 0 1 ${x1.toFixed(2)} ${y1.toFixed(2)} Z" fill="${cols[i]}" stroke="#fff" stroke-width="2"/>`+
          `<text x="${R+21}" y="${R+3.5}" transform="rotate(${m-90} ${R} ${R})" font-size="10" font-weight="600" font-family="Poppins,sans-serif" fill="${ink[i]}">${SHORT[i]}</text>`;}
     return `<svg viewBox="0 0 200 200" class="wh-svg" aria-hidden="true">${g}<circle cx="100" cy="100" r="16" fill="#fff" stroke="#fbd3e0" stroke-width="3"/><text x="100" y="105" text-anchor="middle" font-size="14">🎁</text></svg>`;};
@@ -3003,11 +3004,11 @@ let seen=false;try{seen=!!localStorage.getItem(KEY+'-seen')}catch(_){seen=true}
     w.querySelector('.btns').innerHTML='<a class="btn btn-pink" href="https://discord.gg/FbgWxMPjf" target="_blank" rel="noopener">Claim on Discord</a><button class="btn btn-ghost" type="button">Close</button>';
     w.querySelector('.btns button').onclick=()=>w.remove();};
   chip.onclick=()=>{const w=document.createElement('div');w.className='gift-win';
-    w.innerHTML='<div role="dialog" aria-modal="true" aria-label="Christmas spin wheel"><h3>Christmas spin wheel</h3><p class="gw-msg">One free spin per person. Every slice is a prize from Keiko ♡</p><div class="wh"><div class="wh-pin"></div><div class="wh-rot">'+wheelSVG()+'</div></div><div class="btns"><button class="btn btn-pink wh-go" type="button">Spin!</button><button class="btn btn-ghost wh-x" type="button">Close</button></div></div>';
+    w.innerHTML='<div role="dialog" aria-modal="true" aria-label="Christmas spin wheel"><h3>Christmas spin wheel</h3><p class="gw-msg">One free spin per person. Skeb slots are all claimed this season, every other slice is a prize from Keiko ♡</p><div class="wh"><div class="wh-pin"></div><div class="wh-rot">'+wheelSVG()+'</div></div><div class="btns"><button class="btn btn-pink wh-go" type="button">Spin!</button><button class="btn btn-ghost wh-x" type="button">Close</button></div></div>';
     document.body.appendChild(w);w.addEventListener('click',e=>{if(e.target===w)w.remove();});w.querySelector('.wh-x').onclick=()=>w.remove();
     const esc=e=>{if(e.key==='Escape'){w.remove();document.removeEventListener('keydown',esc);chip.focus();}};document.addEventListener('keydown',esc);setTimeout(()=>{const f=w.querySelector('.wh-go:not([disabled]),.btns a,.btns button');if(f)f.focus();},50);
-    const rot=w.querySelector('.wh-rot'),seg=360/n;
-    if(res){rot.style.transform=`rotate(${360-(res.g+.5)*seg}deg)`;result(w);return;}
+    const rot=w.querySelector('.wh-rot'),seg=360/N;
+    if(res){rot.style.transform=`rotate(${360-(slice(res)+.5)*seg}deg)`;result(w);return;}
     w.querySelector('.wh-go').onclick=async e=>{e.target.disabled=true;
       const calm=matchMedia('(prefers-reduced-motion:reduce)').matches;
       if(!calm){rot.style.transition='transform 1.2s ease-in';rot.style.transform='rotate(720deg)';}   // starts turning while the server draws
@@ -3018,7 +3019,7 @@ let seen=false;try{seen=!!localStorage.getItem(KEY+'-seen')}catch(_){seen=true}
         w.querySelector('.gw-msg').textContent='The wheel is stuck for a moment. Please try again in a minute ♡';return;}
       res=r;save();const jit=(Math.random()-.5)*seg*.6;
       requestAnimationFrame(()=>{rot.style.transition=calm?'none':'transform 4.2s cubic-bezier(.17,.67,.12,1)';
-        rot.style.transform=`rotate(${(calm?0:720+360*5)+360-(res.g+.5)*seg+jit}deg)`;});
+        rot.style.transform=`rotate(${(calm?0:720+360*5)+360-(slice(res)+.5)*seg+jit}deg)`;});
       setTimeout(()=>{result(w);label();confetti();KA_STAT('spin');},calm?50:4300);};};
 })();
 (function(){if(navigator.webdriver||matchMedia('(prefers-reduced-motion:reduce)').matches||!('IntersectionObserver' in window))return;   // reveal on scroll (skipped for automated tests)
