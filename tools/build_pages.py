@@ -20,6 +20,8 @@ def js_object(name):
     return json.loads(out.stdout)
 
 SERVICES, DETAILS, GALLERY = js_object('SERVICES'), js_object('DETAILS'), js_object('GALLERY')
+# the "-layout" covers (tools/make_layouts.py) are only for the homepage service cards
+GALLERY = {k: [n for n in v if not n.endswith('-layout')] for k, v in GALLERY.items()}
 CSS_V = hashlib.md5(open(os.path.join(ROOT, 'assets/site.css'), 'rb').read()).hexdigest()[:8]
 TODAY = datetime.date.today().isoformat()
 e = lambda s: html.escape(str(s), quote=True)
