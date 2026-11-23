@@ -5,7 +5,8 @@ header('Content-Type: application/json');
 header('X-Content-Type-Options: nosniff');
 header('Cache-Control: no-store');
 
-const GIFTS = ['Free emotes', 'Free Christmas badges', 'Free source files', 'Free sketch', '10% off your next commission'];   // skeb removed by the owner (Nov 2026)
+const GIFTS = ['Free emotes', 'Free Christmas badges', 'Free source files', 'Free skeb (surprise-me art)', 'Free sketch', '10% off your next commission'];
+const WEIGHTS = [19, 19, 19, 5, 19, 19];   // skeb is rare: 5 in 100 spins (owner, Nov 2026); the others share the rest
 const SEASON_END = '2027-01-07';
 
 function out($code, $data) { http_response_code($code); echo json_encode($data); exit; }
@@ -24,7 +25,8 @@ $hits = array_filter(json_decode(@file_get_contents($rl) ?: '[]', true) ?: [], f
 if (count($hits) >= 3) out(429, ['ok' => false, 'msg' => 'too many']);
 $hits[] = time(); @file_put_contents($rl, json_encode(array_values($hits)));
 
-$g = random_int(0, count(GIFTS) - 1);
+$r = random_int(1, array_sum(WEIGHTS)); $g = 0;
+foreach (WEIGHTS as $i => $w) { if ($r <= $w) { $g = $i; break; } $r -= $w; }
 $alpha = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; $c = '';
 for ($i = 0; $i < 5; $i++) $c .= $alpha[random_int(0, strlen($alpha) - 1)];
 $code = 'XMAS-' . $c;
