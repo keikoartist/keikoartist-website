@@ -82,7 +82,7 @@ Run the site with `php -S 127.0.0.1:8830` in a copy of the repo that has a test 
 - Cloudflare: the owner's colleague (Bu Mella) may ask to switch the nameservers. Before that, check that deploys use the hosting's FTP address, not the domain name.
 - A possible move of the site to the studio standard (Next.js on Bu Mella's server) is not decided. Do not start it unless asked.
 - Commission status badge in the hero: `SLOTS` in `index.html` (open/closed, `start` = "I can start right away", shown next to "Our Services" and in the order form). The badge is a link that opens the order form. The hero badge shows Keiko's emote (images/contact-emote.webp, pops out of the pill, waves now and then) + "Commissions • open" with a live green dot, no arrow, next to the spin wheel button (no Christmas deadline, owner Nov 2026).
-- First-visit loading screen (`#kaLoader` right after `<body>` in `index.html`, chibi `images/loader-chibi.webp`): once per browser session, hides on page load or after 2.5 s, never with `?dryrun=1` or in automated browsers.
+- First-visit loading screen (`#kaLoader` right after `<body>` in `index.html`, chibi `images/loader-chibi.webp`): once per browser session, hides as soon as the page is ready (at most 1 s; smoke puff 1.1 s, UX review Nov 2026), never with `?dryrun=1` or in automated browsers.
 - `VTUBERS` (section "Original VTuber Characters"): Keiko's own original characters, not clients. No names; never present them as client VTubers.
 - The owner's VGen account (vgen.co/keikoarts) is suspended; reviews there cannot be read publicly. The owner will not appeal: do not suggest it.
 - Owner time zone: WIB (GMT+7).
