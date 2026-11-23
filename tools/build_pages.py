@@ -138,6 +138,17 @@ def addons_line(name):
 # ---------------------------------------------------------------- layout
 NAV = [('/', 'Home'), ('/custom-vtuber-model/', 'VTuber Models'), ('/live2d-rigging/', 'Live2D Rigging'),
        ('/custom-pngtuber-model/', 'PNGTuber'), ('/vtuber-pricing/', 'Pricing'), ('/vtuber-portfolio/', 'Portfolio')]
+
+# line icons for the menu (same style as the homepage header)
+_mi = lambda d: '<svg class="mi" viewBox="0 0 24 24" width="17" height="17" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">' + d + '</svg>'
+NAV_ICON = {
+    '/': _mi('<path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10v9.5h13V10"/><path d="M10 19.5v-5h4v5"/>'),
+    '/custom-vtuber-model/': _mi('<circle cx="12" cy="9" r="4.5"/><path d="M4.5 20c1.2-3.6 4-5.5 7.5-5.5s6.3 1.9 7.5 5.5"/><path d="M8 5.5 6.5 2.8M16 5.5l1.5-2.7"/>'),
+    '/live2d-rigging/': _mi('<path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/>'),
+    '/custom-pngtuber-model/': _mi('<rect x="4" y="4" width="16" height="16" rx="4"/><circle cx="9.5" cy="10.5" r="1"/><circle cx="14.5" cy="10.5" r="1"/><path d="M9.5 14.5c1.4 1.2 3.6 1.2 5 0"/>'),
+    '/vtuber-pricing/': _mi('<path d="M3.5 12.5 12 4h7.5V11.5L11 20z"/><circle cx="16" cy="8" r="1.4"/>'),
+    '/vtuber-portfolio/': _mi('<rect x="3.5" y="4.5" width="17" height="15" rx="2.5"/><circle cx="9" cy="10" r="1.8"/><path d="m4 18 5-5 4 4 3-3 4 4"/>'),
+}
 FOOT = [('/custom-vtuber-model/', 'Custom VTuber Model'), ('/live2d-rigging/', 'Live2D Rigging'), ('/custom-pngtuber-model/', 'Custom PNGTuber Model'), ('/custom-twitch-emotes/', 'Custom Twitch Emotes'),
         ('/vtuber-pricing/', 'VTuber Pricing'), ('/vtuber-portfolio/', 'VTuber Portfolio'), ('/vtuber-model-cost/', 'VTuber Model Cost'), ('/how-to-commission-a-vtuber-model/', 'How to Commission'), ('/live2d-vs-pngtuber/', 'Live2D vs PNGTuber'), ('/#faq', 'FAQ'), ('/#tos', 'Terms of Service'), ('/#privacy', 'Privacy')]
 
@@ -145,7 +156,7 @@ def page(path, title, desc, h1, crumb, body, faq, og_image, order='', extra_ld=N
     # studio signature line under the intro, in Keiko's own words (same as the homepage)
     body = re.sub(r'(<p class="lead">.*?</p>)', r'\1\n      <p class="style-line">✦ Cute meets gothic, made from scratch with updates at every stage</p>', body, count=1, flags=re.S)
     url = SITE + path.strip('/') + '/'
-    nav = ''.join(f'<a href="{u}"{" aria-current=" + chr(34) + "page" + chr(34) if u == "/" + path + "/" else ""}>{t}</a>' for u, t in NAV)
+    nav = ''.join(f'<a href="{u}"{" aria-current=" + chr(34) + "page" + chr(34) if u == "/" + path + "/" else ""}>{NAV_ICON.get(u, "")}<span>{t}</span></a>' for u, t in NAV)
     order_url = '/?order=' + order.replace(' ', '%20') if order else '/?order'
     faq_html = ''.join(f'<details><summary>{e(q)}</summary><p>{a}</p></details>' for q, a in faq)
     ld = [{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [

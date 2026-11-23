@@ -126,3 +126,6 @@ body.xmas header .logo::before{content:"";position:absolute;left:-7px;top:-11px;
 .xmas-pill{display:inline-flex;align-items:center;gap:6px;margin:10px 0 0;font-size:13px;font-weight:600;color:var(--pink-text);background:#fff4f8;border:1px solid var(--line);border-radius:999px;padding:5px 12px}
 .xmas-pill:hover{background:#ffe9f1}
 .style-line{margin:8px 0 0;font-size:13.5px;font-weight:600;color:var(--pink-text);letter-spacing:.01em}
+.menu a{display:inline-flex;align-items:center;gap:6px;font-weight:600}.menu a .mi{flex:none;color:var(--pink)}.menu a[aria-current=page],.menu a[aria-current=page] .mi{color:var(--pink-text)}
+.menu a{white-space:nowrap}
+@media (max-width:1200px){.menu{gap:16px}.menu a .mi{display:none}.logo small{white-space:nowrap}}
