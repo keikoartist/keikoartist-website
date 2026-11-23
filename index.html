@@ -1555,6 +1555,7 @@ html{overflow-x:hidden}
 }
 #services .card .price:has(.pnote){display:flex!important;flex-direction:column!important;flex-wrap:nowrap!important;height:auto!important;align-items:flex-start!important;justify-content:flex-start!important;gap:2px}
 #services .card .price .pnote{white-space:normal}
+.start-pill{color:#0d7a4c!important}
 </style>
 </head>
 <body>
@@ -2010,7 +2011,7 @@ html{overflow-x:hidden}
       <div class="ty-pay" id="tyPay" hidden>
         <div class="ty-pay-top"><div><b id="tyPayT">Pay now to secure your slot</b><span id="tyPayInfo"></span></div><strong id="tyPayAmt"></strong></div>
         <a class="btn btn-paypal" id="tyPayBtn" href="#" target="_blank" rel="noopener"><span id="tyPayLabel">Pay with PayPal</span></a>
-        <small id="tyPaySm">Secure checkout on PayPal (card or PayPal balance). Full refund if I can't take your request.</small>
+        <small id="tyPaySm">Secure checkout on PayPal (card or PayPal balance). Full refund if I can't take your request. Rather wait for my reply? The same link is in your email, so you can pay after I confirm (usually within 6 hours, WIB).</small>
         <small class="ty-kofi" hidden>Questions about paying? Email me at keikoarts22@gmail.com with your <span id="tyKofiRef">Request ID</span>.</small>
       </div>
       <div class="inv-actions" id="invActions" hidden><button type="button" class="btn btn-ghost" id="invSave">💾 Save invoice (PDF)</button><button type="button" class="btn btn-ghost" id="invCopy">🔗 Copy payment link</button></div>
@@ -3114,7 +3115,7 @@ function showThanks(last){
       ${last.payUrl&&due>0?`<p class="print-only pay-link">Pay ${money2(due)} online with PayPal: <a href="${esc(last.payUrl)}">${esc(last.payUrl)}</a></p>`:''}
     </div>`;$('#tyInv').hidden=false;
     if(payNow){$('#tyPayT').textContent=partial?'Pay now to secure your slot':'Pay your invoice';$('#tyPayInfo').textContent=(custom?'Total incl. 13% tax':partial?planLabel(inv.plan||last.plan):'Full payment')+' · '+last.id;$('#tyPayAmt').textContent=money2(due);$('#tyPayLabel').textContent='Pay '+money2(due)+' with PayPal';
-      $('#tyPaySm').textContent="Secure checkout on PayPal (card or PayPal balance). Full refund if I can't take your order.";$('#tyKofiRef').textContent='invoice number';
+      $('#tyPaySm').textContent="Secure checkout on PayPal (card or PayPal balance). Full refund if I can't take your order. Rather wait for my reply? The same link is in your email, so you can pay after I confirm (usually within 6 hours, WIB).";$('#tyKofiRef').textContent='invoice number';
       $('#tyDcT').textContent='Questions about your order?';$('#tyDcS').textContent='Message me on Discord with your invoice number.';}
     else{$('#tyDcS').textContent='Send me your invoice number so I can send your PayPal link.';}
     $('#tyNote').textContent=inv.emailed?'A copy of this invoice was sent to your email (check Spam). Other ways to reach me:':'Other ways to reach me:';

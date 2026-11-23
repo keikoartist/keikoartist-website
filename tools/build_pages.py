@@ -659,7 +659,7 @@ def pricing():
             per = ' <small>per emote</small>' if s.get('qty') else ''
             cards = ''.join(f'<div class="pr-card"><h4>{e(p[0])}</h4><p class="pr-price">{money(p[1])}{per}</p><p class="pr-sub">{e(p[2])}</p><a class="btn btn-ghost pr-btn" rel="nofollow" href="{go}">Order</a></div>' for p in s['packages'])
         blocks.append(f'''    <div class="pr-svc" id="{slug(n)}">
-      <div class="pr-head">{thumb(n)}<div><h3>{e(n)}</h3><p>{e(about)}</p><p class="pr-meta">From <b>{money(s["from"])}</b> · about {e(s["eta"])} {more}</p></div></div>
+      <div class="pr-head">{thumb(n)}<div><h3>{e(n)}</h3><p>{e(about)}</p><p class="pr-meta">From <b>{money(s["from"])}</b> + 13% tax · about {e(s["eta"])} {more}</p></div></div>
       <div class="pr-cards">{cards}</div>
       {addon_chips(n)}
     </div>''')
