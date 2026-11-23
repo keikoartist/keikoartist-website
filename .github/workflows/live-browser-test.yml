@@ -56,6 +56,7 @@ jobs:
               br=await getattr(p,engine).launch()
               ctx=await br.new_context(**(p.devices[device] if device else {'viewport':{'width':1280,'height':900}}))
               pg=await ctx.new_page(); errs=[]; last={}
+              ctx.set_default_timeout(45000); steps=[]
               pg.on('pageerror',lambda e:errs.append(str(e)[:120]))
               pg.on('response',lambda r:last.__setitem__('api',r.status) if 'order-api.php' in r.url else None)
               async def grab(r):
@@ -74,15 +75,15 @@ jobs:
                           print(f"::warning::[{label}] page load try {attempt+1} failed ({str(ge).splitlines()[0][:80]}), retrying", flush=True)
                           await pg.wait_for_timeout(15000)
                   await pg.wait_for_timeout(1000)
-                  await pg.locator('#svcAll').scroll_into_view_if_needed(); await pg.click('#svcAll')
+                  steps.append('services'); await pg.locator('#svcAll').scroll_into_view_if_needed(); await pg.click('#svcAll')
                   b=pg.locator('.card:has(h3:text-is("Custom Inquiry")) [data-order]')
-                  await b.scroll_into_view_if_needed(); await b.click()
+                  steps.append('custom card'); await b.scroll_into_view_if_needed(); await b.click()
                   await pg.fill('#fDetails','Automated cross-browser test (test mode, nothing saved)')
                   await pg.fill('#budget','100'); await pg.fill('#fName','Test'); await pg.fill('#fEmail','test@example.com'); await pg.fill('#fDiscord','tester')
                   refs=[{'name':'ref.png','mimeType':'image/png','buffer':PNG}]
                   if label=='Chrome desktop' and os.environ.get('GITHUB_EVENT_NAME')=='workflow_dispatch': refs.append({'name':'big-ref.pdf','mimeType':'application/pdf','buffer':os.urandom(15*1024*1024)})
-                  await pg.set_input_files('#refFiles',files=refs); await pg.wait_for_timeout(1000)
-                  await pg.check('#agree'); await pg.click('#sendBtn')
+                  steps.append('files'); await pg.set_input_files('#refFiles',files=refs); await pg.wait_for_timeout(1000)
+                  steps.append('send custom'); await pg.check('#agree'); await pg.click('#sendBtn')
                   await pg.wait_for_selector('#tyModal.show',timeout=90000)
                   await pg.wait_for_timeout(500)
                   st=await pg.evaluate("({t:$('#tyTitle').textContent,w:$('#tyWarn').textContent,id:$('#tyRefId').textContent,pay:!$('#tyPay').hidden,sum:$('#tySummary').innerText})")
@@ -91,7 +92,7 @@ jobs:
                   out.append(f"CUSTOM OK {st['t']} {st['id']} {st['sum'].split(chr(10))[-1]} [{st['w']}]")
                   await pg.locator('#tyModal [data-tyclose]').first.click()
                   if 'dryrun=1' not in pg.url: raise Exception('test mode lost after closing: '+pg.url)
-                  await pg.evaluate("openOrder('VTuber')"); await pg.click('label[for=mt1]'); await pg.click('label[for=ms1]'); await pg.click('label[for=a0]'); await pg.click('label[for=pp2]')
+                  steps.append('vtuber form'); await pg.evaluate("openOrder('VTuber')"); await pg.click('label[for=mt1]'); await pg.click('label[for=ms1]'); await pg.click('label[for=a0]'); await pg.click('label[for=pp2]')
                   await pg.fill('#fDetails','Automated test'); await pg.fill('#fName','Test'); await pg.fill('#fEmail','test@example.com'); await pg.fill('#fDiscord','tester')
                   await pg.check('#agree'); await pg.click('#sendBtn')
                   await pg.wait_for_selector('#tyModal.show',timeout=90000)
@@ -103,7 +104,7 @@ jobs:
                   et=''
                   try: et=await pg.evaluate("($('#err')||{}).textContent")
                   except Exception: pass
-                  out.append('FAILED: '+str(e).split('\n')[0][:140]+f" | api status {last.get('api')} | form msg: {et}")
+                  out.append('FAILED at '+(steps[-1] if steps else 'page load')+': '+str(e).split('\n')[0][:140]+f" | api status {last.get('api')} | form msg: {et}")
               line=f"[{label}] "+' || '.join(out)+(f" | JS errors: {errs[:3]}" if errs else ' | no JS errors')
               print("::notice::"+line, flush=True)
               if errs or any(o.startswith('FAILED') for o in out): PROBLEMS.append(line)
@@ -112,7 +113,9 @@ jobs:
           async def main():
               async with async_playwright() as p:
                   for a in [('Chrome desktop','chromium',None),('Android Chrome','chromium','Pixel 7'),('iPhone Safari','webkit','iPhone 13'),('Mac Safari','webkit',None),('Firefox','firefox',None)]:
-                      await run(p,*a)
+                      try: await asyncio.wait_for(run(p,*a),timeout=300)
+                      except asyncio.TimeoutError:
+                          line=f"[{a[0]}] FAILED: stuck for 5 minutes"; print('::notice::'+line,flush=True); PROBLEMS.append(line)
           asyncio.run(main())
           if PROBLEMS:
               open('problems.txt','w').write('\n'.join(PROBLEMS)); raise SystemExit(1)
