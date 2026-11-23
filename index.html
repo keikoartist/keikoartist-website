@@ -1209,7 +1209,7 @@ a.slot-badge:focus-visible{outline:2px solid var(--pink-text);outline-offset:3px
 @media (hover:hover){.menu a:hover .mi{transform:translateY(-1px) scale(1.08)}}
 .menu a.active,.menu a.active .mi{color:var(--pink-text)}
 .ns-txt{display:none}
-@media (min-width:1360px){
+@media (min-width:1560px){
   .nav-search{width:auto;height:40px;border-radius:999px;background:#fff6f9;border:1.5px solid var(--line);padding:0 16px 0 13px;gap:8px;display:inline-flex;align-items:center;color:var(--muted);min-width:200px}
   .nav-search:hover{background:#fff;border-color:var(--pink-2);color:var(--pink-text)}
   .ns-txt{display:inline;font-size:14px;font-weight:500}
@@ -1330,6 +1330,10 @@ html.rv-on .sec-head.rv.in h2::after{transform:scaleX(1)}
 #kaSmoke{position:fixed;inset:0;z-index:9998;pointer-events:none;overflow:hidden}
 #kaSmoke i{position:absolute;left:var(--x);top:var(--y);width:80vmax;height:80vmax;margin:-40vmax 0 0 -40vmax;border-radius:50%;background:radial-gradient(closest-side,var(--c) 0,var(--c2) 48%,rgba(242,98,143,0) 100%);opacity:0;animation:kasmk 2.3s cubic-bezier(.25,.6,.3,1) var(--d) forwards;will-change:transform,opacity}
 @keyframes kasmk{0%{transform:scale(.55);opacity:0}22%{transform:scale(1);opacity:1}100%{transform:translate(var(--tx),var(--ty)) scale(1.7);opacity:0}}
+/* header never runs off the right edge (laptops, zoomed browsers, the admin Inbox pill) */
+@media (min-width:821px) and (max-width:1559px){header .nav{gap:10px}header .menu{gap:2px}header .menu a{padding-left:9px!important;padding-right:9px!important}header .nav-cta{padding:10px 16px!important;white-space:nowrap}.admin-pill{padding:6px 10px!important;white-space:nowrap}}
+@media (min-width:821px) and (max-width:1439px){.nav-dc span{display:none}.nav-dc{padding:0!important;width:42px;justify-content:center}}
+@media (min-width:821px) and (max-width:1279px){header .menu .mi{display:none}}
 </style>
 </head>
 <body>
