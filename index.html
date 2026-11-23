@@ -2641,6 +2641,7 @@ $$('.services .card').forEach(c=>{const p=c.querySelector(':scope>.price'),b=c.q
     if(d.a>.35){B.cur=d.i===B.cur?B.cur+1:B.cur-1;}draw();});
   stage.addEventListener('keydown',e=>{if(e.key==='ArrowRight'){stop();go(1);}if(e.key==='ArrowLeft'){stop();go(-1);}});stage.tabIndex=0;
   document.documentElement.classList.add('has-book');grid.remove();show('works');
+  const h2=$('#portfolio .sec-head h2');if(h2)h2.textContent='Open a spellbook';   // the shelf holds more than works (owner, Nov 2026); phones keep "Featured Works"
   [...document.querySelectorAll('.bk-mini')].forEach((m,k,all)=>m.addEventListener('click',e=>{e.preventDefault();if(window.openLB)openLB(all.map(x=>({src:x.getAttribute('href'),cap:x.querySelector('span').textContent})),k,null);}));
   // links to How it works / FAQ / TOS / Privacy open the matching book
   const fp=Math.ceil(faq.length/2),pg=face=>Math.ceil(face/2);   // face number → spread
