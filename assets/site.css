@@ -121,7 +121,7 @@ footer{margin-top:60px;background:linear-gradient(135deg,#f2628f,#ff8fb1);color:
 
 /* Christmas edition (until SEASON.until in index.html) */
 body.xmas header{border-bottom:0}
-body.xmas header::after{content:"";position:absolute;left:0;right:0;bottom:-3px;height:3px;background:repeating-linear-gradient(-45deg,#f2628f 0 8px,#ffe3ec 8px 16px);opacity:.85;pointer-events:none}
+body.xmas header::after{content:"";position:absolute;left:0;right:0;bottom:-3px;height:3px;background:linear-gradient(90deg,#f2628f,#c9a7ff,#f2628f);opacity:.9;pointer-events:none}
 body.xmas header .logo{position:relative}
 .xmas-pill{display:inline-flex;align-items:center;gap:6px;margin:10px 0 0;font-size:13px;font-weight:600;color:var(--pink-text);background:#fff4f8;border:1px solid var(--line);border-radius:999px;padding:5px 12px}
 .xmas-pill:hover{background:#ffe9f1}
@@ -185,3 +185,7 @@ body.xmas header .logo{position:relative}
 .pr-add{font-size:12.5px;background:#fff4f8;border:1px solid var(--line);border-radius:999px;padding:4px 10px;color:var(--ink)}.pr-add b{color:var(--pink-text)}
 @media (max-width:820px){.pr-steps{grid-template-columns:1fr 1fr}}
 @media (max-width:560px){.pr-steps{grid-template-columns:1fr}.pr-svc{padding:14px}.pr-thumb{width:56px;height:56px}.pr-jump{flex-wrap:nowrap;overflow-x:auto;margin:0 -20px 16px;padding:2px 20px 6px;scrollbar-width:none}.pr-jump .wf{flex:none}}
+
+/* match the homepage design review (Nov 2026) */
+body.xmas header::after{height:2px!important;bottom:-2px!important}
+.xmas-pill{display:inline-flex;align-items:center;gap:7px}
