@@ -1438,6 +1438,21 @@ html.has-book .book-wrap{display:block}
 .face .tp a{color:var(--pink-text);font-weight:600}
 .face.textpage .pg-num{text-align:center}
 @media (min-width:821px){html.has-book #process,html.has-book #faq,html.has-book #tos{display:none}}
+/* "Commissions open" badge with Keiko's emote (owner, Nov 2026) */
+.slot-badge.sb-split{border:0!important;background:#fff!important;box-shadow:0 6px 18px rgba(194,58,105,.14),inset 0 0 0 1.5px #ffd1e2!important;overflow:visible!important}
+.slot-badge.sb-split::after{display:none}
+.sb-main.sb-cute{position:relative;display:inline-flex!important;align-items:center;gap:9px;padding:4px 14px 4px 4px!important;background:none!important}
+.sb-emote{width:34px;height:34px;border-radius:50%;object-fit:cover;object-position:50% 20%;background:linear-gradient(135deg,#ffe3ec,#efe6ff);box-shadow:0 0 0 2px #fff,0 0 0 3.5px #ffc2d6;transform-origin:50% 90%;animation:sbwave 3.2s ease-in-out infinite}
+@keyframes sbwave{0%,70%,100%{transform:rotate(0)}76%{transform:rotate(-10deg)}82%{transform:rotate(8deg)}88%{transform:rotate(-5deg)}}
+.sb-txt{display:inline-flex;align-items:baseline;gap:5px;font-size:12.5px;letter-spacing:.04em}
+.sb-cute .sb-lbl{color:var(--ink);font-weight:600;text-transform:none;letter-spacing:0}
+.sb-cute .sb-open{color:#fff;background:linear-gradient(135deg,#2fb67a,#17a06a);padding:3px 10px;border-radius:999px;font-size:11.5px;letter-spacing:.06em;text-transform:uppercase}
+.sb-live{position:absolute;left:30px;top:3px;width:10px;height:10px;border-radius:50%;background:#22c07a;box-shadow:0 0 0 2px #fff}
+.sb-live::after{content:"";position:absolute;inset:0;border-radius:50%;background:#22c07a;animation:sblive 1.8s ease-out infinite}
+@keyframes sblive{0%{transform:scale(1);opacity:.7}100%{transform:scale(2.6);opacity:0}}
+.slot-badge.sb-split .sb-go{background:none!important;color:var(--pink-text);padding:0 12px 0 2px!important}
+@media (hover:hover){a.slot-badge.sb-split:hover .sb-emote{animation:sbwave .9s ease-in-out}}
+@media (prefers-reduced-motion:reduce){.sb-emote,.sb-live::after{animation:none}}
 </style>
 </head>
 <body>
@@ -2922,7 +2937,7 @@ document.addEventListener('click',e=>{const a=e.target.closest('.menu-chat');if(
   const p=$('#startPill'),c=$('#cStart');if(p){p.textContent='⚡ '+SLOTS.start;p.hidden=false;}if(c){c.textContent='⚡ '+SLOTS.start+'.';c.hidden=false;}})();
 (function(){const b=$('#slotBadge');if(b&&typeof SLOTS!=='undefined'){b.textContent=SLOTS.text;b.className='slot-badge '+(SLOTS.open?'open':'closed');
   const xm=typeof SEASON!=='undefined'&&SEASON.christmas&&SEASON.orderBy&&SLOTS.open&&new Date()<new Date(SEASON.until)&&new Date()<=new Date(SEASON.orderBy+'T23:59:59+07:00');
-  const st=SLOTS.open?'<span class="sb-main"><i class="sb-dot" aria-hidden="true"></i><span class="sb-lbl gh-l">Commissions</span><b class="sb-open">Open</b><i class="sb-spark" aria-hidden="true">✦</i></span>':'';
+  const st=SLOTS.open?'<span class="sb-main sb-cute"><img class="sb-emote" src="images/contact-emote.webp" alt="" width="34" height="34" decoding="async"><span class="sb-txt"><span class="sb-lbl gh-l">Commissions</span><b class="sb-open">Open</b></span><i class="sb-live" aria-hidden="true"></i></span>':'';
   if(st){b.innerHTML=st;b.classList.add('sb-split');}
   // hero badge shows only "Commissions open" (owner, Nov 2026); the Christmas deadline stays in the order form
   if(st)b.insertAdjacentHTML('beforeend','<span class="sb-go" aria-hidden="true">›</span>');}})();
