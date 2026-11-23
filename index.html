@@ -1308,10 +1308,11 @@ html.rv-on .sec-head.rv.in h2::after{transform:scaleX(1)}
   .hero{min-height:660px;display:flex!important;align-items:center}
   .hero .wrap.hero-grid{position:static!important;display:block!important;padding:64px 0 56px}
   .hero-copy{position:relative;z-index:5;max-width:600px}
-  .hero-art{position:absolute!important;inset:0 0 0 30%;width:auto!important;max-width:none!important;margin:0!important;z-index:0;transform:none!important}
+  .hero-art{position:absolute!important;inset:0 0 0 max(30%,520px);width:auto!important;max-width:none!important;margin:0!important;z-index:0;transform:none!important}
   .hero-art::before{display:none}
   .hero-art img{width:100%!important;height:100%!important;aspect-ratio:auto!important;object-fit:cover;object-position:62% 30%;border:0!important;border-radius:0!important;box-shadow:none!important;animation:none!important}
-  .hero-art::after{content:"";position:absolute;inset:0;z-index:1;background:linear-gradient(90deg,#fff 0,rgba(255,255,255,.9) 14%,rgba(255,255,255,.45) 30%,rgba(255,255,255,0) 44%),linear-gradient(0deg,#fff 0,rgba(255,255,255,0) 16%)}
+  .hero-art::after{display:none}
+  .hero-art img{-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 34%),linear-gradient(0deg,transparent 0,#000 24%),linear-gradient(180deg,transparent 0,#000 8%);-webkit-mask-composite:source-in,source-in;mask-image:linear-gradient(90deg,transparent 0,#000 34%),linear-gradient(0deg,transparent 0,#000 24%),linear-gradient(180deg,transparent 0,#000 8%);mask-composite:intersect}
   .hero-art figcaption{left:auto!important;right:28px!important;bottom:28px!important;z-index:2}
   body.xmas .hero .xmas-snow{z-index:2}
 }
@@ -1841,20 +1842,20 @@ const PAYPAL = {          // kosong: link PayPal dikirim lewat email invoice set
   currency: "USD",
 };
 const GALLERY = {   // contoh karya per service (geser di kartu Services). Tambah/ubah nama file di sini.
-  "VTuber":          ["vtuber-model-commission-cover","custom-vtuber-model-kitsune-gown","custom-vtuber-model-witch","custom-vtuber-model-maid","custom-vtuber-model-rocker","custom-vtuber-model-dragon"],
+  "VTuber":          ["custom-vtuber-model-kitsune-gown","custom-vtuber-model-witch","custom-vtuber-model-maid","custom-vtuber-model-rocker","custom-vtuber-model-dragon"],
   "VTuber Packages": ["vtuber-debut-package-keikomi","custom-vtuber-model-dragon","custom-vtuber-model-witch","chibi-vtuber-model-witch","custom-twitch-emotes-witch","vtuber-stream-background-room"],
   "Background":      ["vtuber-stream-background-room"],
-  "Custom PFP":      ["custom-pfp-commission-cover","custom-vtuber-pfp-wolf","custom-vtuber-pfp-glasses","custom-vtuber-pfp-leaf"],
-  "Emotes":          ["twitch-emotes-commission-cover","custom-twitch-emotes-witch","animated-twitch-emotes-witch","custom-twitch-emote-witch"],
+  "Custom PFP":      ["custom-vtuber-pfp-wolf","custom-vtuber-pfp-glasses","custom-vtuber-pfp-leaf"],
+  "Emotes":          ["custom-twitch-emotes-witch","animated-twitch-emotes-witch","custom-twitch-emote-witch"],
   "Stream Overlay":  ["vtuber-stream-overlay-keikomi","vtuber-stream-background-room"],
   "Banner":          ["vtuber-twitch-banner-eyes-blue","animated-vtuber-banner-eyes-silver","vtuber-twitch-banner-mouth","vtuber-twitch-banner-eyes-fire","vtuber-twitch-banner-eyes-sakura"],
-  "VTuber Pet":      ["vtuber-pet-commission-cover","vtuber-pet-mascot-anglercat","vtuber-pet-mascot-cat","vtuber-pet-mascot-tiger","vtuber-pet-mascot-snow-leopard","vtuber-pet-mascot-peach","vtuber-pet-mascot-bear"],
-  "Chibi VTuber":    ["chibi-vtuber-commission-cover","chibi-vtuber-model-witch"],
+  "VTuber Pet":      ["vtuber-pet-mascot-anglercat","vtuber-pet-mascot-cat","vtuber-pet-mascot-tiger","vtuber-pet-mascot-snow-leopard","vtuber-pet-mascot-peach","vtuber-pet-mascot-bear"],
+  "Chibi VTuber":    ["chibi-vtuber-model-witch"],
   "VTuber Logo":     ["vtuber-logo-mosswing"],
-  "PNGTuber":        ["pngtuber-commission-cover","custom-pngtuber-model-cat-mask","custom-pngtuber-model-violet"],
+  "PNGTuber":        ["custom-pngtuber-model-cat-mask","custom-pngtuber-model-violet"],
   "Custom Inquiry":  ["custom-illustration-calico-cat","custom-illustration-tabby-kitten","custom-illustration-couple-selfie","custom-illustration-cottage-garden"],
 };
-const WIDE = ["vtuber-model-commission-cover","custom-pfp-commission-cover","twitch-emotes-commission-cover","vtuber-pet-commission-cover","chibi-vtuber-commission-cover","pngtuber-commission-cover","vtuber-debut-package-keikomi","vtuber-stream-overlay-keikomi","vtuber-stream-background-room","custom-twitch-emotes-witch","vtuber-twitch-banner-eyes-fire","vtuber-twitch-banner-eyes-sakura","animated-vtuber-banner-eyes-silver","vtuber-twitch-banner-mouth","custom-illustration-cottage-garden","animated-twitch-emotes-witch","vtuber-twitch-banner-eyes-blue","custom-illustration-couple-selfie"];
+const WIDE = ["vtuber-debut-package-keikomi","vtuber-stream-overlay-keikomi","vtuber-stream-background-room","custom-twitch-emotes-witch","vtuber-twitch-banner-eyes-fire","vtuber-twitch-banner-eyes-sakura","animated-vtuber-banner-eyes-silver","vtuber-twitch-banner-mouth","custom-illustration-cottage-garden","animated-twitch-emotes-witch","vtuber-twitch-banner-eyes-blue","custom-illustration-couple-selfie"];
 const CONTAIN = ["vtuber-logo-mosswing"];
 const DETAILS = {   // deskripsi lengkap tiap service (muncul saat kartu diklik). Edit bebas.
   "VTuber": { about:"A fully original Live2D VTuber model designed around your character, personality and stream style.",

@@ -32,7 +32,6 @@ The owner writes in Indonesian and wants short, direct answers in Indonesian. Do
 | `spin-api.php` | Christmas spin wheel draw (see Open items). |
 | `admin/index.html` | Admin inbox at /admin/: Chats, Orders (board view like VGen, plus list view), Settings (Discord webhook, Gmail App Password). |
 | `tools/build_pages.py` | Generates the service pages (`custom-vtuber-model/`, `live2d-rigging/`, `custom-pngtuber-model/`, `custom-twitch-emotes/`, `vtuber-portfolio/`, `vtuber-pricing/`), the guide pages for search (`vtuber-model-cost/`, `how-to-commission-a-vtuber-model/`, `live2d-vs-pngtuber/`; text built from the prices and terms in `index.html`), `404.html` and `sitemap.xml` from the data in `index.html`. Run `python3 tools/build_pages.py` after changing prices, services or the gallery. |
-| `tools/make_layouts.py` | Makes the "layout" cover images (`images/*-commission-cover.webp`, artwork cut out with a white outline, centred on a plum background, no text) used as the first slide of the homepage service cards. Run `python3 tools/make_layouts.py <font dir>` (DM Serif Display + Poppins SemiBold TTFs, not in git). `build_pages.py` leaves these cover images out of the service pages. |
 | `assets/site.css` | Shared styles for the service pages. |
 | `images/` | Artwork (WebP). `images/t/` = small versions for grids (520 px wide) and `images/s/` = 360 px versions for phones, both made from the originals. |
 | `tools/ftp_deploy.py` | Deploy script (uploads changed files only). |
