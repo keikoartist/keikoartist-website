@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 """Make the "layout" cover images for the service cards (same idea as the debut package image):
-the artwork cut out with a white sticker outline on a plum background, with a small card that lists
-what is included (taken from DETAILS in index.html, shortened).
+the artwork cut out with a white sticker outline, centred on a plum background with stars. No text.
 
 Usage: python3 tools/make_layouts.py FONT_DIR
 FONT_DIR must hold DMSerifDisplay-Regular.ttf and Poppins-SemiBold.ttf (Google Fonts, OFL).
@@ -16,17 +15,17 @@ W, H = 1600, 1200
 
 LAYOUTS = [
     # output name, source artwork, title, list (from DETAILS in index.html)
-    ('vtuber-model-commission-layout', 'custom-vtuber-model-kitsune-gown', 'VTuber Model',
+    ('vtuber-model-commission-cover', 'custom-vtuber-model-kitsune-gown', 'VTuber Model',
      ['Bust, half or full body', 'Layered PSD', 'Live2D rigging', 'VTube Studio ready', 'Updates at every stage']),
-    ('pngtuber-commission-layout', 'custom-pngtuber-model-cat-mask', 'PNGTuber',
+    ('pngtuber-commission-cover', 'custom-pngtuber-model-cat-mask', 'PNGTuber',
      ['Idle + talking states', 'Blinking', 'Transparent PNGs', 'Props included']),
-    ('vtuber-pet-commission-layout', 'vtuber-pet-mascot-anglercat', 'VTuber Pet',
+    ('vtuber-pet-commission-cover', 'vtuber-pet-mascot-anglercat', 'VTuber Pet',
      ['Layered pet art', 'Optional Live2D rig', 'Transparent PNG']),
-    ('chibi-vtuber-commission-layout', 'chibi-vtuber-model-witch', 'Chibi VTuber',
+    ('chibi-vtuber-commission-cover', 'chibi-vtuber-model-witch', 'Chibi VTuber',
      ['Full-body chibi', '3 expressions', 'Layered, ready to rig']),
-    ('custom-pfp-commission-layout', 'custom-vtuber-pfp-wolf', 'Custom PFP',
+    ('custom-pfp-commission-cover', 'custom-vtuber-pfp-wolf', 'Custom PFP',
      ['Headshot to half body', 'High-resolution PNG', 'Simple background']),
-    ('twitch-emotes-commission-layout', 'custom-twitch-emotes-witch', 'Emotes',
+    ('twitch-emotes-commission-cover', 'custom-twitch-emotes-witch', 'Emotes',
      ['Static or animated', 'Twitch & Discord sizes', 'Transparent PNG / GIF']),
 ]
 
@@ -96,12 +95,12 @@ def background(seed):
     bg = bg.convert('RGBA')
     glow = Image.new('RGBA', (W, H), (0, 0, 0, 0))
     g = ImageDraw.Draw(glow)
-    g.ellipse((W * .42, H * .02, W * 1.02, H * .98), fill=(255, 140, 190, 120))
+    g.ellipse((W * .2, H * .02, W * .8, H * .98), fill=(255, 140, 190, 120))
     g.ellipse((-W * .2, H * .55, W * .35, H * 1.3), fill=(201, 167, 255, 70))
     bg.alpha_composite(glow.filter(ImageFilter.GaussianBlur(120)))
     ring = Image.new('RGBA', (W, H), (0, 0, 0, 0))
     r = ImageDraw.Draw(ring)
-    cx, cy, rad = int(W * .7), int(H * .5), int(H * .44)
+    cx, cy, rad = int(W * .5), int(H * .5), int(H * .44)
     r.ellipse((cx - rad, cy - rad, cx + rad, cy + rad), outline=(255, 214, 230, 120), width=4)
     r.ellipse((cx - rad + 26, cy - rad + 26, cx + rad - 26, cy + rad - 26), fill=(255, 225, 238, 38))
     bg.alpha_composite(ring)
@@ -138,16 +137,13 @@ def card(title, items):
 def make(name, src, title, items, seed):
     canvas = background(seed)
     art = cutout(os.path.join(ROOT, 'images', src + '.webp'))
-    maxh, maxw = int(H * .9), int(W * .56)
+    maxh, maxw = int(H * .9), int(W * .8)
     s = min(maxh / art.height, maxw / art.width)
     art = art.resize((int(art.width * s), int(art.height * s)), Image.LANCZOS)
     st = sticker(art, 12)
-    x = int(W * .7 - st.width / 2)
-    x = min(x, W - st.width + 20)
+    x = int(W / 2 - st.width / 2)
     y = H - st.height + 30 if art.height > H * .8 else int(H / 2 - st.height / 2)
-    canvas.alpha_composite(st, (max(x, int(W * .36)), y))
-    cd = card(title, items)
-    canvas.alpha_composite(cd, (40, int(H / 2 - cd.height / 2)))
+    canvas.alpha_composite(st, (x, y))   # no text on the cover (owner, Nov 2026); title and items stay in LAYOUTS for reference
     out = canvas.convert('RGB')
     out.save(os.path.join(ROOT, 'images', name + '.webp'), 'WEBP', quality=84, method=6)
     for folder, w in (('t', 520), ('s', 360)):
