@@ -308,6 +308,13 @@ def custom_vtuber():
   </div></section>
 
   <section class="sec"><div class="wrap">
+    <h2>Expression toggle ideas</h2>
+    <p>Toggles are extra faces or effects you switch on with a hotkey while streaming (+{money(vadd["Extra expression / toggle"])} each). Popular picks:</p>
+    <ol class="toggle-ideas"><li><b>01</b>Blush</li><li><b>02</b>Teary eyes</li><li><b>03</b>Crying</li><li><b>04</b>Heart eyes</li><li><b>05</b>Starry eyes</li><li><b>06</b>Angry mark</li><li><b>07</b>Dark face</li><li><b>08</b>Dizzy eyes</li><li><b>09</b>Shocked (O_O)</li><li><b>10</b>&gt;_&lt;</li><li><b>11</b>Sweat drop</li><li><b>12</b>Sleepy (zzz)</li></ol>
+    <p class="note">Smiling, blinking and closed eyes already come from face tracking, so there's no need to pick them as toggles. Send your own references too; the final look is drawn to match your character.</p>
+  </div></section>
+
+  <section class="sec"><div class="wrap">
     <h2>Custom character design</h2>
     <p>You don't need a finished character sheet. Send a description, a few references or an existing design, and I work out the outfit, colors and details with you. Small changes are unlimited during the sketch stage, so the design can settle before coloring starts.</p>
     <div class="gallery">{"".join(fig(x, CAPTION.get(x, "VTuber model art")) for x in vtubers)}</div>

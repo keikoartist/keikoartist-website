@@ -129,3 +129,6 @@ body.xmas header .logo::before{content:"";position:absolute;left:-7px;top:-11px;
 .menu a{display:inline-flex;align-items:center;gap:6px;font-weight:600}.menu a .mi{flex:none;color:var(--pink)}.menu a[aria-current=page],.menu a[aria-current=page] .mi{color:var(--pink-text)}
 .menu a{white-space:nowrap}
 @media (max-width:1200px){.menu{gap:16px}.menu a .mi{display:none}.logo small{white-space:nowrap}}
+.toggle-ideas{list-style:none;padding:0;margin:14px 0;display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.toggle-ideas li{display:flex;align-items:center;gap:10px;background:#fff4f8;border:1px solid var(--line);border-radius:14px;padding:10px 12px;font-weight:600;font-size:14px;color:var(--ink)}
+.toggle-ideas li b{font-family:"DM Serif Display",serif;font-weight:400;color:var(--pink-text);font-size:18px}
