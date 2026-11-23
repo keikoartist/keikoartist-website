@@ -64,7 +64,7 @@ PayPal receiver email: `PAYPAL_EMAIL` in `order-api.php` (confirmed correct by t
 
 ## Email
 
-The host blocks `mail()`. Emails go through the owner's Gmail (SMTP with an App Password saved in admin → Settings, stored in `settings.json` on the server). Until that is set up, a FormSubmit backup is used, which often lands in spam.
+The host blocks `mail()`. Emails go through the owner's Gmail (SMTP with an App Password saved in admin → Settings, stored in `settings.json` on the server). FormSubmit is only the backup if Gmail sending fails.
 
 ## Secrets (server only, never in git)
 
@@ -78,7 +78,7 @@ Run the site with `php -S 127.0.0.1:8830` in a copy of the repo that has a test 
 
 ## Open items
 
-- Gmail App Password not set up yet (admin → Settings → Emails to clients).
+- Gmail App Password set up by the owner on 23 Nov 2026 (diag: mail_set true, smtp.gmail.com reachable). Emails to clients now go through Gmail.
 - Cloudflare: the owner's colleague (Bu Mella) may ask to switch the nameservers. Before that, check that deploys use the hosting's FTP address, not the domain name.
 - A possible move of the site to the studio standard (Next.js on Bu Mella's server) is not decided. Do not start it unless asked.
 - Commission status badge in the hero: `SLOTS` in `index.html` (open/closed, `start` = "I can start right away", shown next to "Our Services" and in the order form). The badge is a link that opens the order form. The hero badge shows Keiko's emote (images/contact-emote.webp, pops out of the pill, waves now and then) + "Commissions • open" with a live green dot, no arrow, next to the spin wheel button (no Christmas deadline, owner Nov 2026).
