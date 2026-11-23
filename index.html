@@ -53,10 +53,10 @@ a{color:inherit;text-decoration:none}
 
 /* buttons */
 .btn{display:inline-flex;align-items:center;gap:10px;white-space:nowrap;padding:14px 28px;border-radius:999px;font-weight:600;font-size:15px;transition:.2s;border:2px solid transparent;cursor:pointer;font-family:inherit}
-.btn-pink{background:var(--pink);color:#fff;box-shadow:0 8px 20px rgba(242,98,143,.35)}
-.btn-pink:hover{background:#e04b7a;transform:translateY(-2px)}
+.btn-pink{background:var(--btn-pink);color:#fff;box-shadow:0 8px 20px rgba(201,58,106,.3)}
+.btn-pink:hover{background:#b3305c;transform:translateY(-2px)}
 .btn-ghost{background:#fff;border-color:var(--pink);color:var(--pink)}
-.btn-ghost:hover{background:var(--pink);color:#fff}
+.btn-ghost:hover{background:var(--btn-pink);color:#fff}
 .arrow::after{content:"→"}
 
 /* header */
@@ -662,7 +662,7 @@ a.vt:hover img{transform:scale(1.06)}
 .kc-msg p{padding:9px 12px;border-radius:16px;font-size:13.5px;line-height:1.45;white-space:pre-wrap;word-wrap:break-word;margin:0}
 .kc-msg small{font-size:10.5px;color:var(--muted);padding:0 6px}
 .kc-msg.admin{align-self:flex-start}.kc-msg.admin p{background:#fff;border:1px solid var(--line);border-bottom-left-radius:4px;color:var(--ink)}
-.kc-msg.visitor{align-self:flex-end;align-items:flex-end}.kc-msg.visitor p{background:var(--pink);color:#fff;border-bottom-right-radius:4px}
+.kc-msg.visitor{align-self:flex-end;align-items:flex-end}.kc-msg.visitor p{background:var(--btn-pink);color:#fff;border-bottom-right-radius:4px}
 .kc-msg.pending p{opacity:.6}
 .kc-start{display:grid;gap:8px;padding:12px 14px 6px;border-top:1px solid var(--line)}
 .kc-start input,.kc-start textarea{padding:10px 12px;font-size:13.5px;border-radius:10px}
@@ -680,7 +680,7 @@ a.vt:hover img{transform:scale(1.06)}
 .kc-contact p{margin:0;font-size:12.5px;line-height:1.4;color:var(--ink)}
 .kc-contact input{font:inherit;font-size:16px;padding:8px 10px;border:1px solid #f6c3d4;border-radius:10px;width:100%;box-sizing:border-box}
 .kc-ct-btns{display:flex;gap:8px}
-.kc-ct-save{flex:1;border:0;border-radius:999px;background:var(--pink);color:#fff;font:inherit;font-weight:600;font-size:13px;padding:8px;cursor:pointer}
+.kc-ct-save{flex:1;border:0;border-radius:999px;background:var(--btn-pink);color:#fff;font:inherit;font-weight:600;font-size:13px;padding:8px;cursor:pointer}
 .kc-ct-skip{border:0;background:none;color:var(--muted);font:inherit;font-size:12.5px;cursor:pointer;padding:8px}
 .kc-ct-open{border:0;border-top:1px solid #fbd3e0;background:#fff8fb;color:var(--pink-d,#d6457a);font:inherit;font-size:12.5px;font-weight:600;padding:7px;cursor:pointer}
 body:has(.modal.show,.sd.show,.lb.show) .kc-bubble,body:has(.modal.show,.sd.show,.lb.show) .kc-panel{display:none}
@@ -1080,7 +1080,7 @@ footer{margin-top:24px}
 .kc-welcome a{color:var(--pink);font-weight:600}
 
 /* polish 2026-11: readable small pink text (4.7:1), same brand pink for buttons, headings and decoration */
-:root{--pink-text:#c23a69}
+:root{--pink-text:#c23a69;--btn-pink:#c93a6a}   /* buttons: darker pink chosen by the owner (4.9:1 with white text) */
 .eyebrow,.btn-ghost,.card .more,.price b,.member .ig,.q-ask a,.tiers li b,.tiers td,.tiers .addons summary,.svc-note a,.vm-card a,.vm-links a,.kc-welcome a,.svc-empty a,.st,.drop b,.ty-pay .ty-kofi a,.ty-soc a{color:var(--pink-text)}
 .btn-ghost{border-color:var(--pink)}
 @media (hover:hover){.btn-ghost:hover{color:#fff}}

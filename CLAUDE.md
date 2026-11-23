@@ -5,7 +5,7 @@ The owner writes in Indonesian and wants short, direct answers in Indonesian. Do
 
 ## Rules that always apply
 
-- Refine and polish, never redesign. Light theme only. Keep the pink brand colour (#f2628f).
+- Refine and polish, never redesign. Light theme only. Keep the pink brand colour (#f2628f). Filled buttons use the darker `--btn-pink` (#c93a6a) so white text stays readable (owner chose this, Nov 2026).
 - Never invent reviews, prices, testimonials or client names. Reviews come only from real VGen screenshots or text the owner sends.
 - This repo is **public**: never commit passwords, webhook URLs, App Passwords or other secrets. Secrets live only on the server (see "Secrets").
 - Never ask the owner to paste a password, webhook URL or App Password into the chat. They type those into the admin Settings themselves.
