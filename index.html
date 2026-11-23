@@ -1334,6 +1334,12 @@ html.rv-on .sec-head.rv.in h2::after{transform:scaleX(1)}
 @media (min-width:821px) and (max-width:1559px){header .nav{gap:10px}header .menu{gap:2px}header .menu a{padding-left:9px!important;padding-right:9px!important}header .nav-cta{padding:10px 16px!important;white-space:nowrap}.admin-pill{padding:6px 10px!important;white-space:nowrap}}
 @media (min-width:821px) and (max-width:1439px){.nav-dc span{display:none}.nav-dc{padding:0!important;width:42px;justify-content:center}}
 @media (min-width:821px) and (max-width:1279px){header .menu .mi{display:none}}
+/* portfolio: a work grows when the mouse is over it (no click needed) */
+@media (hover:hover) and (prefers-reduced-motion:no-preference){
+  .works .work{transition:transform .35s cubic-bezier(.2,.7,.2,1),box-shadow .35s}
+  .works .work:hover{transform:scale(1.1)!important;z-index:6;box-shadow:0 26px 54px rgba(122,40,70,.28)!important}
+  .works .work.fw-wide:hover{transform:scale(1.05)!important}
+}
 </style>
 </head>
 <body>
