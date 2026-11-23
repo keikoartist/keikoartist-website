@@ -1362,7 +1362,8 @@ html.has-book .book-wrap{display:block}
 .face .pg-art{flex:1;min-height:0;width:100%;display:flex;align-items:center;justify-content:center}
 .face .work{position:relative;aspect-ratio:auto!important;width:100%;height:100%;border-radius:10px;overflow:hidden;background:#fff!important;display:flex;align-items:center;justify-content:center;box-shadow:none!important;transform:none!important}
 .face .work img{width:100%;height:100%;object-fit:contain;transform:none!important}
-.face .work video{width:100%;height:100%;object-fit:cover;border-radius:10px}
+.face .work video{width:100%;height:100%;object-fit:contain;border-radius:10px;background:transparent}
+.face .work.rig{background:linear-gradient(180deg,#fdeef3,#fbe3ec)!important;display:flex!important;align-items:center!important;justify-content:center}
 .face .work .tag{display:none}
 .face .pg-cap{margin:12px 0 0;font-family:"DM Serif Display",serif;font-size:19px;color:var(--ink);text-align:center;line-height:1.2}
 .face .pg-num{margin-top:4px;font-size:11px;letter-spacing:.18em;color:var(--pink-text);opacity:.75}
@@ -1383,6 +1384,46 @@ html.has-book .book-wrap{display:block}
 .book-nav button:disabled{opacity:.35;cursor:default}
 .book-nav span{min-width:130px;text-align:center;font-size:13.5px;color:var(--muted)}
 @media (prefers-reduced-motion:reduce){.book,.leaf{transition:none}}
+/* book feel: page edges, turning shadow, a corner that lifts on hover, drag to turn */
+.face.front:not(.cover){box-shadow:inset 18px 0 28px -18px rgba(90,35,64,.35),1px 0 0 #f1e2e8,2px 0 0 #fff,3px 0 0 #ecd6df,4px 0 0 #fff,5px 0 0 #e7cfd9,0 18px 40px rgba(90,35,64,.18)}
+.face.back:not(.cover){box-shadow:inset -18px 0 28px -18px rgba(90,35,64,.35),-1px 0 0 #f1e2e8,-2px 0 0 #fff,-3px 0 0 #ecd6df,-4px 0 0 #fff,-5px 0 0 #e7cfd9,0 18px 40px rgba(90,35,64,.18)}
+.face::before{content:"";position:absolute;inset:0;z-index:3;pointer-events:none;opacity:var(--sh,0);background:linear-gradient(90deg,rgba(60,20,45,.55),rgba(60,20,45,0) 70%)}
+.face.back::before{background:linear-gradient(270deg,rgba(60,20,45,.55),rgba(60,20,45,0) 70%)}
+.face.cover::before{z-index:0;opacity:1;background:none}
+.leaf.turning .face:not(.cover)::before{animation:pgshade 1s ease}
+@keyframes pgshade{0%,100%{opacity:0}45%{opacity:.5}}
+.leaf.dragging{transition:none!important;cursor:grabbing}
+.leaf.next-up,.leaf.prev-up{cursor:grab}
+@media (hover:hover){.leaf.next-up:not(.dragging):hover{transform:rotateY(-14deg)}.leaf.prev-up:not(.dragging):hover{transform:rotateY(-166deg)}}
+.book-stage{user-select:none;-webkit-user-select:none;touch-action:pan-y}
+.face img{-webkit-user-drag:none;user-drag:none}
+/* decorations beside the book (wide screens) */
+.book-wrap{position:relative}
+.book-deco{position:absolute;inset:-40px -9999px 0;pointer-events:none;z-index:0;display:none}
+.book-stage,.book-nav{position:relative;z-index:1}
+@media (min-width:1100px){html.has-book .book-deco{display:block}}
+.book-deco .bd-left{position:absolute;left:calc(50% - 50vw + max(24px,(100vw - 1360px)/2) + 10px);bottom:90px;width:150px;text-align:center}
+@media (max-width:1599px){.book-deco .bd-left{left:calc(50% - 50vw + max(24px,(100vw - 1200px)/2))}}
+.bd-left img{width:118px;height:auto;filter:drop-shadow(0 12px 14px rgba(122,40,70,.22));animation:ldbob 2.4s ease-in-out infinite}
+.bd-bubble{display:inline-block;margin-bottom:10px;background:#fff;border:1.5px solid var(--line);color:var(--pink-text);font-weight:600;font-size:13px;padding:7px 13px;border-radius:14px 14px 14px 4px;box-shadow:0 8px 18px rgba(122,40,70,.1);animation:bdbub 3s ease-in-out infinite}
+@keyframes bdbub{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+.book-deco .bd-right{position:absolute;right:calc(50% - 50vw + max(24px,(100vw - 1360px)/2) + 10px);top:60px;width:150px;height:100%}
+@media (max-width:1599px){.book-deco .bd-right{right:calc(50% - 50vw + max(24px,(100vw - 1200px)/2))}}
+.bd-orb{position:absolute!important;right:auto!important;left:40px!important;top:20px!important;width:54px!important;height:54px!important}
+.bd-candle{position:absolute;left:44px;bottom:230px;width:62px;height:auto;filter:drop-shadow(0 10px 12px rgba(122,40,70,.18))}
+.bd-flame{transform-origin:30px 40px;animation:bdflick 1.6s ease-in-out infinite}
+.bd-glow{animation:bdglow 1.6s ease-in-out infinite}
+@keyframes bdflick{0%,100%{transform:scale(1) rotate(-2deg)}30%{transform:scale(1.06,.94) rotate(3deg)}60%{transform:scale(.95,1.07) rotate(-3deg)}}
+@keyframes bdglow{0%,100%{opacity:.45}50%{opacity:.7}}
+.bd-sp{position:absolute;font-style:normal;color:#e59bd0;animation:bdtw 2.6s ease-in-out infinite}
+.bd-sp.s1{left:8px;top:150px;font-size:18px}.bd-sp.s2{left:110px;top:110px;font-size:14px;animation-delay:.8s}.bd-sp.s3{left:100px;top:300px;font-size:20px;animation-delay:1.5s;color:#c9a7ff}
+@keyframes bdtw{0%,100%{opacity:.25;transform:scale(.8)}50%{opacity:1;transform:scale(1.15)}}
+.book-deco .bd-smk1{width:620px;height:200px;left:calc(50% - 560px);bottom:40px;--c:rgba(199,125,255,.28);--d:20s}
+.book-deco .bd-smk2{width:620px;height:200px;left:calc(50% - 60px);bottom:30px;--c:rgba(242,98,143,.2);--d:24s;--l:-8s}
+#portfolio{overflow:hidden}
+.book-deco{transition:opacity .5s}
+@media (max-width:1749px){.book-wrap.is-open .book-deco>div{opacity:0}.book-deco>div{transition:opacity .5s}}
+@media (prefers-reduced-motion:reduce){.bd-left img,.bd-bubble,.bd-flame,.bd-glow,.bd-sp{animation:none}}
 </style>
 </head>
 <body>
@@ -1465,7 +1506,14 @@ html.has-book .book-wrap{display:block}
       <a href="images/vtuber-pet-mascot-anglercat.webp" class="work"><img src="images/vtuber-pet-mascot-anglercat.webp" srcset="images/s/vtuber-pet-mascot-anglercat.webp 360w, images/t/vtuber-pet-mascot-anglercat.webp 520w, images/vtuber-pet-mascot-anglercat.webp 1000w" sizes="(max-width:700px) 46vw, (max-width:1050px) 31vw, 290px" alt="VTuber pet: fluffy blue cat sitting on a glowing anglerfish" width="1000" height="1000" loading="lazy" decoding="async"><span class="tag">Anglerfish cat · VTuber pet</span></a>
       <a href="images/custom-illustration-calico-cat.webp" class="work"><img src="images/custom-illustration-calico-cat.webp" srcset="images/s/custom-illustration-calico-cat.webp 360w, images/t/custom-illustration-calico-cat.webp 520w, images/custom-illustration-calico-cat.webp 1000w" sizes="(max-width:700px) 46vw, (max-width:1050px) 31vw, 290px" alt="Illustration of a fluffy calico cat in a flower meadow" width="1000" height="1000" loading="lazy" decoding="async"><span class="tag">Calico cat · illustration</span></a>
     </div>
-    <div class="book-wrap" id="bookWrap" aria-label="Featured works book"><div class="book-stage"><div class="book at-start" id="book"></div></div><div class="book-nav"><button type="button" id="bkPrev" aria-label="Previous page">‹</button><span id="bkCount">Cover</span><button type="button" id="bkNext" aria-label="Next page">›</button></div></div>
+    <div class="book-wrap" id="bookWrap" aria-label="Featured works book"><div class="book-deco" aria-hidden="true">
+      <div class="bd-left"><span class="bd-bubble">Turn the page ♡</span><img src="images/loader-chibi.webp" width="123" height="200" alt="" loading="lazy" decoding="async"></div>
+      <div class="bd-right"><span class="orb bd-orb"><i></i><b></b></span>
+        <svg class="bd-candle" viewBox="0 0 60 140"><defs><radialGradient id="bdf" cx=".5" cy=".7" r=".6"><stop offset="0" stop-color="#fff7d6"/><stop offset=".45" stop-color="#ffc46b"/><stop offset="1" stop-color="#ff7aa8" stop-opacity="0"/></radialGradient></defs><ellipse class="bd-glow" cx="30" cy="34" rx="26" ry="30" fill="url(#bdf)" opacity=".55"/><path class="bd-flame" d="M30 12c7 10 9 17 5 24-2 4-8 5-10 1-4-6 1-14 5-25Z" fill="#ffd27a"/><path d="M30 24c3 5 3 9 1 12-1 2-3 2-4 0-1-3 1-7 3-12Z" fill="#fff6d8"/><rect x="27" y="40" width="6" height="7" rx="2" fill="#5a2340"/><rect x="16" y="46" width="28" height="78" rx="6" fill="#e9b8d6"/><path d="M16 60c6 4 10-2 14 3s10 1 14-3v-8H16Z" fill="#f7dcea"/><rect x="21" y="70" width="4" height="40" rx="2" fill="#fff" opacity=".45"/><rect x="10" y="122" width="40" height="10" rx="5" fill="#c23a69"/></svg>
+        <i class="bd-sp s1">✦</i><i class="bd-sp s2">✧</i><i class="bd-sp s3">✦</i></div>
+      <i class="smk bd-smk1"></i><i class="smk bd-smk2"></i>
+    </div>
+    <div class="book-stage"><div class="book at-start" id="book"></div></div><div class="book-nav"><button type="button" id="bkPrev" aria-label="Previous page">‹</button><span id="bkCount">Cover</span><button type="button" id="bkNext" aria-label="Next page">›</button></div></div>
     <div class="sec-more"><a href="/vtuber-portfolio/" class="btn btn-ghost arrow">View full portfolio</a></div>
   </div>
 </section>
@@ -2500,20 +2548,35 @@ $$('.services .card').forEach(c=>{const p=c.querySelector(':scope>.price'),b=c.q
     book.appendChild(leaf);leaves.push(leaf);
   }
   let cur=0;const n=leaves.length,prev=$('#bkPrev'),next=$('#bkNext'),count=$('#bkCount');
-  const draw=()=>{leaves.forEach((l,i)=>{const f=i<cur;l.classList.toggle('flipped',f);l.style.zIndex=f?i+1:n-i;});
+  const draw=()=>{leaves.forEach((l,i)=>{const f=i<cur;l.classList.toggle('flipped',f);l.classList.toggle('next-up',i===cur);l.classList.toggle('prev-up',i===cur-1);l.style.zIndex=f?i+1:n-i;});
     book.classList.toggle('at-start',cur===0);book.classList.toggle('at-end',cur===n);
+    $('#bookWrap').classList.toggle('is-open',cur>0&&cur<n);
     prev.disabled=cur===0;next.disabled=cur===n;
     count.textContent=cur===0?'Cover':cur===n?'The end':'Pages '+(cur*2-1)+'–'+Math.min(cur*2,faces.length-1);};
-  const go=d=>{cur=Math.max(0,Math.min(n,cur+d));draw();};
+  const turn=l=>{if(!l)return;l.classList.remove('turning');void l.offsetWidth;l.classList.add('turning');setTimeout(()=>l.classList.remove('turning'),1000);};
+  const go=d=>{const t=Math.max(0,Math.min(n,cur+d));if(t===cur)return;turn(leaves[d>0?cur:t]);cur=t;draw();};
   prev.onclick=()=>go(-1);next.onclick=()=>go(1);
-  leaves.forEach((l,i)=>l.addEventListener('click',e=>{if(e.target.closest('a,button,video'))return;go(i<cur?-1:1);}));
+  let dragged=false;
+  leaves.forEach((l,i)=>l.addEventListener('click',e=>{if(dragged){e.preventDefault();e.stopPropagation();dragged=false;return;}if(e.target.closest('a,button,video'))return;go(i<cur?-1:1);},true));
+  // drag a page like a real book: grab the right page and pull it left (or the left page and pull it right)
+  let drag=null;
+  book.addEventListener('pointerdown',e=>{if(e.button)return;const leaf=e.target.closest('.leaf');if(!leaf)return;const i=leaves.indexOf(leaf);
+    if(i!==cur&&i!==cur-1)return;if(!e.target.closest('video'))e.preventDefault();drag={leaf,i,x:e.clientX,w:book.getBoundingClientRect().width/2,on:false,a:0};});
+  book.querySelectorAll('a,img').forEach(x=>x.draggable=false);
+  addEventListener('pointercancel',()=>{if(drag){drag.leaf.classList.remove('dragging');drag.leaf.style.transform='';drag=null;draw();}});
+  addEventListener('pointermove',e=>{if(!drag)return;const dx=e.clientX-drag.x;if(!drag.on){if(Math.abs(dx)<8)return;drag.on=true;stop();drag.leaf.classList.add('dragging');drag.leaf.style.zIndex=n+5;}
+    const r=Math.max(0,Math.min(1,(drag.i===cur?-dx:dx)/(drag.w*1.1)));drag.a=r;
+    const deg=drag.i===cur?-180*r:-180+180*r;drag.leaf.style.transform='rotateY('+deg+'deg)';drag.leaf.style.setProperty('--sh',(Math.sin(r*Math.PI)*.45).toFixed(3));});
+  addEventListener('pointerup',()=>{if(!drag)return;const d=drag;drag=null;if(!d.on)return;dragged=true;setTimeout(()=>dragged=false,50);
+    d.leaf.classList.remove('dragging');d.leaf.style.transform='';d.leaf.style.removeProperty('--sh');
+    if(d.a>.35){cur=d.i===cur?cur+1:cur-1;}draw();});
   book.parentNode.addEventListener('keydown',e=>{if(e.key==='ArrowRight')go(1);if(e.key==='ArrowLeft')go(-1);});book.parentNode.tabIndex=0;
   document.documentElement.classList.add('has-book');grid.remove();draw();
-  // turns its own pages while it is on screen (every 3.5 s, then starts again from page 1); stops for good once the visitor turns a page, pauses on hover
+  // turns its own pages while it is on screen (every 3.2 s, then starts again from page 1); stops for good once the visitor turns a page
   let vis=false,hover=false,manual=false,timer=0;
-  const tick=()=>{clearTimeout(timer);if(manual||!vis||document.hidden)return;timer=setTimeout(()=>{if(!hover&&!manual&&vis){if(cur>=n-1){cur=0;draw();setTimeout(()=>go(1),900);}else go(1);}tick();},cur===0?700:3500);};
+  const tick=()=>{clearTimeout(timer);if(manual||!vis||document.hidden)return;timer=setTimeout(()=>{if(!manual&&vis&&!drag){if(cur>=n-1){cur=0;draw();setTimeout(()=>go(1),900);}else go(1);}tick();},cur===0?600:3200);};
   const stop=()=>{manual=true;clearTimeout(timer);};
-  [prev,next].forEach(x=>x.addEventListener('click',stop));book.addEventListener('click',stop);book.parentNode.addEventListener('keydown',stop);
+  [prev,next].forEach(x=>x.addEventListener('click',stop));book.addEventListener('click',e=>{if(!e.target.closest('.work'))stop();});book.parentNode.addEventListener('keydown',stop);
   book.addEventListener('pointerenter',()=>hover=true);book.addEventListener('pointerleave',()=>{hover=false;});
   document.addEventListener('visibilitychange',tick);
   if('IntersectionObserver' in window&&!navigator.webdriver&&!matchMedia('(prefers-reduced-motion:reduce)').matches){new IntersectionObserver(es=>{vis=es[0].isIntersecting;tick();},{threshold:.5}).observe(book.parentNode);}
