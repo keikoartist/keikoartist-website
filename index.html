@@ -1105,7 +1105,6 @@ body.fab-off .fab-order{opacity:0;pointer-events:none}
 body.xmas header:not(.kc-head){border-bottom:0;box-shadow:none}
 body.xmas header:not(.kc-head)::after{content:"";position:absolute;left:0;right:0;bottom:-3px;height:3px;background:repeating-linear-gradient(-45deg,#f2628f 0 8px,#ffe3ec 8px 16px);opacity:.85;pointer-events:none}
 body.xmas header .logo{position:relative}
-body.xmas header .logo::before{content:"";position:absolute;left:-7px;top:-11px;width:30px;height:26px;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 34'%3E%3Cpath d='M4 26 C8 12 18 4 30 6 C34 7 36 12 33 16 C30 12 26 12 24 14 C30 18 34 22 36 26 Z' fill='%23e8476f'/%3E%3Crect x='2' y='24' width='36' height='8' rx='4' fill='%23fff' stroke='%23fbd3e0'/%3E%3Ccircle cx='34' cy='17' r='4.5' fill='%23fff' stroke='%23fbd3e0'/%3E%3C/svg%3E") no-repeat center/contain;transform:rotate(-18deg);pointer-events:none;z-index:2}
 body.xmas .sec-head h2::before{content:"\2744\FE0E"}
 .xmas-snow{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:0}
 .xmas-snow i{position:absolute;top:-12px;width:var(--s);height:var(--s);border-radius:50%;background:var(--c);opacity:.75;animation:xsnow var(--d) linear var(--l) infinite}
@@ -1418,6 +1417,27 @@ html.has-book .book-wrap{display:block}
 /* hero fits one screen on desktop: minimal (no perk row), headline scales with screen height */
 @media (min-width:821px){.hero .perks{display:none!important}.hero h1{font-size:clamp(40px,min(4.6vw,7.4vh),64px)!important}.hero .wrap.hero-grid{padding:40px 0!important}}
 .bk-side{position:relative;z-index:3}
+/* shelf of three books + text pages */
+.bk-shelf{display:flex;justify-content:center;gap:12px;margin:0 0 18px}
+.bk-tab{position:relative;display:inline-flex;align-items:center;gap:9px;border:0;cursor:pointer;font:600 14px Poppins,sans-serif;color:#ffe9f2;padding:11px 18px 11px 14px;border-radius:6px 12px 12px 6px;background:linear-gradient(120deg,#7a2654,#4a1f3a);box-shadow:inset 6px 0 0 rgba(0,0,0,.18),0 6px 14px rgba(74,31,58,.18);opacity:.7;transition:transform .25s,opacity .25s,box-shadow .25s}
+.bk-tab.t2{background:linear-gradient(120deg,#5b3a8c,#36205c)}
+.bk-tab.t3{background:linear-gradient(120deg,#a8456f,#6a2346)}
+.bk-tab i{width:10px;height:10px;border-radius:50%;background:#ffd1e6;box-shadow:0 0 8px #ffb3d0}
+.bk-tab:hover{opacity:1;transform:translateY(-2px)}
+.bk-tab.on{opacity:1;transform:translateY(-4px);box-shadow:inset 6px 0 0 rgba(0,0,0,.18),0 12px 24px rgba(74,31,58,.3)}
+.book[hidden]{display:none}
+.bookWrap-t2 .face.cover{}
+#bookWrap[data-book=order] .face.cover{background:radial-gradient(120% 90% at 30% 20%,#6a45a3 0,#3d2566 55%,#261744 100%)}
+#bookWrap[data-book=terms] .face.cover{background:radial-gradient(120% 90% at 30% 20%,#b5507c 0,#7a2a52 55%,#4a1a33 100%)}
+.face.textpage{justify-content:flex-start;align-items:stretch;padding:34px 34px 20px}
+.face .tp{flex:1;min-height:0;overflow:auto;text-align:left;scrollbar-width:thin}
+.face .tp h4{font-family:"DM Serif Display",serif;font-weight:400;font-size:21px;line-height:1.2;color:var(--ink);margin:0 0 8px}
+.face .tp h4:not(:first-child){margin-top:22px;padding-top:18px;border-top:1px dashed rgba(242,98,143,.3)}
+.face .tp p,.face .tp li{font-size:14px;line-height:1.65;color:var(--muted);margin:0 0 6px}
+.face .tp ul{margin:0;padding-left:18px}
+.face .tp a{color:var(--pink-text);font-weight:600}
+.face.textpage .pg-num{text-align:center}
+@media (min-width:821px){html.has-book #process,html.has-book #faq,html.has-book #tos{display:none}}
 </style>
 </head>
 <body>
@@ -1500,7 +1520,7 @@ html.has-book .book-wrap{display:block}
       <a href="images/vtuber-pet-mascot-anglercat.webp" class="work"><img src="images/vtuber-pet-mascot-anglercat.webp" srcset="images/s/vtuber-pet-mascot-anglercat.webp 360w, images/t/vtuber-pet-mascot-anglercat.webp 520w, images/vtuber-pet-mascot-anglercat.webp 1000w" sizes="(max-width:700px) 46vw, (max-width:1050px) 31vw, 290px" alt="VTuber pet: fluffy blue cat sitting on a glowing anglerfish" width="1000" height="1000" loading="lazy" decoding="async"><span class="tag">Anglerfish cat · VTuber pet</span></a>
       <a href="images/custom-illustration-calico-cat.webp" class="work"><img src="images/custom-illustration-calico-cat.webp" srcset="images/s/custom-illustration-calico-cat.webp 360w, images/t/custom-illustration-calico-cat.webp 520w, images/custom-illustration-calico-cat.webp 1000w" sizes="(max-width:700px) 46vw, (max-width:1050px) 31vw, 290px" alt="Illustration of a fluffy calico cat in a flower meadow" width="1000" height="1000" loading="lazy" decoding="async"><span class="tag">Calico cat · illustration</span></a>
     </div>
-    <div class="book-wrap" id="bookWrap" aria-label="Featured works book"><div class="bk-side bk-l"><a class="bk-mini" href="images/chibi-vtuber-model-witch.webp"><img src="images/t/chibi-vtuber-model-witch.webp" alt="Chibi VTuber witch with pink hair and a big hat" width="520" height="520" loading="lazy" decoding="async"><span>Chibi witch · Chibi VTuber</span></a><a class="bk-mini" href="images/custom-pngtuber-model-cat-mask.webp"><img src="images/t/custom-pngtuber-model-cat-mask.webp" alt="PNGTuber model with a black cat mask" width="520" height="520" loading="lazy" decoding="async"><span>Cat mask · PNGTuber</span></a><a class="bk-mini" href="images/custom-vtuber-pfp-wolf.webp"><img src="images/t/custom-vtuber-pfp-wolf.webp" alt="Profile picture of a silver-haired wolf girl in red" width="520" height="520" loading="lazy" decoding="async"><span>Wolf girl · Custom PFP</span></a></div><div class="bk-mid"><div class="book-stage"><div class="book at-start" id="book"></div></div><div class="book-nav"><button type="button" id="bkPrev" aria-label="Previous page">‹</button><span id="bkCount">Cover</span><button type="button" id="bkNext" aria-label="Next page">›</button></div></div><div class="bk-side bk-r"><a class="bk-mini" href="images/custom-vtuber-model-rocker.webp"><img src="images/t/custom-vtuber-model-rocker.webp" alt="Full-body VTuber model of a silver-haired rocker" width="520" height="520" loading="lazy" decoding="async"><span>Silver-haired rocker · VTuber model</span></a><a class="bk-mini" href="images/custom-twitch-emote-witch.webp"><img src="images/t/custom-twitch-emote-witch.webp" alt="Twitch emote of the pink-haired witch" width="520" height="520" loading="lazy" decoding="async"><span>Witch emote · Emotes</span></a><a class="bk-mini" href="images/vtuber-pet-mascot-snow-leopard.webp"><img src="images/t/vtuber-pet-mascot-snow-leopard.webp" alt="VTuber pet snow leopard mascot" width="520" height="520" loading="lazy" decoding="async"><span>Snow leopard · VTuber pet</span></a></div></div>
+    <div class="book-wrap" id="bookWrap" aria-label="Featured works book"><div class="bk-side bk-l"><a class="bk-mini" href="images/chibi-vtuber-model-witch.webp"><img src="images/t/chibi-vtuber-model-witch.webp" alt="Chibi VTuber witch with pink hair and a big hat" width="520" height="520" loading="lazy" decoding="async"><span>Chibi witch · Chibi VTuber</span></a><a class="bk-mini" href="images/custom-pngtuber-model-cat-mask.webp"><img src="images/t/custom-pngtuber-model-cat-mask.webp" alt="PNGTuber model with a black cat mask" width="520" height="520" loading="lazy" decoding="async"><span>Cat mask · PNGTuber</span></a><a class="bk-mini" href="images/custom-vtuber-pfp-wolf.webp"><img src="images/t/custom-vtuber-pfp-wolf.webp" alt="Profile picture of a silver-haired wolf girl in red" width="520" height="520" loading="lazy" decoding="async"><span>Wolf girl · Custom PFP</span></a></div><div class="bk-mid"><div class="bk-shelf" id="bkShelf" role="toolbar" aria-label="Choose a book"><button type="button" class="bk-tab t1" data-open="works" aria-pressed="true"><i></i>Portfolio</button><button type="button" class="bk-tab t2" data-open="order" aria-pressed="false"><i></i>How to Order</button><button type="button" class="bk-tab t3" data-open="terms" aria-pressed="false"><i></i>TOS &amp; FAQ</button></div><div class="book-stage" id="bookStage"></div><div class="book-nav"><button type="button" id="bkPrev" aria-label="Previous page">‹</button><span id="bkCount">Featured Works</span><button type="button" id="bkNext" aria-label="Next page">›</button></div></div><div class="bk-side bk-r"><a class="bk-mini" href="images/custom-vtuber-model-rocker.webp"><img src="images/t/custom-vtuber-model-rocker.webp" alt="Full-body VTuber model of a silver-haired rocker" width="520" height="520" loading="lazy" decoding="async"><span>Silver-haired rocker · VTuber model</span></a><a class="bk-mini" href="images/custom-twitch-emote-witch.webp"><img src="images/t/custom-twitch-emote-witch.webp" alt="Twitch emote of the pink-haired witch" width="520" height="520" loading="lazy" decoding="async"><span>Witch emote · Emotes</span></a><a class="bk-mini" href="images/vtuber-pet-mascot-snow-leopard.webp"><img src="images/t/vtuber-pet-mascot-snow-leopard.webp" alt="VTuber pet snow leopard mascot" width="520" height="520" loading="lazy" decoding="async"><span>Snow leopard · VTuber pet</span></a></div></div>
     <div class="sec-more"><a href="/vtuber-portfolio/" class="btn btn-ghost arrow">View full portfolio</a></div>
   </div>
 </section>
@@ -2504,57 +2524,93 @@ $$('.services .card').forEach(c=>{const p=c.querySelector(':scope>.price'),b=c.q
   works.forEach((w,k)=>w.addEventListener('click',e=>{e.preventDefault();open(works.map(x=>({src:urlOf(x),cap:x.querySelector('.tag')?.textContent||''})),k,null);}));
 })();
 
-// featured works as a book (pages turn); phones keep the grid. The work items are moved into the pages, so the lightbox and the rigging video keep working.
+// three books on one shelf (screens 760px+; phones keep the normal sections): Portfolio, How to Order, TOS & FAQ.
+// The work items, FAQ answers and terms are taken from the page itself, so the text stays the same in both places.
 (function(){
-  const grid=$('.works.fw'),book=$('#book');if(!grid||!book||innerWidth<760)return;
-  const items=[...grid.children];
+  const grid=$('.works.fw'),stage=$('#bookStage'),shelf=$('#bkShelf');if(!grid||!stage||!shelf||innerWidth<760)return;
+  const prev=$('#bkPrev'),next=$('#bkNext'),count=$('#bkCount');
   const moon='<svg class="cv-moon" viewBox="0 0 64 64" aria-hidden="true"><defs><radialGradient id="cvg" cx=".35" cy=".3"><stop offset="0" stop-color="#fff"/><stop offset=".45" stop-color="#ffd1e6"/><stop offset="1" stop-color="#f2628f"/></radialGradient></defs><path d="M40 6a26 26 0 1 0 18 44A22 22 0 0 1 40 6Z" fill="url(#cvg)"/><path d="M50 10l1.6 3.6L55 15l-3.4 1.4L50 20l-1.6-3.6L45 15l3.4-1.4z" fill="#fff"/></svg>';
-  const faces=['<div class="face-in cover-in">'+moon+'<h3>Featured Works</h3><p>KeikoArts · spellbook</p><span class="cv-hint">Open the book ›</span></div>'];
-  items.forEach((w,i)=>faces.push({el:w,cap:(w.querySelector('.tag')||{}).textContent||'',n:i+1}));
-  faces.push('<div class="face-in"><h3>Your character next?</h3><p>Every piece here was drawn from scratch. Tell me your idea and get your invoice by email.</p><a href="#order" data-order class="btn btn-pink arrow">Start a Project</a><a href="/vtuber-portfolio/" class="btn btn-ghost">Full portfolio</a></div>');
-  if(faces.length%2)faces.push('<div class="face-in">'+moon+'</div>');
-  const leaves=[];
-  for(let i=0;i<faces.length;i+=2){
-    const leaf=document.createElement('div');leaf.className='leaf';
-    [faces[i],faces[i+1]].forEach((f,k)=>{const d=document.createElement('div');d.className='face '+(k?'back':'front');
-      if(typeof f==='string'){d.innerHTML=f;if(i===0&&!k)d.classList.add('cover');else if(i+k===faces.length-1)d.classList.add('cover');else d.classList.add('endpage');}
-      else{const a=document.createElement('div');a.className='pg-art';a.appendChild(f.el);d.appendChild(a);d.insertAdjacentHTML('beforeend','<p class="pg-cap">'+esc(f.cap)+'</p><p class="pg-num">'+f.n+' / '+items.length+'</p>');}
-      leaf.appendChild(d);});
-    book.appendChild(leaf);leaves.push(leaf);
-  }
-  let cur=0;const n=leaves.length,prev=$('#bkPrev'),next=$('#bkNext'),count=$('#bkCount');
-  const draw=()=>{leaves.forEach((l,i)=>{const f=i<cur;l.classList.toggle('flipped',f);l.classList.toggle('next-up',i===cur);l.classList.toggle('prev-up',i===cur-1);l.style.zIndex=f?i+1:n-i;});
-    book.classList.toggle('at-start',cur===0);book.classList.toggle('at-end',cur===n);
+  const cover=(t,sub)=>'<div class="face-in cover-in">'+moon+'<h3>'+t+'</h3><p>'+sub+'</p><span class="cv-hint">Open the book ›</span></div>';
+  const endpg='<div class="face-in"><h3>Your character next?</h3><p>Tell me your idea in the order form and get your invoice by email.</p><a href="#order" data-order class="btn btn-pink arrow">Start a Project</a></div>';
+  const txt=(items)=>({text:items.map(([h,body])=>'<h4>'+h+'</h4>'+body).join('')});
+  // book 1: portfolio
+  const works=[...grid.children];
+  const f1=[cover('Featured Works','KeikoArts · spellbook')];
+  works.forEach((w,i)=>f1.push({el:w,cap:(w.querySelector('.tag')||{}).textContent||'',n:i+1,of:works.length}));
+  f1.push('<div class="face-in"><h3>Your character next?</h3><p>Every piece here was drawn from scratch. Tell me your idea and get your invoice by email.</p><a href="#order" data-order class="btn btn-pink arrow">Start a Project</a><a href="/vtuber-portfolio/" class="btn btn-ghost">Full portfolio</a></div>');
+  // book 2: how to order (same facts as the order form, TOS and FAQ)
+  const f2=[cover('How to Order','Five steps · no account needed'),
+    txt([['1 · Pick a service','<p>Choose a service in <a href="#services">Our Services</a> and press Order now. The form shows every option and your total before you send it.</p>'],['2 · Send the form','<p>Tell me about your character: a description, a character sheet or a few references. Only your email is required to reach you.</p>']]),
+    txt([['3 · Get your invoice','<p>I check your order and email your invoice (PDF), usually within 6 hours (WIB, GMT+7). 13% tax is added on every invoice.</p>'],['4 · Pay with PayPal','<p>Card or PayPal balance, in USD. Pay in full, 50/50, or in 3 parts for orders above $150. Your slot is secured once payment is received.</p>']]),
+    txt([['5 · I make your art','<p>Sketch → lineart → coloring → (rigging). You get progress updates at every stage. Every commission takes 3 weeks at most.</p>'],['6 · Delivery','<p>You get your final files, ready to stream. Questions any time on <a href="https://discord.gg/FbgWxMPjf" target="_blank" rel="noopener">Discord</a>.</p>']]),
+    endpg];
+  // book 3: FAQ + terms
+  const faq=[...document.querySelectorAll('#faq .faq-grid details')].map(d=>[esc(d.querySelector('summary').textContent),d.querySelector('p').outerHTML]);
+  const tos=[...document.querySelectorAll('#tos .tos>div')].map(d=>[esc(d.querySelector('h3').textContent),[...d.children].slice(1).map(x=>x.outerHTML).join('')]);
+  const f3=[cover('TOS &amp; FAQ','Questions · terms · privacy')];
+  for(let i=0;i<faq.length;i+=2)f3.push(txt(faq.slice(i,i+2)));
+  for(let i=0;i<tos.length;i+=2)f3.push(txt(tos.slice(i,i+2)));
+  f3.push(endpg);
+  const defs=[['works','Featured Works',f1],['order','How to Order',f2],['terms','TOS & FAQ',f3]];
+  const books=defs.map(([id,title,faces])=>{
+    if(faces.length%2)faces.push('<div class="face-in">'+moon+'</div>');
+    const el=document.createElement('div');el.className='book at-start';el.dataset.book=id;el.hidden=true;stage.appendChild(el);
+    const leaves=[];
+    for(let i=0;i<faces.length;i+=2){
+      const leaf=document.createElement('div');leaf.className='leaf';
+      [faces[i],faces[i+1]].forEach((f,k)=>{const d=document.createElement('div');d.className='face '+(k?'back':'front');
+        if(typeof f==='string'){d.innerHTML=f;d.classList.add(i===0&&!k||i+k===faces.length-1?'cover':'endpage');}
+        else if(f.text){d.classList.add('textpage');d.innerHTML='<div class="tp">'+f.text+'</div><p class="pg-num">'+(i+k)+' / '+(faces.length-2)+'</p>';}
+        else{const a=document.createElement('div');a.className='pg-art';a.appendChild(f.el);d.appendChild(a);d.insertAdjacentHTML('beforeend','<p class="pg-cap">'+esc(f.cap)+'</p><p class="pg-num">'+f.n+' / '+f.of+'</p>');}
+        leaf.appendChild(d);});
+      el.appendChild(leaf);leaves.push(leaf);
+    }
+    el.querySelectorAll('a,img').forEach(x=>x.draggable=false);
+    return {id,title,el,leaves,n:leaves.length,cur:0,pages:faces.length};
+  });
+  let B=books[0];
+  const draw=()=>{const {leaves,n,cur,el}=B;leaves.forEach((l,i)=>{const f=i<cur;l.classList.toggle('flipped',f);l.classList.toggle('next-up',i===cur);l.classList.toggle('prev-up',i===cur-1);l.style.zIndex=f?i+1:n-i;});
+    el.classList.toggle('at-start',cur===0);el.classList.toggle('at-end',cur===n);
     prev.disabled=cur===0;next.disabled=cur===n;
-    count.textContent=cur===0?'Cover':cur===n?'The end':'Pages '+(cur*2-1)+'–'+Math.min(cur*2,faces.length-1);};
+    count.textContent=cur===0?B.title:cur===n?'The end':'Pages '+(cur*2-1)+'–'+Math.min(cur*2,B.pages-1);};
   const turn=l=>{if(!l)return;l.classList.remove('turning');void l.offsetWidth;l.classList.add('turning');setTimeout(()=>l.classList.remove('turning'),1000);};
-  const go=d=>{const t=Math.max(0,Math.min(n,cur+d));if(t===cur)return;turn(leaves[d>0?cur:t]);cur=t;draw();};
-  prev.onclick=()=>go(-1);next.onclick=()=>go(1);
-  let dragged=false;
-  leaves.forEach((l,i)=>l.addEventListener('click',e=>{if(dragged){e.preventDefault();e.stopPropagation();dragged=false;return;}if(e.target.closest('a,button,video'))return;go(i<cur?-1:1);},true));
-  // drag a page like a real book: grab the right page and pull it left (or the left page and pull it right)
-  let drag=null;
-  book.addEventListener('pointerdown',e=>{if(e.button)return;const leaf=e.target.closest('.leaf');if(!leaf)return;const i=leaves.indexOf(leaf);
-    if(i!==cur&&i!==cur-1)return;if(!e.target.closest('video'))e.preventDefault();drag={leaf,i,x:e.clientX,w:book.getBoundingClientRect().width/2,on:false,a:0};});
-  book.querySelectorAll('a,img').forEach(x=>x.draggable=false);
+  const go=d=>{const t=Math.max(0,Math.min(B.n,B.cur+d));if(t===B.cur)return;turn(B.leaves[d>0?B.cur:t]);B.cur=t;draw();};
+  const tabs=[...shelf.querySelectorAll('[data-open]')];
+  const show=(id,page)=>{const nb=books.find(x=>x.id===id)||books[0];
+    if(nb!==B){B.el.hidden=true;B=nb;}B.el.hidden=false;
+    tabs.forEach(t=>{const on=t.dataset.open===B.id;t.classList.toggle('on',on);t.setAttribute('aria-pressed',on);});
+    $('#bookWrap').dataset.book=B.id;
+    if(page!=null){B.cur=Math.max(0,Math.min(B.n,page));}draw();};
+  tabs.forEach(t=>t.addEventListener('click',()=>{stop();const was=B.id===t.dataset.open;show(t.dataset.open);if(!was&&B.cur===0)setTimeout(()=>go(1),350);}));
+  prev.onclick=()=>{stop();go(-1);};next.onclick=()=>{stop();go(1);};
+  let dragged=false,drag=null;
+  books.forEach(bk=>{
+    bk.leaves.forEach((l,i)=>l.addEventListener('click',e=>{if(dragged){e.preventDefault();e.stopPropagation();dragged=false;return;}if(e.target.closest('a,button,video,.tp'))return;stop();go(i<B.cur?-1:1);},true));
+    bk.el.addEventListener('pointerdown',e=>{if(e.button||e.target.closest('.tp a'))return;const leaf=e.target.closest('.leaf');if(!leaf)return;const i=B.leaves.indexOf(leaf);
+      if(i!==B.cur&&i!==B.cur-1)return;if(!e.target.closest('video,.tp'))e.preventDefault();drag={leaf,i,x:e.clientX,w:B.el.getBoundingClientRect().width/2,on:false,a:0};});
+  });
   addEventListener('pointercancel',()=>{if(drag){drag.leaf.classList.remove('dragging');drag.leaf.style.transform='';drag=null;draw();}});
-  addEventListener('pointermove',e=>{if(!drag)return;const dx=e.clientX-drag.x;if(!drag.on){if(Math.abs(dx)<8)return;drag.on=true;stop();drag.leaf.classList.add('dragging');drag.leaf.style.zIndex=n+5;}
-    const r=Math.max(0,Math.min(1,(drag.i===cur?-dx:dx)/(drag.w*1.1)));drag.a=r;
-    const deg=drag.i===cur?-180*r:-180+180*r;drag.leaf.style.transform='rotateY('+deg+'deg)';drag.leaf.style.setProperty('--sh',(Math.sin(r*Math.PI)*.45).toFixed(3));});
+  addEventListener('pointermove',e=>{if(!drag)return;const dx=e.clientX-drag.x;if(!drag.on){if(Math.abs(dx)<8)return;drag.on=true;stop();drag.leaf.classList.add('dragging');drag.leaf.style.zIndex=B.n+5;}
+    const r=Math.max(0,Math.min(1,(drag.i===B.cur?-dx:dx)/(drag.w*1.1)));drag.a=r;
+    drag.leaf.style.transform='rotateY('+(drag.i===B.cur?-180*r:-180+180*r)+'deg)';drag.leaf.style.setProperty('--sh',(Math.sin(r*Math.PI)*.45).toFixed(3));});
   addEventListener('pointerup',()=>{if(!drag)return;const d=drag;drag=null;if(!d.on)return;dragged=true;setTimeout(()=>dragged=false,50);
     d.leaf.classList.remove('dragging');d.leaf.style.transform='';d.leaf.style.removeProperty('--sh');
-    if(d.a>.35){cur=d.i===cur?cur+1:cur-1;}draw();});
-  book.parentNode.addEventListener('keydown',e=>{if(e.key==='ArrowRight')go(1);if(e.key==='ArrowLeft')go(-1);});book.parentNode.tabIndex=0;
-  document.documentElement.classList.add('has-book');grid.remove();draw();
+    if(d.a>.35){B.cur=d.i===B.cur?B.cur+1:B.cur-1;}draw();});
+  stage.addEventListener('keydown',e=>{if(e.key==='ArrowRight'){stop();go(1);}if(e.key==='ArrowLeft'){stop();go(-1);}});stage.tabIndex=0;
+  document.documentElement.classList.add('has-book');grid.remove();show('works');
   [...document.querySelectorAll('.bk-mini')].forEach((m,k,all)=>m.addEventListener('click',e=>{e.preventDefault();if(window.openLB)openLB(all.map(x=>({src:x.getAttribute('href'),cap:x.querySelector('span').textContent})),k,null);}));
-  // turns its own pages while it is on screen (every 3.2 s, then starts again from page 1); stops for good once the visitor turns a page
-  let vis=false,hover=false,manual=false,timer=0;
-  const tick=()=>{clearTimeout(timer);if(manual||!vis||document.hidden)return;timer=setTimeout(()=>{if(!manual&&vis&&!drag){if(cur>=n-1){cur=0;draw();setTimeout(()=>go(1),900);}else go(1);}tick();},cur===0?600:3200);};
-  const stop=()=>{manual=true;clearTimeout(timer);};
-  [prev,next].forEach(x=>x.addEventListener('click',stop));book.addEventListener('click',e=>{if(!e.target.closest('.work'))stop();});book.parentNode.addEventListener('keydown',stop);
-  book.addEventListener('pointerenter',()=>hover=true);book.addEventListener('pointerleave',()=>{hover=false;});
+  // links to How it works / FAQ / TOS / Privacy open the matching book
+  const fp=Math.ceil(faq.length/2),pg=face=>Math.ceil(face/2);   // face number → spread
+  const target={'#process':['order',1],'#faq':['terms',1],'#tos':['terms',pg(1+fp)],'#privacy':['terms',pg(fp+Math.ceil(tos.length/2))]};
+  document.addEventListener('click',e=>{const a=e.target.closest('a[href^="#"]');if(!a)return;const t=target[a.getAttribute('href')];if(!t)return;
+    e.preventDefault();stop();show(t[0],t[1]);setTimeout(()=>$('#portfolio').scrollIntoView({behavior:'smooth',block:'start'}),a.hasAttribute('data-close')?120:0);},true);
+  if(target[location.hash])setTimeout(()=>{show(...target[location.hash]);$('#portfolio').scrollIntoView();},300);
+  // the portfolio book turns its own pages while it is on screen; stops for good once the visitor uses any book
+  let vis=false,manual=false,timer=0;
+  const tick=()=>{clearTimeout(timer);if(manual||!vis||document.hidden||B.id!=='works')return;timer=setTimeout(()=>{if(!manual&&vis&&!drag&&B.id==='works'){if(B.cur>=B.n-1){B.cur=0;draw();setTimeout(()=>go(1),900);}else go(1);}tick();},B.cur===0?600:3200);};
+  function stop(){manual=true;clearTimeout(timer);}
   document.addEventListener('visibilitychange',tick);
-  if('IntersectionObserver' in window&&!navigator.webdriver&&!matchMedia('(prefers-reduced-motion:reduce)').matches){new IntersectionObserver(es=>{vis=es[0].isIntersecting;tick();},{threshold:.5}).observe(book.parentNode);}
+  if('IntersectionObserver' in window&&!navigator.webdriver&&!matchMedia('(prefers-reduced-motion:reduce)').matches){new IntersectionObserver(es=>{vis=es[0].isIntersecting;tick();},{threshold:.5}).observe(stage);}
 })();
 // service detail modal
 (function(){
