@@ -1628,7 +1628,9 @@ body.xmas header:not(.kc-head)::after{background:linear-gradient(90deg,#f2628f,#
 .db-card .btn{margin-top:auto;justify-content:center}
 .db-dc{display:inline-flex;align-items:center;gap:8px}
 .db-note{color:var(--muted);font-size:13px;text-align:center}
-@media (max-width:900px){.db-grid{grid-template-columns:1fr}}
+@media (max-width:900px){.db-grid{grid-template-columns:minmax(0,1fr)}}
+.db-card{min-width:0}.db-date input{width:100%;min-width:0;max-width:100%;box-sizing:border-box;-webkit-appearance:none;appearance:none}
+@media (max-width:360px){.db-card{padding:16px}}
 </style>
 </head>
 <body>
