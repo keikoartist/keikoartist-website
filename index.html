@@ -1146,7 +1146,7 @@ body:has(.gift-win) .fab-order,body:has(.gift-win) .gift-count{display:none}
 .wh-svg{width:100%;height:100%;display:block}
 .wh-pin{position:absolute;left:50%;top:-10px;transform:translateX(-50%);width:0;height:0;border-left:13px solid transparent;border-right:13px solid transparent;border-top:24px solid #c23a69;z-index:2;filter:drop-shadow(0 2px 3px rgba(122,40,70,.3))}
 .gift-win .wh-go:disabled{opacity:.6}
-.gift-hunt .gh-s,.slot-badge .gh-s{display:none}
+.gift-hunt .gh-l{display:none}.gift-hunt .gh-s{display:inline}.slot-badge .gh-s{display:none}
 .hero-top .eyebrow{flex-basis:100%}
 @media (max-width:820px){.gift-hunt .gh-l,.slot-badge .gh-l{display:none}.gift-hunt .gh-s,.slot-badge .gh-s{display:inline}}
 .gw-code{color:var(--pink-text);letter-spacing:.08em;font-size:18px}
@@ -1172,6 +1172,18 @@ html.rv-on .rv.in{opacity:1;transform:none}
 .works .work img{transition:transform .45s ease}
 @media (hover:hover){.works .work:hover img{transform:scale(1.04)}}
 @media (prefers-reduced-motion:reduce){html.rv-on .rv{opacity:1;transform:none;transition:none}.hero-art img,.hero .btns .btn-pink::after{animation:none}.works .work:hover img{transform:none}}
+
+/* commission status: two-tone pill with a "live" dot */
+.slot-badge.sb-split{padding:0!important;gap:0;overflow:hidden;border:1px solid #bfe8cf;background:#fff;box-shadow:0 4px 12px rgba(23,112,61,.10)}
+.slot-badge.sb-split::before{display:none}
+.sb-main{display:inline-flex;align-items:center;gap:8px;padding:5px 12px 5px 10px;background:linear-gradient(135deg,#e7f8ee,#d3f3e0);color:#17703d;font-weight:700;letter-spacing:.01em}
+.sb-dot{position:relative;width:8px;height:8px;border-radius:50%;background:#22b35e;flex:none}
+.sb-dot::after{content:"";position:absolute;inset:-4px;border-radius:50%;border:2px solid #22b35e;opacity:0;animation:sbping 2s ease-out infinite}
+@keyframes sbping{0%{transform:scale(.5);opacity:.7}100%{transform:scale(1.6);opacity:0}}
+.sb-xmas{display:inline-flex;align-items:center;padding:5px 12px;background:#fff4f8;color:var(--pink-text);font-weight:600;border-left:1px dashed #f4b9cc}
+@media (prefers-reduced-motion:reduce){.sb-dot::after{animation:none}}
+.slot-badge .gh-s{display:none}
+@media (max-width:820px){.slot-badge .gh-l{display:none}.slot-badge .gh-s{display:inline}.sb-main,.sb-xmas{padding:5px 10px}}
 </style>
 </head>
 <body>
@@ -2556,7 +2568,9 @@ document.addEventListener('click',e=>{const a=e.target.closest('.menu-chat');if(
   },{passive:true});})();
 (function(){const b=$('#slotBadge');if(b&&typeof SLOTS!=='undefined'){b.textContent=SLOTS.text;b.className='slot-badge '+(SLOTS.open?'open':'closed');
   const xm=typeof SEASON!=='undefined'&&SEASON.christmas&&SEASON.orderBy&&SLOTS.open&&new Date()<new Date(SEASON.until)&&new Date()<=new Date(SEASON.orderBy+'T23:59:59+07:00');
-  if(xm){const d=new Date(SEASON.orderBy+'T12:00:00+07:00').toLocaleDateString('en-GB',{day:'numeric',month:'short'});b.innerHTML='<span class="gh-l">'+SLOTS.text+' · 🎄 order by '+d+'</span><span class="gh-s">Open · 🎄 by '+d+'</span>';b.title='Order by '+d+' for delivery before Christmas';}}})();
+  const st=SLOTS.open?'<span class="sb-main"><i class="sb-dot" aria-hidden="true"></i><span class="gh-l">'+SLOTS.text+'</span><span class="gh-s">Open</span></span>':'';
+  if(st){b.innerHTML=st;b.classList.add('sb-split');}
+  if(xm){const d=new Date(SEASON.orderBy+'T12:00:00+07:00').toLocaleDateString('en-GB',{day:'numeric',month:'short'});b.insertAdjacentHTML('beforeend','<span class="sb-xmas"><span class="gh-l">🎄 order by '+d+'</span><span class="gh-s">🎄 by '+d+'</span></span>');b.title='Order by '+d+' for delivery before Christmas';}}})();
 (function(){const t=[...document.querySelectorAll('#start,footer')];if(!t.length||!('IntersectionObserver' in window))return;const on=new Set();const io=new IntersectionObserver(es=>{es.forEach(e=>e.isIntersecting?on.add(e.target):on.delete(e.target));document.body.classList.toggle('fab-off',on.size>0);});t.forEach(x=>io.observe(x));})();
 (function(){const hb=document.querySelector('.hero .btns');if(!hb||!('IntersectionObserver' in window)){document.body.classList.add('past-hero');return;}
   new IntersectionObserver(es=>es.forEach(e=>document.body.classList.toggle('past-hero',!e.isIntersecting&&e.boundingClientRect.top<0))).observe(hb);})();
