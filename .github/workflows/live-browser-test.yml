@@ -38,15 +38,18 @@ jobs:
 
   browsers:
     runs-on: ubuntu-24.04
-    timeout-minutes: 45
+    timeout-minutes: 30
+    # Microsoft's Playwright image already has Chromium, WebKit and Firefox with their system libraries,
+    # so nothing is downloaded from Ubuntu's mirrors (that install used to hang and fail the check).
+    container:
+      image: mcr.microsoft.com/playwright/python:v1.48.0-noble
+      options: --ipc=host
     steps:
-      - uses: actions/setup-python@v6
-        with: { python-version: '3.12' }
-      - name: Install Playwright
-        timeout-minutes: 12
+      - name: Playwright ready
+        timeout-minutes: 5
         run: |
-          pip install -q playwright > pip.log 2>&1 || { echo "::error::pip: $(tail -c 400 pip.log | tr '\n' ' ')"; exit 1; }
-          ok=0; for t in 1 2; do if timeout 300 python -m playwright install --with-deps chromium webkit firefox > pw.log 2>&1; then ok=1; break; fi; echo "::warning::playwright install try $t failed or timed out, retrying"; done; [ $ok = 1 ] || { echo "::error::playwright: $(tail -c 600 pw.log | tr '\n' ' ')"; exit 1; }
+          python3 -c "import playwright" 2>/dev/null || pip install -q playwright==1.48.0
+          python3 -c "import playwright; print('playwright ok')"
       - name: Order flows on keikoartist.com
         run: |
           cat > t.py <<'PY'
@@ -122,7 +125,7 @@ jobs:
           if PROBLEMS:
               open('problems.txt','w').write('\n'.join(PROBLEMS)); raise SystemExit(1)
           PY
-          python t.py
+          python3 t.py
 
   notify:
     if: always() && github.event_name == 'schedule'
