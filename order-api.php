@@ -50,7 +50,7 @@ function fail(int $code, string $msg): void {
   jout($code, ['error' => $msg]);
 }
 
-if ($_SERVER['REQUEST_METHOD'] !== 'POST' && !in_array($_GET['a'] ?? '', ['pdf', 'pay', 'track'], true)) fail(405, 'POST only');   // GET only for the invoice PDF, pay and tracking links
+if ($_SERVER['REQUEST_METHOD'] !== 'POST' && !in_array($_GET['a'] ?? '', ['pdf', 'pay', 'track', 'cartget', 'cartremind'], true)) fail(405, 'POST only');   // GET only for the invoice PDF, pay and tracking links
 $hostHdr = strtolower($_SERVER['HTTP_HOST'] ?? '');
 $host = preg_replace('/:\d+$/', '', $hostHdr);
 $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
@@ -85,6 +85,7 @@ function db(): PDO {
   foreach (['approved' => 'INTEGER DEFAULT 0', 'paid' => 'REAL DEFAULT 0', 'view_key' => 'TEXT', 'files_removed' => 'INTEGER DEFAULT 0', 'lines' => 'TEXT', 'stage' => "TEXT DEFAULT ''", 'stage_note' => "TEXT DEFAULT ''", 'stage_at' => 'INTEGER DEFAULT 0'] as $c => $t) if (!in_array($c, $cols, true)) $pdo->exec("ALTER TABLE orders ADD COLUMN $c $t");
   $pdo->exec('CREATE TABLE IF NOT EXISTS payments(txn_id TEXT PRIMARY KEY, order_id TEXT, amount REAL, currency TEXT, payer TEXT, status TEXT, created INTEGER)');
   $pdo->exec('CREATE INDEX IF NOT EXISTS idx_pay_order ON payments(order_id)');
+  $pdo->exec('CREATE TABLE IF NOT EXISTS carts(token TEXT PRIMARY KEY, email TEXT, items TEXT, total REAL, created INTEGER, reminded INTEGER DEFAULT 0, done INTEGER DEFAULT 0)');
   $pdo->exec('CREATE TABLE IF NOT EXISTS ipn_log(id INTEGER PRIMARY KEY AUTOINCREMENT, created INTEGER, ok INTEGER, note TEXT)');
   return $pdo;
 }
@@ -465,6 +466,79 @@ if (($_GET['a'] ?? '') === 'status') {
 }
 
 
+/* =================== public: "Email me my cart" (like Etsy): the cart by email now + one reminder a day later =================== */
+function cart_mail_html(array $c, string $site, bool $reminder): array {
+  $items = json_decode((string)$c['items'], true) ?: []; $url = $site . '?cart=' . $c['token'];
+  $rows = ''; $txt = '';
+  foreach ($items as $it) {
+    $rows .= '<tr><td style="padding:6px 16px 6px 0"><b>' . h((string)$it['svc']) . '</b><br><span style="color:#a8607a;font-size:13px">' . h(implode(' · ', array_map(function ($l) { return preg_replace('/^\+ /', '', (string)$l[0]); }, $it['lines']))) . '</span></td><td align="right" valign="top" style="padding:6px 0">' . money2((float)$it['sub']) . '</td></tr>';
+    $txt .= '- ' . $it['svc'] . ': ' . money2((float)$it['sub']) . "\n";
+  }
+  $sub = round((float)$c['total'] / (1 + TAX_RATE), 2);
+  $head = $reminder ? 'Still thinking about your commission? ♡' : 'Here is your KeikoArts cart ♡';
+  $intro = $reminder ? 'Your cart is saved. Slots are limited, and every commission is done within 3 weeks.' : 'You asked for your cart by email. Open it any time to check out, on any device.';
+  $html = '<div style="font-family:Arial,sans-serif;color:#7a2846;font-size:14px;line-height:1.55"><h2 style="color:#f2628f;margin:0 0 8px">' . $head . '</h2><p>' . $intro . '</p>'
+        . '<table cellspacing="0" style="border-collapse:collapse;font-size:14px;min-width:280px">' . $rows
+        . '<tr><td style="padding:8px 16px 4px 0;border-top:1px solid #fbd3e0">Subtotal + 13% tax</td><td align="right" style="border-top:1px solid #fbd3e0;padding-top:8px"><b>' . money2((float)$c['total']) . '</b></td></tr></table>'
+        . '<p style="margin:18px 0"><a href="' . h($url) . '" style="display:inline-block;background:#c93a6a;color:#fff;font-weight:bold;text-decoration:none;padding:12px 22px;border-radius:999px">Open my cart</a></p>'
+        . '<p>Questions first? Reply to this email or message me on Discord: <a href="' . DISCORD_USER . '">' . DISCORD_USER . '</a></p>'
+        . '<p style="color:#a8607a;font-size:12px">' . ($reminder ? 'This was the only reminder. Your email is deleted after 14 days.' : 'I send one reminder tomorrow, nothing else. Your email is deleted after 14 days.') . '</p><p>— Keiko, KeikoArts</p></div>';
+  $text = "$head\n\n$intro\n\n{$txt}Total incl. 13% tax: " . money2((float)$c['total']) . "\n\nOpen my cart: $url\n\nQuestions? Reply to this email or message me on Discord: " . DISCORD_USER . "\n\n" . ($reminder ? 'This was the only reminder.' : 'I send one reminder tomorrow, nothing else.') . " Your email is deleted after 14 days.\n\n— Keiko, KeikoArts";
+  return [$reminder ? 'Your KeikoArts cart is waiting ♡' : 'Your KeikoArts cart', $html, $text];
+}
+if (($_GET['a'] ?? '') === 'cartsave') {
+  rate_limit('cartsave:' . client_ip(), 6, 3600);
+  $in = json_decode((string)file_get_contents('php://input', false, null, 0, 40000), true);
+  if (!is_array($in)) fail(400, 'bad request');
+  $email = trim((string)($in['email'] ?? ''));
+  if (!filter_var($email, FILTER_VALIDATE_EMAIL) || strlen($email) > 120) fail(400, 'Please check your email address.');
+  $P = json_decode((string)@file_get_contents(__DIR__ . '/prices.json'), true) ?: [];
+  $items = []; $total = 0.0;
+  foreach (array_slice(is_array($in['items'] ?? null) ? $in['items'] : [], 0, 6) as $it) {
+    if (!is_array($it) || !isset($P[(string)($it['svc'] ?? '')]) || !is_array($it['lines'] ?? null)) continue;
+    $lines = []; $sub = 0.0;
+    foreach (array_slice($it['lines'], 0, 12) as $l) if (is_array($l) && count($l) >= 2 && is_string($l[0]) && is_numeric($l[1])) { $a = round(min(100000, max(0, (float)$l[1])), 2); $lines[] = [clean($l[0], 120), $a]; $sub += $a; }
+    if (!$lines) continue;
+    $items[] = ['svc' => (string)$it['svc'], 'lines' => $lines, 'sub' => round($sub, 2), 'details' => clean((string)($it['details'] ?? ''), 1500), 'sel' => array_slice(array_values(array_filter((array)($it['sel'] ?? []), 'is_string')), 0, 30), 'aq' => is_array($it['aq'] ?? null) ? array_slice($it['aq'], 0, 10) : [], 'qty' => (int)($it['qty'] ?? 1), 'pkg' => clean((string)($it['pkg'] ?? ''), 120), 'addons' => clean((string)($it['addons'] ?? ''), 300)];
+    $total += $sub;
+  }
+  if (!$items) fail(400, 'Your cart is empty.');
+  $total = round($total * (1 + TAX_RATE), 2);
+  $db = db();
+  $st = $db->prepare('SELECT COUNT(*) FROM carts WHERE email = ? AND created > ?'); $st->execute([$email, time() - 86400]);
+  if ((int)$st->fetchColumn() >= 3) fail(429, 'Your cart was already sent to this email today. Please check your inbox (and Spam).');
+  $c = ['token' => bin2hex(random_bytes(12)), 'email' => $email, 'items' => json_encode($items, JSON_UNESCAPED_UNICODE), 'total' => $total];
+  $db->prepare('INSERT INTO carts(token, email, items, total, created) VALUES(?,?,?,?,?)')->execute([$c['token'], $email, $c['items'], $total, time()]);
+  [$subj, $html, $text] = cart_mail_html($c, $SITE, false);
+  $sent = send_mail($email, $subj, $html, $text, OWNER_EMAIL);
+  $hook = discord_hook($cfg);
+  if ($hook) after_response(function () use ($hook, $items, $total, $email) {
+    discord_post($hook, ['username' => 'KeikoArts Orders', 'allowed_mentions' => ['parse' => []], 'embeds' => [[
+      'title' => '🛒 Cart saved (not ordered yet) · ' . money2($total), 'color' => 0xB57BD9,
+      'description' => implode("\n", array_map(function ($i) { return '• ' . $i['svc'] . ' — ' . money2($i['sub']); }, $items)),
+      'fields' => [['name' => 'Email', 'value' => $email, 'inline' => true]], 'footer' => ['text' => 'They get the cart by email now and one reminder tomorrow']]]]);
+  });
+  jout(200, ['sent' => $sent]);
+}
+if (($_GET['a'] ?? '') === 'cartget') {   // the "Open my cart" link puts the saved cart back on any device
+  rate_limit('cartget:' . client_ip(), 60, 3600);
+  $t = (string)($_GET['t'] ?? ''); if (!preg_match('/^[a-f0-9]{24}$/', $t)) fail(404, 'not found');
+  $st = db()->prepare('SELECT items FROM carts WHERE token = ?'); $st->execute([$t]); $r = $st->fetch();
+  if (!$r) fail(404, 'This cart link has expired.');
+  jout(200, ['items' => json_decode((string)$r['items'], true) ?: []]);
+}
+if (($_GET['a'] ?? '') === 'cartremind') {   // run every 15 minutes by chat-reminders.yml: one reminder 24 h after saving, unless they ordered
+  $db = db(); $now = time(); $n = 0;
+  $db->prepare('DELETE FROM carts WHERE created < ?')->execute([$now - 14 * 86400]);
+  $st = $db->prepare('SELECT * FROM carts WHERE reminded = 0 AND done = 0 AND created < ? AND created > ? LIMIT 10'); $st->execute([$now - 86400, $now - 3 * 86400]);
+  foreach ($st->fetchAll() as $c) {
+    $db->prepare('UPDATE carts SET reminded = 1 WHERE token = ?')->execute([$c['token']]);
+    [$subj, $html, $text] = cart_mail_html($c, $SITE, true);
+    if (send_mail((string)$c['email'], $subj, $html, $text, OWNER_EMAIL)) $n++;
+  }
+  jout(200, ['reminded' => $n]);
+}
+
 /* =================== public: the client follows their order (like VGen's progress view) =================== */
 if (($_GET['a'] ?? '') === 'track') {
   rate_limit('track:' . client_ip(), 120, 3600);
@@ -630,6 +704,7 @@ if (($_GET['a'] ?? '') === 'submit') {
         'service' => $service, 'package' => $fields['Package'] ?? '', 'plan' => $plan, 'price' => $price, 'tax' => $tax,
         'total' => $total, 'due' => $due, 'fields' => json_encode($fields, JSON_UNESCAPED_UNICODE), 'files' => json_encode($files)];
   $now = time(); $vkey = bin2hex(random_bytes(8));
+  if ($email !== '') { try { $db->prepare('UPDATE carts SET done = 1 WHERE email = ?')->execute([$email]); } catch (Throwable $e) {} }   // they ordered: no cart reminder
   $db->prepare('INSERT INTO orders(id,kind,status,name,email,discord,service,package,plan,price,tax,total,due,fields,files,created,updated,paid,view_key,lines)
                 VALUES(?,?,\'new\',?,?,?,?,?,?,?,?,?,?,?,?,?,?,0,?,?)')
      ->execute([$id, $kind, $name, $email, $o['discord'], $service, $o['package'], $plan, $price, $tax, $total, $due, $o['fields'], $o['files'], $now, $now, $vkey, json_encode($lines, JSON_UNESCAPED_UNICODE)]);

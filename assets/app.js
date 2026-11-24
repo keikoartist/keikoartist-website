@@ -135,7 +135,7 @@ function cartUI(){
 }
 function renderCart(){
   const c=readCart(),sm=cartSum(c);
-  $('#cartEmpty').hidden=!!c.length;$('#cartFoot').hidden=!c.length;$('#cartCheckout').hidden=!c.length;$('#cartClear').hidden=!c.length;$('#cartClear').classList.remove('sure');$('#cartClear span').textContent='Clear cart';
+  $('#cartEmpty').hidden=!!c.length;$('#cartFoot').hidden=!c.length;$('#cartSave').hidden=!c.length;$('#cartCheckout').hidden=!c.length;$('#cartClear').hidden=!c.length;$('#cartClear').classList.remove('sure');$('#cartClear span').textContent='Clear cart';
   $('#cartList').innerHTML=c.map(x=>{const opts=x.lines.map(l=>l[0].replace(/^\+ /,'')).join(' · ').replace(x.svc+' · ','');
     return `<li class="ci"><span class="ci-th" style="background-image:url('${svcThumb(x.svc)}')"></span><div class="ci-t"><b>${esc(x.svc)}</b><small>${esc(opts)}</small>${x.details?`<em>“${esc(x.details)}”</em>`:''}<button type="button" class="ci-save" data-sv="${esc(x.id)}">Save for later</button></div><b class="ci-p">${money2(x.sub)}</b><div class="ci-a"><button type="button" class="ci-x ci-ed" data-ed="${esc(x.id)}" aria-label="Edit ${esc(x.svc)}" title="Edit"><svg class="ic" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9a2.1 2.1 0 0 0-3-3L5 17v3Z"/><path d="m14.5 7.5 3 3"/></svg></button><button type="button" class="ci-x" data-rm="${esc(x.id)}" aria-label="Remove ${esc(x.svc)}" title="Remove">✕</button></div></li>`;}).join('');
   const sv=readSaved();$('#savedBox').hidden=!sv.length;
@@ -379,6 +379,24 @@ function go(n){
 $('#prevBtn').onclick=()=>{const back=CART_MODE||EDIT_ID?3:1;EDIT_ID=null;go(back);};
 $('#addCartBtn').onclick=addToCart;$('#navCart').onclick=openCart;$('#cmGo').onclick=()=>go(3);
 $('#cartMore').onclick=()=>go(1);
+// "Email me my cart": the cart by email now + one reminder tomorrow (order-api.php cartsave)
+$('#cartMail').onclick=async()=>{
+  const em=$('#cartEmail').value.trim(),msg=$('#cartMailMsg'),b=$('#cartMail');
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em)){msg.textContent='Please check your email address.';$('#cartEmail').focus();return;}
+  if(/[?&]dryrun=1/.test(location.search)||!LIVE_SITE){msg.textContent='Test mode: nothing was sent.';return;}
+  b.disabled=true;b.textContent='Sending…';
+  try{const r=await fetch('order-api.php?a=cartsave',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:em,items:readCart()})});const j=await r.json().catch(()=>({}));
+    msg.textContent=r.ok&&j.ok?'Sent! Check your inbox (and Spam). Your cart also stays on this device.':(j.error||'Sorry, that did not work. Please try again.');}
+  catch(_){msg.textContent='Sorry, that did not work. Please try again.';}
+  b.disabled=false;b.textContent='Email me my cart';
+};
+// "Open my cart" link from the email: put the saved cart back on this device
+(function(){const t=(location.search.match(/[?&]cart=([a-f0-9]{24})/)||[])[1];if(!t)return;
+  const q=new URLSearchParams(location.search);q.delete('cart');history.replaceState(null,'',location.pathname+(q.toString()?'?'+q:'')+location.hash);
+  fetch('order-api.php?a=cartget&t='+t).then(r=>r.json()).then(j=>{if(!j||!j.ok||!Array.isArray(j.items))return;
+    const have=readCart(),ids=new Set(have.map(x=>x.svc+'|'+JSON.stringify(x.lines)));
+    const add=j.items.filter(x=>SERVICES[x.svc]&&!ids.has(x.svc+'|'+JSON.stringify(x.lines))).map(x=>Object.assign({},x,{id:Date.now().toString(36)+Math.random().toString(36).slice(2,5),t:Date.now()}));
+    writeCart([...have,...add].slice(0,CART_MAX));openCart();}).catch(()=>{});})();
 $('#cartClear').onclick=()=>{const b=$('#cartClear');if(!b.classList.contains('sure')){b.classList.add('sure');b.querySelector('span').textContent='Tap again to remove all';setTimeout(()=>{if(b.classList.contains('sure')){b.classList.remove('sure');b.querySelector('span').textContent='Clear cart';}},4000);return;}writeCart([]);renderCart();};$('#cartCheckout').onclick=openCheckout;
 $('#cartView').addEventListener('click',e=>{
   const sv=e.target.closest('[data-sv]'),mv=e.target.closest('[data-mv]'),sr=e.target.closest('[data-srm]');
@@ -732,9 +750,9 @@ $$('.services .card').forEach(c=>{const p=c.querySelector(':scope>.price'),b=c.q
   const t=$('#vtTrack');if(!VTUBERS.length){$('#clients').hidden=true;return;}
   const item=v=>{const inner=`<img src="images/${v.img}.webp" alt="${esc(v.name||'Original VTuber character by KeikoArts')}" loading="lazy">${v.name?`<span>${esc(v.name)}</span>`:''}`;
     return v.link&&/^https:\/\//.test(v.link)?`<a class="vt" href="${esc(v.link)}" target="_blank" rel="noopener">${inner}</a>`:`<div class="vt">${inner}</div>`;};
-  const one=VTUBERS.map(item).join('');
+  const set=VTUBERS.map(item).join(''),one=set.repeat(Math.max(1,Math.ceil(2600/(VTUBERS.length*170))));   // repeated so even very wide screens never show an empty gap
   t.innerHTML=one+`<span aria-hidden="true" class="vt-dup">${one}</span>`;
-  t.style.setProperty('--dur',Math.max(20,VTUBERS.length*5)+'s');
+  t.style.setProperty('--dur',Math.max(20,VTUBERS.length*5)*Math.max(1,Math.ceil(2600/(VTUBERS.length*170)))+'s');
 })();
 
 // performance: lazy-load gallery images, play video only when visible
