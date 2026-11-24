@@ -125,11 +125,13 @@ SHOWCASES = [('hoodie', 'Long-haired boy in a hoodie · Live2D model', 'Live2D m
 VIDEOS = [  # for VideoObject structured data and the video sitemap (Google video results)
     ('live2d-rigging-showcase', 'Live2D rigging showcase', 'Live2D rigging by KeikoArts: head turns, blinking and hair physics on a white-haired VTuber model.', 'PT11S', '2026-11-21'),
     ('live2d-model-showcase-hoodie', 'Live2D VTuber model: long-haired boy in a hoodie', 'Moving Live2D VTuber model by KeikoArts: head turns, blinking, expressions and toggles, ready for VTube Studio.', 'PT58S', '2026-11-24'),
-    ('live2d-model-showcase-red-dress', 'Live2D VTuber model: wolf girl in a red dress', 'Moving Live2D VTuber model by KeikoArts: blinking, expressions and toggles, ready for VTube Studio.', 'PT70S', '2026-11-24')]
+    ('live2d-model-showcase-red-dress', 'Live2D VTuber model: wolf girl in a red dress', 'Moving Live2D VTuber model by KeikoArts: blinking, expressions and toggles, ready for VTube Studio.', 'PT70S', '2026-11-24'),
+    ('live2d-rigging-wip-process', 'Live2D rigging work in progress: tail and hair physics', 'Behind the scenes of a KeikoArts Live2D rig: setting up tail, hair and dress physics in Live2D Cubism for a nine-tailed fox VTuber.', 'PT42S', '2026-11-24')]
 def video_ld():
     return [{"@context": "https://schema.org", "@type": "VideoObject", "name": n, "description": d, "thumbnailUrl": f"{SITE}images/{k}-poster.webp",
              "contentUrl": f"{SITE}images/{k}.mp4", "uploadDate": f"{dt}T08:00:00+07:00", "duration": dur, "creator": {"@type": "Organization", "name": "KeikoArts", "url": SITE}}
             for k, n, d, dur, dt in VIDEOS]
+WIP_VIDEO = ('<figure class="wide"><video src="/images/live2d-rigging-wip-process.mp4" poster="/images/live2d-rigging-wip-process-poster.webp" controls muted loop playsinline preload="none" width="960" height="540" aria-label="Live2D rigging work in progress: tail and hair physics in Live2D Cubism"></video><figcaption>Work in progress: tail, hair and dress physics in Live2D Cubism</figcaption></figure>')
 SHOW_VIDEOS = ''.join(f'<figure class="wide"><video src="/images/live2d-model-showcase-{k}.mp4" poster="/images/live2d-model-showcase-{k}-poster.webp" controls muted loop playsinline preload="none" width="960" height="540" aria-label="{e(al)}"></video><figcaption>{e(cap)}</figcaption></figure>' for k, cap, al in SHOWCASES)
 
 def svc_table(name, show_includes=True):
@@ -415,7 +417,7 @@ def rigging():
 
   <section class="sec"><div class="wrap">
     <h2>Rigged models</h2>
-    <div class="gallery">{RIG_VIDEO}{SHOW_VIDEOS}{"".join(fig(x, "VTuber model art") for x in GALLERY["VTuber"][:3])}</div>
+    <div class="gallery">{RIG_VIDEO}{SHOW_VIDEOS}{WIP_VIDEO}{"".join(fig(x, "VTuber model art") for x in GALLERY["VTuber"][:3])}</div>
     <p class="note">More in the <a href="/vtuber-portfolio/">portfolio</a>.</p>
   </div></section>
 {related("/live2d-rigging/")}
@@ -955,6 +957,40 @@ def sm_url(u, p):
 sm = ('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" '
       'xmlns:image="http://www.google.com/schemas/sitemap-image/1.1" xmlns:video="http://www.google.com/schemas/sitemap-video/1.1">\n' + ''.join(sm_url(u, p) for u, p in urls) + '</urlset>\n')
 open(os.path.join(ROOT, 'sitemap.xml'), 'w', encoding='utf-8').write(sm)
+# llms.txt: a plain summary for AI assistants (ChatGPT, Claude, Perplexity...) built from the same data as the site
+def _pk(n): return '; '.join(f'{p[0]} {money(p[1])}' + (' each' if SERVICES[n].get('qty') else '') for p in SERVICES[n]['packages'])
+llms = f"""# KeikoArts (keikoartist.com)
+
+> KeikoArts is Keiko's VTuber art and Live2D studio: original anime VTuber models drawn from scratch and rigged in Live2D, ready for VTube Studio, plus PNGTubers, emotes, banners, logos and stream assets. Style: cute meets gothic. 200+ commissions completed. Prices in USD; 13% tax is added on every invoice. Every commission is done within 3 weeks.
+
+## How to order
+- Order form with live total: {SITE}?order=VTuber (all services: {SITE}#services)
+- Payment: PayPal (card or PayPal balance), in full, 50/50, or 3 parts for orders above $150
+- Questions before ordering: Discord {'https://discord.gg/FbgWxMPjf'} or the live chat on the website (usually replies within 6 hours, WIB / GMT+7)
+- Merch / commercial rights: +$30 for any service. Rush delivery: +25%.
+
+## Prices
+- Live2D VTuber model: {_pk('VTuber')}
+- VTuber model add-ons: {'; '.join(f"{a[0]} +{money(a[1])}" + (' each' if 'toggle' in a[0].lower() else '') for a in SERVICES['VTuber']['addons'])}
+- VTuber debut packages: {_pk('VTuber Packages')}
+- PNGTuber: {_pk('PNGTuber')}
+- Twitch / Discord emotes: {_pk('Emotes')}
+- Chibi VTuber: {_pk('Chibi VTuber')}
+- VTuber pet: {_pk('VTuber Pet')}
+- Others (from): {', '.join(f"{n} {money(SERVICES[n]['from'])}" for n in ['Custom PFP', 'Banner', 'VTuber Logo', 'Stream Overlay', 'Background'])}
+
+## Pages
+- [Custom VTuber model]({SITE}custom-vtuber-model/): what is included, sizes, rigging, timeline
+- [Live2D rigging]({SITE}live2d-rigging/): rig only for your own art, VTube Studio file, showcase videos
+- [Custom PNGTuber]({SITE}custom-pngtuber-model/)
+- [Custom Twitch emotes]({SITE}custom-twitch-emotes/)
+- [Portfolio]({SITE}vtuber-portfolio/)
+- [All prices]({SITE}vtuber-pricing/)
+- [How much does a VTuber model cost?]({SITE}vtuber-model-cost/)
+- [How to commission a VTuber model]({SITE}how-to-commission-a-vtuber-model/)
+- [Live2D vs PNGTuber]({SITE}live2d-vs-pngtuber/)
+"""
+open(os.path.join(ROOT, 'llms.txt'), 'w', encoding='utf-8').write(llms)
 # prices for the chat's automatic reply (chat-api.php reads this; same data as the order form)
 open(os.path.join(ROOT, 'prices.json'), 'w', encoding='utf-8').write(json.dumps({n: {'from': s['from'], 'eta': s.get('eta', ''), 'qty': bool(s.get('qty')), 'packages': s['packages'], 'addons': s['addons']} for n, s in SERVICES.items()}, ensure_ascii=False, indent=1))
-print('built', ', '.join(PAGES), '+ 404.html + sitemap.xml + prices.json')
+print('built', ', '.join(PAGES), '+ 404.html + sitemap.xml + prices.json + llms.txt')

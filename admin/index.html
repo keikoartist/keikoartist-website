@@ -219,7 +219,6 @@ select{padding:7px 10px;border:1px solid var(--line);border-radius:999px;backgro
     <img src="../images/keikoarts-logo.webp" alt="">
     <h1 class="serif">Inbox <small id="unreadTot"></small></h1>
     <div class="modes" role="tablist"><button type="button" class="on" data-mode="chat">💬 Chats</button><button type="button" data-mode="orders">🧾 Orders <i id="newOrders" hidden></i></button></div>
-    <label class="agent"><span>Reply as</span><input id="agent" maxlength="30" placeholder="Keiko"></label>
     <button class="btn ghost small notify" id="notifyBtn" type="button" hidden>🔔 Enable alerts</button>
     <button class="btn ghost small" id="setBtn" type="button">⚙️<span class="set-txt"> Settings</span></button>
     <a class="btn ghost small" href="../" id="toSite">🌐 Website</a>
@@ -306,13 +305,11 @@ const el=(tag,cls,text)=>{const e=document.createElement(tag);if(cls)e.className
 function showLogin(){clearInterval(listTimer);clearInterval(thTimer);clearInterval(typeof oTimer==='undefined'?0:oTimer);$('#appView').hidden=true;$('#loginView').hidden=false;$('#pw').focus();}
 async function showApp(){
   $('#loginView').hidden=true;$('#appView').hidden=false;
-  $('#agent').value=store.get('ka_agent','Keiko');
   if('Notification' in window&&Notification.permission==='default')$('#notifyBtn').hidden=false;
   await loadList();listTimer=setInterval(()=>loadList(),5000);
   clearInterval(oTimer);pollOrders();oTimer=setInterval(pollOrders,15000);
   if(store.get('ka_mode','chat')==='orders'||location.hash==='#orders')setMode('orders');
 }
-$('#agent').addEventListener('change',e=>store.set('ka_agent',e.target.value.trim()||'Keiko'));
 $('#notifyBtn').onclick=async()=>{try{await Notification.requestPermission()}catch(_){} $('#notifyBtn').hidden=true;};
 
 $('#loginForm').addEventListener('submit',async e=>{
@@ -407,7 +404,7 @@ async function openThread(id){
   ta.addEventListener('input',()=>{ta.style.height='auto';ta.style.height=Math.min(ta.scrollHeight,140)+'px';});
   ta.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey&&!e.isComposing){e.preventDefault();form.requestSubmit();}});
   form.addEventListener('submit',async e=>{e.preventDefault();const text=ta.value.trim();if(!text)return;send.disabled=true;
-    try{const j=await api({action:'reply',id,message:text,agent:$('#agent').value.trim()||'Keiko',since:last});ta.value='';ta.style.height='auto';j.messages.forEach(addMsg);msgs.scrollTop=msgs.scrollHeight;loadList();
+    try{const j=await api({action:'reply',id,message:text,agent:'Keiko',since:last});ta.value='';ta.style.height='auto';j.messages.forEach(addMsg);msgs.scrollTop=msgs.scrollHeight;loadList();
       if(j.emailed){const n=el('div','th-note','✉️ Also emailed to the visitor');msgs.appendChild(n);msgs.scrollTop=msgs.scrollHeight;setTimeout(()=>n.remove(),5000);}}
     catch(err){if(err.message!=='login')alertBox(err.message);}
     send.disabled=false;ta.focus();});

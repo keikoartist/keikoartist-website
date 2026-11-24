@@ -83,19 +83,19 @@
   "qty": false,
   "packages": [
    [
-    "Starter",
+    "Starter · Bust up",
     250,
-    "Model art + Live2D rig + 3 expressions"
+    "Bust-up model art + Live2D rig + 3 expressions"
    ],
    [
-    "Debut",
+    "Debut · Half body",
     380,
-    "Starter + 6 emotes + 1 background + overlay"
+    "Half-body model + rig + 3 expressions + 6 emotes + 1 background + overlay"
    ],
    [
-    "Full Debut",
+    "Full Debut · Full body",
     520,
-    "Debut + PFP + VTuber logo + stream screens"
+    "Full-body model + rig + 3 expressions + 6 emotes + background + overlay + PFP + VTuber logo + stream screens"
    ]
   ],
   "addons": [

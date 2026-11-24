@@ -1,0 +1,30 @@
+# KeikoArts (keikoartist.com)
+
+> KeikoArts is Keiko's VTuber art and Live2D studio: original anime VTuber models drawn from scratch and rigged in Live2D, ready for VTube Studio, plus PNGTubers, emotes, banners, logos and stream assets. Style: cute meets gothic. 200+ commissions completed. Prices in USD; 13% tax is added on every invoice. Every commission is done within 3 weeks.
+
+## How to order
+- Order form with live total: https://keikoartist.com/?order=VTuber (all services: https://keikoartist.com/#services)
+- Payment: PayPal (card or PayPal balance), in full, 50/50, or 3 parts for orders above $150
+- Questions before ordering: Discord https://discord.gg/FbgWxMPjf or the live chat on the website (usually replies within 6 hours, WIB / GMT+7)
+- Merch / commercial rights: +$30 for any service. Rush delivery: +25%.
+
+## Prices
+- Live2D VTuber model: Bust · Art only $100; Half body · Art only $150; Full body · Art only $250; Bust · Art + Rig $150; Half body · Art + Rig $250; Full body · Art + Rig $400; Bust · Rig only $100; Half body · Rig only $150; Full body · Rig only $250
+- VTuber model add-ons: Extra expression / toggle +$20 each; Hand toggle +$30 each; VBridger +$200; Extra outfit +$100; Extra hairstyle +$100; Commercial / merch rights +$30
+- VTuber debut packages: Starter · Bust up $250; Debut · Half body $380; Full Debut · Full body $520
+- PNGTuber: Bust-up $60; Thigh-up / full body $100
+- Twitch / Discord emotes: Static emote $5 each; Animated emote $15 each
+- Chibi VTuber: Chibi model art $45
+- VTuber pet: Pet art $63; Pet art + rig $110
+- Others (from): Custom PFP $36, Banner $45, VTuber Logo $30, Stream Overlay $45, Background $100
+
+## Pages
+- [Custom VTuber model](https://keikoartist.com/custom-vtuber-model/): what is included, sizes, rigging, timeline
+- [Live2D rigging](https://keikoartist.com/live2d-rigging/): rig only for your own art, VTube Studio file, showcase videos
+- [Custom PNGTuber](https://keikoartist.com/custom-pngtuber-model/)
+- [Custom Twitch emotes](https://keikoartist.com/custom-twitch-emotes/)
+- [Portfolio](https://keikoartist.com/vtuber-portfolio/)
+- [All prices](https://keikoartist.com/vtuber-pricing/)
+- [How much does a VTuber model cost?](https://keikoartist.com/vtuber-model-cost/)
+- [How to commission a VTuber model](https://keikoartist.com/how-to-commission-a-vtuber-model/)
+- [Live2D vs PNGTuber](https://keikoartist.com/live2d-vs-pngtuber/)
