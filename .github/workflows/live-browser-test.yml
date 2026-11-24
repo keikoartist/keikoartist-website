@@ -38,13 +38,15 @@ jobs:
 
   browsers:
     runs-on: ubuntu-24.04
+    timeout-minutes: 45
     steps:
       - uses: actions/setup-python@v6
         with: { python-version: '3.12' }
       - name: Install Playwright
+        timeout-minutes: 12
         run: |
           pip install -q playwright > pip.log 2>&1 || { echo "::error::pip: $(tail -c 400 pip.log | tr '\n' ' ')"; exit 1; }
-          python -m playwright install --with-deps chromium webkit firefox > pw.log 2>&1 || { echo "::error::playwright: $(tail -c 600 pw.log | tr '\n' ' ')"; exit 1; }
+          ok=0; for t in 1 2; do if timeout 300 python -m playwright install --with-deps chromium webkit firefox > pw.log 2>&1; then ok=1; break; fi; echo "::warning::playwright install try $t failed or timed out, retrying"; done; [ $ok = 1 ] || { echo "::error::playwright: $(tail -c 600 pw.log | tr '\n' ' ')"; exit 1; }
       - name: Order flows on keikoartist.com
         run: |
           cat > t.py <<'PY'
