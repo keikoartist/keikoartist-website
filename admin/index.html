@@ -136,6 +136,7 @@ body.dragging{cursor:grabbing;user-select:none;-webkit-user-select:none}
 .st.new{background:#ffe3ec;color:#d23a6b}.st.paid{background:#e3f6e9;color:#1d7a43}.st.in_progress{background:#e8ecff;color:#3f4fc4}.st.done{background:#f0f0f0;color:#666}.st.cancelled{background:#f6e3e3;color:#9b3030}
 .od{flex:1;overflow-y:auto;padding:16px;display:grid;gap:14px;align-content:start}
 .card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px 16px}
+.prog{display:grid;gap:8px}.prog select,.prog textarea{font:inherit;font-size:14px;border:1px solid var(--line);border-radius:10px;padding:8px 10px;background:#fff;width:100%}.prog-chk{font-size:13px;display:flex;align-items:center;gap:6px}.prog-chk[hidden]{display:none}.prog-msg{color:var(--muted);font-size:12px}.prog .btn{justify-self:start}
 .card h3{font-size:13px;color:var(--muted);font-weight:600;margin-bottom:8px;text-transform:uppercase;letter-spacing:.06em}
 .kv{display:grid;grid-template-columns:150px 1fr;gap:6px 12px;font-size:13.5px}
 .kv dt{color:var(--muted)}.kv dd{white-space:pre-wrap;word-break:break-word}
@@ -617,7 +618,21 @@ async function openOrder(id){
   if(f['Reference links']){dl2.appendChild(el('dt',null,'Reference links'));const dd=el('dd');
     f['Reference links'].split(/\s+/).forEach(t=>{if(/^https?:\/\//i.test(t)){const a=el('a',null,t);a.href=t;a.target='_blank';a.rel='noopener noreferrer';dd.appendChild(a);dd.appendChild(document.createElement('br'));}else if(t)dd.appendChild(document.createTextNode(t+' '));});dl2.appendChild(dd);}
   oc.appendChild(dl2);
-  body.append(mc,cc,oc);
+  // progress the client sees on their tracking page (like VGen)
+  const pgPC=el('div','card');pgPC.appendChild(el('h3',null,'Progress (client sees this)'));
+  const pgPR=el('div','prog');const pgSS=el('select');pgSS.setAttribute('aria-label','Stage');
+  [['','Not started'],...(o.stages||[]).map(x=>[x,x])].forEach(([v,t])=>{const pgOP=el('option',null,t);pgOP.value=v;pgSS.appendChild(pgOP);});pgSS.value=o.stage||'';
+  const pgNT=el('textarea');pgNT.rows=2;pgNT.maxLength=600;pgNT.placeholder='Short update for the client (optional), e.g. "Sketch is ready, check your email for the preview"';pgNT.value=o.stage_note||'';
+  const pgNL=el('label','prog-chk');const pgNC=el('input');pgNC.type='checkbox';pgNC.checked=true;pgNL.append(pgNC,document.createTextNode(' Email the client'));
+  const pgDL=el('label','prog-chk');const pgDC=el('input');pgDC.type='checkbox';pgDL.append(pgDC,document.createTextNode(' Mark order Done'));pgDL.hidden=pgSS.value!=='Final files';pgSS.onchange=()=>{pgDL.hidden=pgSS.value!=='Final files';};
+  const pgSV=el('button','btn small','Save progress');pgSV.type='button';
+  const pgMSG=el('small','prog-msg',o.stage_at?'Last update '+fmt(o.stage_at):'');
+  pgSV.onclick=async()=>{pgSV.disabled=true;try{const r=await oapi({action:'stage',id,stage:pgSS.value,note:pgNT.value,notify:pgNC.checked,done:pgDC.checked});pgMSG.textContent='Saved ✓'+(pgNC.checked?(r.mailed?' · emailed':' · email not sent'):'');loadOrders();}catch(e){if(e.message!=='login')alert(e.message);}pgSV.disabled=false;};
+  const pgTL=el('div','paylinks');
+  if(o.track_url){const pgCP=el('button','btn ghost small','🔗 Copy tracking link');pgCP.type='button';pgCP.onclick=async()=>{try{await navigator.clipboard.writeText(o.track_url);pgCP.textContent='Copied ✓';}catch(_){prompt('Tracking link',o.track_url);}};
+    const pgOP=el('a','btn ghost small','Open client view');pgOP.href=o.track_url;pgOP.target='_blank';pgOP.rel='noopener';pgTL.append(pgCP,pgOP);}
+  pgPR.append(pgSS,pgNT,pgNL,pgDL,pgSV,pgMSG);pgPC.append(pgPR,pgTL);
+  body.append(mc,pgPC,cc,oc);
   // files
   if(o.files_removed&&o.files&&o.files.length){const fc=el('div','card');fc.appendChild(el('h3',null,'Reference files'));fc.appendChild(el('p','note-off',`${o.files.length} file(s) were removed automatically 30 days after this order was finished, to save hosting space.`));body.appendChild(fc);}
   else if(o.files&&o.files.length){const fc=el('div','card');fc.appendChild(el('h3',null,`Reference files (${o.files.length})`));const g=el('div','files');fc.appendChild(g);body.appendChild(fc);

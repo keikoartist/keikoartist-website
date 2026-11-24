@@ -30,6 +30,7 @@ const ALLOWED_EXT = ['jpg', 'jpeg', 'png', 'webp', 'gif', 'pdf', 'psd', 'clip', 
 const MAIL_ATTACH_MAX = 15 * 1024 * 1024;              // bigger uploads stay in the admin inbox only
 const DISCORD_USER   = 'https://discord.gg/FbgWxMPjf';   // Keiko's Discord server invite
 const STATUSES       = ['new', 'paid', 'in_progress', 'done', 'cancelled'];
+const STAGES         = ['Sketch', 'Lineart', 'Coloring', 'Rigging', 'Final files'];   // progress the client sees on the tracking page
 
 function jout(int $code, array $data = []): void {
   header('Content-Type: application/json; charset=utf-8'); http_response_code($code);
@@ -49,7 +50,7 @@ function fail(int $code, string $msg): void {
   jout($code, ['error' => $msg]);
 }
 
-if ($_SERVER['REQUEST_METHOD'] !== 'POST' && !in_array($_GET['a'] ?? '', ['pdf', 'pay'], true)) fail(405, 'POST only');   // GET only for the invoice PDF and pay links
+if ($_SERVER['REQUEST_METHOD'] !== 'POST' && !in_array($_GET['a'] ?? '', ['pdf', 'pay', 'track'], true)) fail(405, 'POST only');   // GET only for the invoice PDF, pay and tracking links
 $hostHdr = strtolower($_SERVER['HTTP_HOST'] ?? '');
 $host = preg_replace('/:\d+$/', '', $hostHdr);
 $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
@@ -81,7 +82,7 @@ function db(): PDO {
   $pdo->exec('CREATE INDEX IF NOT EXISTS idx_orders_created ON orders(created)');
   $pdo->exec('CREATE TABLE IF NOT EXISTS hits(k TEXT, t INTEGER)');
   $cols = array_column($pdo->query('PRAGMA table_info(orders)')->fetchAll(), 'name');
-  foreach (['paid' => 'REAL DEFAULT 0', 'view_key' => 'TEXT', 'files_removed' => 'INTEGER DEFAULT 0', 'lines' => 'TEXT'] as $c => $t) if (!in_array($c, $cols, true)) $pdo->exec("ALTER TABLE orders ADD COLUMN $c $t");
+  foreach (['paid' => 'REAL DEFAULT 0', 'view_key' => 'TEXT', 'files_removed' => 'INTEGER DEFAULT 0', 'lines' => 'TEXT', 'stage' => "TEXT DEFAULT ''", 'stage_note' => "TEXT DEFAULT ''", 'stage_at' => 'INTEGER DEFAULT 0'] as $c => $t) if (!in_array($c, $cols, true)) $pdo->exec("ALTER TABLE orders ADD COLUMN $c $t");
   $pdo->exec('CREATE TABLE IF NOT EXISTS payments(txn_id TEXT PRIMARY KEY, order_id TEXT, amount REAL, currency TEXT, payer TEXT, status TEXT, created INTEGER)');
   $pdo->exec('CREATE INDEX IF NOT EXISTS idx_pay_order ON payments(order_id)');
   $pdo->exec('CREATE TABLE IF NOT EXISTS ipn_log(id INTEGER PRIMARY KEY AUTOINCREMENT, created INTEGER, ok INTEGER, note TEXT)');
@@ -224,6 +225,7 @@ function pdf_link(array $o, string $site, $total = null): string {
   return $site . 'order-api.php?' . http_build_query($q);
 }
 /* short, safe "pay this invoice" link (keikoartist.com/order-api.php?a=pay...) that opens PayPal with the amount filled in */
+function track_link(array $o, string $site): string { return preg_match('/^[a-f0-9]{16}$/', (string)($o['view_key'] ?? '')) ? $site . 'order-api.php?a=track&id=' . rawurlencode((string)$o['id']) . '&k=' . $o['view_key'] : ''; }
 function pay_link(array $o, string $site, $total = null): string {
   $l = pdf_link($o, $site, $total);
   return $l === '' ? '' : str_replace('a=pdf', 'a=pay', $l);
@@ -461,6 +463,43 @@ if (($_GET['a'] ?? '') === 'status') {
   jout(200, ['status' => $o['status'], 'paid' => (float)$o['paid'], 'due' => (float)$o['due'], 'total' => (float)$o['total']]);
 }
 
+
+/* =================== public: the client follows their order (like VGen's progress view) =================== */
+if (($_GET['a'] ?? '') === 'track') {
+  rate_limit('track:' . client_ip(), 120, 3600);
+  $nf = function () { http_response_code(404); page('Order not found', '<h1>Order not found</h1><p>Please check the link in your email.</p>', true); };
+  $id = (string)($_GET['id'] ?? ''); $k = (string)($_GET['k'] ?? '');
+  if (!preg_match('/^(INV|REQ)-\d{4}-\d{4}$/', $id) || !preg_match('/^[a-f0-9]{16}$/', $k)) $nf();
+  $st = db()->prepare('SELECT * FROM orders WHERE id = ?'); $st->execute([$id]); $o = $st->fetch();
+  if (!$o || !hash_equals((string)$o['view_key'], $k)) $nf();
+  if ($o['status'] === 'cancelled') page('Order cancelled', '<h1>This order was cancelled</h1><p class="muted">Order ' . h($id) . '</p><p>Questions? Message me on Discord or reply to my email.</p>', true);
+  $paid = (float)$o['paid']; $total = (float)$o['total']; $done = $o['status'] === 'done';
+  $stage = (string)($o['stage'] ?? ''); $si = array_search($stage, STAGES, true);
+  $started = $done || $o['status'] === 'in_progress' || $si !== false;
+  $steps = [['Order received', date('M j, Y', (int)$o['created']), true],
+            ['Payment', $paid >= $total - 0.01 && $total > 0 ? 'Paid in full' : ($paid > 0 ? money2($paid) . ' of ' . money2($total) . ' paid' : 'Waiting for payment'), $paid > 0 || $done]];
+  foreach (STAGES as $i => $nm) $steps[] = [$nm, '', $done || ($si !== false && $i <= $si)];
+  $steps[] = ['Delivered', $done ? 'Enjoy your art! ♡' : '', $done];
+  $cur = -1; foreach ($steps as $i => $x) if ($x[2]) $cur = $i;
+  $li = '';
+  foreach ($steps as $i => $x) {
+    $c = $x[2] ? ($i === $cur && !$done ? 'now' : 'ok') : 'todo';
+    $li .= '<li class="' . $c . '"><b>' . h($x[0]) . '</b>' . ($x[1] !== '' ? '<span>' . h($x[1]) . '</span>' : '') . '</li>';
+  }
+  $note = trim((string)($o['stage_note'] ?? ''));
+  $ready = date('M j, Y', (int)$o['created'] + 21 * 86400);
+  $pay = !$done && pay_amount($o) > 0 ? '<a class="pp" href="' . h(pay_link($o, $SITE)) . '">Pay ' . money2(pay_amount($o)) . ' with PayPal</a>' : '';
+  page('Order ' . $id,
+    '<style>.tl{list-style:none;margin:18px 0;padding:0}.tl li{position:relative;padding:0 0 18px 30px}.tl li::before{content:"";position:absolute;left:0;top:2px;width:16px;height:16px;border-radius:50%;border:2px solid #fbd3e0;background:#fff;box-sizing:border-box}'
+    . '.tl li::after{content:"";position:absolute;left:7px;top:20px;bottom:0;width:2px;background:#fbd3e0}.tl li:last-child::after{display:none}.tl li.ok::before{background:#f2628f;border-color:#f2628f}.tl li.now::before{border-color:#f2628f;box-shadow:0 0 0 4px #ffe1ec}'
+    . '.tl li.todo b{color:#c9a0b2;font-weight:400}.tl span{display:block;font-size:13px;color:#a8607a}.note{background:#fff0f5;border-left:3px solid #f2628f;border-radius:8px;padding:10px 14px;white-space:pre-wrap}</style>'
+    . '<h1>Your order ♡</h1><p class="muted">Order <b>' . h($id) . '</b> · ' . h(trim($o['service'] . ' · ' . $o['package'], ' ·')) . '</p>'
+    . ($note !== '' ? '<p class="note"><b>Update from Keiko' . ((int)$o['stage_at'] ? ' · ' . date('M j', (int)$o['stage_at']) : '') . ':</b><br>' . h($note) . '</p>' : '')
+    . '<ol class="tl">' . $li . '</ol>'
+    . (!$done ? '<p>Ready by about <b>' . h($ready) . '</b> (3 weeks at most' . ($started ? '' : ', counted from your order') . '). I email you at every stage.</p>' : '')
+    . $pay, true);
+}
+
 /* =================== public: new order =================== */
 if (($_GET['a'] ?? '') === 'submit') {
   if (!$_POST) fail(413, 'Your reference files are too big to upload. Please attach smaller images, or paste links instead.');
@@ -638,13 +677,15 @@ if (($_GET['a'] ?? '') === 'submit') {
       $body = "<p>Hi $cn, thank you for your commission request at KeikoArts! ♡</p><p>Request ID: <b style=\"color:#f2628f\">" . h($id) . '</b><br>Service: ' . h($service . ' (' . $o['package'] . ')') . '<br>Estimated total: ' . money2($total) . '<br>Payment plan: ' . h($plan) . '</p>';
       $txt = "Hi " . (no_links($name) ?: 'there') . ", thank you for your commission request at KeikoArts!\n\nRequest ID: $id\nService: $service ({$o['package']})\nEstimated total: " . money2($total) . "\nPayment plan: $plan\n\n";
     }
-    $pdfUrl = pdf_link(['id' => $id, 'view_key' => $vkey], $SITE);
+    $pdfUrl = pdf_link(['id' => $id, 'view_key' => $vkey], $SITE); $trackUrl = track_link(['id' => $id, 'view_key' => $vkey], $SITE);
     if ($payUrl !== '') {
       $body .= '<p style="margin:16px 0"><a href="' . h($payUrl) . '" style="display:inline-block;background:#ffc439;color:#003087;font-weight:bold;text-decoration:none;padding:12px 22px;border-radius:999px">Pay ' . money2($due) . ' with PayPal</a></p>'
              . '<p>One click, the amount is already filled in (card or PayPal balance). ' . ($due < $total ? 'This is your first payment (' . h($plan) . '). ' : '') . "Full refund if I can't take your order.</p>"
              . '<p>Your invoice (PDF): <a href="' . h($pdfUrl) . '">open invoice</a></p>';
       $txt .= "Pay " . money2($due) . " with PayPal (one click, the amount is already filled in):\n$payUrl\n" . ($due < $total ? "This is your first payment ($plan).\n" : '') . "Full refund if I can't take your order.\n\nYour invoice (PDF): $pdfUrl\n\n";
     }
+    $body .= '<p>Follow your order (progress at every stage): <a href="' . h($trackUrl) . '">track your order</a></p>';
+    $txt .= "Follow your order: $trackUrl\n\n";
     $body .= '<p>' . ($payUrl !== '' ? 'I start as soon as the payment comes in.' : 'I review your order and email you your invoice (PDF) within 6 hours. You pay securely with PayPal (one click, card or PayPal balance).') . '</p><p>Want to chat on Discord? <a href="' . DISCORD_USER . '">Join my server</a> and send your order ID <b>' . h($id) . '</b>.</p><p>— Keiko, KeikoArts</p>';
     $txt .= ($payUrl !== '' ? "I start as soon as the payment comes in." : "I review your order and email you your invoice (PDF) within 6 hours. You pay securely with PayPal (one click, card or PayPal balance).") . "\nWant to chat on Discord? Join my server and send your order ID $id:\n" . DISCORD_USER . "\n\n— Keiko, KeikoArts";
     $clientMailed = send_mail($email, $subj, '<div style="font-family:Arial,sans-serif;color:#7a2846;font-size:14px">' . $body . '</div>', $txt, OWNER_EMAIL);
@@ -665,7 +706,7 @@ if (($_GET['a'] ?? '') === 'submit') {
       . '<p><b>Next step:</b> I review your order and email you your invoice (PDF) within 6 hours. You pay securely with PayPal (one click, card or PayPal balance).</p><p class="muted">Want to chat on Discord? <a class="back" href="' . DISCORD_USER . '">Join my Discord server</a> and send your order ID.</p>', true);
   }
   jout(200, ['id' => $id, 'kind' => $kind, 'price' => $price, 'tax' => $tax, 'total' => $total, 'due' => $due, 'plan' => $plan,
-             'pay_url' => $payUrl, 'pdf_url' => pdf_link(['id' => $id, 'view_key' => $vkey], $SITE), 'date' => $dateStr, 'emailed' => $clientMailed, 'notified' => $mailed, 'files' => count($files), 'skipped_files' => $skipped, 'skipped_names' => $skippedNames, 'key' => $vkey]);
+             'pay_url' => $payUrl, 'pdf_url' => pdf_link(['id' => $id, 'view_key' => $vkey], $SITE), 'track_url' => track_link(['id' => $id, 'view_key' => $vkey], $SITE), 'date' => $dateStr, 'emailed' => $clientMailed, 'notified' => $mailed, 'files' => count($files), 'skipped_files' => $skipped, 'skipped_names' => $skippedNames, 'key' => $vkey]);
 }
 
 /* =================== admin =================== */
@@ -698,7 +739,7 @@ switch ($action) {
     $o['pay_url'] = paypal_link((float)$o['due'], $o['id'], order_label($o), $SITE);
     if (!preg_match('/^[a-f0-9]{16}$/', (string)$o['view_key'])) { $o['view_key'] = bin2hex(random_bytes(8)); db()->prepare('UPDATE orders SET view_key = ? WHERE id = ?')->execute([$o['view_key'], $o['id']]); }
     $o['pdf_url'] = pdf_link($o, $SITE);
-    $o['pay_link'] = pay_link($o, $SITE); $o['pay_now'] = pay_amount($o);
+    $o['pay_link'] = pay_link($o, $SITE); $o['pay_now'] = pay_amount($o); $o['track_url'] = track_link($o, $SITE); $o['stages'] = STAGES; $o['stage_at'] = (int)($o['stage_at'] ?? 0);
     $rem = round((float)$o['total'] - (float)$o['paid'], 2);
     $o['remaining'] = max(0, $rem);
     $o['remaining_url'] = $rem > 0 && $o['paid'] > 0 ? paypal_link($rem, $o['id'], order_label($o) . ', remaining balance', $SITE) : '';
@@ -763,6 +804,25 @@ switch ($action) {
     $s = (string)($in['status'] ?? ''); if (!in_array($s, STATUSES, true)) fail(400, 'bad status');
     db()->prepare('UPDATE orders SET status = ?, updated = ? WHERE id = ?')->execute([$s, time(), $o['id']]);
     jout(200);
+  }
+  case 'stage': {   // progress the client sees; optional email to the client
+    $o = order_row((string)($in['id'] ?? ''));
+    $sg = (string)($in['stage'] ?? ''); if ($sg !== '' && !in_array($sg, STAGES, true)) fail(400, 'bad stage');
+    $note = clean((string)($in['note'] ?? ''), 600); $now = time();
+    $status = $o['status'];
+    if ($sg !== '' && in_array($status, ['new', 'paid'], true)) $status = 'in_progress';
+    if ($sg === 'Final files' && !empty($in['done'])) $status = 'done';
+    db()->prepare('UPDATE orders SET stage = ?, stage_note = ?, stage_at = ?, status = ?, updated = ? WHERE id = ?')->execute([$sg, $note, $now, $status, $now, $o['id']]);
+    $mailed = false;
+    if (!empty($in['notify']) && filter_var((string)$o['email'], FILTER_VALIDATE_EMAIL)) {
+      $url = track_link($o, $SITE); $cn = no_links((string)$o['name']) ?: 'there';
+      $what = $sg !== '' ? "Your order is now at: $sg" : 'Update on your order';
+      $mailed = send_mail((string)$o['email'], "$what · KeikoArts {$o['id']}",
+        '<div style="font-family:Arial,sans-serif;color:#7a2846;font-size:14px"><p>Hi ' . h($cn) . ',</p><p><b>' . h($what) . '</b></p>' . ($note !== '' ? '<p style="background:#fff0f5;border-left:3px solid #f2628f;padding:10px 14px;border-radius:6px;white-space:pre-wrap">' . h($note) . '</p>' : '')
+        . '<p><a href="' . h($url) . '">See your order progress</a></p><p>— Keiko, KeikoArts</p></div>',
+        "Hi $cn,\n\n$what\n" . ($note !== '' ? "\n$note\n" : '') . "\nSee your order progress: $url\n\n— Keiko, KeikoArts", OWNER_EMAIL);
+    }
+    jout(200, ['status' => $status, 'mailed' => $mailed]);
   }
   case 'file': {
     $o = order_row((string)($in['id'] ?? ''));

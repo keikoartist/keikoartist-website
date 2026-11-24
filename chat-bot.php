@@ -11,9 +11,19 @@ function bot_reply(string $msg, bool $first): string {
   $words = ['one' => 1, 'two' => 2, 'three' => 3, 'four' => 4, 'five' => 5, 'six' => 6, 'seven' => 7, 'eight' => 8, 'nine' => 9, 'ten' => 10];
   $q = preg_replace_callback('/\b(one|two|three|four|five|six|seven|eight|nine|ten)\b/', function ($m) use ($words) { return (string)$words[$m[1]]; }, $q);
   $out = [];
-  if ($first) $out[] = "Thanks for your message! Keiko will reply here and by email, usually within 6 hours (WIB).";
+  if ($first) $out[] = "Thanks for your message! Keiko will reply here and by email, usually within 6 hours (WIB). For a faster reply, message Keiko on Discord: discord.gg/FbgWxMPjf";
   if (!is_array($P)) return implode("\n\n", $out);
 
+  // "are you open?", "how long?", "how do I order / pay?" (facts from the site, never invented)
+  $info = [];
+  if (preg_match('/\b(open|slots?|available|availability|taking|accept(ing)?)\b|buka|komisi/', $q)) {
+    $openNow = !isset($P['_status']['open']) || $P['_status']['open'];
+    $info[] = $openNow ? 'Yes, commissions are open right now and Keiko can start soon.' : 'Commissions are closed at the moment. Join the Discord server to hear when they open: discord.gg/FbgWxMPjf';
+  }
+  if (preg_match('/how long|turnaround|deadline|when.*(done|ready|finish)|lama|berapa minggu/', $q)) $info[] = 'Every commission is done within 3 weeks at most, with updates at every stage. Rush delivery (+25%) takes about half the time.';
+  if (preg_match('/how (do|can) i (order|commission|pay|start)|payment|paypal|pay with|cara (order|bayar)/', $q)) $info[] = 'To order: pick your options in the order form (keikoartist.com/?order=VTuber), or add several services to the cart. You get an invoice right away and pay with PayPal (card or PayPal balance): in full, 50% now, or in 3 payments for orders above $150. Full refund before work starts.';
+  if (preg_match('/revision|revisi/', $q)) $info[] = 'Revisions: unlimited at the sketch stage, and 2 minor revisions after coloring.';
+  if ($info) $out[] = implode("\n", $info);
   $priceAsk = preg_match('/price|how much|cost|rate|quote|budget|\$|harga|berapa|total/', $q);
   $vt = $P['VTuber'] ?? null;
   $size = preg_match('/full\s*-?\s*body|fullbody/', $q) ? 'Full body' : (preg_match('/half\s*-?\s*body|halfbody|half/', $q) ? 'Half body' : (preg_match('/bust/', $q) ? 'Bust' : ''));

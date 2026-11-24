@@ -1676,6 +1676,20 @@ body.xmas header:not(.kc-head)::after{background:linear-gradient(90deg,#f2628f,#
 @media (max-width:380px){.so-l{display:none}.mtot small{font-size:9.5px!important}}
 @media (max-width:360px){.mtot b{font-size:15.5px!important}#orderModal .mnav{gap:6px!important}#orderModal .mnav{padding-left:12px!important;padding-right:12px!important}#sendBtn{padding-left:12px!important;padding-right:12px!important}}
 .rv-ctr{min-width:64px;text-align:center;font:600 14px Poppins,sans-serif;color:var(--muted)}
+
+/* Etsy / VGen-style trust details */
+.coupon{margin-top:12px;display:grid;gap:4px}.coupon small{font-size:13px;color:var(--muted)}
+.inv-fx{margin:6px 0 0;font-size:13px;color:var(--muted);text-align:right}
+.inv-inc{list-style:none;margin:10px 0 0;padding:10px 0 0;border-top:1px dashed var(--line);display:grid;gap:6px;font-size:13px;color:var(--muted);line-height:1.45}
+.inv-inc li{padding-left:18px;position:relative}.inv-inc li::before{content:"✓";position:absolute;left:0;color:#1d9a55;font-weight:700}
+.inv-inc b{color:var(--ink);font-weight:600}.inv-inc a{color:var(--pink-text);font-weight:600}
+.ty-track{display:block;margin:10px 0 0;padding:12px 14px;border-radius:14px;background:#f4ecff;color:#6b3a8f;font-weight:600;text-decoration:none;text-align:center}.ty-track:hover{background:#ebdcff}.ty-track[hidden]{display:none}
+.ci-save{justify-self:start;border:0;background:none;padding:2px 0;margin-top:2px;color:#6b3a8f;font:500 13px Poppins,sans-serif;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+.saved{margin-top:6px}.saved h4{font-size:14px;margin:0 0 8px;color:var(--muted)}.saved[hidden]{display:none}.saved .ci{opacity:.85;background:#fffafc}
+.rv-more{text-align:center;margin-top:20px}
+@media (min-width:768px){.rv-grid:not(.all) .rv-card:nth-child(n+9){display:none}}
+@media (max-width:767px){.rv-more{display:none}}
+.kc-dc{color:inherit;font-weight:600;text-decoration:underline;text-underline-offset:2px}
 </style>
 </head>
 <body>
@@ -1956,6 +1970,7 @@ body.xmas header:not(.kc-head)::after{background:linear-gradient(90deg,#f2628f,#
         <ul class="rv-tags"><li>On time delivery</li><li>Amazing skills</li><li>Attentive to details</li></ul>
       </figure>
     </div>
+    <div class="rv-more" id="rvMore"><button type="button" class="btn btn-ghost" id="rvMoreBtn"></button></div>
     <div class="rv-nav" aria-label="More reviews"><button type="button" class="rv-prev" aria-label="Previous review">‹</button><div class="rv-dots"></div><button type="button" class="rv-next" aria-label="Next review">›</button></div>
   </div>
 </section>
@@ -2074,7 +2089,7 @@ body.xmas header:not(.kc-head)::after{background:linear-gradient(90deg,#f2628f,#
 <section class="kc-panel" id="kcPanel" role="dialog" aria-modal="false" aria-labelledby="kcTitle" hidden>
   <header class="kc-head">
     <img src="images/keikoarts-logo.webp" alt="" width="40" height="40">
-    <div><b id="kcTitle">KeikoArts</b><span>Usually replies within 6 hours ♡</span></div>
+    <div><b id="kcTitle">KeikoArts</b><span>Usually replies within 6 hours · <a class="kc-dc" href="https://discord.gg/FbgWxMPjf" target="_blank" rel="noopener">faster on Discord</a></span></div>
     <button type="button" class="kc-x" id="kcClose" aria-label="Close chat">✕</button>
   </header>
   <div class="kc-body" id="kcBody" aria-live="polite">
@@ -2204,6 +2219,7 @@ body.xmas header:not(.kc-head)::after{background:linear-gradient(90deg,#f2628f,#
             <h4>Your info</h4>
             <div class="row"><input name="Name" id="fName" aria-label="Your name (required)" placeholder="Your name / VTuber name *" required autocomplete="name"><input type="email" name="email" id="fEmail" aria-label="Email (required)" placeholder="Email (I send your invoice here) *" required autocomplete="email" inputmode="email"></div>
             <input name="Discord" id="fDiscord" aria-label="Discord username (optional)" placeholder="Discord username (optional)" autocomplete="off" style="margin-top:12px">
+            <div class="coupon"><input name="Coupon code" id="fCoupon" maxlength="24" aria-label="Coupon or prize code (optional)" placeholder="Coupon or prize code (optional)" autocomplete="off" autocapitalize="characters"><small>Got a code from the Christmas wheel? Add it here and I apply it to your final invoice.</small></div>
           </div>
 
           <div class="sec" id="secPay">
@@ -2219,6 +2235,8 @@ body.xmas header:not(.kc-head)::after{background:linear-gradient(90deg,#f2628f,#
             <div class="c-inv-h">Price estimate <span id="invEta">USD</span></div>
             <dl id="invLines"></dl>
             <p id="invNote">After sending, I review your order and email you your invoice (PDF) with a one-click PayPal link. Nothing is charged now.</p>
+            <p class="inv-fx" id="invFx" hidden></p>
+            <ul class="inv-inc"><li><b>Revisions included:</b> unlimited at the sketch stage, 2 minor revisions after coloring</li><li><b>Safe payment:</b> PayPal checkout (card or PayPal balance), I never see your card details</li><li><b>Refunds:</b> full refund before work starts (<a href="#tos" data-close>Terms</a>)</li><li><b>Track it:</b> you get a link to follow every stage of your order</li></ul>
           </div>
           <label class="check" id="agreeRow"><input type="checkbox" id="agree"><span>I have read and agree to the <a href="#tos" data-close style="color:var(--pink-text);font-weight:600">Terms of Service and Privacy</a>.</span></label>
         </div>
@@ -2227,8 +2245,10 @@ body.xmas header:not(.kc-head)::after{background:linear-gradient(90deg,#f2628f,#
           <p class="c-intro">Check everything before you order. Nothing is paid yet ♡</p>
           <p class="cart-empty" id="cartEmpty">Your cart is empty ♡ Pick a service and tap “Add to cart”.</p>
           <ul class="cart-list" id="cartList"></ul>
+          <div class="saved" id="savedBox" hidden><h4>Saved for later</h4><ul class="cart-list" id="savedList"></ul></div>
           <div class="cart-foot" id="cartFoot">
             <dl class="cart-tot" id="cartTot"></dl>
+            <p class="inv-fx" id="cartFx" hidden></p>
             <p class="cart-note">One order and one invoice for everything. Every commission takes 3 weeks at most. At checkout you can pay in full, 50% now, or in 3 payments (orders above $150).</p>
           </div>
           <div class="cart-btns"><button type="button" class="cart-clear" id="cartClear"><svg class="ic" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M9 7V4.5h6V7M6.5 7l1 12.5h9l1-12.5"/></svg> <span>Clear cart</span></button><button type="button" class="btn btn-ghost" id="cartMore">Add another service</button><button type="button" class="btn btn-pink" id="cartCheckout">Checkout</button></div>
@@ -2253,6 +2273,7 @@ body.xmas header:not(.kc-head)::after{background:linear-gradient(90deg,#f2628f,#
       <p class="ty-warn" id="tyWarn" hidden></p>
       <p class="ty-lead" id="tyLead">Thank you for choosing KeikoArts! Your order has been received ♡</p>
       <div class="ty-ref" id="tyRef" hidden><span id="tyRefLbl">Order ID</span>: <b id="tyRefId"></b></div>
+      <a class="ty-track" id="tyTrack" href="#" target="_blank" rel="noopener" hidden>Track your order: see every stage <span aria-hidden="true">→</span></a>
       <div id="tyInv" hidden></div>
       <div class="summary" id="tySummary" hidden></div>
       <div class="ty-pay" id="tyPay" hidden>
@@ -2531,6 +2552,9 @@ const CART_KEY='ka_cart', CART_MAX=6, CART_SVC={packages:[['Cart',0,'']],addons:
 let CART_MODE=false, EDIT_ID=null;
 function readCart(){try{const c=JSON.parse(localStorage.getItem(CART_KEY)||'[]');return Array.isArray(c)?c.filter(x=>x&&SERVICES[x.svc]&&Array.isArray(x.lines)&&Date.now()-(x.t||0)<30*864e5).slice(0,CART_MAX):[];}catch(_){return [];}}
 function writeCart(c){try{c.length?localStorage.setItem(CART_KEY,JSON.stringify(c)):localStorage.removeItem(CART_KEY);}catch(_){}cartUI();}
+const SAVED_KEY='ka_saved';
+function readSaved(){try{const c=JSON.parse(localStorage.getItem(SAVED_KEY)||'[]');return Array.isArray(c)?c.filter(x=>x&&SERVICES[x.svc]&&Array.isArray(x.lines)).slice(0,12):[];}catch(_){return [];}}
+function writeSaved(c){try{c.length?localStorage.setItem(SAVED_KEY,JSON.stringify(c)):localStorage.removeItem(SAVED_KEY);}catch(_){}}
 function cartSum(c){const sub=r2(c.reduce((a,x)=>a+(+x.sub||0),0)),tax=r2(sub*TAX);return {sub,tax,total:r2(sub+tax)};}
 function cartUI(){
   const c=readCart(),n=c.length,sm=cartSum(c);
@@ -2542,7 +2566,10 @@ function renderCart(){
   const c=readCart(),sm=cartSum(c);
   $('#cartEmpty').hidden=!!c.length;$('#cartFoot').hidden=!c.length;$('#cartCheckout').hidden=!c.length;$('#cartClear').hidden=!c.length;$('#cartClear').classList.remove('sure');$('#cartClear span').textContent='Clear cart';
   $('#cartList').innerHTML=c.map(x=>{const opts=x.lines.map(l=>l[0].replace(/^\+ /,'')).join(' · ').replace(x.svc+' · ','');
-    return `<li class="ci"><span class="ci-th" style="background-image:url('${svcThumb(x.svc)}')"></span><div class="ci-t"><b>${esc(x.svc)}</b><small>${esc(opts)}</small>${x.details?`<em>“${esc(x.details)}”</em>`:''}</div><b class="ci-p">${money2(x.sub)}</b><div class="ci-a"><button type="button" class="ci-x ci-ed" data-ed="${esc(x.id)}" aria-label="Edit ${esc(x.svc)}" title="Edit"><svg class="ic" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9a2.1 2.1 0 0 0-3-3L5 17v3Z"/><path d="m14.5 7.5 3 3"/></svg></button><button type="button" class="ci-x" data-rm="${esc(x.id)}" aria-label="Remove ${esc(x.svc)}" title="Remove">✕</button></div></li>`;}).join('');
+    return `<li class="ci"><span class="ci-th" style="background-image:url('${svcThumb(x.svc)}')"></span><div class="ci-t"><b>${esc(x.svc)}</b><small>${esc(opts)}</small>${x.details?`<em>“${esc(x.details)}”</em>`:''}<button type="button" class="ci-save" data-sv="${esc(x.id)}">Save for later</button></div><b class="ci-p">${money2(x.sub)}</b><div class="ci-a"><button type="button" class="ci-x ci-ed" data-ed="${esc(x.id)}" aria-label="Edit ${esc(x.svc)}" title="Edit"><svg class="ic" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9a2.1 2.1 0 0 0-3-3L5 17v3Z"/><path d="m14.5 7.5 3 3"/></svg></button><button type="button" class="ci-x" data-rm="${esc(x.id)}" aria-label="Remove ${esc(x.svc)}" title="Remove">✕</button></div></li>`;}).join('');
+  const sv=readSaved();$('#savedBox').hidden=!sv.length;
+  $('#savedList').innerHTML=sv.map(x=>`<li class="ci"><span class="ci-th" style="background-image:url('${svcThumb(x.svc)}')"></span><div class="ci-t"><b>${esc(x.svc)}</b><small>${esc(x.lines.map(l=>l[0].replace(/^\+ /,'')).join(' · ').replace(x.svc+' · ',''))}</small><button type="button" class="ci-save" data-mv="${esc(x.id)}">Move to cart</button></div><b class="ci-p">${money2(x.sub)}</b><div class="ci-a"><button type="button" class="ci-x" data-srm="${esc(x.id)}" aria-label="Remove ${esc(x.svc)}" title="Remove">✕</button></div></li>`).join('');
+  fxLine(sm.total,$('#cartFx'));
   $('#cartTot').innerHTML=`<dt>Subtotal</dt><dd>${money2(sm.sub)}</dd><dt>Tax (13%)</dt><dd>${money2(sm.tax)}</dd><dt class="grand">Total (USD)</dt><dd class="grand">${money2(sm.total)}</dd>`;
 }
 function addToCart(){
@@ -2711,12 +2738,22 @@ function calc(){
   ORDER={lines:[[`${svcName} · ${pk[0]}${svc.qty?' × '+qty:''}`,base],...adds.map(a=>[a[0],a[1]]),...(rush?[['Rush delivery (+25%)',rushAmt]]:[]),['Tax (13%)',taxAmt]],total:t,due,plan,custom:false,rush};
   renderInv();return t;
 }
+const readyBy=rush=>new Date(Date.now()+(rush?11:21)*864e5).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});   // every commission: 3 weeks at most
+// approximate price in the visitor's own currency (ECB rates via frankfurter.app; the invoice is always in USD)
+const FX_CUR=(()=>{const r=((navigator.language||'').split('-')[1]||'').toUpperCase(),EU='AT BE CY DE EE ES FI FR GR HR IE IT LT LU LV MT NL PT SI SK'.split(' ');
+  const m={ID:'IDR',GB:'GBP',JP:'JPY',PH:'PHP',MY:'MYR',SG:'SGD',AU:'AUD',CA:'CAD',BR:'BRL',MX:'MXN',KR:'KRW',IN:'INR',TH:'THB',NZ:'NZD',CH:'CHF',SE:'SEK',NO:'NOK',DK:'DKK',PL:'PLN',CZ:'CZK',HU:'HUF',TR:'TRY',ZA:'ZAR',HK:'HKD',CN:'CNY'};
+  return EU.includes(r)?'EUR':(m[r]||'');})();
+let FX=null,fxBusy=false;
+function fxLoad(cb){if(!FX_CUR)return;if(FX)return cb();try{const c=JSON.parse(sessionStorage.getItem('ka_fx')||'null');if(c&&c.cur===FX_CUR&&Date.now()-c.t<864e5){FX=c;return cb();}}catch(_){}
+  if(fxBusy)return;fxBusy=true;fetch('https://api.frankfurter.app/latest?from=USD&to='+FX_CUR).then(r=>r.json()).then(j=>{const v=j&&j.rates&&j.rates[FX_CUR];if(v>0){FX={cur:FX_CUR,rate:v,t:Date.now()};try{sessionStorage.setItem('ka_fx',JSON.stringify(FX));}catch(_){}cb();}}).catch(()=>{}).finally(()=>{fxBusy=false;});}
+function fxText(usd){if(!FX||!(usd>0))return '';try{return '≈ '+new Intl.NumberFormat(undefined,{style:'currency',currency:FX.cur,maximumFractionDigits:FX.rate>50?0:2}).format(usd*FX.rate)+' (approx., you pay in USD)';}catch(_){return '';}}
+function fxLine(usd,el){el=el||$('#invFx');if(!el)return;const t=fxText(usd);el.textContent=t;el.hidden=!t;if(!FX&&usd>0)fxLoad(()=>fxLine(usd,el));}
 function renderInv(){
   const o=ORDER, empty=o.custom&&!o.total, partial=!o.custom&&o.due<o.total;
   $('#invLines').innerHTML=o.lines.map(([l,a])=>`<dt>${esc(l)}</dt><dd>${empty?'—':a?money2(a):'Free'}</dd>`).join('')
     +`<dt class="grand">Total</dt><dd class="grand">${empty?'—':money2(o.total)}</dd>`
     +(partial?`<dt class="now">First payment · ${esc(planLabel(o.plan))}</dt><dd class="now">${money2(o.due)}</dd>`:'');
-  $('#invEta').textContent=o.custom?'USD':`USD · ${o.rush?'rush, about half of '+svc.eta:'est. '+svc.eta}`;
+  $('#invEta').textContent=`USD · ready by ${readyBy(o.rush)}`;fxLine(o.custom&&!o.total?0:o.total);
   $('#navLbl').textContent=partial?'1st payment (incl. tax)':'Total (incl. 13% tax)';
   $('#navTotal').textContent=empty?'—':money2(partial?o.due:o.total);
 }
@@ -2770,6 +2807,12 @@ $('#prevBtn').onclick=()=>{const back=CART_MODE||EDIT_ID?3:1;EDIT_ID=null;go(bac
 $('#addCartBtn').onclick=addToCart;$('#navCart').onclick=openCart;$('#cmGo').onclick=()=>go(3);
 $('#cartMore').onclick=()=>go(1);
 $('#cartClear').onclick=()=>{const b=$('#cartClear');if(!b.classList.contains('sure')){b.classList.add('sure');b.querySelector('span').textContent='Tap again to remove all';setTimeout(()=>{if(b.classList.contains('sure')){b.classList.remove('sure');b.querySelector('span').textContent='Clear cart';}},4000);return;}writeCart([]);renderCart();};$('#cartCheckout').onclick=openCheckout;
+$('#cartView').addEventListener('click',e=>{
+  const sv=e.target.closest('[data-sv]'),mv=e.target.closest('[data-mv]'),sr=e.target.closest('[data-srm]');
+  if(sv){const c=readCart(),x=c.find(y=>y.id===sv.dataset.sv);if(x){writeSaved([x,...readSaved().filter(y=>y.id!==x.id)]);writeCart(c.filter(y=>y.id!==x.id));renderCart();}}
+  else if(mv){const s2=readSaved(),x=s2.find(y=>y.id===mv.dataset.mv),c=readCart();if(x){if(c.length>=CART_MAX){err(`Your cart is full (${CART_MAX} services).`);return;}x.t=Date.now();writeCart([...c,x]);writeSaved(s2.filter(y=>y.id!==x.id));renderCart();}}
+  else if(sr){writeSaved(readSaved().filter(y=>y.id!==sr.dataset.srm));renderCart();}
+});
 $('#cartList').addEventListener('click',e=>{const ed=e.target.closest('[data-ed]');if(ed){editCartItem(ed.dataset.ed);return;}const b=e.target.closest('[data-rm]');if(!b)return;writeCart(readCart().filter(x=>x.id!==b.dataset.rm));renderCart();});
 addEventListener('storage',e=>{if(e.key===CART_KEY)cartUI();});
 cartUI();
@@ -2880,7 +2923,7 @@ https://discord.gg/FbgWxMPjf
       const copy=(!j.dry_run&&!j.notified)?buildCopy(j.id,j.pay_url||'',j.date,j.files?j.files+' file(s) uploaded: see admin → Orders':''):null;
       if(copy&&j.pdf_url)copy['Invoice PDF (send to client)']=j.pdf_url;
       if(copy&&j.emailed)delete copy._autoresponse;
-      const lastInv={id:j.id,due:j.due,plan:j.plan,payUrl:j.pay_url||'',rows,emailed:!!j.emailed,warn,key:j.key||''};
+      const lastInv={id:j.id,due:j.due,plan:j.plan,payUrl:j.pay_url||'',rows,emailed:!!j.emailed,warn,key:j.key||'',track:j.dry_run?'':(j.track_url||'')};
       if(copy){$('#sendBtn').textContent='Almost done…';await Promise.race([sendCopy(copy),new Promise(z=>setTimeout(z,9000))]);}   // the email to Keiko goes out before the page can be closed
       done(lastInv);
       return;}
@@ -3303,6 +3346,10 @@ let tabVisitorN=0,tabAdminN=0;const tabSync=()=>tabDot(tabVisitorN+tabAdminN);
   if('IntersectionObserver' in window){const io=new IntersectionObserver(es=>{if(es[0].isIntersecting){io.disconnect();upd();}},{rootMargin:'400px'});io.observe(g);}else upd();   // measure only when the reviews come near (saves layout work at load)
   if('IntersectionObserver' in window)new IntersectionObserver(es=>es.forEach(e=>document.body.classList.toggle('in-reviews',e.isIntersecting)),{rootMargin:'-85% 0px 0px 0px'}).observe($('#reviews'));
 })();
+// reviews on wider screens: 8 first, the rest behind "Show all"
+(function(){const g=$('.rv-grid'),b=$('#rvMoreBtn');if(!g||!b)return;const n=g.querySelectorAll('.rv-card').length;
+  if(n<=8){$('#rvMore').remove();return;}
+  b.textContent=`Show all ${n} reviews`;b.onclick=()=>{g.classList.add('all');$('#rvMore').remove();};})();
 // "Chat with us" in the phone menu opens the chat
 document.addEventListener('click',e=>{const a=e.target.closest('.menu-chat');if(!a)return;e.preventDefault();$('#menu').classList.remove('open');const b=$('#kcBubble');if(b)b.click();});
 // the floating "Order now" button appears once the hero buttons are scrolled away
@@ -3425,7 +3472,8 @@ function showThanks(last){
   try{if(last&&last.id)sessionStorage.setItem('ka_ty',last.id);}catch(_){}
   const ty=$('#tyModal');
   Object.entries(TY0).forEach(([k,v])=>$('#'+k).textContent=v);
-  ['#tyRef','#tySummary','#tyPay','#tyInv','#invActions'].forEach(q=>$(q).hidden=true);
+  ['#tyRef','#tySummary','#tyPay','#tyInv','#invActions','#tyTrack'].forEach(q=>$(q).hidden=true);
+  if(last&&last.track&&/^https:\/\/keikoartist\.com\/order-api\.php\?a=track/.test(last.track)||last&&last.track&&/^http:\/\/(localhost|127\.0\.0\.1)/.test(last.track)){$('#tyTrack').href=last.track;$('#tyTrack').hidden=false;}
   if(last&&last.inv){$('#invActions').hidden=false;$('#invCopy').hidden=!last.payUrl;$('#invCopy').textContent='🔗 Copy payment link';
     $('#invCopy').onclick=async()=>{try{await navigator.clipboard.writeText(last.payUrl);$('#invCopy').textContent='Copied ✓';}catch(_){prompt('Your payment link',last.payUrl);}};
     $('#invSave').onclick=()=>window.print();}
