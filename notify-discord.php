@@ -26,7 +26,8 @@ if ($hook === '') {   // webhook saved from the admin page (Settings)
 if (!preg_match('#^https://(?:ptb\.|canary\.)?(?:discord|discordapp)\.com/api/webhooks/\d+/[\w-]+$#', $hook)) out(200, 'webhook not set');
 
 // simple rate limit: 5 requests / 10 min per IP
-$ip = $_SERVER['REMOTE_ADDR'] ?? '0';
+require_once __DIR__ . '/real-ip.php';
+$ip = ka_real_ip();
 $rl = sys_get_temp_dir() . '/ka_rl_' . md5($ip);
 $hits = array_filter(json_decode(@file_get_contents($rl) ?: '[]', true) ?: [], fn($t) => $t > time() - 600);
 if (count($hits) >= 5) out(429, 'too many');

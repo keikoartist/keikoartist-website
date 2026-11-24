@@ -16,7 +16,8 @@ if ($origin && strtolower((string)parse_url($origin, PHP_URL_HOST)) !== $host) d
 $ua = (string)($_SERVER['HTTP_USER_AGENT'] ?? '');
 if ($ua === '' || preg_match('/bot|crawl|spider|slurp|preview|lighthouse|headless|playwright|curl|wget|python|monitor/i', $ua)) done();
 
-$ip = $_SERVER['REMOTE_ADDR'] ?? '0';
+require_once __DIR__ . '/real-ip.php';
+$ip = ka_real_ip();
 $rl = sys_get_temp_dir() . '/ka_stat_' . md5($ip);
 $hits = array_filter(json_decode(@file_get_contents($rl) ?: '[]', true) ?: [], fn($t) => $t > time() - 600);
 if (count($hits) >= 120) done(429);

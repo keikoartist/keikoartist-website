@@ -28,6 +28,8 @@ The owner writes in Indonesian and wants short, direct answers in Indonesian. Do
 | `order-pdf.php` + `lib/fpdf/` | Invoice and brief PDF (FPDF, Helvetica). |
 | `chat-api.php` | Website live chat: visitors, admin replies, contact details, reply emails, admin login and "Forgot password?". |
 | `notify-discord.php` | Helper for Discord notifications. |
+| `real-ip.php` | `ka_real_ip()`: the visitor's real IP (CF-Connecting-IP trusted only from Cloudflare's IP ranges). 404 when opened directly. |
+| `fx-api.php` | USD → visitor currency rate for the "≈ Rp …" line (cached 12 h). |
 | `stats-api.php` | Anonymous visit counter (no cookies, IP never stored): page views, sources (`?ref=` / `utm_source` / referrer), order form opened, orders sent, spins. Daily files in `keikoarts-data/stats/`; yesterday's summary is posted to Discord once a day. The admin Settings panel shows the last 7 days and the Christmas spins (`stats` action in `order-api.php`). |
 | `spin-api.php` | Christmas spin wheel draw (see Open items). |
 | `admin/index.html` | Admin inbox at /admin/: Chats, Orders (board view like VGen, plus list view), Settings (Discord webhook, Gmail App Password). |
@@ -80,7 +82,7 @@ Run the site with `php -S 127.0.0.1:8830` in a copy of the repo that has a test 
 ## Open items
 
 - Gmail App Password set up by the owner on 23 Nov 2026 (diag: mail_set true, smtp.gmail.com reachable). Emails to clients now go through Gmail.
-- Cloudflare: the owner's colleague (Bu Mella) may ask to switch the nameservers. Before that, check that deploys use the hosting's FTP address, not the domain name.
+- Cloudflare (prepared 24 Nov 2026, not switched yet; the owner must create the Cloudflare account and change the nameservers at Rumahweb, Claude cannot log in for them). `cloudflare-check.yml` (manual) showed: nameservers ns1–4.rumahweb, A 202.10.43.86 + AAAA, MX `0 keikoartist.com` (hosting mail), SPF + DMARC TXT, www/ftp/mail CNAME to the root, Let's Encrypt certificate. Deploys use the hosting's own server name (not affected). `real-ip.php` (`ka_real_ip()`, used by chat-api, order-api, spin-api, stats-api, notify-discord) reads CF-Connecting-IP only from Cloudflare's IP ranges, so rate limits keep working per visitor. When switching: SSL/TLS mode "Full (strict)"; `mail`, `ftp`, `cpanel`, `webmail` records DNS only (grey cloud) and MX pointing to a DNS-only host; do not cache HTML ("Cache Everything" off) so admin/API stay live; check PayPal IPN, chat, order and admin afterwards.
 - A possible move of the site to the studio standard (Next.js on Bu Mella's server) is not decided. Do not start it unless asked.
 - Commission status badge in the hero: `SLOTS` in `index.html` (open/closed, `start` = "I can start right away", shown next to "Our Services" and in the order form). The badge is a link that opens the order form. The hero badge shows Keiko's emote (images/contact-emote.webp, pops out of the pill, waves now and then) + "Commissions • open" with a live green dot, no arrow, next to the spin wheel button (no Christmas deadline, owner Nov 2026).
 - First-visit loading screen (`#kaLoader` right after `<body>` in `index.html`, chibi `images/loader-chibi.webp`): once per browser session, hides as soon as the page is ready (at most 1 s; smoke puff 1.1 s, UX review Nov 2026), never with `?dryrun=1` or in automated browsers.

@@ -19,7 +19,8 @@ $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
 if ($origin && strtolower((string)parse_url($origin, PHP_URL_HOST)) !== $host) out(403, ['ok' => false, 'msg' => 'bad origin']);
 
 // rate limit: 3 spins / 10 min per IP
-$ip = $_SERVER['REMOTE_ADDR'] ?? '0';
+require_once __DIR__ . '/real-ip.php';
+$ip = ka_real_ip();
 $rl = sys_get_temp_dir() . '/ka_spin_' . md5($ip);
 $hits = array_filter(json_decode(@file_get_contents($rl) ?: '[]', true) ?: [], fn($t) => $t > time() - 600);
 if (count($hits) >= 3) out(429, ['ok' => false, 'msg' => 'too many']);

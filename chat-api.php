@@ -69,7 +69,8 @@ function clean(string $v, int $max): string {
   $v = trim($v);
   return mb_substr($v, 0, $max);
 }
-function client_ip(): string { return $_SERVER['REMOTE_ADDR'] ?? '0'; }
+require_once __DIR__ . '/real-ip.php';
+function client_ip(): string { return ka_real_ip(); }   // real visitor IP, also behind Cloudflare
 function rate_limit(string $key, int $max, int $window): void {
   $db = db(); $now = time();
   $db->prepare('DELETE FROM hits WHERE t < ?')->execute([$now - 3600]);
