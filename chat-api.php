@@ -240,7 +240,7 @@ switch ($action) {
     if ($name === '') $name = 'Visitor ' . strtoupper(substr(bin2hex(random_bytes(2)), 0, 4));
     if ($email !== '' && !filter_var($email, FILTER_VALIDATE_EMAIL)) fail(400, 'Please check your email address.');
     $dc = clean_discord((string)($in['discord'] ?? ''));
-    if ($email === '' || $dc === '') fail(400, 'Please add your email and your Discord username so I can reply even after you leave.');   // also blocks old cached pages without the contact fields
+    if ($email === '' && $dc === '') fail(400, 'Please add your email or your Discord username so I can reply even after you leave.');   // also blocks old cached pages without the contact fields
     $id = bin2hex(random_bytes(12)); $tok = bin2hex(random_bytes(24)); $now = time();
     $db = db(); $db->beginTransaction();
     $db->prepare('INSERT INTO conversations(id, token_hash, name, email, discord, page, created, updated, unread_admin) VALUES(?,?,?,?,?,?,?,?,1)')
