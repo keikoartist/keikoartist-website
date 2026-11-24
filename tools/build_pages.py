@@ -360,7 +360,7 @@ def custom_vtuber():
 {related("/custom-vtuber-model/")}
 {cta("Got a VTuber in mind?", "Choose your options, see your total and order instantly with PayPal.", "VTuber", "Start your VTuber model")}'''
     faq = [
-        ('How much does a custom VTuber model cost?', f'Art only costs {money(vp["Bust · Art only"])} (bust), {money(vp["Half body · Art only"])} (half body) or {money(vp["Full body · Art only"])} (full body). Art + rig costs {money(vp["Bust · Art + Rig"])}, {money(vp["Half body · Art + Rig"])} or {money(vp["Full body · Art + Rig"])}. Complex designs with wings or many accessories may cost a bit more; the final price is on your invoice. See <a href="/vtuber-pricing/">all prices</a>.'),
+        ('How much does a custom VTuber model cost?', f'Art only costs {money(vp["Bust · Art only"])} (bust), {money(vp["Half body · Art only"])} (half body) or {money(vp["Full body · Art only"])} (full body). Art + rig costs {money(vp["Bust · Art + Rig"])}, {money(vp["Half body · Art + Rig"])} or {money(vp["Full body · Art + Rig"])}. Complex designs with wings or many accessories may cost a bit more; the order form shows your total before you pay. See <a href="/vtuber-pricing/">all prices</a>.'),
         ('How long does a VTuber model take?', f'About {e(V["eta"])}, depending on the complexity of the design and the queue. Rush delivery (+25%) is available in the order form.'),
         ('Does the model work with VTube Studio?', 'Yes. Art + Rig and Rig only orders include a VTube Studio file, ready to stream with webcam or iPhone face tracking. Art only orders get a layered PSD that is ready to rig.'),
         ('Can I use my model on monetized streams?', f'Yes. Streaming, monetized videos and social media are included. Merch and other commercial rights are an add-on (+{money(vadd["Commercial / merch rights"])}).'),
@@ -741,7 +741,7 @@ def pricing():
     </div>
   </div></section>
 {related("/vtuber-pricing/")}
-{cta("Found what you need?", "Send the order form and I'll email your invoice.", "", "Start a project")}'''
+{cta("Found what you need?", "Choose your options, see your total and order instantly with PayPal.", "", "Start a project")}'''
     faq = [
         ('How much does a custom VTuber model cost?', f'Art only starts at {money(vp["Bust · Art only"])} (bust); art + rig at {money(vp["Bust · Art + Rig"])}. A full-body model with rigging is {money(vp["Full body · Art + Rig"])}. See <a href="/custom-vtuber-model/">custom VTuber models</a>.'),
         ('Can I pay in installments?', 'Yes: 50/50 (half upfront, half before final files), or 3 installments for orders above $150.'),
@@ -1032,7 +1032,7 @@ def guide_xmas():
     <h2>Spin the Christmas wheel</h2>
     <p>One spin per visitor, until {e(fmt(until))}. You can win:</p>
     <ul class="ticks">{gift_li}</ul>
-    <p class="note">You get a prize code (XMAS-…). Add it in the order form or send it to me on Discord, and I apply it to your order by hand.</p>
+    <p class="note">You get a prize code (XMAS-…). Add it in the order form and press Apply: 10% off comes off your total right away; other prizes I add to your order by hand.</p>
   </div></section>
 
   <section class="sec"><div class="wrap">
@@ -1048,11 +1048,11 @@ def guide_xmas():
 {cta("Want your model before Christmas?", "Order by " + fmt(order_by) + ", or ask first on Discord.", "VTuber", "Start a project")}"""
     faq = [
         ('Will my VTuber model be ready before Christmas?', f'Yes, if you order by {fmt(order_by)}: every commission is done within 3 weeks. After that date, ask on Discord about rush delivery (+25%).'),
-        ('How does the Christmas wheel work?', f'Every visitor can spin once until {fmt(until)}. The prize comes with a code; add it in the order form or send it on Discord and it is applied to your order.'),
+        ('How does the Christmas wheel work?', f'Every visitor can spin once until {fmt(until)}. The prize comes with a code: add it in the order form and press Apply. 10% off comes off your total right away; other prizes are added to your order by hand.'),
         ('Can I give a VTuber model as a gift?', 'Yes. Put the gift receiver\'s character details in the order form, or ask on Discord first if you want it to stay a surprise.'),
     ]
     title = 'Christmas VTuber Commissions | KeikoArtist'
-    desc = f'Christmas VTuber commissions at KeikoArts: order by {fmt(order_by)} to get your Live2D model, PNGTuber or emotes before Christmas, and spin the wheel for a free extra.'
+    desc = f'Christmas VTuber commissions: order by {fmt(order_by)} to get your Live2D model, PNGTuber or emotes before Christmas, and spin the wheel for a free extra.'
     return page('christmas', title, desc, 'Christmas VTuber Commissions', 'Christmas', body, faq, GALLERY["VTuber"][0], 'VTuber', eyebrow='KeikoArts · Christmas')
 
 PAGES = {'custom-vtuber-model': custom_vtuber, 'live2d-rigging': rigging, 'custom-pngtuber-model': pngtuber, 'custom-twitch-emotes': emotes,
