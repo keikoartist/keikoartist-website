@@ -130,7 +130,9 @@ function bot_answer(string $convId, string $text, bool $first, string $email, st
 function send_reminders(array $cfg): int {
   $hook = (string)($cfg['discord_webhook'] ?? '');
   if (!preg_match('#^https://(?:ptb\.|canary\.)?(?:discord|discordapp)\.com/api/webhooks/\d+/[\w-]+$#', $hook)) { $st = ka_settings(); $hook = (string)($st['discord_webhook'] ?? ''); }
-  if (!preg_match('#^https://(?:ptb\.|canary\.)?(?:discord|discordapp)\.com/api/webhooks/\d+/[\w-]+$#', $hook) || !function_exists('curl_init')) return 0;
+  $hasHook = preg_match('#^https://(?:ptb\.|canary\.)?(?:discord|discordapp)\.com/api/webhooks/\d+/[\w-]+$#', $hook) && function_exists('curl_init');
+  $ks = ka_settings(); $ownerMail = (string)($ks['gmail_user'] ?? '');   // Keiko's own Gmail (the one set in admin → Settings) also gets the reminder
+  if (!$hasHook && $ownerMail === '') return 0;
   $db = db(); $now = time(); $sent = 0;
   $st = $db->prepare("SELECT c.*, (SELECT body FROM messages m WHERE m.conv_id = c.id AND m.sender = 'visitor' ORDER BY m.id DESC LIMIT 1) AS last_msg,
                              (SELECT MIN(created) FROM messages m WHERE m.conv_id = c.id AND m.sender = 'visitor' AND m.id > COALESCE((SELECT MAX(id) FROM messages a WHERE a.conv_id = c.id AND a.sender = 'admin'), 0)) AS waiting_since
@@ -148,9 +150,19 @@ function send_reminders(array $cfg): int {
       'fields' => array_values(array_filter([$c['email'] ? ['name' => 'Email', 'value' => $safe($c['email']), 'inline' => true] : null, !empty($c['discord']) ? ['name' => 'Discord', 'value' => $safe($c['discord']), 'inline' => true] : null])),
       'footer' => ['text' => 'Reminder ' . ((int)$c['remind_n'] + 1) . '/12 · reply at keikoartist.com/admin'],
     ]]];
-    $ch = curl_init($hook);
-    curl_setopt_array($ch, [CURLOPT_POST => true, CURLOPT_POSTFIELDS => json_encode($payload), CURLOPT_HTTPHEADER => ['Content-Type: application/json'], CURLOPT_RETURNTRANSFER => true, CURLOPT_TIMEOUT => 4]);
-    curl_exec($ch); curl_close($ch); $sent++;
+    if ($hasHook) { $ch = curl_init($hook);
+      curl_setopt_array($ch, [CURLOPT_POST => true, CURLOPT_POSTFIELDS => json_encode($payload), CURLOPT_HTTPHEADER => ['Content-Type: application/json'], CURLOPT_RETURNTRANSFER => true, CURLOPT_TIMEOUT => 4]);
+      curl_exec($ch); curl_close($ch); }
+    if ($ownerMail !== '') {
+      $who = (string)($c['name'] ?: 'Visitor'); $msg = mb_substr((string)$c['last_msg'], 0, 600);
+      @chat_mail($ownerMail, "⏰ Unread chat: $who (waiting $wait)",
+        "$who is still waiting for your reply on keikoartist.com ($wait).\n\nLast message:\n$msg\n\n" . ($c['email'] ? "Email: {$c['email']}\n" : '') . (!empty($c['discord']) ? "Discord: {$c['discord']}\n" : '') . "\nReply here: https://keikoartist.com/admin/\n\nReminder " . ((int)$c['remind_n'] + 1) . '/12',
+        '<div style="font-family:Arial,sans-serif;color:#7a2846;font-size:14px;line-height:1.55"><p><b>' . htmlspecialchars($who) . '</b> is still waiting for your reply on keikoartist.com (' . $wait . ').</p>'
+        . '<blockquote style="margin:12px 0;padding:10px 14px;background:#fff0f5;border-left:3px solid #f2628f;border-radius:6px">' . nl2br(htmlspecialchars($msg)) . '</blockquote>'
+        . '<p>' . ($c['email'] ? 'Email: ' . htmlspecialchars((string)$c['email']) . '<br>' : '') . (!empty($c['discord']) ? 'Discord: ' . htmlspecialchars((string)$c['discord']) : '') . '</p>'
+        . '<p><a href="https://keikoartist.com/admin/" style="color:#c93a6a;font-weight:bold">Reply in the admin inbox</a></p><p style="color:#999;font-size:12px">Reminder ' . ((int)$c['remind_n'] + 1) . '/12</p></div>');
+    }
+    $sent++;
   }
   return $sent;
 }
