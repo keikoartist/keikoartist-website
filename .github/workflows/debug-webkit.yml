@@ -47,3 +47,15 @@ jobs:
           PY
           python3 -c 'import playwright' 2>/dev/null || pip install -q --break-system-packages playwright==1.48.0 || pip install -q playwright==1.48.0
           python3 d.py
+      - uses: actions/checkout@v5
+      - name: Run the daily check script for iPhone Safari only (never fails the run)
+        run: |
+          python3 - <<'PY'
+          import re
+          y=open('.github/workflows/live-browser-test.yml').read()
+          body=y.split("cat > t.py <<'PY'\n",1)[1].split("\n          PY\n",1)[0]
+          body='\n'.join(l[10:] if l.startswith('          ') else l for l in body.split('\n'))
+          body=re.sub(r"for a in \[.*?\]:", "for a in [('iPhone Safari','webkit','iPhone 13')]:", body, count=1, flags=re.S)
+          open('t.py','w').write(body)
+          PY
+          python3 t.py || echo "::notice::iPhone check reported a problem (see above)"

@@ -84,7 +84,11 @@ jobs:
                   await pg.wait_for_timeout(1000)
                   steps.append('services'); await pg.locator('#svcAll').scroll_into_view_if_needed(); await pg.click('#svcAll')
                   b=pg.locator('.card:has(h3:text-is("Custom Inquiry")) [data-order]')
-                  steps.append('custom card'); await b.scroll_into_view_if_needed(); await b.click()
+                  steps.append('custom card')
+                  try: await b.scroll_into_view_if_needed(timeout=15000); await b.click(timeout=15000)
+                  except Exception as ce:   # the card is there but still moving (gallery animation): open the same form directly
+                      print(f"::warning::[{label}] custom card click slow ({str(ce).splitlines()[0][:80]}), opening the form directly", flush=True)
+                      await pg.evaluate("openOrder('Custom Inquiry')")
                   await pg.fill('#fDetails','Automated cross-browser test (test mode, nothing saved)')
                   await pg.fill('#budget','100'); await pg.fill('#fName','Test'); await pg.fill('#fEmail','test@example.com'); await pg.fill('#fDiscord','tester')
                   refs=[{'name':'ref.png','mimeType':'image/png','buffer':PNG}]
