@@ -16,4 +16,5 @@ foreach ($ids as $id) {
   $db->prepare('DELETE FROM messages WHERE conv_id = ?')->execute([$id]);
   $db->prepare('DELETE FROM conversations WHERE id = ?')->execute([$id]);
 }
-echo json_encode(['deleted' => count($ids)]);
+$diag = $db->query("SELECT created, name, email FROM conversations WHERE email LIKE '%example.com%' ORDER BY created DESC LIMIT 5")->fetchAll(PDO::FETCH_ASSOC);
+echo json_encode(['deleted' => count($ids), 'dir' => basename($dir), 'window' => [$from, $to], 'test_chats_left' => array_map(function ($r) { return [(int)$r['created'], $r['name']]; }, $diag)]);
