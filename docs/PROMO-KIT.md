@@ -163,3 +163,6 @@ Kirim file video ke sesi Claude Code (atau taruh di folder proyek). Claude akan 
 - Senin: baca ringkasan statistik di Discord. Kanal dengan pengunjung terbanyak → posting lebih sering di sana.
 - Setiap hari: balas chat dan order di bawah 6 jam (keikoartist.com/admin/).
 - Setiap komisi selesai: kirim pesan minta ulasan (bagian 4).
+
+## Christmas link (until 7 Jan 2027)
+Share `keikoartist.com/christmas/?ref=x` (or `?ref=reddit`, `?ref=tiktok`…). The page says "order by Dec 4 to get it before Christmas" and links the spin wheel.

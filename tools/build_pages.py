@@ -987,9 +987,57 @@ def guide_start():
                 GALLERY["VTuber"][0], 'VTuber', article_ld('how-to-become-a-vtuber', title, desc, GALLERY["VTuber"][0]),
                 eyebrow='KeikoArts · VTuber commission guides')
 
+# Christmas page (only built while SEASON is on): order-by date, the spin wheel prizes, popular prices. Facts only from index.html / app.js.
+_SEA = re.search(r'const SEASON = \{ christmas: (true|false), until: "([\d-]+)", orderBy: "([\d-]+)"', SRC)
+XMAS_ON = bool(_SEA and _SEA.group(1) == 'true' and datetime.date.today().isoformat() < _SEA.group(2))
+def guide_xmas():
+    until, order_by = _SEA.group(2), _SEA.group(3)
+    fmt = lambda d: datetime.date.fromisoformat(d).strftime('%B %-d, %Y')
+    appjs = open(os.path.join(ROOT, 'assets/app.js'), encoding='utf-8').read()
+    gifts = json.loads(re.search(r"const GIFTS=(\[[^\]]*\])", appjs).group(1).replace("'", '"'))
+    P = SERVICES['PNGTuber']; K = SERVICES['VTuber Packages']['packages']; E = dict((p[0], p[1]) for p in SERVICES['Emotes']['packages'])
+    gift_li = ''.join(f'<li>{e(g)}{" <small>(rare prize)</small>" if "skeb" in g.lower() else ""}</li>' for g in gifts)
+    body = f"""  <section class="wrap phero">
+    <div>
+      <p class="eyebrow">Christmas at KeikoArts</p>
+      <h1 class="serif">Christmas VTuber Commissions: Order by {e(fmt(order_by).rsplit(',', 1)[0])}</h1>
+      <p class="lead">Order your VTuber model, PNGTuber or emotes by {e(fmt(order_by))} and it is ready before Christmas: every commission is done within 3 weeks. Every visitor can also spin the Christmas wheel once for a free extra.</p>
+      <div class="btns"><a class="btn btn-pink arrow" rel="nofollow" href="/?order=VTuber">Start a project</a><a class="btn btn-ghost" rel="nofollow" href="/?spin=1">Spin the Christmas wheel</a></div>
+    </div>
+    <figure>{img(GALLERY["VTuber"][0], eager=True)}</figure>
+  </section>
+
+  <section class="sec"><div class="wrap">
+    <h2>Spin the Christmas wheel</h2>
+    <p>One spin per visitor, until {e(fmt(until))}. You can win:</p>
+    <ul class="ticks">{gift_li}</ul>
+    <p class="note">You get a prize code (XMAS-…). Add it in the order form or send it to me on Discord, and I apply it to your order by hand.</p>
+  </div></section>
+
+  <section class="sec"><div class="wrap">
+    <h2>Popular for a holiday debut</h2>
+    <div class="grid">
+      <div class="box"><h3>Live2D VTuber model</h3><p>Art + rig: bust {money(vp["Bust · Art + Rig"])}, half body {money(vp["Half body · Art + Rig"])}, full body {money(vp["Full body · Art + Rig"])}. <a href="/custom-vtuber-model/">See the models</a></p></div>
+      <div class="box"><h3>Debut packages</h3><p>{"; ".join(f"{e(p[0])} {money(p[1])}" for p in K)}. <a href="/vtuber-pricing/">All prices</a></p></div>
+      <div class="box"><h3>PNGTuber &amp; emotes</h3><p>PNGTuber from {money(P["from"])}. Emotes from {money(min(E.values()))} each, made for your character. <a href="/custom-twitch-emotes/">Emotes</a></p></div>
+    </div>
+    <p class="note">Prices in USD; 13% tax is added. Your total is shown in the order form before you pay with PayPal.</p>
+  </div></section>
+{guides_block("/christmas/")}
+{cta("Want your model before Christmas?", "Order by " + fmt(order_by) + ", or ask first on Discord.", "VTuber", "Start a project")}"""
+    faq = [
+        ('Will my VTuber model be ready before Christmas?', f'Yes, if you order by {fmt(order_by)}: every commission is done within 3 weeks. After that date, ask on Discord about rush delivery (+25%).'),
+        ('How does the Christmas wheel work?', f'Every visitor can spin once until {fmt(until)}. The prize comes with a code; add it in the order form or send it on Discord and it is applied to your order.'),
+        ('Can I give a VTuber model as a gift?', 'Yes. Put the gift receiver\'s character details in the order form, or ask on Discord first if you want it to stay a surprise.'),
+    ]
+    title = 'Christmas VTuber Commissions | KeikoArtist'
+    desc = f'Christmas VTuber commissions at KeikoArts: order by {fmt(order_by)} to get your Live2D model, PNGTuber or emotes before Christmas, and spin the wheel for a free extra.'
+    return page('christmas', title, desc, 'Christmas VTuber Commissions', 'Christmas', body, faq, GALLERY["VTuber"][0], 'VTuber', eyebrow='KeikoArts · Christmas')
+
 PAGES = {'custom-vtuber-model': custom_vtuber, 'live2d-rigging': rigging, 'custom-pngtuber-model': pngtuber, 'custom-twitch-emotes': emotes,
          'vtuber-portfolio': portfolio, 'vtuber-pricing': pricing,
          'vtuber-model-cost': guide_cost, 'how-to-commission-a-vtuber-model': guide_howto, 'live2d-vs-pngtuber': guide_compare, 'how-to-become-a-vtuber': guide_start}
+if XMAS_ON: PAGES['christmas'] = guide_xmas
 for slug_, fn in PAGES.items():
     os.makedirs(os.path.join(ROOT, slug_), exist_ok=True)
     open(os.path.join(ROOT, slug_, 'index.html'), 'w', encoding='utf-8').write(fn())
