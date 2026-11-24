@@ -219,7 +219,7 @@ function withCoupon(o){
 }
 function pkgSaving(i){
   const g=(k,n)=>{const s=SERVICES[k];if(!s)return NaN;const p=s.packages.find(x=>x[0]===n);return p?p[1]:NaN;};
-  const parts=[[g('VTuber','Bust · Art + Rig')],
+  const parts=[[g('VTuber','Bust · Art + Rig'),3*g('Emotes','Static emote'),g('Custom PFP','Headshot')],
     [g('VTuber','Half body · Art + Rig'),6*g('Emotes','Static emote'),g('Background','Static'),g('Stream Overlay','Screens set')],
     [g('VTuber','Full body · Art + Rig'),6*g('Emotes','Static emote'),g('Background','Static'),g('Stream Overlay','Screens set'),g('Custom PFP','Headshot'),g('VTuber Logo','Custom logo')]][i];
   const pk=(SERVICES['VTuber Packages']||{packages:[]}).packages[i];if(!parts||!pk)return 0;
