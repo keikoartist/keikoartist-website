@@ -745,7 +745,8 @@ def not_found():
 # ---------------------------------------------------------------- guides (long-tail search pages)
 GUIDES = [('/vtuber-model-cost/', 'How much does a VTuber model cost?', 'Prices by size, extras and packages'),
           ('/how-to-commission-a-vtuber-model/', 'How to commission a VTuber model', 'Step by step, from idea to stream'),
-          ('/live2d-vs-pngtuber/', 'Live2D vs PNGTuber', 'Which avatar fits you and your budget')]
+          ('/live2d-vs-pngtuber/', 'Live2D vs PNGTuber', 'Which avatar fits you and your budget'),
+          ('/how-to-become-a-vtuber/', 'How to become a VTuber', 'What you need to start, step by step')]
 
 def guides_block(exclude):
     cards = ''.join(f'<a href="{u}"><b>{t}</b><span>{d}</span></a>' for u, t, d in GUIDES if u != exclude)
@@ -933,9 +934,56 @@ def guide_compare():
                 'custom-pngtuber-model-cat-mask', 'PNGTuber', article_ld('live2d-vs-pngtuber', title, desc, 'custom-pngtuber-model-cat-mask'),
                 eyebrow='KeikoArts · VTuber commission guides')
 
+def guide_start():
+    P = SERVICES['PNGTuber']; K = SERVICES['VTuber Packages']['packages']
+    body = f"""  <section class="wrap phero">
+    <div>
+      <p class="eyebrow">VTuber commission guide</p>
+      <h1 class="serif">How to Become a VTuber: What You Need to Start</h1>
+      <p class="lead">A VTuber streams or makes videos as an animated character instead of on camera. You need four things: a character, a model, tracking software and a way to stream. Here is each step, with real prices.</p>
+      <div class="btns"><a class="btn btn-pink arrow" rel="nofollow" href="/?order=VTuber">Start a project</a><a class="btn btn-ghost" href="/vtuber-pricing/">See prices</a></div>
+    </div>
+    <figure>{img(GALLERY["VTuber"][0], eager=True)}</figure>
+  </section>
+
+  <section class="sec"><div class="wrap">
+    <h2>The 5 steps</h2>
+    <ol class="steps">
+      <li><b>Create your character.</b> Name, personality, colors and outfit. A few reference images or a short description is enough; I design the rest with you.</li>
+      <li><b>Choose your model type.</b> A <a href="/custom-pngtuber-model/">PNGTuber</a> (from {money(P["from"])}) switches images when you talk. A <a href="/custom-vtuber-model/">Live2D model</a> (art + rig from {money(vp["Bust · Art + Rig"])}) follows your face. <a href="/live2d-vs-pngtuber/">Compare them</a>.</li>
+      <li><b>Get the model made.</b> Every commission is done within 3 weeks, with updates at every stage. Live2D models come with a VTube Studio file.</li>
+      <li><b>Set up tracking.</b> VTube Studio tracks your face with a webcam or an iPhone. A PNGTuber only needs your microphone (PNGTuber Plus or Veadotube).</li>
+      <li><b>Start streaming.</b> Add the model to OBS or Streamlabs and go live on Twitch, YouTube or TikTok. Emotes, a background and an overlay make your channel look complete.</li>
+    </ol>
+  </div></section>
+
+  <section class="sec"><div class="wrap">
+    <h2>What it costs</h2>
+    <div class="grid">
+      <div class="box"><h3>Start small</h3><p>PNGTuber from {money(P["from"])}. Good for starting soon on a small budget.</p></div>
+      <div class="box"><h3>Live2D model</h3><p>Art + rig: bust {money(vp["Bust · Art + Rig"])}, half body {money(vp["Half body · Art + Rig"])}, full body {money(vp["Full body · Art + Rig"])}.</p></div>
+      <div class="box"><h3>Full debut</h3><p>{"; ".join(f"{e(p[0])} {money(p[1])}" for p in K)}: model, rig and stream assets in one style.</p></div>
+    </div>
+    <p class="note">Prices in USD; 13% tax is added on the invoice. See <a href="/vtuber-model-cost/">how much a VTuber model costs</a> for every option.</p>
+  </div></section>
+{guides_block("/how-to-become-a-vtuber/")}
+{cta("Ready to make your character?", "Tell me your idea in the order form, or ask first on Discord.", "", "Start a project")}"""
+    faq = [
+        ('What do I need to become a VTuber?', 'A character design, a model (PNGTuber or Live2D), tracking software such as VTube Studio, and streaming software such as OBS. A webcam or iPhone is used for Live2D face tracking.'),
+        ('How much does it cost to become a VTuber?', f'You can start with a PNGTuber from {money(P["from"])}. A Live2D model with rigging starts at {money(vp["Bust · Art + Rig"])} for a bust. 13% tax is added.'),
+        ('Do I need to draw my own model?', 'No. Most VTubers commission an artist. Send your idea or references and the artist designs, draws and rigs the model.'),
+        ('How long does it take to get a VTuber model?', 'Every commission at KeikoArts is done within 3 weeks, with updates at every stage.'),
+        ('Can I use a VTuber model on YouTube and TikTok?', 'Yes. Streaming, monetized videos and social media are included. Merch / commercial rights are a $30 add-on.'),
+    ]
+    desc = f'How to become a VTuber: create a character, choose a PNGTuber (from {money(P["from"])}) or Live2D model (from {money(vp["Bust · Art + Rig"])}), set up VTube Studio and start streaming.'
+    title = 'How to Become a VTuber: What You Need to Start'
+    return page('how-to-become-a-vtuber', title + ' | KeikoArtist', desc, 'How to Become a VTuber', 'How to become a VTuber', body, faq,
+                GALLERY["VTuber"][0], 'VTuber', article_ld('how-to-become-a-vtuber', title, desc, GALLERY["VTuber"][0]),
+                eyebrow='KeikoArts · VTuber commission guides')
+
 PAGES = {'custom-vtuber-model': custom_vtuber, 'live2d-rigging': rigging, 'custom-pngtuber-model': pngtuber, 'custom-twitch-emotes': emotes,
          'vtuber-portfolio': portfolio, 'vtuber-pricing': pricing,
-         'vtuber-model-cost': guide_cost, 'how-to-commission-a-vtuber-model': guide_howto, 'live2d-vs-pngtuber': guide_compare}
+         'vtuber-model-cost': guide_cost, 'how-to-commission-a-vtuber-model': guide_howto, 'live2d-vs-pngtuber': guide_compare, 'how-to-become-a-vtuber': guide_start}
 for slug_, fn in PAGES.items():
     os.makedirs(os.path.join(ROOT, slug_), exist_ok=True)
     open(os.path.join(ROOT, slug_, 'index.html'), 'w', encoding='utf-8').write(fn())
@@ -989,6 +1037,7 @@ llms = f"""# KeikoArts (keikoartist.com)
 - [How much does a VTuber model cost?]({SITE}vtuber-model-cost/)
 - [How to commission a VTuber model]({SITE}how-to-commission-a-vtuber-model/)
 - [Live2D vs PNGTuber]({SITE}live2d-vs-pngtuber/)
+- [How to become a VTuber]({SITE}how-to-become-a-vtuber/)
 """
 open(os.path.join(ROOT, 'llms.txt'), 'w', encoding='utf-8').write(llms)
 # prices for the chat's automatic reply (chat-api.php reads this; same data as the order form)

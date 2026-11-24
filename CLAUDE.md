@@ -107,3 +107,4 @@ Run the site with `php -S 127.0.0.1:8830` in a copy of the repo that has a test 
 - VTuber Packages (owner, 24 Nov 2026): same prices and contents, named by model size: "Starter · Bust up" $250, "Debut · Half body" $380, "Full Debut · Full body" $520.
 - WIP rigging video (owner, 24 Nov 2026): images/live2d-rigging-wip-process.mp4 (Live2D Cubism physics, nine-tailed fox) on /live2d-rigging/ and in the VideoObject list (VIDEOS in build_pages.py).
 - AI assistants (24 Nov 2026): build_pages.py writes `llms.txt` (summary, prices and page links from SERVICES) so ChatGPT / Claude / Perplexity can read the studio's facts; robots.txt allows all crawlers.
+- Guide page /how-to-become-a-vtuber/ (24 Nov 2026, guide_start in build_pages.py). Homepage JSON-LD ProfessionalService has knowsAbout, founder (Keiko) and slogan. Search Console: the owner already has keikoartist.com verified (seen 24 Nov 2026).
