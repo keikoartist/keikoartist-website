@@ -15,7 +15,7 @@ The owner writes in Indonesian and wants short, direct answers in Indonesian. Do
 
 ## Stack
 
-- Static `index.html` (inline CSS and JS) plus PHP 7.4 endpoints on Rumahweb shared hosting (LiteSpeed). PHP `mail()` is disabled by the host.
+- Static `index.html` (inline CSS, data and a small loader script; the main script is `assets/app.js`) plus PHP 7.4 endpoints on Rumahweb shared hosting (LiteSpeed). PHP `mail()` is disabled by the host.
 - Data: SQLite files in `keikoarts-data/` **outside** the public folder (`orders.sqlite`, `chat.sqlite`, `settings.json`).
 - No build step for the homepage. Service pages are generated (see below).
 
@@ -23,7 +23,7 @@ The owner writes in Indonesian and wants short, direct answers in Indonesian. Do
 
 | Path | What it is |
 | --- | --- |
-| `index.html` | Homepage: hero, featured works, services and order form, reviews, process, FAQ, TOS, chat widget. Prices and options are in the `SERVICES`, `DETAILS` and `GALLERY` objects inside it. |
+| `index.html` | Homepage: hero, featured works, services and order form, reviews, process, FAQ, TOS, chat widget (markup + inline CSS; the script is in `assets/app.js`). Prices and options are in the `SERVICES`, `DETAILS` and `GALLERY` objects inside it. |
 | `order-api.php` | Orders: submit, PDF invoice link (`?a=pdf`), PayPal pay link (`?a=pay`), PayPal IPN (marks orders Paid), admin actions, Discord webhook, Gmail sending. |
 | `order-pdf.php` + `lib/fpdf/` | Invoice and brief PDF (FPDF, Helvetica). |
 | `chat-api.php` | Website live chat: visitors, admin replies, contact details, reply emails, admin login and "Forgot password?". |
@@ -32,6 +32,7 @@ The owner writes in Indonesian and wants short, direct answers in Indonesian. Do
 | `spin-api.php` | Christmas spin wheel draw (see Open items). |
 | `admin/index.html` | Admin inbox at /admin/: Chats, Orders (board view like VGen, plus list view), Settings (Discord webhook, Gmail App Password). |
 | `tools/build_pages.py` | Generates the service pages (`custom-vtuber-model/`, `live2d-rigging/`, `custom-pngtuber-model/`, `custom-twitch-emotes/`, `vtuber-portfolio/`, `vtuber-pricing/`), the guide pages for search (`vtuber-model-cost/`, `how-to-commission-a-vtuber-model/`, `live2d-vs-pngtuber/`; text built from the prices and terms in `index.html`), `404.html` and `sitemap.xml` from the data in `index.html`. Run `python3 tools/build_pages.py` after changing prices, services or the gallery. |
+| `assets/app.js` | Homepage script (order form, cart, chat widget, spellbook, spin wheel, reviews…), loaded with `defer` from `index.html`. The editable data (SERVICES, DETAILS, GALLERY, SLOTS, SEASON, PAYPAL, VTUBERS) stays inline in `index.html` and runs first. After editing app.js run `python3 tools/build_pages.py`: it updates `assets/app.js?v=…` in index.html so browsers fetch the new version. |
 | `assets/site.css` | Shared styles for the service pages. |
 | `images/` | Artwork (WebP). `images/t/` = small versions for grids (520 px wide) and `images/s/` = 360 px versions for phones, both made from the originals. |
 | `tools/ftp_deploy.py` | Deploy script (uploads changed files only). |

@@ -1,3 +1,4 @@
+import re
 """Builds the SEO service pages of keikoartist.com from the data in index.html.
 
 Run from the repo root:  python3 tools/build_pages.py
@@ -21,6 +22,11 @@ def js_object(name):
 
 SERVICES, DETAILS, GALLERY = js_object('SERVICES'), js_object('DETAILS'), js_object('GALLERY')
 CSS_V = hashlib.md5(open(os.path.join(ROOT, 'assets/site.css'), 'rb').read()).hexdigest()[:8]
+# homepage script: keep index.html pointing at the current version of assets/app.js
+_APP_V = hashlib.md5(open(os.path.join(ROOT, 'assets/app.js'), 'rb').read()).hexdigest()[:8]
+_idx = os.path.join(ROOT, 'index.html'); _h = open(_idx, encoding='utf-8').read()
+_h2 = re.sub(r'assets/app\.js\?v=[0-9a-f]+', 'assets/app.js?v=' + _APP_V, _h)
+if _h2 != _h: open(_idx, 'w', encoding='utf-8').write(_h2)
 TODAY = datetime.date.today().isoformat()
 e = lambda s: html.escape(str(s), quote=True)
 
