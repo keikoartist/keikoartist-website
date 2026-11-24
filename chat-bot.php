@@ -18,7 +18,8 @@ function bot_reply(string $msg, bool $first): string {
   $info = [];
   if (preg_match('/\b(open|slots?|available|availability|taking|accept(ing)?)\b|buka|komisi/', $q)) {
     $openNow = !isset($P['_status']['open']) || $P['_status']['open'];
-    $info[] = $openNow ? 'Yes, commissions are open right now and Keiko can start soon.' : 'Commissions are closed at the moment. Join the Discord server to hear when they open: discord.gg/FbgWxMPjf';
+    $sl = $P['_status']['slots'] ?? []; $slTxt = isset($sl['VTuber']) ? ' VTuber model slots left: ' . (int)$sl['VTuber'] . '.' : '';
+    $info[] = $openNow ? 'Yes, commissions are open right now and Keiko can start soon.' . $slTxt : 'Commissions are closed at the moment. Join the Discord server to hear when they open: discord.gg/FbgWxMPjf';
   }
   if (preg_match('/how long|turnaround|deadline|when.*(done|ready|finish)|lama|berapa minggu/', $q)) $info[] = 'Every commission is done within 3 weeks at most, with updates at every stage. Rush delivery (+25%) takes about half the time.';
   if (preg_match('/how (do|can) i (order|commission|pay|start)|payment|paypal|pay with|cara (order|bayar)/', $q)) $info[] = 'To order: pick your options in the order form (keikoartist.com/?order=VTuber), or add several services to the cart. You get an invoice right away and pay with PayPal (card or PayPal balance): in full, 50% now, or in 3 payments for orders above $150. Full refund before work starts.';

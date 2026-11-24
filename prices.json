@@ -442,6 +442,19 @@
   "addons": []
  },
  "_status": {
-  "open": true
+  "open": true,
+  "slots": {
+   "VTuber": 5,
+   "VTuber Packages": 3,
+   "PNGTuber": 4,
+   "Chibi VTuber": 4,
+   "VTuber Pet": 4,
+   "Emotes": 10,
+   "Custom PFP": 6,
+   "Banner": 6,
+   "VTuber Logo": 6,
+   "Stream Overlay": 4,
+   "Background": 4
+  }
  }
 }

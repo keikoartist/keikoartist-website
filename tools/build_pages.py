@@ -1043,6 +1043,8 @@ open(os.path.join(ROOT, 'llms.txt'), 'w', encoding='utf-8').write(llms)
 # prices for the chat's automatic reply (chat-api.php reads this; same data as the order form)
 _prices = {n: {'from': s['from'], 'eta': s.get('eta', ''), 'qty': bool(s.get('qty')), 'packages': s['packages'], 'addons': s['addons']} for n, s in SERVICES.items()}
 _m = re.search(r'const SLOTS = \{ open: (true|false)', SRC)
-_prices['_status'] = {'open': bool(_m and _m.group(1) == 'true')}   # commissions open/closed, for the chat's automatic answer
+_prices['_status'] = {'open': bool(_m and _m.group(1) == 'true')}
+_ps = re.search(r'per: (\{[^}]*\})', SRC[SRC.index('const SLOTS'):SRC.index('const SLOTS') + 900])
+_prices['_status']['slots'] = json.loads(_ps.group(1)) if _ps else {}   # commissions open/closed, for the chat's automatic answer
 open(os.path.join(ROOT, 'prices.json'), 'w', encoding='utf-8').write(json.dumps(_prices, ensure_ascii=False, indent=1))
 print('built', ', '.join(PAGES), '+ 404.html + sitemap.xml + prices.json + llms.txt')

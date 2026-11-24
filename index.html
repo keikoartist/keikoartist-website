@@ -1690,6 +1690,10 @@ body.xmas header:not(.kc-head)::after{background:linear-gradient(90deg,#f2628f,#
 @media (min-width:768px){.rv-grid:not(.all) .rv-card:nth-child(n+9){display:none}}
 @media (max-width:767px){.rv-more{display:none}}
 .kc-dc{color:inherit;font-weight:600;text-decoration:underline;text-underline-offset:2px}
+
+.slot-left{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:600;color:#1d7a43;margin:-2px 0 6px}
+.slot-left i{width:7px;height:7px;border-radius:50%;background:#22a35a;box-shadow:0 0 0 3px rgba(34,163,90,.15)}
+.slot-left.full{color:var(--muted)}.slot-left.full i{background:#c9a0b2;box-shadow:none}
 </style>
 </head>
 <body>
@@ -2319,7 +2323,8 @@ body.xmas header:not(.kc-head)::after{background:linear-gradient(90deg,#f2628f,#
 const KA_STAT=e=>{try{if(/dryrun=1/.test(location.search)||!location.protocol.startsWith('http'))return;const q=new URLSearchParams(location.search),r=document.referrer?new URL(document.referrer).hostname:'';const s=q.get('ref')||q.get('utm_source')||(r&&r!==location.hostname?r:'');navigator.sendBeacon('stats-api.php',new Blob([JSON.stringify({e,p:location.pathname,s})],{type:'application/json'}));}catch(_){}};   // anonymous visit counter (no cookies), daily summary in Discord
 KA_STAT('view');
 const SEASON = { christmas: true, until: "2027-01-07", orderBy: "2026-12-04" };   // orderBy: last day to order for delivery before Christmas (max 3 weeks)   // tema Natal: salju, topi Santa di logo, garis permen. Matikan: christmas:false (mati otomatis setelah tanggal until)
-const SLOTS = { open: true, text: "Commissions open", start: "I can start right away" };   // status komisi di hero. Tutup: { open: false, text: "Commissions closed" }
+const SLOTS = { open: true, text: "Commissions open", start: "I can start right away",
+  per: {"VTuber": 5, "VTuber Packages": 3, "PNGTuber": 4, "Chibi VTuber": 4, "VTuber Pet": 4, "Emotes": 10, "Custom PFP": 6, "Banner": 6, "VTuber Logo": 6, "Stream Overlay": 4, "Background": 4} };   // slot tersisa per layanan (owner: VTuber 5). 0 = "Fully booked"   // status komisi di hero. Tutup: { open: false, text: "Commissions closed" }
 const PAYPAL = {          // kosong: link PayPal dikirim lewat email invoice setelah order dicek (bukan langsung di website)
   email: "",
   me: "",
@@ -2638,7 +2643,7 @@ const sizeName=c=>c==='Half'?'Half body':c==='Full'?'Full body':c;
 function pickService(k){
   CART_MODE=false;EDIT_ID=null;svc=SERVICES[k]; svcName=k; cmOn=!!svc.quote;
   $('#shName').textContent=k;
-  $('#shMeta').textContent=cmOn?'You name the price · 13% tax added':`From ${money(svc.from)} + 13% tax · ${svc.eta}`;
+  {const st=slotTxt(k);$('#shMeta').textContent=(cmOn?'You name the price · 13% tax added':`From ${money(svc.from)} + 13% tax · ${svc.eta}`)+(st?' · '+st:'');}
   $('#shThumb').style.backgroundImage=`url("${svcThumb(k)}")`;
   $('#shIntro').textContent=cmOn?'Tell me your idea and name your price ♡':'Choose your options and tell me your idea ♡';
   const mx=!!svc.table; $('#mx').hidden=!mx; $('#pkgOpts').hidden=mx;
@@ -3350,6 +3355,14 @@ let tabVisitorN=0,tabAdminN=0;const tabSync=()=>tabDot(tabVisitorN+tabAdminN);
 (function(){const g=$('.rv-grid'),b=$('#rvMoreBtn');if(!g||!b)return;const n=g.querySelectorAll('.rv-card').length;
   if(n<=8){$('#rvMore').remove();return;}
   b.textContent=`Show all ${n} reviews`;b.onclick=()=>{g.classList.add('all');$('#rvMore').remove();};})();
+
+// slots left per service (SLOTS.per): on the service cards, in the service list and in the order form
+const slotTxt=k=>{if(typeof SLOTS==='undefined'||!SLOTS.open||!SLOTS.per||!(k in SLOTS.per))return '';const n=SLOTS.per[k];return n>0?`${n} slot${n===1?'':'s'} left`:'Fully booked';};
+(function(){
+  $$('.card').forEach(c=>{const h=c.querySelector('h3'),t=h&&slotTxt(h.textContent.trim());if(!t)return;
+    const e=document.createElement('span');e.className='slot-left'+(/Fully/.test(t)?' full':'');e.innerHTML='<i aria-hidden="true"></i>'+t;h.after(e);});
+  $$('#svcOpts label').forEach(l=>{const inp=document.getElementById(l.htmlFor),t=inp&&slotTxt(inp.value),sm=l.querySelector('small');if(t&&sm)sm.textContent+=' · '+t;});
+})();
 // "Chat with us" in the phone menu opens the chat
 document.addEventListener('click',e=>{const a=e.target.closest('.menu-chat');if(!a)return;e.preventDefault();$('#menu').classList.remove('open');const b=$('#kcBubble');if(b)b.click();});
 // the floating "Order now" button appears once the hero buttons are scrolled away
