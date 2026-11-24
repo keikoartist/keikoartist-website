@@ -120,6 +120,10 @@ def fig(name, caption, wide=False):
 RIG_VIDEO = ('<figure class="wide"><video src="/images/live2d-rigging-showcase.mp4" poster="/images/live2d-rigging-showcase-poster.webp" controls muted loop playsinline preload="none" '
              'width="1280" height="720" aria-label="Live2D rigging showcase: head turns, blinking and hair physics"></video><figcaption>Live2D rigging showcase</figcaption></figure>')
 
+SHOWCASES = [('hoodie', 'Long-haired boy in a hoodie · Live2D model', 'Live2D model of a long-haired boy in a grey hoodie: head turns, blinking, expressions and toggles'),
+             ('red-dress', 'Wolf girl in red · Live2D model', 'Live2D model of a silver-haired wolf girl in a red dress: blinking, expressions and toggles')]
+SHOW_VIDEOS = ''.join(f'<figure class="wide"><video src="/images/live2d-model-showcase-{k}.mp4" poster="/images/live2d-model-showcase-{k}-poster.webp" controls muted loop playsinline preload="none" width="960" height="540" aria-label="{e(al)}"></video><figcaption>{e(cap)}</figcaption></figure>' for k, cap, al in SHOWCASES)
+
 def svc_table(name, show_includes=True):
     s = SERVICES[name]
     if s.get('table'):
@@ -403,7 +407,7 @@ def rigging():
 
   <section class="sec"><div class="wrap">
     <h2>Rigged models</h2>
-    <div class="gallery">{RIG_VIDEO}{"".join(fig(x, "VTuber model art") for x in GALLERY["VTuber"][:3])}</div>
+    <div class="gallery">{RIG_VIDEO}{SHOW_VIDEOS}{"".join(fig(x, "VTuber model art") for x in GALLERY["VTuber"][:3])}</div>
     <p class="note">More in the <a href="/vtuber-portfolio/">portfolio</a>.</p>
   </div></section>
 {related("/live2d-rigging/")}
@@ -576,6 +580,10 @@ def portfolio():
         n_here = len(names)
         if cid == 'vtuber-models':
             n_here += 1
+            for k, cap, al in SHOWCASES:
+                n_here += 1
+                cards.append(f'<article class="wcard wide" data-cat="vtuber-models"><div class="wimg"><video src="/images/live2d-model-showcase-{k}.mp4" poster="/images/live2d-model-showcase-{k}-poster.webp" controls muted loop playsinline preload="none" width="960" height="540" aria-label="{e(al)}"></video></div>'
+                             f'<div class="wbody"><div class="wtags"><span class="wtag">Live2D model</span><span class="wtag soft">Moving model</span></div><h3>{e(cap.split(" · ")[0])}</h3><a class="wgo" rel="nofollow" href="/?order=VTuber">Order similar →</a></div></article>')
             cards.append('<article class="wcard wide" data-cat="vtuber-models"><div class="wimg"><video src="/images/live2d-rigging-showcase.mp4" poster="/images/live2d-rigging-showcase-poster.webp" controls muted loop playsinline preload="none" width="1280" height="720" aria-label="Live2D rigging showcase: head turns, blinking and hair physics"></video></div>'
                          '<div class="wbody"><div class="wtags"><span class="wtag">Live2D rigging</span><span class="wtag soft">Showcase</span></div><h3>Live2D rigging showcase</h3><a class="wgo" href="/live2d-rigging/">About rigging →</a></div></article>')
         for n in names:
