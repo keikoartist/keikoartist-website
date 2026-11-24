@@ -1,6 +1,6 @@
 # KeikoArts (keikoartist.com)
 
-> KeikoArts is Keiko's VTuber art and Live2D studio: original anime VTuber models drawn from scratch and rigged in Live2D, ready for VTube Studio, plus PNGTubers, emotes, banners, logos and stream assets. Style: cute meets gothic. 200+ commissions completed. Prices in USD; 13% tax is added on every invoice. Every commission is done within 3 weeks.
+> KeikoArts is Keiko's VTuber art and Live2D studio: original anime VTuber models drawn from scratch and rigged in Live2D, ready for VTube Studio, plus PNGTubers, emotes, banners, logos and stream assets. Style: cute meets gothic. 200+ commissions completed. Prices in USD; a 13% PayPal fee is added on every invoice. Every commission is done within 3 weeks.
 
 ## How to order
 - Order form with live total: https://keikoartist.com/?order=VTuber (all services: https://keikoartist.com/#services)

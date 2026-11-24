@@ -557,7 +557,7 @@ async function openOrder(id){
   // money
   const mc=el('div','card');mc.appendChild(el('h3',null,'Payment'));const m=el('div','money');
   const box=(k,v)=>{const d=el('div');d.appendChild(el('small',null,k));d.appendChild(el('b',null,v));m.appendChild(d);};
-  if(o.kind==='custom'){box('Client price',usd(o.price));box('Tax 13%',usd(o.tax));box('Total (pay upfront)',usd(o.total));}
+  if(o.kind==='custom'){box('Client price',usd(o.price));box('PayPal fee 13%',usd(o.tax));box('Total (pay upfront)',usd(o.total));}
   else{box('Estimated total',usd(o.total));box('Due now · '+(o.plan||''),usd(o.due));}
   mc.appendChild(m);
   if(o.payments&&o.payments.length){const pl=el('div','pays');

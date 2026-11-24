@@ -46,9 +46,9 @@ function bot_reply(string $msg, bool $first): string {
       $hs = $n('/(\d+)\s*(?:extra\s*)?hair\s*styles?/'); if ($hs && isset($ad['Extra hairstyle'])) { $lines[] = "$hs extra hairstyle" . ($hs > 1 ? 's' : '') . ': +' . bot_money($ad['Extra hairstyle'] * $hs); $sub += $ad['Extra hairstyle'] * $hs; }
       if (preg_match('/commercial|merch/', $q) && isset($ad['Commercial / merch rights'])) { $lines[] = 'Commercial / merch rights: +' . bot_money($ad['Commercial / merch rights']); $sub += $ad['Commercial / merch rights']; }
       $tax = round($sub * 0.13, 2);
-      $t = "Estimate (USD):\n- " . implode("\n- ", $lines) . "\nSubtotal " . bot_money($sub) . " + 13% tax " . bot_money($tax) . " = " . bot_money($sub + $tax);
+      $t = "Estimate (USD):\n- " . implode("\n- ", $lines) . "\nSubtotal " . bot_money($sub) . " + 13% PayPal fee " . bot_money($tax) . " = " . bot_money($sub + $tax);
       if (preg_match('/advanced?|pro\s*rig/', $q) && $type !== 'Art only') $t .= "\nFull rigging (head turns, blinking, lip-sync, hair & clothing physics) is included in Art + Rig.";
-      $t .= "\nAbout " . ($vt['eta'] ?: '2–3 weeks') . ". Keiko confirms the final price. You can send it now with the order form: keikoartist.com/?order=VTuber";
+      $t .= "\nDone within 3 weeks. Keiko confirms the final price. You can send it now with the order form: keikoartist.com/?order=VTuber";
       $out[] = $t;
       return implode("\n\n", $out);
     }
@@ -63,16 +63,16 @@ function bot_reply(string $msg, bool $first): string {
       $pk = array_map(function ($p) use ($s) { return $p[0] . ' ' . bot_money($p[1]) . (!empty($s['qty']) ? ' each' : ''); }, array_slice($s['packages'], 0, 4));
       $l[] = "$name: " . implode(', ', $pk);
     }
-    $out[] = "Prices (USD, + 13% tax):\n- " . implode("\n- ", $l) . "\nFull list: keikoartist.com/vtuber-pricing";
+    $out[] = "Prices (USD, + 13% PayPal fee):\n- " . implode("\n- ", $l) . "\nFull list: keikoartist.com/vtuber-pricing";
   } elseif ($priceAsk && $vt) {
     $g = function ($n) use ($vt) { foreach ($vt['packages'] as $p) if ($p[0] === $n) return bot_money($p[1]); return '?'; };
-    $out[] = "Live2D VTuber prices (USD, + 13% tax): Art + Rig bust " . $g('Bust · Art + Rig') . ", half body " . $g('Half body · Art + Rig') . ", full body " . $g('Full body · Art + Rig') . ". Art only from " . $g('Bust · Art only') . ".\nFull list: keikoartist.com/vtuber-pricing";
+    $out[] = "Live2D VTuber prices (USD, + 13% PayPal fee): Art + Rig bust " . $g('Bust · Art + Rig') . ", half body " . $g('Half body · Art + Rig') . ", full body " . $g('Full body · Art + Rig') . ". Art only from " . $g('Bust · Art only') . ".\nFull list: keikoartist.com/vtuber-pricing";
   }
   // nothing specific matched: the first message still gets a useful overview (prices, slots, how to order)
   if ($first && count($out) === 1 && $vt) {
     $g = function ($n) use ($vt) { foreach ($vt['packages'] as $p) if ($p[0] === $n) return bot_money($p[1]); return '?'; };
     $sl = $P['_status']['slots']['VTuber'] ?? null; $open = !isset($P['_status']['open']) || $P['_status']['open'];
-    $out[] = "While you wait, the basics:\n- Live2D VTuber model (art + rig): bust " . $g('Bust · Art + Rig') . ", half body " . $g('Half body · Art + Rig') . ", full body " . $g('Full body · Art + Rig') . " (+ 13% tax)"
+    $out[] = "While you wait, the basics:\n- Live2D VTuber model (art + rig): bust " . $g('Bust · Art + Rig') . ", half body " . $g('Half body · Art + Rig') . ", full body " . $g('Full body · Art + Rig') . " (+ 13% PayPal fee)"
       . "\n- PNGTuber, emotes, overlays, logos and more: keikoartist.com/vtuber-pricing"
       . "\n- " . ($open ? 'Commissions are open' . ($sl !== null ? ' (' . (int)$sl . ' VTuber slots left)' : '') . ', every commission done within 3 weeks' : 'Commissions are closed right now')
       . "\n- Order form: keikoartist.com/?order=VTuber";

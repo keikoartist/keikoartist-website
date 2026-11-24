@@ -19,7 +19,7 @@ ini_set('serialize_precision', '-1');
 const OWNER_EMAIL    = 'keikoarts22@gmail.com';        // where new orders are emailed
 const PAYPAL_EMAIL   = 'theresa.oktavia10@gmail.com';  // PayPal account that receives payments
 const MAIL_FROM      = 'orders@keikoartist.com';
-const TAX_RATE       = 0.13;                           // 13% tax, added on every invoice
+const TAX_RATE       = 0.13;                           // 13% PayPal fee, added on every invoice
 const COMMERCIAL_FEE = 30.0;                           // commercial / merch rights (Custom Inquiry: when Usage = Commercial)
 const MAX_FILES      = 8;
 const MAX_FILE_BYTES = 12 * 1024 * 1024;              // files sent directly with the order (old way)
@@ -130,7 +130,7 @@ function paypal_link(float $amount, string $id, string $label, string $site, str
     'return' => $site . '?paid=1&rid=' . rawurlencode($id), 'cancel_return' => $site, 'notify_url' => $site . 'order-api.php?a=ipn']);
 }
 function order_label(array $o): string {
-  return ($o['kind'] ?? '') === 'custom' ? 'Custom commission, incl. 13% tax' : trim(($o['service'] ?? '') . ' (' . ($o['package'] ?? '') . ')');
+  return ($o['kind'] ?? '') === 'custom' ? 'Custom commission, incl. 13% PayPal fee' : trim(($o['service'] ?? '') . ' (' . ($o['package'] ?? '') . ')');
 }
 function prune_files(): void {   // reference files of finished orders are removed 30 days after the order was marked Done / Cancelled
   $db = db();
@@ -255,7 +255,7 @@ function discord_order(array $cfg, array $o, $newTotal = null, bool $resend = fa
     'color' => 0xF2628F,
     'fields' => [
       $f('Service', trim(($o['service'] ?? '') . ' — ' . ($o['kind'] === 'custom' ? ($fields['Usage'] ?? 'Personal') . ' use' : ($o['package'] ?? '')), ' —')),
-      $f('Total', money2($total) . ((float)($o['tax'] ?? 0) > 0 ? ' (incl. 13% tax)' : '')),
+      $f('Total', money2($total) . ((float)($o['tax'] ?? 0) > 0 ? ' (incl. 13% PayPal fee)' : '')),
       $f('Plan', (string)$o['plan']),
       $f('Client', $o['name']), $f('Discord', $o['discord']), $f('Email', $o['email']),
       $f('Deadline', $fields['Deadline'] ?? ''), $f('Files', (string)count($files)),
@@ -479,11 +479,11 @@ function cart_mail_html(array $c, string $site, bool $reminder): array {
   $intro = $reminder ? 'Your cart is saved. Slots are limited, and every commission is done within 3 weeks.' : 'You asked for your cart by email. Open it any time to check out, on any device.';
   $html = '<div style="font-family:Arial,sans-serif;color:#7a2846;font-size:14px;line-height:1.55"><h2 style="color:#f2628f;margin:0 0 8px">' . $head . '</h2><p>' . $intro . '</p>'
         . '<table cellspacing="0" style="border-collapse:collapse;font-size:14px;min-width:280px">' . $rows
-        . '<tr><td style="padding:8px 16px 4px 0;border-top:1px solid #fbd3e0">Subtotal + 13% tax</td><td align="right" style="border-top:1px solid #fbd3e0;padding-top:8px"><b>' . money2((float)$c['total']) . '</b></td></tr></table>'
+        . '<tr><td style="padding:8px 16px 4px 0;border-top:1px solid #fbd3e0">Subtotal + 13% PayPal fee</td><td align="right" style="border-top:1px solid #fbd3e0;padding-top:8px"><b>' . money2((float)$c['total']) . '</b></td></tr></table>'
         . '<p style="margin:18px 0"><a href="' . h($url) . '" style="display:inline-block;background:#c93a6a;color:#fff;font-weight:bold;text-decoration:none;padding:12px 22px;border-radius:999px">Open my cart</a></p>'
         . '<p>Questions first? Reply to this email or message me on Discord: <a href="' . DISCORD_USER . '">' . DISCORD_USER . '</a></p>'
         . '<p style="color:#a8607a;font-size:12px">' . ($reminder ? 'This was the only reminder. Your email is deleted after 14 days.' : 'I send one reminder tomorrow, nothing else. Your email is deleted after 14 days.') . '</p><p>— Keiko, KeikoArts</p></div>';
-  $text = "$head\n\n$intro\n\n{$txt}Total incl. 13% tax: " . money2((float)$c['total']) . "\n\nOpen my cart: $url\n\nQuestions? Reply to this email or message me on Discord: " . DISCORD_USER . "\n\n" . ($reminder ? 'This was the only reminder.' : 'I send one reminder tomorrow, nothing else.') . " Your email is deleted after 14 days.\n\n— Keiko, KeikoArts";
+  $text = "$head\n\n$intro\n\n{$txt}Total incl. 13% PayPal fee: " . money2((float)$c['total']) . "\n\nOpen my cart: $url\n\nQuestions? Reply to this email or message me on Discord: " . DISCORD_USER . "\n\n" . ($reminder ? 'This was the only reminder.' : 'I send one reminder tomorrow, nothing else.') . " Your email is deleted after 14 days.\n\n— Keiko, KeikoArts";
   return [$reminder ? 'Your KeikoArts cart is waiting ♡' : 'Your KeikoArts cart', $html, $text];
 }
 if (($_GET['a'] ?? '') === 'cartsave') {
@@ -624,16 +624,16 @@ if (($_GET['a'] ?? '') === 'submit') {
   }
   // invoice lines (as shown in the order form); checked against the total
   $lines = [];
-  if ($kind === 'custom') $lines = array_merge([['Custom commission (' . ($fields['Usage'] ?? 'Personal') . ' use)', $price]], $com > 0 ? [['Commercial / merch rights', $com]] : [], [['Tax (13%)', $tax]]);
+  if ($kind === 'custom') $lines = array_merge([['Custom commission (' . ($fields['Usage'] ?? 'Personal') . ' use)', $price]], $com > 0 ? [['Commercial / merch rights', $com]] : [], [['PayPal fee (13%)', $tax]]);
   else {
     $lj = json_decode((string)($_POST['_lines'] ?? ''), true);
     if (is_array($lj)) foreach (array_slice($lj, 0, 60) as $l)
       if (is_array($l) && count($l) >= 2 && is_string($l[0]) && is_numeric($l[1])) $lines[] = [clean($l[0], 120), round(min(100000, max(0, (float)$l[1])), 2)];
     if (!$lines || abs(array_sum(array_column($lines, 1)) - $total) > 0.05) $lines = [[trim($service . ' - ' . ($fields['Package'] ?? ''), ' -'), $total]];
-    // 13% tax on every order: the order form sends it as its own line; add it here when it is missing (e.g. an old cached page)
-    $ti = -1; foreach ($lines as $i => $l) if (strpos($l[0], 'Tax (13%)') === 0) $ti = $i;
+    // 13% PayPal fee on every order: the order form sends it as its own line; add it here when it is missing (e.g. an old cached page)
+    $ti = -1; foreach ($lines as $i => $l) if (preg_match('/^(PayPal fee|Tax) \(13%\)/', $l[0])) { $ti = $i; $lines[$i][0] = 'PayPal fee (13%)'; }   // pages cached before 24 Nov 2026 still send "Tax (13%)"
     if ($total > 0 && $ti < 0 && !empty($_POST['_taxed'])) { $tax = round($total - $total / (1 + TAX_RATE), 2); }   // total already includes tax, the lines just did not add up
-    elseif ($total > 0 && $ti < 0) { $tax = round($total * TAX_RATE, 2); $lines[] = ['Tax (13%)', $tax]; $total = round($total + $tax, 2); }
+    elseif ($total > 0 && $ti < 0) { $tax = round($total * TAX_RATE, 2); $lines[] = ['PayPal fee (13%)', $tax]; $total = round($total + $tax, 2); }
     elseif ($ti >= 0) {   // never trust the tax amount from the browser: recompute it from the other lines
       $sub = 0.0; foreach ($lines as $i => $l) if ($i !== $ti) $sub += $l[1];
       $tax = round($sub * TAX_RATE, 2); $lines[$ti][1] = $tax; $total = round($sub + $tax, 2);
@@ -724,14 +724,14 @@ if (($_GET['a'] ?? '') === 'submit') {
   // ---- email to Keiko ----
   $rows = '';
   $sum = $kind === 'custom'
-    ? ['Client price' => money2($price)] + ($com > 0 ? ['Commercial / merch rights' => money2($com)] : []) + ['Tax (13%)' => money2($tax), 'Total (paid upfront)' => money2($total)]
-    : ['Total (incl. 13% tax)' => money2($total), 'Due now' => money2($due) . " ($plan)"];
+    ? ['Client price' => money2($price)] + ($com > 0 ? ['Commercial / merch rights' => money2($com)] : []) + ['PayPal fee (13%)' => money2($tax), 'Total (paid upfront)' => money2($total)]
+    : ['Total (incl. 13% PayPal fee)' => money2($total), 'Due now' => money2($due) . " ($plan)"];
   foreach ($sum + $fields as $k => $v) $rows .= '<tr><th align="left" valign="top" style="padding:6px 12px 6px 0;color:#a8607a;font-weight:500;white-space:nowrap">' . h((string)$k) . '</th><td style="padding:6px 0;white-space:pre-wrap">' . h((string)$v) . '</td></tr>';
   $fileNote = $files ? count($files) . ' reference file(s)' : 'No files';
   $attach = []; $bytes = 0;
   foreach ($files as $f) { $bytes += $f['size']; if ($bytes <= MAIL_ATTACH_MAX) $attach[] = ['path' => "$dir/{$f['name']}", 'name' => $f['name'], 'type' => $f['type']]; }
   if (count($attach) < count($files)) $fileNote .= ' (open the admin inbox to see all files)';
-  $titleTxt = $kind === 'custom' ? "New custom order — " . money2($total) . " incl. tax [$id]" : "New request: $service (" . $o['package'] . ") — " . money2($total) . " [$id]";
+  $titleTxt = $kind === 'custom' ? "New custom order — " . money2($total) . " incl. PayPal fee [$id]" : "New request: $service (" . $o['package'] . ") — " . money2($total) . " [$id]";
   $html = '<div style="font-family:Arial,sans-serif;color:#7a2846;font-size:14px"><h2 style="color:#f2628f;margin:0 0 6px">' . h($titleTxt) . '</h2>'
         . '<p style="margin:0 0 14px;color:#a8607a">' . h($dateStr) . ' · ' . h($fileNote) . ' · <a href="' . h($SITE) . 'admin/">Open admin → Orders</a></p>'
         . '<table cellspacing="0" style="border-collapse:collapse;font-size:14px">' . $rows . '</table>'
@@ -754,9 +754,9 @@ if (($_GET['a'] ?? '') === 'submit') {
             . '<tr><td colspan="2" style="padding:0 0 8px;color:#a8607a">Order <b style="color:#f2628f">' . h($id) . '</b> · ' . h($dateStr) . '</td></tr>'
             . '<tr><td style="padding:4px 16px 4px 0">Custom commission (' . h($fields['Usage'] ?? 'Personal') . ' use)</td><td align="right">' . money2($price) . '</td></tr>'
             . ($com > 0 ? '<tr><td style="padding:4px 16px 4px 0">Commercial / merch rights</td><td align="right">' . money2($com) . '</td></tr>' : '')
-            . '<tr><td style="padding:4px 16px 4px 0">Tax (13%)</td><td align="right">' . money2($tax) . '</td></tr>'
+            . '<tr><td style="padding:4px 16px 4px 0">PayPal fee (13%)</td><td align="right">' . money2($tax) . '</td></tr>'
             . '<tr><td style="padding:8px 16px 4px 0;border-top:1px solid #fbd3e0"><b>Suggested total (USD)</b></td><td align="right" style="border-top:1px solid #fbd3e0;padding-top:8px"><b>' . money2($total) . '</b></td></tr></table>';
-      $txt = "Hi " . (no_links($name) ?: 'there') . ", thank you for your custom request at KeikoArts!\nI check your idea and the price you suggested, and reply within 6 hours (WIB). Once we agree on the price, I email your invoice with a one-click PayPal link.\n\nREQUEST $id · $dateStr\nCustom commission: " . money2($price) . ($com > 0 ? "\nCommercial / merch rights: " . money2($com) : '') . "\nTax (13%): " . money2($tax) . "\nSUGGESTED TOTAL: " . money2($total) . " USD\n\n";
+      $txt = "Hi " . (no_links($name) ?: 'there') . ", thank you for your custom request at KeikoArts!\nI check your idea and the price you suggested, and reply within 6 hours (WIB). Once we agree on the price, I email your invoice with a one-click PayPal link.\n\nREQUEST $id · $dateStr\nCustom commission: " . money2($price) . ($com > 0 ? "\nCommercial / merch rights: " . money2($com) : '') . "\nPayPal fee (13%): " . money2($tax) . "\nSUGGESTED TOTAL: " . money2($total) . " USD\n\n";
     } else {
       $subj = "Your KeikoArts request $id";
       $body = "<p>Hi $cn, thank you for your commission request at KeikoArts! ♡</p><p>Request ID: <b style=\"color:#f2628f\">" . h($id) . '</b><br>Service: ' . h($service . ' (' . $o['package'] . ')') . '<br>Estimated total: ' . money2($total) . '<br>Payment plan: ' . h($plan) . '</p>';
@@ -783,8 +783,8 @@ if (($_GET['a'] ?? '') === 'submit') {
 
   if ($HTML_MODE) {
     $rowsH = $kind === 'custom'
-      ? '<tr><td>Custom commission (' . h($fields['Usage'] ?? 'Personal') . ' use)</td><td>' . money2($price) . '</td></tr>' . ($com > 0 ? '<tr><td>Commercial / merch rights</td><td>' . money2($com) . '</td></tr>' : '') . '<tr><td>Tax (13%)</td><td>' . money2($tax) . '</td></tr><tr class="tot"><td>Total due (USD)</td><td>' . money2($total) . '</td></tr>'
-      : '<tr><td>' . h($service . ' (' . $o['package'] . ')') . '</td><td>' . money2($total) . '</td></tr><tr class="tot"><td>Total incl. 13% tax (' . h($plan) . ')</td><td>' . money2($total) . '</td></tr>';
+      ? '<tr><td>Custom commission (' . h($fields['Usage'] ?? 'Personal') . ' use)</td><td>' . money2($price) . '</td></tr>' . ($com > 0 ? '<tr><td>Commercial / merch rights</td><td>' . money2($com) . '</td></tr>' : '') . '<tr><td>PayPal fee (13%)</td><td>' . money2($tax) . '</td></tr><tr class="tot"><td>Total due (USD)</td><td>' . money2($total) . '</td></tr>'
+      : '<tr><td>' . h($service . ' (' . $o['package'] . ')') . '</td><td>' . money2($total) . '</td></tr><tr class="tot"><td>Total incl. 13% PayPal fee (' . h($plan) . ')</td><td>' . money2($total) . '</td></tr>';
     page('Order sent',
       '<h1>Order sent! ♡</h1><p class="muted">Order ID <b>' . h($id) . '</b> · ' . h($dateStr) . '</p><p>Name <b>' . h($name) . '</b></p>'
       . '<table>' . $rowsH . '</table>'

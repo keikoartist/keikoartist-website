@@ -1717,6 +1717,13 @@ body.xmas header:not(.kc-head)::after{background:linear-gradient(90deg,#f2628f,#
 .fq-res b{color:#4a2a63}.fq-res .btn{margin-top:8px;padding:9px 16px;font-size:13.5px}
 .pinst{display:block;font-size:13px;color:var(--muted);margin-top:2px}
 @media (max-width:820px){.buy-help{grid-template-columns:1fr}}
+
+.mx-help,.pay-help{display:block;font-size:13px;color:var(--muted);line-height:1.5;margin-top:8px}.mx-help b{color:var(--ink);font-weight:600}
+.svc-guide{flex-basis:100%;margin:6px 0 0;font-size:14px;color:var(--muted);line-height:1.55}.svc-guide b{color:var(--ink);font-weight:600}
+.wyg{border:1px solid var(--line);border-radius:14px;background:#fffafc;padding:10px 14px;font-size:14px}.wyg summary{cursor:pointer;font-weight:600;color:var(--pink-text)}
+.wyg ul{margin:8px 0 2px;padding-left:18px;line-height:1.55;color:var(--muted)}.wyg[hidden]{display:none}
+.add-note{display:block;font-size:12.5px;color:var(--muted);font-weight:400;margin-top:2px}
+.ask-first{margin:-4px 0 0;font-size:13.5px;color:var(--muted)}.ask-first a{color:var(--pink-text);font-weight:600}
 </style>
 </head>
 <body>
@@ -1819,23 +1826,24 @@ body.xmas header:not(.kc-head)::after{background:linear-gradient(90deg,#f2628f,#
   <div class="wrap">
     <div class="sec-head">
       <h2 class="serif">Our Services</h2><span class="start-pill" id="startPill" hidden></span><span class="work-now" id="workNow" hidden></span>
+      <p class="svc-guide"><b>VTuber</b> moves with your face · <b>VTuber Packages</b> model + emotes and stream assets · <b>PNGTuber</b> image-based, simpler and cheaper · <b>Chibi VTuber</b> a cute small version</p>
       <label class="svc-search"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2"/><path d="m20 20-4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
         <input type="search" id="svcSearch" placeholder="Search services… e.g. emotes, logo, rig" aria-label="Search services" autocomplete="off"></label>
     </div>
     <p class="svc-empty" id="svcEmpty" hidden>No service matches “<span></span>”. Try another word, or <a href="#order" data-order="Custom Inquiry">make a custom order</a> ♡</p>
     <div class="services">
-      <div class="card main"><div class="img art"></div><h3>VTuber</h3><p>Live2D VTuber model: bust, half or full body.</p><div class="price"><b>From $100 <small class="ptax">+ 13% tax</small></b><span class="pnote">Art only · moving model (art + rig) from $150</span></div><button class="btn btn-pink req" data-order="VTuber">Order now</button></div>
-      <div class="card main"><div class="img"></div><span class="best-tag">Best value</span><h3>VTuber Packages</h3><p>Debut bundle: model, rig, emotes and stream assets.</p><div class="price"><b>From $250 <small class="ptax">+ 13% tax</small></b></div><button class="btn btn-pink req" data-order="VTuber Packages">Order now</button></div>
-      <div class="card main"><div class="img"></div><h3>PNGTuber</h3><p>Talking and idle avatar, ready to stream.</p><div class="price"><b>From $60 <small class="ptax">+ 13% tax</small></b></div><button class="btn btn-pink req" data-order="PNGTuber">Order now</button></div>
+      <div class="card main"><div class="img art"></div><h3>VTuber</h3><p>Live2D VTuber model: bust, half or full body.</p><div class="price"><b>From $100 <small class="ptax">+ 13% PayPal fee</small></b><span class="pnote">Art only · moving model (art + rig) from $150</span></div><button class="btn btn-pink req" data-order="VTuber">Order now</button></div>
+      <div class="card main"><div class="img"></div><span class="best-tag">Best value</span><h3>VTuber Packages</h3><p>Debut bundle: model, rig, emotes and stream assets.</p><div class="price"><b>From $250 <small class="ptax">+ 13% PayPal fee</small></b></div><button class="btn btn-pink req" data-order="VTuber Packages">Order now</button></div>
+      <div class="card main"><div class="img"></div><h3>PNGTuber</h3><p>Talking and idle avatar, ready to stream.</p><div class="price"><b>From $60 <small class="ptax">+ 13% PayPal fee</small></b></div><button class="btn btn-pink req" data-order="PNGTuber">Order now</button></div>
       <p class="svc-more-l">More services</p>
-      <div class="card"><div class="img art"></div><h3>VTuber Pet</h3><p>A cute companion pet for your VTuber.</p><div class="price"><b>From $63 <small class="ptax">+ 13% tax</small></b></div><button class="btn btn-pink req" data-order="VTuber Pet">Order now</button></div>
-      <div class="card"><div class="img art"></div><h3>Emotes</h3><p>Static or animated, made for your character.</p><div class="price"><b>From $5 <small class="ptax">+ 13% tax</small></b></div><button class="btn btn-pink req" data-order="Emotes">Order now</button></div>
-      <div class="card"><div class="img art"></div><h3>Custom PFP</h3><p>Profile picture of your character for socials.</p><div class="price"><b>From $36 <small class="ptax">+ 13% tax</small></b></div><button class="btn btn-pink req" data-order="Custom PFP">Order now</button></div>
-      <div class="card extra"><div class="img"></div><h3>Banner</h3><p>Eye or mouth banner, static or animated.</p><div class="price"><b>From $45 <small class="ptax">+ 13% tax</small></b></div><button class="btn btn-pink req" data-order="Banner">Order now</button></div>
-      <div class="card extra"><div class="img art"></div><h3>Chibi VTuber</h3><p>Cute chibi version of your VTuber character.</p><div class="price"><b>From $45 <small class="ptax">+ 13% tax</small></b></div><button class="btn btn-pink req" data-order="Chibi VTuber">Order now</button></div>
-      <div class="card extra"><div class="img"></div><h3>VTuber Logo</h3><p>Name logo that matches your character.</p><div class="price"><b>From $30 <small class="ptax">+ 13% tax</small></b></div><button class="btn btn-pink req" data-order="VTuber Logo">Order now</button></div>
-      <div class="card extra"><div class="img"></div><h3>Stream Overlay</h3><p>Matching stream screens, layouts and panels.</p><div class="price"><b>From $45 <small class="ptax">+ 13% tax</small></b></div><button class="btn btn-pink req" data-order="Stream Overlay">Order now</button></div>
-      <div class="card extra"><div class="img"></div><h3>Background</h3><p>Original background for your stream layout.</p><div class="price"><b>From $100 <small class="ptax">+ 13% tax</small></b></div><button class="btn btn-pink req" data-order="Background">Order now</button></div>
+      <div class="card"><div class="img art"></div><h3>VTuber Pet</h3><p>A cute companion pet for your VTuber.</p><div class="price"><b>From $63 <small class="ptax">+ 13% PayPal fee</small></b></div><button class="btn btn-pink req" data-order="VTuber Pet">Order now</button></div>
+      <div class="card"><div class="img art"></div><h3>Emotes</h3><p>Static or animated, made for your character.</p><div class="price"><b>From $5 <small class="ptax">+ 13% PayPal fee</small></b></div><button class="btn btn-pink req" data-order="Emotes">Order now</button></div>
+      <div class="card"><div class="img art"></div><h3>Custom PFP</h3><p>Profile picture of your character for socials.</p><div class="price"><b>From $36 <small class="ptax">+ 13% PayPal fee</small></b></div><button class="btn btn-pink req" data-order="Custom PFP">Order now</button></div>
+      <div class="card extra"><div class="img"></div><h3>Banner</h3><p>Eye or mouth banner, static or animated.</p><div class="price"><b>From $45 <small class="ptax">+ 13% PayPal fee</small></b></div><button class="btn btn-pink req" data-order="Banner">Order now</button></div>
+      <div class="card extra"><div class="img art"></div><h3>Chibi VTuber</h3><p>Cute chibi version of your VTuber character.</p><div class="price"><b>From $45 <small class="ptax">+ 13% PayPal fee</small></b></div><button class="btn btn-pink req" data-order="Chibi VTuber">Order now</button></div>
+      <div class="card extra"><div class="img"></div><h3>VTuber Logo</h3><p>Name logo that matches your character.</p><div class="price"><b>From $30 <small class="ptax">+ 13% PayPal fee</small></b></div><button class="btn btn-pink req" data-order="VTuber Logo">Order now</button></div>
+      <div class="card extra"><div class="img"></div><h3>Stream Overlay</h3><p>Matching stream screens, layouts and panels.</p><div class="price"><b>From $45 <small class="ptax">+ 13% PayPal fee</small></b></div><button class="btn btn-pink req" data-order="Stream Overlay">Order now</button></div>
+      <div class="card extra"><div class="img"></div><h3>Background</h3><p>Original background for your stream layout.</p><div class="price"><b>From $100 <small class="ptax">+ 13% PayPal fee</small></b></div><button class="btn btn-pink req" data-order="Background">Order now</button></div>
       <div class="card extra"><div class="img"></div><h3>Custom Inquiry</h3><p>Not listed? Describe it and name your price ♡</p><div class="price"><b>Your price</b></div><button class="btn btn-pink req" data-order="Custom Inquiry">Send inquiry</button></div>
     </div>
     <div class="sec-more"><button type="button" class="btn btn-ghost" id="svcAll" aria-expanded="false">View all services (12)</button><a href="/vtuber-pricing/" class="link arrow">Compare all prices </a></div>
@@ -1849,7 +1857,7 @@ body.xmas header:not(.kc-head)::after{background:linear-gradient(90deg,#f2628f,#
         <h3>Not sure what you need?</h3>
         <p>Three quick questions and I suggest a package.</p>
         <div class="fq" id="fq">
-          <div class="fq-q"><span>Your budget (before tax)</span><div class="chips" data-q="b"><button type="button" data-v="low">Under $100</button><button type="button" data-v="mid">$100–300</button><button type="button" data-v="high">$300+</button></div></div>
+          <div class="fq-q"><span>Your budget (before the PayPal fee)</span><div class="chips" data-q="b"><button type="button" data-v="low">Under $100</button><button type="button" data-v="mid">$100–300</button><button type="button" data-v="high">$300+</button></div></div>
           <div class="fq-q"><span>Should it move with your face?</span><div class="chips" data-q="m"><button type="button" data-v="yes">Yes (Live2D)</button><button type="button" data-v="no">No, simple is fine</button></div></div>
           <div class="fq-q"><span>Do you also need emotes, overlay or logo?</span><div class="chips" data-q="x"><button type="button" data-v="yes">Yes, the full debut</button><button type="button" data-v="no">Just the model</button></div></div>
           <div class="fq-res" id="fqRes" hidden></div>
@@ -2099,7 +2107,7 @@ body.xmas header:not(.kc-head)::after{background:linear-gradient(90deg,#f2628f,#
       <summary><span class="serif">Terms of Service</span><small>By ordering you agree to these terms. Tap to read.</small></summary>
       <div class="tos">
       <div><h3>1. Ordering</h3><p>Choose your options, send the order form and pay with PayPal. Your slot is secured once payment is received. Custom Inquiry: I reply within 6 hours (WIB, GMT+7) to agree on the price, then email your invoice.</p></div>
-      <div><h3>2. Payment</h3><p>Once the details are confirmed, I send your invoice as a PDF with a one-click PayPal link (card or PayPal balance, USD). Choose full payment, 50/50 (50% upfront, 50% before final files), or 3× installments for orders above $150. 13% tax is added on every invoice. Custom orders: you name the price and pay the full invoice upfront.</p></div>
+      <div><h3>2. Payment</h3><p>Once the details are confirmed, I send your invoice as a PDF with a one-click PayPal link (card or PayPal balance, USD). Choose full payment, 50/50 (50% upfront, 50% before final files), or 3× installments for orders above $150. A 13% PayPal fee is added on every invoice. Custom orders: you name the price and pay the full invoice upfront.</p></div>
       <div><h3>3. Process &amp; timeline</h3><p>Sketch → lineart → coloring → (rigging) → delivery. You get progress updates at every stage. Estimated time is shown in the form; rush delivery is available.</p></div>
       <div><h3>4. Revisions</h3><p>Unlimited small revisions during sketch. Up to 2 minor revisions after coloring; major changes after approval may have extra fees.</p></div>
       <div><h3>5. Refunds</h3><p>Full refund before work starts. After the sketch, refunds are based on completed work. No refund after final files are delivered.</p></div>
@@ -2206,6 +2214,7 @@ body.xmas header:not(.kc-head)::after{background:linear-gradient(90deg,#f2628f,#
         <div class="ostep on" data-s="1">
           <div class="cart-mini" id="cartMini" hidden><span>In your cart: <b id="cmN"></b> · <b id="cmT"></b></span><button type="button" class="btn btn-pink" id="cmGo">View cart</button></div>
           <p class="c-intro">What would you like to order? Pick one to see its options ♡<span class="c-start" id="cStart" hidden></span></p>
+          <p class="ask-first">Questions before ordering? <a href="#chat" class="menu-chat">Ask in the chat</a> or <a href="https://discord.gg/FbgWxMPjf" target="_blank" rel="noopener">on Discord</a>, it's free.</p>
           <div class="opts" id="svcOpts"></div>
         </div>
 
@@ -2216,12 +2225,13 @@ body.xmas header:not(.kc-head)::after{background:linear-gradient(90deg,#f2628f,#
             <button type="button" class="sh-change" id="shChange">Change</button>
           </div>
           <p class="c-intro" id="shIntro"></p>
+          <details class="wyg" id="wyg" hidden><summary>What you get</summary><ul id="wygList"></ul></details>
           <div class="draft-note" id="draftNote" hidden><span>✓ Your details were restored.</span><button type="button" id="draftClear">Start fresh</button></div>
 
           <div class="sec" id="secPkg">
             <h4>Choose your package</h4>
             <div class="mx" id="mx" hidden>
-              <div class="mx-g"><span>What do you need?</span><div class="chips big" id="mxType"></div></div>
+              <div class="mx-g"><span>What do you need?</span><div class="chips big" id="mxType"></div><small class="mx-help"><b>Art only</b>: the drawing as a layered PSD, for your own rigger · <b>Art + Rig</b>: a moving model, ready for VTube Studio · <b>Rig only</b>: I rig art you already have</small></div>
               <div class="mx-g"><span>How much of your character?</span><div class="chips big" id="mxSize"></div></div>
               <p class="mx-pick" id="mxPick"></p>
             </div>
@@ -2237,7 +2247,7 @@ body.xmas header:not(.kc-head)::after{background:linear-gradient(90deg,#f2628f,#
 
           <div class="sec" id="secBudget" hidden>
             <h4>Your price</h4>
-            <div id="budgetWrap" class="budget"><label class="lbl" for="budget">Your budget (USD)</label><div class="bin"><span>$</span><input type="number" id="budget" name="_price" min="5" max="10000" step="0.01" inputmode="decimal" placeholder="e.g. 80"></div><small id="budgetHint">The price you'd like to pay for this commission. 13% tax is added on your invoice.</small></div>
+            <div id="budgetWrap" class="budget"><label class="lbl" for="budget">Your budget (USD)</label><div class="bin"><span>$</span><input type="number" id="budget" name="_price" min="5" max="10000" step="0.01" inputmode="decimal" placeholder="e.g. 80"></div><small id="budgetHint">The price you'd like to pay for this commission. A 13% PayPal fee is added on your invoice.</small></div>
           </div>
 
           <div class="sec">
@@ -2271,9 +2281,10 @@ body.xmas header:not(.kc-head)::after{background:linear-gradient(90deg,#f2628f,#
             <h4>How would you like to pay?</h4>
             <div class="chips big pay">
               <input type="radio" name="Payment plan" id="pp1" value="Full payment" checked><label for="pp1">Pay in full<small>All at once</small></label>
-              <input type="radio" name="Payment plan" id="pp2" value="50/50"><label for="pp2">50% now<small>Rest before final files</small></label>
+              <input type="radio" name="Payment plan" id="pp2" value="50/50"><label for="pp2">50% now<small>Rest when your art is ready</small></label>
               <input type="radio" name="Payment plan" id="pp3" value="3x installments"><label for="pp3">3 payments<small>Orders above $150</small></label>
             </div>
+            <small class="pay-help">50% or 3 payments: I email you the next PayPal link as your commission moves forward. The last payment is due before you get the final files.</small>
           </div>
 
           <div class="c-inv" aria-live="polite">
@@ -2281,7 +2292,7 @@ body.xmas header:not(.kc-head)::after{background:linear-gradient(90deg,#f2628f,#
             <dl id="invLines"></dl>
             <p id="invNote">Instant order: pay with PayPal right after sending to secure your slot. Full refund if I can't take your order.</p>
             <p class="inv-fx" id="invFx" hidden></p>
-            <ul class="inv-inc"><li><b>Revisions included:</b> unlimited at the sketch stage, 2 minor revisions after coloring</li><li><b>Safe payment:</b> PayPal checkout (card or PayPal balance), I never see your card details</li><li><b>No marketplace fees:</b> you order directly from Keiko, nothing added on top</li><li><b>Refunds:</b> full refund before work starts (<a href="#tos" data-close>Terms</a>)</li><li><b>Track it:</b> you get a link to follow every stage of your order</li></ul>
+            <ul class="inv-inc"><li><b>Revisions included:</b> unlimited at the sketch stage, 2 minor revisions after coloring</li><li><b>Safe payment:</b> PayPal checkout (card or PayPal balance), I never see your card details</li><li><b>Refunds:</b> full refund before work starts (<a href="#tos" data-close>Terms</a>)</li><li><b>Track it:</b> you get a link to follow every stage of your order</li></ul>
           </div>
           <label class="check" id="agreeRow"><input type="checkbox" id="agree"><span>I have read and agree to the <a href="#tos" data-close style="color:var(--pink-text);font-weight:600">Terms of Service and Privacy</a>.</span></label>
         </div>
@@ -2307,7 +2318,7 @@ body.xmas header:not(.kc-head)::after{background:linear-gradient(90deg,#f2628f,#
         <p class="err" id="err"></p>
         <div class="mnav" id="mnav">
           <button type="button" class="btn btn-ghost" id="prevBtn" aria-label="Back"><span class="pbl">Back</span></button>
-          <div class="mtot" id="navTot"><small id="navLbl">Total (incl. 13% tax)</small><b id="navTotal">$0</b></div>
+          <div class="mtot" id="navTot"><small id="navLbl">Total (incl. fee)</small><b id="navTotal">$0</b></div>
           <button type="button" class="btn btn-ghost" id="addCartBtn" aria-label="Add to cart"><svg class="ic" viewBox="0 0 24 24" width="21" height="21" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M7.2 10a4.8 4.8 0 0 1 9.6 0"/><path d="M3.5 10h17l-1.6 8.3a2 2 0 0 1-2 1.7H7.1a2 2 0 0 1-2-1.7Z"/><path d="M12 17.4s-2.7-1.5-2.7-3.4a1.35 1.35 0 0 1 2.7-.5 1.35 1.35 0 0 1 2.7.5c0 1.9-2.7 3.4-2.7 3.4Z" fill="#f2628f" stroke="none"/></svg><span class="acl">Add to cart</span></button>
           <button type="submit" class="btn btn-pink" id="sendBtn">Send<span class="so-l"> Order</span> <svg class="ic" viewBox="0 0 24 24" width="17" height="17" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10Z" fill="none" stroke="currentColor" stroke-width="2"/></svg></button>
         </div>
@@ -2428,7 +2439,7 @@ const DETAILS = {   // deskripsi lengkap tiap service (muncul saat kartu diklik)
     notes:"Add toggles, hairstyles or outfits as needed." },
   "Custom Inquiry": { about:"Have an idea that isn't listed? Illustrations, stream assets or something new: just describe it.",
     includes:["Full illustrations and scenes","Stream screens, overlays and alerts","Anything else, priced to your budget"],
-    notes:"Name your price (+13% tax; commercial use +$30). I confirm the details and email you your invoice with a one-click PayPal link." },
+    notes:"Name your price (+13% PayPal fee; commercial use +$30). I confirm the details and email you your invoice with a one-click PayPal link." },
 };
 const VTUBERS = [   // VTuber yang pernah kamu buat. Isi name & link HANYA dengan nama klien asli (link: Twitch/YouTube/X). Karakter orisinal portofolio pribadi Keiko (bukan klien): jangan diberi nama klien
   { img:"vtuber-avatar-witch",  name:"", link:"" },
@@ -2487,6 +2498,6 @@ const SERVICES = {
 };
 /* ========================================================== */
 </script>
-<script src="assets/app.js?v=cabddb23" defer></script>
+<script src="assets/app.js?v=3f05e884" defer></script>
 </body>
 </html>

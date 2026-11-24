@@ -141,13 +141,13 @@ function renderCart(){
   const sv=readSaved();$('#savedBox').hidden=!sv.length;
   $('#savedList').innerHTML=sv.map(x=>`<li class="ci"><span class="ci-th" style="background-image:url('${svcThumb(x.svc)}')"></span><div class="ci-t"><b>${esc(x.svc)}</b><small>${esc(x.lines.map(l=>l[0].replace(/^\+ /,'')).join(' · ').replace(x.svc+' · ',''))}</small><button type="button" class="ci-save" data-mv="${esc(x.id)}">Move to cart</button></div><b class="ci-p">${money2(x.sub)}</b><div class="ci-a"><button type="button" class="ci-x" data-srm="${esc(x.id)}" aria-label="Remove ${esc(x.svc)}" title="Remove">✕</button></div></li>`).join('');
   fxLine(sm.total,$('#cartFx'));
-  $('#cartTot').innerHTML=`<dt>Subtotal</dt><dd>${money2(sm.sub)}</dd><dt>Tax (13%)</dt><dd>${money2(sm.tax)}</dd><dt class="grand">Total (USD)</dt><dd class="grand">${money2(sm.total)}</dd>`;
+  $('#cartTot').innerHTML=`<dt>Subtotal</dt><dd>${money2(sm.sub)}</dd><dt>PayPal fee (13%)</dt><dd>${money2(sm.tax)}</dd><dt class="grand">Total (USD)</dt><dd class="grand">${money2(sm.total)}</dd>`;
 }
 function addToCart(){
   if(!svc||cmOn||CART_MODE)return;
   calc();
   const c=readCart(),ei=EDIT_ID?c.findIndex(x=>x.id===EDIT_ID):-1;if(ei<0&&c.length>=CART_MAX){err(`Your cart is full (${CART_MAX} services). Please check out first.`);return;}
-  const ls=ORDER.lines.filter(l=>!/^Tax \(13%\)/.test(l[0])).map((l,i)=>[i?'+ '+l[0]:l[0],l[1]]);
+  const ls=ORDER.lines.filter(l=>!/^(Tax|PayPal fee) \(13%\)/.test(l[0])).map((l,i)=>[i?'+ '+l[0]:l[0],l[1]]);
   const sel=[...$$('#sheet input[type=radio]:checked'),...$$('#sheet input[type=checkbox]:checked')].map(x=>x.id).filter(id=>id&&id!=='agree'&&!/^pp\d/.test(id)),aq={};$$('#addOpts .add-q').forEach(x=>aq[x.id]=x.value);
   const item={id:ei>=0?EDIT_ID:Date.now().toString(36)+Math.random().toString(36).slice(2,5),t:Date.now(),sel,aq,svc:svcName,pkg:$('#fPackage').value,qty:+$('#fQty').value||1,addons:$('#fAddons').value,lines:ls,sub:r2(ls.reduce((a,l)=>a+l[1],0)),details:$('#fDetails').value.split('\n').filter(l=>!/^\s*[^:\n]{1,60}:\s*$/.test(l)).join('\n').replace(/\n{3,}/g,'\n\n').trim().slice(0,1500)};
   if(ei>=0)c[ei]=item;else c.push(item);EDIT_ID=null;
@@ -168,7 +168,7 @@ function editCartItem(id){
 function openCheckout(){
   const c=readCart();if(!c.length){go(3);return;}
   CART_MODE=true;svc=CART_SVC;svcName='Cart';cmOn=false;
-  $('#shName').textContent='Your cart';$('#shMeta').textContent=`${c.length} service${c.length>1?'s':''} · + 13% tax · 3 weeks at most`;
+  $('#shName').textContent='Your cart';$('#shMeta').textContent=`${c.length} service${c.length>1?'s':''} · + 13% PayPal fee · 3 weeks at most`;
   $('#shThumb').style.backgroundImage=`url("${svcThumb(c[0].svc)}")`;
   $('#shIntro').textContent='One order and one invoice for everything in your cart ♡';
   $('#secPkg').hidden=true;$('#secAdd').hidden=true;$('#secBudget').hidden=true;$('#useBox').hidden=true;$('#secPay').hidden=false;
@@ -209,9 +209,10 @@ const sizeName=c=>c==='Half'?'Half body':c==='Full'?'Full body':c;
 function pickService(k){
   CART_MODE=false;EDIT_ID=null;svc=SERVICES[k]; svcName=k; cmOn=!!svc.quote;
   $('#shName').textContent=k;
-  {const st=slotTxt(k);$('#shMeta').textContent=(cmOn?'You name the price · 13% tax added':`From ${money(svc.from)} + 13% tax · ${svc.eta}`)+(st?' · '+st:'');}
+  {const st=slotTxt(k);$('#shMeta').textContent=(cmOn?'You name the price · 13% PayPal fee added':`From ${money(svc.from)} + 13% PayPal fee · done within 3 weeks`)+(st?' · '+st:'');}
   $('#shThumb').style.backgroundImage=`url("${svcThumb(k)}")`;
-  $('#shIntro').textContent=cmOn?'Tell me your idea and name your price ♡':'Choose your options and tell me your idea ♡';
+  $('#shIntro').textContent=cmOn?'Tell me your idea and name your price ♡':/VTuber|PNGTuber|Chibi|Pet/.test(k)?'Choose your options and tell me your idea ♡ No design yet? Describe your character and I design it with you.':'Choose your options and tell me your idea ♡';
+  {const inc=(typeof DETAILS!=='undefined'&&DETAILS[k]&&DETAILS[k].includes)||[];$('#wygList').innerHTML=inc.map(x=>`<li>${esc(x)}</li>`).join('');$('#wyg').hidden=!inc.length;$('#wyg').open=false;}
   const mx=!!svc.table; $('#mx').hidden=!mx; $('#pkgOpts').hidden=mx;
   $('#pkgOpts').innerHTML=svc.packages.map(([n,p,d],i)=>`<div class="opt"><input type="radio" name="pkg" id="p${i}" value="${i}" ${i===0?'checked':''}><label for="p${i}">${esc(n)} <em>${cmOn?'':money(p)+(svc.qty?' each':'')}</em><small>${esc(d)}</small></label></div>`).join('');
   if(mx){
@@ -219,7 +220,7 @@ function pickService(k){
     $('#mxType').innerHTML=svc.table.rows.map(([r,ix],i)=>`<input type="radio" name="mxType" id="mt${i}" value="${i}" ${i===mt0?'checked':''}><label for="mt${i}">${esc(r)}<small>from ${money(Math.min(...ix.map(j=>svc.packages[j][1])))}</small></label>`).join('');
     $('#mxSize').innerHTML=svc.table.cols.map((c,i)=>`<input type="radio" name="mxSize" id="ms${i}" value="${i}" ${i===0?'checked':''}><label for="ms${i}">${esc(sizeName(c))}<small></small></label>`).join('');
   }else{$('#mxType').innerHTML='';$('#mxSize').innerHTML='';}
-  $('#addOpts').innerHTML=svc.addons.map(([n,p],i)=>{const each=/toggle/i.test(n);return `<span class="add-w"><input type="checkbox" name="add" id="a${i}" value="${i}"><label for="a${i}">${esc(n)} <em>${p?'+'+money(p)+(each?' each':''):'Free'}</em></label>${each?`<input type="number" class="add-q" id="aq${i}" min="1" max="20" value="1" inputmode="numeric" aria-label="How many ${esc(n).toLowerCase()}s">`:''}</span>`;}).join('');
+  $('#addOpts').innerHTML=svc.addons.map(([n,p],i)=>{const each=/toggle/i.test(n);return `<span class="add-w"><input type="checkbox" name="add" id="a${i}" value="${i}"><label for="a${i}">${esc(n)} <em>${p?'+'+money(p)+(each?' each':''):'Free'}</em>${/commercial/i.test(n)?'<small class="add-note">Streaming and monetized videos are always included; this is for merch</small>':''}</label>${each?`<input type="number" class="add-q" id="aq${i}" min="1" max="20" value="1" inputmode="numeric" aria-label="How many ${esc(n).toLowerCase()}s">`:''}</span>`;}).join('');
   $('#qtyWrap').hidden=!svc.qty; $('#qty').value=1;
   $('#secPkg').hidden=cmOn; $('#secAdd').hidden=cmOn; $('#secPay').hidden=cmOn; $('#secBudget').hidden=!cmOn; $('#useBox').hidden=!cmOn;
   $$('input[name=Usage]').forEach(x=>x.disabled=!cmOn);
@@ -283,16 +284,16 @@ function calc(){
     const plan=$('input[name="Payment plan"]:checked').value,due=dueNow(sm.total,plan);
     $('#fService').value=c.map(x=>x.svc).join(' + ');$('#fPackage').value=c.map(x=>x.pkg+(x.qty>1?' × '+x.qty:'')).join('; ');$('#fQty').value=c.length;
     $('#fAddons').value=c.map(x=>x.addons&&x.addons!=='-'?x.svc+': '+x.addons:'').filter(Boolean).join('; ')||'-';
-    $('#fTotal').value=money2(sm.total)+' (incl. 13% tax)';$('#fSubject').value=`New cart order: ${$('#fService').value} — ${money2(sm.total)}`;
-    ORDER={lines:[...c.flatMap(x=>x.lines),['Tax (13%)',sm.tax]],total:sm.total,due,plan,custom:false,rush:false};
+    $('#fTotal').value=money2(sm.total)+' (incl. 13% PayPal fee)';$('#fSubject').value=`New cart order: ${$('#fService').value} — ${money2(sm.total)}`;
+    ORDER={lines:[...c.flatMap(x=>x.lines),['PayPal fee (13%)',sm.tax]],total:sm.total,due,plan,custom:false,rush:false};
     renderInv();return sm.total;
   }
   if(cmOn){
     const iv=invoice(), bud=iv.sub;
     $('#fService').value=svcName;$('#fPackage').value=svc.packages[0][0];$('#fQty').value=1;$('#fAddons').value='-';
-    $('#fTotal').value=bud?`${money2(iv.total)} (client's price ${money2(bud)}${iv.com?' + commercial rights '+money2(iv.com):''} + 13% tax ${money2(iv.tax)})`:'-';
-    $('#fSubject').value=`New custom order — ${bud?money2(iv.total)+' incl. tax':'no price'}`;
-    ORDER={lines:[[`Custom commission (${usageVal()} use)`,bud],...(iv.com?[['Commercial / merch rights',iv.com]]:[]),['Tax (13%)',iv.tax]],total:iv.total,due:iv.total,plan:'Full payment',custom:true};
+    $('#fTotal').value=bud?`${money2(iv.total)} (client's price ${money2(bud)}${iv.com?' + commercial rights '+money2(iv.com):''} + 13% PayPal fee ${money2(iv.tax)})`:'-';
+    $('#fSubject').value=`New custom order — ${bud?money2(iv.total)+' incl. PayPal fee':'no price'}`;
+    ORDER={lines:[[`Custom commission (${usageVal()} use)`,bud],...(iv.com?[['Commercial / merch rights',iv.com]]:[]),['PayPal fee (13%)',iv.tax]],total:iv.total,due:iv.total,plan:'Full payment',custom:true};
     renderInv();return bud;
   }
   const pk=svc.packages[selIndex()], qty=svc.qty?Math.min(50,Math.max(1,parseInt($('#qty').value,10)||1)):1;
@@ -305,8 +306,8 @@ function calc(){
   const plan=$('input[name="Payment plan"]:checked').value, due=dueNow(t,plan);
   $('#fService').value=svcName;$('#fPackage').value=pk[0];$('#fQty').value=qty;
   $('#fAddons').value=[...adds.map(a=>a[0]),rush?'Rush delivery (+25%)':''].filter(Boolean).join(', ')||'-';
-  $('#fTotal').value=money2(t)+' (incl. 13% tax)';$('#fSubject').value=`New request: ${svcName} (${pk[0]}${svc.qty?' × '+qty:''}) — ${money2(t)}`;
-  ORDER={lines:[[`${svcName} · ${pk[0]}${svc.qty?' × '+qty:''}`,base],...adds.map(a=>[a[0],a[1]]),...(rush?[['Rush delivery (+25%)',rushAmt]]:[]),['Tax (13%)',taxAmt]],total:t,due,plan,custom:false,rush};
+  $('#fTotal').value=money2(t)+' (incl. 13% PayPal fee)';$('#fSubject').value=`New request: ${svcName} (${pk[0]}${svc.qty?' × '+qty:''}) — ${money2(t)}`;
+  ORDER={lines:[[`${svcName} · ${pk[0]}${svc.qty?' × '+qty:''}`,base],...adds.map(a=>[a[0],a[1]]),...(rush?[['Rush delivery (+25%)',rushAmt]]:[]),['PayPal fee (13%)',taxAmt]],total:t,due,plan,custom:false,rush};
   renderInv();return t;
 }
 const readyBy=rush=>new Date(Date.now()+(rush?11:21)*864e5).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});   // every commission: 3 weeks at most
@@ -327,7 +328,7 @@ function renderInv(){
   $('#invEta').textContent=`USD · ready by ${readyBy(o.rush)}`;
   $('#invHead').textContent=o.custom?'Your suggested price':'Price estimate';{const sl=$('#sendBtn .so-l');if(sl&&!$('#sendBtn').dataset.busy)sl.textContent=o.custom?' Request':' Order';}   // a Custom Inquiry is paid only after Keiko agrees the price
   $('#invNote').textContent=o.custom?"I check your idea and price first (within 6 hours, WIB). Once we agree, I email your invoice with a one-click PayPal link. Nothing is charged now.":"Instant order: pay with PayPal right after sending to secure your slot. Full refund if I can't take your order.";fxLine(o.custom&&!o.total?0:o.total);
-  $('#navLbl').textContent=partial?'1st payment (incl. tax)':'Total (incl. 13% tax)';
+  $('#navLbl').textContent=partial?'1st payment (incl. fee)':'Total (incl. 13% fee)';
   $('#navTotal').textContent=empty?'—':money2(partial?o.due:o.total);
 }
 
@@ -355,7 +356,7 @@ function orderRows(){
   const refs=(refFiles.length?refFiles.length+' file(s)':'')+(form['Reference links'].value?(refFiles.length?' + links':'Links'):'')||'-';
   return [['Service',CART_MODE?$('#fService').value:svcName],...(cmOn?[['Usage',usageVal()+' use']]:[['Package',$('#fPackage').value],['Add-ons',$('#fAddons').value],['Payment plan',$('input[name="Payment plan"]:checked').value]]),
     ['Deadline',$('#fDeadline').value||'-'],['Name',$('#fName').value],['Email',$('#fEmail').value||'-'],['Discord',$('#fDiscord').value||'-'],['References',refs],
-    ['Total',ORDER.total?money2(ORDER.total)+' incl. 13% tax':'-']];
+    ['Total',ORDER.total?money2(ORDER.total)+' incl. 13% PayPal fee':'-']];
 }
 function err(m){const e=$('#err');e.textContent=m;e.style.display=m?'block':'none';}
 function valid(n){
@@ -454,7 +455,7 @@ form.addEventListener('submit',async e=>{
   const totalNum=calc(), plan=cmOn?'Full payment':$('input[name="Payment plan"]:checked').value, iv=cmOn?invoice():null, due=cmOn?iv.total:dueNow(totalNum,plan);
   const lines=ORDER.lines.map(x=>x.slice()), invTotal=cmOn?iv.total:totalNum;
   const name=$('#fName').value.trim(), total=$('#fTotal').value;
-  const label=cmOn?`Custom commission, ${usageVal()} use, incl. 13% tax`:`${svcName} (${$('#fPackage').value})`;
+  const label=cmOn?`Custom commission, ${usageVal()} use, incl. 13% PayPal fee`:`${svcName} (${$('#fPackage').value})`;
   const rows=orderRows();
   const ctx={name,usage:usageVal(),deadline:$('#fDeadline').value,brief:$('#fDetails').value.trim().slice(0,140),contact:$('#fEmail').value+($('#fDiscord').value?' · Discord '+$('#fDiscord').value:'')};
   const mkInv=(dateStr,emailed,tot,dueAmt)=>({date:dateStr,name,contact:ctx.contact,deadline:ctx.deadline,brief:ctx.brief,usage:cmOn?ctx.usage:'',custom:cmOn,service:svcName,lines,total:tot,due:dueAmt,plan,emailed});
@@ -465,14 +466,14 @@ form.addEventListener('submit',async e=>{
   const buildCopy=(id,payUrl,dateStr,filesNote)=>{
     $('#fReq').value=id;
     $('#fSubject').value=$('#fSubject').value.replace(/ \[(INV|REQ)-[\w-]+\]$/,'')+' ['+id+']';
-    $('#fDue').value=cmOn?`${money2(due)} — full payment incl. 13% tax (invoice PDF: Discord / admin)`
+    $('#fDue').value=cmOn?`${money2(due)} — full payment incl. 13% PayPal fee (invoice PDF: Discord / admin)`
       :due?money2(due)+' — '+planLabel(plan)+' (invoice PDF: Discord / admin)':'-';
     const lineTxt=lines.map(([l,a])=>`${l}: ${a?money2(a):'Free'}`).join('\n');
     $('#fAuto').value=`Hi ${name}, thank you for your order at KeikoArts! ♡
 
 ORDER ${id} · ${dateStr}
 ${lineTxt}
-TOTAL: ${money2(invTotal)} USD (incl. 13% tax)
+TOTAL: ${money2(invTotal)} USD (incl. 13% PayPal fee)
 
 ${payUrl?`Pay ${money2(due)} now with PayPal (one click, the amount is already filled in):
 ${payUrl}
@@ -612,7 +613,7 @@ $$('.services .card').forEach(c=>{const p=c.querySelector(':scope>.price'),b=c.q
   // book 2: how to order (same facts as the order form, TOS and FAQ)
   const f2=[cover('How to Order','Five steps · no account needed'),
     txt([['1 · Pick a service','<p>Choose a service in <a href="#services">Our Services</a> and press Order now. The form shows every option and your total before you send it.</p>'],['2 · Send the form','<p>Tell me about your character: a description, a character sheet or a few references. Only your email is required to reach you.</p>']]),
-    txt([['3 · Order instantly','<p>Your total, incl. 13% tax, is shown before you send. Custom Inquiry: I agree the price with you first and email your invoice (within 6 hours, WIB).</p>'],['4 · Pay with PayPal','<p>Card or PayPal balance, in USD, right after sending. Pay in full, 50/50, or in 3 parts for orders above $150. Your slot is secured once payment is received.</p>']]),
+    txt([['3 · Order instantly','<p>Your total, incl. 13% PayPal fee, is shown before you send. Custom Inquiry: I agree the price with you first and email your invoice (within 6 hours, WIB).</p>'],['4 · Pay with PayPal','<p>Card or PayPal balance, in USD, right after sending. Pay in full, 50/50, or in 3 parts for orders above $150. Your slot is secured once payment is received.</p>']]),
     txt([['5 · I make your art','<p>Sketch → lineart → coloring → (rigging). You get progress updates at every stage. Every commission takes 3 weeks at most.</p>'],['6 · Delivery','<p>You get your final files, ready to stream. Questions any time on <a href="https://discord.gg/FbgWxMPjf" target="_blank" rel="noopener">Discord</a>.</p>']]),
     endpg];
   // book 3: FAQ + terms
@@ -954,7 +955,7 @@ const slotTxt=k=>{if(typeof SLOTS==='undefined'||!SLOTS.open||!SLOTS.per||!(k in
 (function(){
   const fromMove=k=>{const sv=SERVICES[k];if(!sv)return 0;const mv=sv.packages.filter(p=>/Art \+ Rig/.test(p[0])).map(p=>p[1]);return mv.length?Math.min(...mv):sv.from;};
   $$('#services .card').forEach(c=>{const k=(c.querySelector('h3')||{}).textContent;if(!k||!SERVICES[k.trim()]||SERVICES[k.trim()].quote)return;const base=fromMove(k.trim());if(base<150)return;
-    const third=Math.ceil(base*(1+TAX)/3*100)/100,pr=c.querySelector('.price');if(!pr)return;const s=document.createElement('span');s.className='pinst';s.textContent=`or 3 payments of ${money2(third)} (incl. tax)`;pr.appendChild(s);});
+    const third=Math.ceil(base*(1+TAX)/3*100)/100,pr=c.querySelector('.price');if(!pr)return;const s=document.createElement('span');s.className='pinst';s.textContent=`or 3 payments of ${money2(third)} (incl. PayPal fee)`;pr.appendChild(s);});
   const small=[['Emotes','emotes for your channel'],['PNGTuber','a simple talking avatar'],['Custom PFP','a profile picture of your character']].filter(([k])=>SERVICES[k]);
   $('#startSmallList').innerHTML=small.map(([k,d])=>`<a href="#order" data-order="${esc(k)}"><span>${esc(k)}<small style="display:block;font-weight:400;color:var(--muted);font-size:12.5px">${esc(d)}</small></span><b>from ${money(SERVICES[k].from)}${SERVICES[k].qty?' each':''}</b></a>`).join('');
   const ans={};
@@ -1107,7 +1108,7 @@ function showThanks(last){
   const inv=last&&last.inv;
   if(inv){
     const custom=inv.custom!==undefined?!!inv.custom:true;
-    const lines=inv.lines||[[`Custom commission (${inv.usage||'Personal'} use)`,inv.sub],['Tax (13%)',inv.tax]];
+    const lines=inv.lines||[[`Custom commission (${inv.usage||'Personal'} use)`,inv.sub],['PayPal fee (13%)',inv.tax]];
     const total=+inv.total||0, due=last.due!=null?+last.due:total, partial=!custom&&due<total;
     const dl=inv.deadline?new Date(inv.deadline+'T00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}):'';
     const meta=dl?'Deadline '+dl:'';
@@ -1122,12 +1123,12 @@ function showThanks(last){
       <div class="inv-meta"><div><small>Invoice no.</small><b>${esc(last.id)}</b></div><div><small>Date</small><b>${esc(inv.date)}</b></div><div><small>Billed to</small><b>${esc(inv.name)}</b>${inv.contact?`<span>${esc(inv.contact)}</span>`:''}</div></div>
       <table class="inv-t"><thead><tr><th>Description</th><th>Amount</th></tr></thead>
       <tbody><tr><td>${esc(first[0])}${meta?`<small>${esc(meta)}</small>`:''}${inv.brief?`<small>“${esc(inv.brief)}${inv.brief.length>=140?'…':''}”</small>`:''}</td><td>${amt(first[1])}</td></tr>${rest.map(([l,a])=>`<tr><td>${esc(l)}</td><td>${amt(a)}</td></tr>`).join('')}</tbody>
-      <tfoot>${custom?`<tr><td>Subtotal</td><td>${money2(lines[0][1])}</td></tr><tr><td>Tax (13%)</td><td>${money2(lines[1]?lines[1][1]:0)}</td></tr><tr class="grand"><td>Total due (USD)</td><td>${money2(total)}</td></tr>`
+      <tfoot>${custom?`<tr><td>Subtotal</td><td>${money2(lines[0][1])}</td></tr><tr><td>PayPal fee (13%)</td><td>${money2(lines[1]?lines[1][1]:0)}</td></tr><tr class="grand"><td>Total due (USD)</td><td>${money2(total)}</td></tr>`
         :partial?`<tr><td>Total</td><td>${money2(total)}</td></tr><tr class="grand"><td>Pay now · ${esc(planLabel(inv.plan||last.plan))}</td><td>${money2(due)}</td></tr>`
         :`<tr class="grand"><td>Total due (USD)</td><td>${money2(total)}</td></tr>`}</tfoot></table>
       ${last.payUrl&&due>0?`<p class="print-only pay-link">Pay ${money2(due)} online with PayPal: <a href="${esc(last.payUrl)}">${esc(last.payUrl)}</a></p>`:''}
     </div>`;$('#tyInv').hidden=false;
-    if(payNow){$('#tyPayT').textContent=partial?'Pay now to secure your slot':'Pay your invoice';$('#tyPayInfo').textContent=(custom?'Total incl. 13% tax':partial?planLabel(inv.plan||last.plan):'Full payment')+' · '+last.id;$('#tyPayAmt').textContent=money2(due);$('#tyPayLabel').textContent='Pay '+money2(due)+' with PayPal';
+    if(payNow){$('#tyPayT').textContent=partial?'Pay now to secure your slot':'Pay your invoice';$('#tyPayInfo').textContent=(custom?'Total incl. 13% PayPal fee':partial?planLabel(inv.plan||last.plan):'Full payment')+' · '+last.id;$('#tyPayAmt').textContent=money2(due);$('#tyPayLabel').textContent='Pay '+money2(due)+' with PayPal';
       $('#tyPaySm').textContent="Secure checkout on PayPal (card or PayPal balance). Your slot is secured as soon as you pay. Full refund if I can't take your order.";$('#tyKofiRef').textContent='invoice number';
       $('#tyDcT').textContent='Questions about your order?';$('#tyDcS').textContent='Message me on Discord with your invoice number.';}
     else{$('#tyDcS').textContent='Send me your invoice number so I can send your PayPal link.';}

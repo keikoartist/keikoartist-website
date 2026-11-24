@@ -281,7 +281,7 @@ def service_ld(name, url, desc, low):
 V, P = SERVICES['VTuber'], SERVICES['PNGTuber']
 vp = {p[0]: p[1] for p in V['packages']}
 vadd = {a[0]: a[1] for a in V['addons']}
-PAY = 'Pay with a one-click PayPal link (card or PayPal balance) in USD: in full, 50/50 (half upfront, half before final files), or in 3 installments for orders above $150. 13% tax is added on every invoice.'
+PAY = 'Pay with a one-click PayPal link (card or PayPal balance) in USD: in full, 50/50 (half upfront, half before final files), or in 3 installments for orders above $150. A 13% PayPal fee is added on every invoice.'
 
 # ---------------------------------------------------------------- 1. custom VTuber model
 def custom_vtuber():
@@ -316,7 +316,7 @@ def custom_vtuber():
       <div class="box"><h3>Art + Rig</h3><p>The complete package: art, Live2D rigging and a VTube Studio file, ready to stream.</p></div>
       <div class="box"><h3>Rig only</h3><p>Send me your layered PSD and I rig it. More on the <a href="/live2d-rigging/">Live2D rigging page</a>.</p></div>
     </div>
-    <p class="note">{e(DETAILS["VTuber"]["notes"])} Your total, incl. 13% tax, is shown in the order form before you pay.</p>
+    <p class="note">{e(DETAILS["VTuber"]["notes"])} Your total, incl. 13% PayPal fee, is shown in the order form before you pay.</p>
   </div></section>
 
   <section class="sec"><div class="wrap">
@@ -557,7 +557,7 @@ def emotes():
 {related("/custom-twitch-emotes/")}
 {cta("Give your chat its own emotes", "Send your list of expressions and get your invoice by email.", "Emotes", "Order your emotes")}"""
     faq = [
-        ('How much do custom Twitch emotes cost?', f'Static emotes are {money(pk["Static emote"])} each and animated emotes are {money(pk["Animated emote"])} each. A sub badge set (3 badges) is +{money(ad["Sub badge set (3)"])}. 13% tax is added on the invoice.'),
+        ('How much do custom Twitch emotes cost?', f'Static emotes are {money(pk["Static emote"])} each and animated emotes are {money(pk["Animated emote"])} each. A sub badge set (3 badges) is +{money(ad["Sub badge set (3)"])}. A 13% PayPal fee is added on the invoice.'),
         ('What sizes and files do I get?', 'Transparent PNG files for static emotes and GIF files for animated emotes, in 112, 56 and 28 px. Twitch-ready resizing is included.'),
         ('How long do emotes take?', f'About {e(E["eta"])}, depending on how many you order and the queue. Rush delivery (+25%) is available in the order form.'),
         ('Can you draw emotes of my VTuber or original character?', 'Yes. Attach a reference of your character in the order form and list the expressions you want.'),
@@ -704,7 +704,7 @@ def pricing():
             per = ' <small>per emote</small>' if s.get('qty') else ''
             cards = ''.join(f'<div class="pr-card"><h4>{e(p[0])}</h4><p class="pr-price">{money(p[1])}{per}</p><p class="pr-sub">{e(p[2])}</p><a class="btn btn-ghost pr-btn" rel="nofollow" href="{go}">Order</a></div>' for p in s['packages'])
         blocks.append(f'''    <div class="pr-svc" id="{slug(n)}">
-      <div class="pr-head">{thumb(n)}<div><h3>{e(n)}</h3><p>{e(about)}</p><p class="pr-meta">From <b>{money(s["from"])}</b> + 13% tax · about {e(s["eta"])} {more}</p></div></div>
+      <div class="pr-head">{thumb(n)}<div><h3>{e(n)}</h3><p>{e(about)}</p><p class="pr-meta">From <b>{money(s["from"])}</b> + 13% PayPal fee · about {e(s["eta"])} {more}</p></div></div>
       <div class="pr-cards">{cards}</div>
       {addon_chips(n)}
     </div>''')
@@ -713,7 +713,7 @@ def pricing():
         ('Pick a service', 'Model, PNGTuber, emotes, banner and more.'),
         ('Choose size and option', 'The card shows the price for each choice.'),
         ('Add extras if you like', 'Expressions, outfits, commercial rights and so on.'),
-        ('Pay your way', '13% tax is added. Pay in full, 50/50 or in 3 parts (orders above $150).')], 1))
+        ('Pay your way', 'A 13% PayPal fee is added. Pay in full, 50/50 or in 3 parts (orders above $150).')], 1))
     body = f'''  <section class="wrap phero" style="grid-template-columns:1fr">
     <div>
       <p class="eyebrow">Prices in USD</p>
@@ -733,7 +733,7 @@ def pricing():
     <h2>Payment and rules</h2>
     <div class="grid">
       <div class="box"><h3>How you pay</h3><p>Right after you send the order form, with the PayPal button. {e(PAY)}</p></div>
-      <div class="box"><h3>Custom requests</h3><p>Have an idea that isn't listed? With a <a rel="nofollow" href="/?order=Custom%20Inquiry">custom inquiry</a> you name your price; 13% tax is added on the invoice and it's paid upfront.</p></div>
+      <div class="box"><h3>Custom requests</h3><p>Have an idea that isn't listed? With a <a rel="nofollow" href="/?order=Custom%20Inquiry">custom inquiry</a> you name your price; a 13% PayPal fee is added on the invoice and it's paid upfront.</p></div>
       <div class="box"><h3>Rush and complex designs</h3><p>Rush delivery is +25%. Very complex designs (for example wings or many accessories) may cost a bit more; the final price is always on your invoice before you pay.</p></div>
       <div class="box"><h3>Revisions</h3><p>Unlimited small revisions during the sketch. Up to 2 minor revisions after coloring; major changes after approval may have extra fees.</p></div>
       <div class="box"><h3>Refunds</h3><p>Full refund before work starts. After the sketch, refunds are based on completed work. No refund after final files are delivered.</p></div>
@@ -745,7 +745,7 @@ def pricing():
     faq = [
         ('How much does a custom VTuber model cost?', f'Art only starts at {money(vp["Bust · Art only"])} (bust); art + rig at {money(vp["Bust · Art + Rig"])}. A full-body model with rigging is {money(vp["Full body · Art + Rig"])}. See <a href="/custom-vtuber-model/">custom VTuber models</a>.'),
         ('Can I pay in installments?', 'Yes: 50/50 (half upfront, half before final files), or 3 installments for orders above $150.'),
-        ('Which currency do you use?', 'All prices are in US dollars (USD), before 13% tax, which is added on the invoice. You pay with a one-click PayPal link (card or PayPal balance).'),
+        ('Which currency do you use?', 'All prices are in US dollars (USD), before the 13% PayPal fee, which is added on the invoice. You pay with a one-click PayPal link (card or PayPal balance).'),
         ('Why do some prices say "from"?', 'It is the starting price of the smallest package. The final price depends on the options and add-ons you choose; the order form shows your total before you pay.'),
         ('What does a VTuber debut package include?', '; '.join(f'{e(p[0])} ({money(p[1])}): {e(p[2])}' for p in SERVICES["VTuber Packages"]["packages"]) + '.'),
     ]
@@ -810,7 +810,7 @@ def guide_cost():
       <tr><td>Art + Rig (Live2D model + VTube Studio file)</td>{row("Art + Rig")}</tr>
       <tr><td>Rig only (you send the PSD)</td>{row("Rig only")}</tr>
     </tbody></table></div>
-    <p class="note">Prices in USD. 13% tax is added on every invoice. Your total is shown in the order form before you pay.</p>
+    <p class="note">Prices in USD. A 13% PayPal fee is added on every invoice. Your total is shown in the order form before you pay.</p>
   </div></section>
 
   <section class="sec"><div class="wrap">
@@ -826,7 +826,7 @@ def guide_cost():
     <h2>Extras and add-ons</h2>
     <div class="grid two">
       <div class="box"><h3>Model add-ons</h3><ul>{addons}</ul></div>
-      <div class="box"><h3>Other costs to plan for</h3><ul><li>13% tax on every invoice</li><li>Rush delivery: +25%</li><li>Merch / commercial rights: +{money(vadd["Commercial / merch rights"])} (streaming and monetized videos are already included)</li></ul></div>
+      <div class="box"><h3>Other costs to plan for</h3><ul><li>13% PayPal fee on every invoice</li><li>Rush delivery: +25%</li><li>Merch / commercial rights: +{money(vadd["Commercial / merch rights"])} (streaming and monetized videos are already included)</li></ul></div>
     </div>
   </div></section>
 
@@ -852,10 +852,10 @@ def guide_cost():
 {cta("Want your exact price?", "Choose your options in the order form: your exact total is shown before you pay.", "VTuber", "Get your price")}'''
     faq = [
         ('How much is a cheap VTuber model?', f'The lowest-cost option here is a PNGTuber from {money(P["from"])}. For a Live2D model, a bust with art and rigging starts at {money(vp["Bust · Art + Rig"])}.'),
-        ('How much does a full-body Live2D VTuber model cost?', f'{money(vp["Full body · Art only"])} for the art only, or {money(vp["Full body · Art + Rig"])} with rigging and a VTube Studio file, plus 13% tax.'),
+        ('How much does a full-body Live2D VTuber model cost?', f'{money(vp["Full body · Art only"])} for the art only, or {money(vp["Full body · Art + Rig"])} with rigging and a VTube Studio file, plus 13% PayPal fee.'),
         ('Is rigging included in the price?', f'Only in Art + Rig. Art only gives you a layered PSD that is ready to rig. Rig only for your own art starts at {money(vp["Bust · Rig only"])}.'),
         ('Can I pay in parts?', 'Yes: 50/50 (half upfront, half before final files), or 3 installments for orders above $150.'),
-        ('Are there hidden costs?', f'No. The order form and your invoice show the total: the package, any add-ons you choose, 13% tax, and optional rush (+25%) or commercial rights (+{money(vadd["Commercial / merch rights"])}).'),
+        ('Are there hidden costs?', f'No. The order form and your invoice show the total: the package, any add-ons you choose, 13% PayPal fee, and optional rush (+25%) or commercial rights (+{money(vadd["Commercial / merch rights"])}).'),
     ]
     desc = f'Custom VTuber model prices: Live2D art + rig from {money(vp["Bust · Art + Rig"])} to {money(vp["Full body · Art + Rig"])}, art only from {money(vp["Bust · Art only"])}. Sizes, add-ons, debut packages and payment options.'
     title = 'How Much Does a Custom VTuber Model Cost?'
@@ -991,13 +991,13 @@ def guide_start():
       <div class="box"><h3>Live2D model</h3><p>Art + rig: bust {money(vp["Bust · Art + Rig"])}, half body {money(vp["Half body · Art + Rig"])}, full body {money(vp["Full body · Art + Rig"])}.</p></div>
       <div class="box"><h3>Full debut</h3><p>{"; ".join(f"{e(p[0])} {money(p[1])}" for p in K)}: model, rig and stream assets in one style.</p></div>
     </div>
-    <p class="note">Prices in USD; 13% tax is added on the invoice. See <a href="/vtuber-model-cost/">how much a VTuber model costs</a> for every option.</p>
+    <p class="note">Prices in USD; a 13% PayPal fee is added on the invoice. See <a href="/vtuber-model-cost/">how much a VTuber model costs</a> for every option.</p>
   </div></section>
 {guides_block("/how-to-become-a-vtuber/")}
 {cta("Ready to make your character?", "Tell me your idea in the order form, or ask first on Discord.", "", "Start a project")}"""
     faq = [
         ('What do I need to become a VTuber?', 'A character design, a model (PNGTuber or Live2D), tracking software such as VTube Studio, and streaming software such as OBS. A webcam or iPhone is used for Live2D face tracking.'),
-        ('How much does it cost to become a VTuber?', f'You can start with a PNGTuber from {money(P["from"])}. A Live2D model with rigging starts at {money(vp["Bust · Art + Rig"])} for a bust. 13% tax is added.'),
+        ('How much does it cost to become a VTuber?', f'You can start with a PNGTuber from {money(P["from"])}. A Live2D model with rigging starts at {money(vp["Bust · Art + Rig"])} for a bust. A 13% PayPal fee is added.'),
         ('Do I need to draw my own model?', 'No. Most VTubers commission an artist. Send your idea or references and the artist designs, draws and rigs the model.'),
         ('How long does it take to get a VTuber model?', 'Every commission at KeikoArts is done within 3 weeks, with updates at every stage.'),
         ('Can I use a VTuber model on YouTube and TikTok?', 'Yes. Streaming, monetized videos and social media are included. Merch / commercial rights are a $30 add-on.'),
@@ -1042,7 +1042,7 @@ def guide_xmas():
       <div class="box"><h3>Debut packages</h3><p>{"; ".join(f"{e(p[0])} {money(p[1])}" for p in K)}. <a href="/vtuber-pricing/">All prices</a></p></div>
       <div class="box"><h3>PNGTuber &amp; emotes</h3><p>PNGTuber from {money(P["from"])}. Emotes from {money(min(E.values()))} each, made for your character. <a href="/custom-twitch-emotes/">Emotes</a></p></div>
     </div>
-    <p class="note">Prices in USD; 13% tax is added. Your total is shown in the order form before you pay with PayPal.</p>
+    <p class="note">Prices in USD; a 13% PayPal fee is added. Your total is shown in the order form before you pay with PayPal.</p>
   </div></section>
 {guides_block("/christmas/")}
 {cta("Want your model before Christmas?", "Order by " + fmt(order_by) + ", or ask first on Discord.", "VTuber", "Start a project")}"""
@@ -1084,7 +1084,7 @@ open(os.path.join(ROOT, 'sitemap.xml'), 'w', encoding='utf-8').write(sm)
 def _pk(n): return '; '.join(f'{p[0]} {money(p[1])}' + (' each' if SERVICES[n].get('qty') else '') for p in SERVICES[n]['packages'])
 llms = f"""# KeikoArts (keikoartist.com)
 
-> KeikoArts is Keiko's VTuber art and Live2D studio: original anime VTuber models drawn from scratch and rigged in Live2D, ready for VTube Studio, plus PNGTubers, emotes, banners, logos and stream assets. Style: cute meets gothic. 200+ commissions completed. Prices in USD; 13% tax is added on every invoice. Every commission is done within 3 weeks.
+> KeikoArts is Keiko's VTuber art and Live2D studio: original anime VTuber models drawn from scratch and rigged in Live2D, ready for VTube Studio, plus PNGTubers, emotes, banners, logos and stream assets. Style: cute meets gothic. 200+ commissions completed. Prices in USD; a 13% PayPal fee is added on every invoice. Every commission is done within 3 weeks.
 
 ## How to order
 - Order form with live total: {SITE}?order=VTuber (all services: {SITE}#services)

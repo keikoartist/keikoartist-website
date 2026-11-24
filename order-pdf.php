@@ -50,7 +50,7 @@ function ka_order_pdf(array $o, $newTotal = null): string {
   $lines  = json_decode((string)($o['lines'] ?? ''), true);
   if (!is_array($lines) || !$lines) {
     $lines = $custom
-      ? [['Custom commission (' . ($f['Usage'] ?? 'Personal') . ' use)', (float)($o['price'] ?? 0)], ['Tax (13%)', (float)($o['tax'] ?? 0)]]
+      ? [['Custom commission (' . ($f['Usage'] ?? 'Personal') . ' use)', (float)($o['price'] ?? 0)], ['PayPal fee (13%)', (float)($o['tax'] ?? 0)]]
       : [[trim(($o['service'] ?? '') . ' - ' . ($o['package'] ?? ''), ' -'), $total]];
   }
   if ($newTotal !== null && abs((float)$newTotal - $total) >= 0.005) {
