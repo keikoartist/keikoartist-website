@@ -325,6 +325,7 @@ function renderInv(){
     +`<dt class="grand">Total</dt><dd class="grand">${empty?'—':money2(o.total)}</dd>`
     +(partial?`<dt class="now">First payment · ${esc(planLabel(o.plan))}</dt><dd class="now">${money2(o.due)}</dd>`:'');
   $('#invEta').textContent=`USD · ready by ${readyBy(o.rush)}`;
+  $('#invHead').textContent=o.custom?'Your suggested price':'Price estimate';{const sl=$('#sendBtn .so-l');if(sl&&!$('#sendBtn').dataset.busy)sl.textContent=o.custom?' Request':' Order';}   // a Custom Inquiry is paid only after Keiko agrees the price
   $('#invNote').textContent=o.custom?"I check your idea and price first (within 6 hours, WIB). Once we agree, I email your invoice with a one-click PayPal link. Nothing is charged now.":"Instant order: pay with PayPal right after sending to secure your slot. Full refund if I can't take your order.";fxLine(o.custom&&!o.total?0:o.total);
   $('#navLbl').textContent=partial?'1st payment (incl. tax)':'Total (incl. 13% tax)';
   $('#navTotal').textContent=empty?'—':money2(partial?o.due:o.total);
@@ -395,7 +396,7 @@ function saveInvoice(last){try{if(last&&last.id&&last.payUrl&&!/PREVIEW|0000-000
 function readInvoice(){try{const v=JSON.parse(localStorage.getItem(INV_KEY)||'null');return v&&v.id&&Date.now()-v.savedAt<45*864e5?v:null;}catch(_){return null;}}
 function dropInvoice(id){try{const v=readInvoice();if(!v||!id||v.id===id)localStorage.removeItem(INV_KEY);}catch(_){}}
 function setBusy(on,label){const sb=$('#sendBtn');if(on){sb.dataset.busy='1';sb.textContent=label;sb.style.opacity='.75';$('#prevBtn').style.visibility='hidden';}
-  else{delete sb.dataset.busy;sb.innerHTML='Send<span class="so-l"> Order</span> <svg class="ic" viewBox="0 0 24 24" width="17" height="17" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10Z" fill="none" stroke="currentColor" stroke-width="2"/></svg>';sb.style.opacity='';$('#prevBtn').style.visibility='visible';}}
+  else{delete sb.dataset.busy;sb.innerHTML='Send<span class="so-l"> '+(cmOn&&!CART_MODE?'Request':'Order')+'</span> <svg class="ic" viewBox="0 0 24 24" width="17" height="17" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10Z" fill="none" stroke="currentColor" stroke-width="2"/></svg>';sb.style.opacity='';$('#prevBtn').style.visibility='visible';}}
 function resetOrderForm(){form.reset();$('#fEmail').disabled=false;$('#fAuto').disabled=false;upState.forEach(s=>{if(s.url&&s.url.startsWith('blob:'))URL.revokeObjectURL(s.url);});upState.clear();upToken=hex(32);refFiles=[];renderRefs();clearDraft();$('#draftNote').hidden=true;sheetStart=0;$('#refSlots').innerHTML='';const m=$('#refMsg');if(m)m.textContent='';setBusy(false);err('');}
 const LIVE_SITE=/(^|\.)keikoartist\.com$/i.test(location.hostname)||/^(localhost|127\.0\.0\.1)$/.test(location.hostname);
 function postOrder(fd,onProgress){
