@@ -1,0 +1,29 @@
+name: Cloudflare readiness check (manual)
+# Before moving the domain's nameservers to Cloudflare: lists the public DNS records that must be copied,
+# the SSL certificate on the hosting, and what kind of address the deploy uses (never prints the secret itself).
+on:
+  workflow_dispatch:
+permissions: {}
+jobs:
+  check:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    env:
+      FTP_SERVER: ${{ secrets.FTP_SERVER }}
+    steps:
+      - name: Public DNS records
+        run: |
+          for t in NS A AAAA MX TXT CAA; do echo "== $t keikoartist.com"; dig +short "$t" keikoartist.com; done
+          for n in www ftp mail webmail cpanel autodiscover _dmarc; do echo "== $n.keikoartist.com"; dig +short "$n.keikoartist.com" A; dig +short "$n.keikoartist.com" CNAME; dig +short "$n.keikoartist.com" TXT; done
+      - name: Deploy address type (value not shown)
+        run: |
+          h="${FTP_SERVER,,}"; h="${h#ftp://}"; h="${h%%/*}"; h="${h%%:*}"
+          site=$(dig +short A keikoartist.com | tail -1)
+          if [[ "$h" =~ ^[0-9.]+$ ]]; then kind="an IP address"; [ "$h" = "$site" ] && kind="$kind (same IP as the website)"
+          elif [ "$h" = "keikoartist.com" ] || [ "$h" = "www.keikoartist.com" ]; then kind="THE WEBSITE DOMAIN: deploys would break behind Cloudflare's proxy"
+          elif [[ "$h" == *.keikoartist.com ]]; then kind="a subdomain of keikoartist.com (must stay DNS only / grey cloud in Cloudflare)"
+          else kind="the hosting's own server name (not affected by Cloudflare)"; fi
+          echo "::notice::Deploy FTP address is $kind"
+      - name: SSL certificate on the hosting
+        run: |
+          echo | openssl s_client -connect keikoartist.com:443 -servername keikoartist.com 2>/dev/null | openssl x509 -noout -issuer -dates
