@@ -379,7 +379,7 @@ def rigging():
     <h2>Rigging prices</h2>
     <p>Prices depend on how much of the character is rigged. Rig only is for art you already have; art + rig includes the character art.</p>
     {svc_table("VTuber")}
-    <p class="addons">Add-ons: extra expression / toggle <b>+{money(vadd["Extra expression / toggle"])}</b> · VBridger <b>+{money(vadd["VBridger"])}</b> · extra outfit <b>+{money(vadd["Extra outfit"])}</b> · extra hairstyle <b>+{money(vadd["Extra hairstyle"])}</b></p>
+    <p class="addons">Add-ons: extra expression / toggle <b>+{money(vadd["Extra expression / toggle"])}</b> · hand toggle <b>+{money(vadd["Hand toggle"])}</b> each · VBridger <b>+{money(vadd["VBridger"])}</b> · extra outfit <b>+{money(vadd["Extra outfit"])}</b> · extra hairstyle <b>+{money(vadd["Extra hairstyle"])}</b></p>
     <p class="note">Rigging a pet companion? <a href="/vtuber-pricing/#vtuber-pet">VTuber pet art + rig</a> is {money(SERVICES["VTuber Pet"]["packages"][1][1])}.</p>
   </div></section>
 

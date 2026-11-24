@@ -1636,6 +1636,10 @@ body.xmas header:not(.kc-head)::after{background:linear-gradient(90deg,#f2628f,#
 .kc-first input{font:inherit;font-size:16px;padding:9px 12px;border:1px solid #f6c3d4;border-radius:12px;background:#fff7fa;box-sizing:border-box;min-width:0;width:100%}
 @media (max-width:360px){.kc-first{grid-template-columns:1fr}}
 #kcFirst[hidden]{display:none}
+.add-w{display:inline-flex;align-items:center;gap:6px}
+.add-q{display:none;width:58px;font:600 15px Poppins,sans-serif;padding:7px 6px;border:1.5px solid var(--pink-2);border-radius:10px;text-align:center;color:var(--ink);background:#fff}
+.tags .add-w input[name=add]:checked~input.add-q{display:inline-block!important;position:static!important;opacity:1!important;pointer-events:auto!important;width:58px!important;height:auto!important}
+.kc-auto p{white-space:pre-line}.kc-autolbl{display:block;margin-top:4px;font-size:11.5px;color:var(--muted)}
 </style>
 </head>
 <body>
@@ -1896,7 +1900,7 @@ body.xmas header:not(.kc-head)::after{background:linear-gradient(90deg,#f2628f,#
       <details><summary>How long does a commission take?</summary><p>VTuber models take 2–3 weeks (3 weeks at most), depending on complexity and the queue. Smaller pieces like PFPs, emotes and banners take about 3–7 days. Each service shows its estimate in the order form.</p></details>
       <details><summary>How do I pay?</summary><p>Send the order form. I review your order and email you your invoice (PDF) with a one-click PayPal link: card or PayPal balance, in USD. Larger projects can be split into installments (50% upfront, 50% before delivery).</p></details>
       <details><summary>Can I use the art commercially?</summary><p>Yes — streaming, monetized videos and social media are included. Merch / commercial rights are a $30 add-on for any service.</p></details>
-      <details><summary>Will my model work in VTube Studio?</summary><p>Yes. Art + Rig and Rig only orders include a VTube Studio file, ready to stream with webcam or iPhone tracking. Art only orders get a layered PSD that's ready to rig. Extra expressions and toggles are $20 each, and VBridger setup is $50.</p></details>
+      <details><summary>Will my model work in VTube Studio?</summary><p>Yes. Art + Rig and Rig only orders include a VTube Studio file, ready to stream with webcam or iPhone tracking. Art only orders get a layered PSD that's ready to rig. Extra expressions and toggles are $20 each, hand toggles $30 each, and VBridger setup is $200.</p></details>
       <details><summary>What's the difference between bust, half body and full body?</summary><p>Bust shows your character up to the chest, half body up to the waist, and full body from head to toe. Art starts at $100 (bust), $150 (half body) and $250 (full body). See <a href="/vtuber-pricing/" style="color:var(--pink);font-weight:600">VTuber prices</a> for each size.</p></details>
       <details><summary>Can I order only the art, or only the rigging?</summary><p>Yes. Order the art only (a layered PSD ready to rig), art + rig ($150 to $400), or rig only for art you already have. Rigging covers head turns, blinking, lip-sync and hair &amp; clothing physics. <a href="/live2d-rigging/" style="color:var(--pink);font-weight:600">About rigging</a></p></details>
       <details><summary>What do I need to start a custom VTuber model?</summary><p>Just your idea: a description, a character sheet or a few references. I design and draw your character from scratch, split the art into clean layers and rig it in Live2D. <a href="/custom-vtuber-model/" style="color:var(--pink);font-weight:600">Custom VTuber models</a></p></details>
@@ -2231,7 +2235,7 @@ const SERVICES = {
                 ["Bust · Art + Rig",150,"Live2D model + VTS file"], ["Half body · Art + Rig",250,"Live2D model + VTS file"], ["Full body · Art + Rig",400,"Live2D model + VTS file"],
                 ["Bust · Rig only",100,"Send me your PSD"], ["Half body · Rig only",150,"Send me your PSD"], ["Full body · Rig only",250,"Send me your PSD"] ],
     table: { cols:["Bust","Half","Full"], rows:[["Art only",[0,1,2]],["Art + Rig",[3,4,5]],["Rig only",[6,7,8]]] },
-    addons:   [ ["Extra expression / toggle", 20], ["VBridger", 50], ["Extra outfit", 100], ["Extra hairstyle", 100], ["Commercial / merch rights", 30] ] },
+    addons:   [ ["Extra expression / toggle", 20], ["Hand toggle", 30], ["VBridger", 200], ["Extra outfit", 100], ["Extra hairstyle", 100], ["Commercial / merch rights", 30] ] },
   "VTuber Packages": { from: 250, eta: "2–3 weeks",
     packages: [ ["Starter", 250, "Model art + Live2D rig + 3 expressions"],
                 ["Debut", 380, "Starter + 6 emotes + 1 background + overlay"],
@@ -2429,7 +2433,7 @@ function pickService(k){
     $('#mxType').innerHTML=svc.table.rows.map(([r,ix],i)=>`<input type="radio" name="mxType" id="mt${i}" value="${i}" ${i===mt0?'checked':''}><label for="mt${i}">${esc(r)}<small>from ${money(Math.min(...ix.map(j=>svc.packages[j][1])))}</small></label>`).join('');
     $('#mxSize').innerHTML=svc.table.cols.map((c,i)=>`<input type="radio" name="mxSize" id="ms${i}" value="${i}" ${i===0?'checked':''}><label for="ms${i}">${esc(sizeName(c))}<small></small></label>`).join('');
   }else{$('#mxType').innerHTML='';$('#mxSize').innerHTML='';}
-  $('#addOpts').innerHTML=svc.addons.map(([n,p],i)=>`<input type="checkbox" name="add" id="a${i}" value="${i}"><label for="a${i}">${esc(n)} <em>${p?'+'+money(p):'Free'}</em></label>`).join('');
+  $('#addOpts').innerHTML=svc.addons.map(([n,p],i)=>{const each=/toggle/i.test(n);return `<span class="add-w"><input type="checkbox" name="add" id="a${i}" value="${i}"><label for="a${i}">${esc(n)} <em>${p?'+'+money(p)+(each?' each':''):'Free'}</em></label>${each?`<input type="number" class="add-q" id="aq${i}" min="1" max="20" value="1" inputmode="numeric" aria-label="How many ${esc(n).toLowerCase()}s">`:''}</span>`;}).join('');
   $('#qtyWrap').hidden=!svc.qty; $('#qty').value=1;
   $('#secPkg').hidden=cmOn; $('#secAdd').hidden=cmOn; $('#secPay').hidden=cmOn; $('#secBudget').hidden=!cmOn; $('#useBox').hidden=!cmOn;
   $$('input[name=Usage]').forEach(x=>x.disabled=!cmOn);
@@ -2497,7 +2501,7 @@ function calc(){
     renderInv();return bud;
   }
   const pk=svc.packages[selIndex()], qty=svc.qty?Math.min(50,Math.max(1,parseInt($('#qty').value,10)||1)):1;
-  const adds=$$('input[name=add]:checked').map(x=>svc.addons[+x.value]);
+  const adds=$$('input[name=add]:checked').map(x=>{const a=svc.addons[+x.value],qi=$('#aq'+x.value),q=qi?Math.min(20,Math.max(1,parseInt(qi.value,10)||1)):1;return [q>1?a[0]+' × '+q:a[0],r2(a[1]*q)];});
   const base=r2(pk[1]*qty), sub=r2(base+adds.reduce((a,x)=>a+x[1],0)), rush=$('#rush').checked, rushAmt=rush?r2(sub*.25):0, pre=r2(sub+rushAmt), taxAmt=r2(pre*TAX), t=r2(pre+taxAmt);
   if(svc.table){const r=radioVal('mxType');
     $$('#mxSize label').forEach((l,i)=>{const sm=l.querySelector('small');if(sm)sm.textContent=money(svc.packages[svc.table.rows[r][1][i]][1]);});
@@ -2971,6 +2975,12 @@ let tabVisitorN=0,tabAdminN=0;const tabSync=()=>tabDot(tabVisitorN+tabAdminN);
     body.appendChild(d);if(m.id)last=Math.max(last,m.id);
   }
   const scroll=()=>{body.scrollTop=body.scrollHeight};
+  // automatic first reply (shown on this device only, labelled as automatic; prices come from SERVICES so they always match the order form)
+  function autoReply(q){const V=SERVICES.VTuber,P=n=>money((V.packages.find(x=>x[0]===n)||[0,0])[1]),A=n=>money((V.addons.find(x=>x[0]===n)||[0,0])[1]);
+    let t='Thanks for your message! Keiko will reply here and by email, usually within 6 hours (WIB).';
+    if(/price|how much|cost|rate|\$|quote|budget|harga/i.test(q))t+='\n\nQuick prices (USD, + 13% tax): Live2D VTuber Art + Rig: bust '+P('Bust · Art + Rig')+', half body '+P('Half body · Art + Rig')+', full body '+P('Full body · Art + Rig')+'. Add-ons: VBridger +'+A('VBridger')+', hand toggle +'+A('Hand toggle')+' each, extra expression / toggle +'+A('Extra expression / toggle')+' each.';
+    t+='\n\nFull price list: keikoartist.com/vtuber-pricing · The order form shows your exact total before you send it.';
+    const d=document.createElement('div');d.className='kc-msg admin kc-auto';const p=document.createElement('p');p.textContent=t;const sm=document.createElement('small');sm.className='kc-autolbl';sm.textContent='Automatic reply';d.append(p,sm);body.appendChild(d);}
   function firstUI(){const f=$('#kcFirst');if(f)f.hidden=!!sess;}
   function mode(){firstUI();ctUI();}
   // contact details: so Keiko can reply by email / Discord after the visitor leaves
@@ -3013,7 +3023,7 @@ let tabVisitorN=0,tabAdminN=0;const tabSync=()=>tabDot(tabVisitorN+tabAdminN);
     try{
       if(!sess){const j=await api({action:'start',message:text,page:location.pathname,_honey:e.target._honey.value,email:$('#kcFEmail').value.trim(),discord:$('#kcFDc').value.trim()});
         sess={id:j.id,token:j.token};save(sess);tmp.remove();j.messages.forEach(add);
-        const sys=document.createElement('div');sys.className='kc-sys';sys.textContent='Sent ♡ I\'ll reply here and by email, or add you on Discord.';body.appendChild(sys);sess.hasContact=true;save(sess);firstUI();ctUI();scroll();schedule();}
+        const sys=document.createElement('div');sys.className='kc-sys';sys.textContent='Sent ♡ I\'ll reply here and by email, or add you on Discord.';body.appendChild(sys);sess.hasContact=true;save(sess);firstUI();ctUI();autoReply(text);scroll();schedule();}
       else{const j=await api({action:'send',id:sess.id,token:sess.token,message:text,since:last});tmp.remove();j.messages.forEach(add);scroll();}
     }
     catch(err){tmp.remove();input.value=text;errEl.textContent=err.message;if(err.status===401){save(null);sess=null;}}
