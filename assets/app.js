@@ -361,7 +361,7 @@ function valid(n){
   if(n===1&&!$('input[name=svc]:checked'))return err('Please choose a service.'),false;
   if(n===2){
     const list=[$('#fDetails'),...(cmOn?[$('#budget')]:[]),$('#fDeadline'),$('#fName'),$('#fEmail'),$('#fDiscord')];
-    for(const f of list)if(!f.checkValidity()){f.reportValidity();f.focus();return err(f.id==='budget'?'Please enter your price ($5 – $10,000).':f.id==='fDeadline'?'Please pick a deadline that is today or later.':f.id==='fEmail'?'Please enter your email, so I can send you your invoice.':'Please fill in the highlighted field.'),false;}
+    for(const f of list)if(!f.checkValidity()){f.reportValidity();f.focus();return err(f.id==='budget'?'Please enter your price ($5 – $10,000).':f.id==='fDeadline'?'Please pick a deadline that is today or later.':f.id==='fEmail'?'Please enter your email, so I can send you your invoice.':f.id==='fDetails'?'Please tell me about your idea (character, colors, what you need), so I know what to make.':f.id==='fName'?'Please enter your name or VTuber name.':'Please fill in the highlighted field.'),false;}
     if(cmOn&&!budget())return $('#budget').focus(),err('Please enter your price ($5 – $10,000).'),false;
     if(!cmOn&&$('#pp3').checked&&calc()/(1+TAX)<149.99)return err('3 payments are available for orders above $150.'),false;
   }
