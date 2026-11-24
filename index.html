@@ -2744,13 +2744,13 @@ function calc(){
   renderInv();return t;
 }
 const readyBy=rush=>new Date(Date.now()+(rush?11:21)*864e5).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});   // every commission: 3 weeks at most
-// approximate price in the visitor's own currency (ECB rates via frankfurter.app; the invoice is always in USD)
+// approximate price in the visitor's own currency (rates fetched and cached by fx-api.php; the invoice is always in USD)
 const FX_CUR=(()=>{const r=((navigator.language||'').split('-')[1]||'').toUpperCase(),EU='AT BE CY DE EE ES FI FR GR HR IE IT LT LU LV MT NL PT SI SK'.split(' ');
   const m={ID:'IDR',GB:'GBP',JP:'JPY',PH:'PHP',MY:'MYR',SG:'SGD',AU:'AUD',CA:'CAD',BR:'BRL',MX:'MXN',KR:'KRW',IN:'INR',TH:'THB',NZ:'NZD',CH:'CHF',SE:'SEK',NO:'NOK',DK:'DKK',PL:'PLN',CZ:'CZK',HU:'HUF',TR:'TRY',ZA:'ZAR',HK:'HKD',CN:'CNY'};
   return EU.includes(r)?'EUR':(m[r]||'');})();
 let FX=null,fxBusy=false;
 function fxLoad(cb){if(!FX_CUR)return;if(FX)return cb();try{const c=JSON.parse(sessionStorage.getItem('ka_fx')||'null');if(c&&c.cur===FX_CUR&&Date.now()-c.t<864e5){FX=c;return cb();}}catch(_){}
-  if(fxBusy)return;fxBusy=true;fetch('https://api.frankfurter.app/latest?from=USD&to='+FX_CUR).then(r=>r.json()).then(j=>{const v=j&&j.rates&&j.rates[FX_CUR];if(v>0){FX={cur:FX_CUR,rate:v,t:Date.now()};try{sessionStorage.setItem('ka_fx',JSON.stringify(FX));}catch(_){}cb();}}).catch(()=>{}).finally(()=>{fxBusy=false;});}
+  if(fxBusy)return;fxBusy=true;fetch('fx-api.php?c='+FX_CUR).then(r=>r.json()).then(j=>{const v=j&&j.ok&&j.rate;if(v>0){FX={cur:FX_CUR,rate:v,t:Date.now()};try{sessionStorage.setItem('ka_fx',JSON.stringify(FX));}catch(_){}cb();}}).catch(()=>{}).finally(()=>{fxBusy=false;});}
 function fxText(usd){if(!FX||!(usd>0))return '';try{return '≈ '+new Intl.NumberFormat(undefined,{style:'currency',currency:FX.cur,maximumFractionDigits:FX.rate>50?0:2}).format(usd*FX.rate)+' (approx., you pay in USD)';}catch(_){return '';}}
 function fxLine(usd,el){el=el||$('#invFx');if(!el)return;const t=fxText(usd);el.textContent=t;el.hidden=!t;if(!FX&&usd>0)fxLoad(()=>fxLine(usd,el));}
 function renderInv(){
