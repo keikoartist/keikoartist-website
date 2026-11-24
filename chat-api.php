@@ -58,6 +58,8 @@ function db(): PDO {
   $cols = array_column($pdo->query('PRAGMA table_info(conversations)')->fetchAll(), 'name');
   if (!in_array('discord', $cols, true)) $pdo->exec('ALTER TABLE conversations ADD COLUMN discord TEXT');
   if (!in_array('notify', $cols, true)) $pdo->exec('ALTER TABLE conversations ADD COLUMN notify INTEGER NOT NULL DEFAULT 1');
+  if (!in_array('remind_at', $cols, true)) $pdo->exec('ALTER TABLE conversations ADD COLUMN remind_at INTEGER NOT NULL DEFAULT 0');
+  if (!in_array('remind_n', $cols, true)) $pdo->exec('ALTER TABLE conversations ADD COLUMN remind_n INTEGER NOT NULL DEFAULT 0');
   return $pdo;
 }
 
@@ -123,6 +125,35 @@ function bot_answer(string $convId, string $text, bool $first, string $email, st
       . '<p>Keiko will reply personally, usually within 6 hours (WIB). Just reply to this email, or <a href="' . $link . '">continue the chat on the website</a>.</p><p>KeikoArts</p></div>');
   }
 }
+/* Reminders: while a chat stays unread, Discord gets a reminder every 30 minutes (up to 12 times = 6 hours).
+   Runs on chat traffic and from the scheduled GitHub workflow (chat-reminders.yml) calling ?remind=1. */
+function send_reminders(array $cfg): int {
+  $hook = (string)($cfg['discord_webhook'] ?? '');
+  if (!preg_match('#^https://(?:ptb\.|canary\.)?(?:discord|discordapp)\.com/api/webhooks/\d+/[\w-]+$#', $hook)) { $st = ka_settings(); $hook = (string)($st['discord_webhook'] ?? ''); }
+  if (!preg_match('#^https://(?:ptb\.|canary\.)?(?:discord|discordapp)\.com/api/webhooks/\d+/[\w-]+$#', $hook) || !function_exists('curl_init')) return 0;
+  $db = db(); $now = time(); $sent = 0;
+  $st = $db->prepare("SELECT c.*, (SELECT body FROM messages m WHERE m.conv_id = c.id AND m.sender = 'visitor' ORDER BY m.id DESC LIMIT 1) AS last_msg,
+                             (SELECT MIN(created) FROM messages m WHERE m.conv_id = c.id AND m.sender = 'visitor' AND m.id > COALESCE((SELECT MAX(id) FROM messages a WHERE a.conv_id = c.id AND a.sender = 'admin'), 0)) AS waiting_since
+                      FROM conversations c WHERE c.unread_admin > 0 AND c.status = 'open' AND c.remind_n < 12 AND c.remind_at < ? LIMIT 10");
+  $st->execute([$now - 1800]);
+  foreach ($st->fetchAll() as $c) {
+    $since = (int)($c['waiting_since'] ?: $c['updated']); if ($now - $since < 1800) continue;   // first reminder after 30 minutes
+    $db->prepare('UPDATE conversations SET remind_at = ?, remind_n = remind_n + 1 WHERE id = ?')->execute([$now, $c['id']]);
+    $mins = intdiv($now - $since, 60); $wait = $mins >= 60 ? intdiv($mins, 60) . ' h ' . ($mins % 60) . ' min' : "$mins min";
+    $safe = fn($x) => str_replace(['@everyone', '@here'], ["@\u{200B}everyone", "@\u{200B}here"], (string)$x);
+    $payload = ['username' => 'KeikoArts Chat', 'allowed_mentions' => ['parse' => []], 'embeds' => [[
+      'title' => '⏰ Still unread: ' . $safe($c['name'] ?: 'Visitor') . " (waiting $wait)",
+      'description' => $safe(mb_substr((string)$c['last_msg'], 0, 400)),
+      'color' => 0xC93A6A,
+      'fields' => array_values(array_filter([$c['email'] ? ['name' => 'Email', 'value' => $safe($c['email']), 'inline' => true] : null, !empty($c['discord']) ? ['name' => 'Discord', 'value' => $safe($c['discord']), 'inline' => true] : null])),
+      'footer' => ['text' => 'Reminder ' . ((int)$c['remind_n'] + 1) . '/12 · reply at keikoartist.com/admin'],
+    ]]];
+    $ch = curl_init($hook);
+    curl_setopt_array($ch, [CURLOPT_POST => true, CURLOPT_POSTFIELDS => json_encode($payload), CURLOPT_HTTPHEADER => ['Content-Type: application/json'], CURLOPT_RETURNTRANSFER => true, CURLOPT_TIMEOUT => 4]);
+    curl_exec($ch); curl_close($ch); $sent++;
+  }
+  return $sent;
+}
 function discord_ping(array $cfg, array $c, string $text, bool $isNew): void {
   $hook = (string)($cfg['discord_webhook'] ?? '');
   if (!preg_match('#^https://(?:ptb\.|canary\.)?(?:discord|discordapp)\.com/api/webhooks/\d+/[\w-]+$#', $hook)) { $st = json_decode((string)@file_get_contents(data_dir() . '/settings.json'), true); $hook = is_array($st) ? (string)($st['discord_webhook'] ?? '') : ''; }
@@ -176,10 +207,12 @@ function require_admin(array $cfg): void {
 }
 
 /* ---------- router ---------- */
+if (isset($_GET['remind'])) { try { $n = send_reminders($cfg); } catch (\Throwable $e) { $n = 0; } out(200, ['ok' => true, 'sent' => $n]); }   // scheduled reminder check (no data returned)
 $raw = file_get_contents('php://input', false, null, 0, 20000) ?: '';
 $in = json_decode($raw, true);
 if (!is_array($in)) fail(400, 'bad json');
 $action = (string)($in['action'] ?? '');
+if (in_array($action, ['start', 'send', 'poll'], true) && mt_rand(1, 10) === 1) { try { send_reminders($cfg); } catch (\Throwable $e) {} }   // also check now and then on chat traffic
 
 try {
 switch ($action) {
@@ -302,7 +335,7 @@ switch ($action) {
   case 'thread': {
     require_admin($cfg);
     $id = (string)($in['id'] ?? ''); if (!preg_match('/^[a-f0-9]{24}$/', $id)) fail(400, 'bad id');
-    db()->prepare('UPDATE conversations SET unread_admin = 0 WHERE id = ?')->execute([$id]);
+    db()->prepare('UPDATE conversations SET unread_admin = 0, remind_n = 0 WHERE id = ?')->execute([$id]);
     $st = db()->prepare('SELECT id, name, email, discord, page, status, created FROM conversations WHERE id = ?'); $st->execute([$id]);
     $c = $st->fetch(); if (!$c) fail(404, 'not found');
     $ks = ka_settings();
@@ -315,7 +348,7 @@ switch ($action) {
     $agent = clean((string)($in['agent'] ?? ''), 30) ?: 'Keiko';
     $now = time(); $db = db();
     $db->prepare('INSERT INTO messages(conv_id, sender, agent, body, created) VALUES(?,?,?,?,?)')->execute([$id, 'admin', $agent, $text, $now]);
-    $db->prepare('UPDATE conversations SET updated = ?, unread_visitor = unread_visitor + 1, unread_admin = 0 WHERE id = ?')->execute([$now, $id]);
+    $db->prepare('UPDATE conversations SET updated = ?, unread_visitor = unread_visitor + 1, unread_admin = 0, remind_n = 0 WHERE id = ?')->execute([$now, $id]);
     $emailed = false;
     $st = $db->prepare('SELECT name, email FROM conversations WHERE id = ?'); $st->execute([$id]); $cv = $st->fetch();
     if ($cv && ($cv['email'] ?? '') !== '' && empty($in['no_email'])) {
@@ -332,7 +365,7 @@ switch ($action) {
   case 'close': case 'reopen': {
     require_admin($cfg);
     $id = (string)($in['id'] ?? ''); if (!preg_match('/^[a-f0-9]{24}$/', $id)) fail(400, 'bad id');
-    db()->prepare('UPDATE conversations SET status = ?, unread_admin = 0 WHERE id = ?')->execute([$action === 'close' ? 'closed' : 'open', $id]);
+    db()->prepare('UPDATE conversations SET status = ?, unread_admin = 0, remind_n = 0 WHERE id = ?')->execute([$action === 'close' ? 'closed' : 'open', $id]);
     out(200);
   }
   case 'delete': {

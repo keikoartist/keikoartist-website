@@ -1,0 +1,15 @@
+name: Chat reminders (Discord)
+# Every 15 minutes: asks the website to send a Discord reminder for chats that are still unread
+# (first after 30 minutes, then every 30 minutes, up to 12 times). Sends no data back.
+on:
+  schedule:
+    - cron: '*/15 * * * *'
+  workflow_dispatch:
+permissions: {}
+jobs:
+  remind:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 3
+    steps:
+      - name: Check unread chats
+        run: curl -s -m 60 -X POST -H 'Content-Type: application/json' -H 'Origin: https://keikoartist.com' --data '{}' 'https://keikoartist.com/chat-api.php?remind=1' || true
