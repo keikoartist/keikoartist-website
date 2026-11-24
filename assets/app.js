@@ -206,6 +206,16 @@ const DETAILS_PH={
 };
 const svcThumb=k=>{const g=(typeof GALLERY!=='undefined'&&GALLERY[k])||[];return g.length?`images/${g[0]}.webp`:'images/keikoarts-logo.webp';};
 const sizeName=c=>c==='Half'?'Half body':c==='Full'?'Full body':c;
+
+// real savings of the debut packages vs buying the same things one by one (cheapest single items; expressions not counted, so it never overstates)
+function pkgSaving(i){
+  const g=(k,n)=>{const s=SERVICES[k];if(!s)return NaN;const p=s.packages.find(x=>x[0]===n);return p?p[1]:NaN;};
+  const parts=[[g('VTuber','Bust · Art + Rig')],
+    [g('VTuber','Half body · Art + Rig'),6*g('Emotes','Static emote'),g('Background','Static'),g('Stream Overlay','Screens set')],
+    [g('VTuber','Full body · Art + Rig'),6*g('Emotes','Static emote'),g('Background','Static'),g('Stream Overlay','Screens set'),g('Custom PFP','Headshot'),g('VTuber Logo','Custom logo')]][i];
+  const pk=(SERVICES['VTuber Packages']||{packages:[]}).packages[i];if(!parts||!pk)return 0;
+  const sep=parts.reduce((a,b)=>a+b,0);return isFinite(sep)&&sep>pk[1]?Math.round(sep-pk[1]):0;
+}
 function pickService(k){
   CART_MODE=false;EDIT_ID=null;svc=SERVICES[k]; svcName=k; cmOn=!!svc.quote;
   $('#shName').textContent=k;
@@ -214,7 +224,7 @@ function pickService(k){
   $('#shIntro').textContent=cmOn?'Tell me your idea and name your price ♡':/VTuber|PNGTuber|Chibi|Pet/.test(k)?'Choose your options and tell me your idea ♡ No design yet? Describe your character and I design it with you.':'Choose your options and tell me your idea ♡';
   {const inc=(typeof DETAILS!=='undefined'&&DETAILS[k]&&DETAILS[k].includes)||[];$('#wygList').innerHTML=inc.map(x=>`<li>${esc(x)}</li>`).join('');$('#wyg').hidden=!inc.length;$('#wyg').open=false;}
   const mx=!!svc.table; $('#mx').hidden=!mx; $('#pkgOpts').hidden=mx;
-  $('#pkgOpts').innerHTML=svc.packages.map(([n,p,d],i)=>`<div class="opt"><input type="radio" name="pkg" id="p${i}" value="${i}" ${i===0?'checked':''}><label for="p${i}">${esc(n)} <em>${cmOn?'':money(p)+(svc.qty?' each':'')}</em><small>${esc(d)}</small></label></div>`).join('');
+  $('#pkgOpts').innerHTML=svc.packages.map(([n,p,d],i)=>{const sv=k==='VTuber Packages'?pkgSaving(i):0;d=sv?d+' · Save $'+sv+' vs buying separately':d;return `<div class="opt"><input type="radio" name="pkg" id="p${i}" value="${i}" ${i===0?'checked':''}><label for="p${i}">${esc(n)} <em>${cmOn?'':money(p)+(svc.qty?' each':'')}</em><small>${esc(d)}</small></label></div>`;}).join('');
   if(mx){
     const mt0=Math.max(0,svc.table.rows.findIndex(([r])=>r==='Art + Rig'));   // most VTubers want a moving model (owner, Nov 2026)
     $('#mxType').innerHTML=svc.table.rows.map(([r,ix],i)=>`<input type="radio" name="mxType" id="mt${i}" value="${i}" ${i===mt0?'checked':''}><label for="mt${i}">${esc(r)}<small>from ${money(Math.min(...ix.map(j=>svc.packages[j][1])))}</small></label>`).join('');
@@ -951,6 +961,8 @@ const slotTxt=k=>{if(typeof SLOTS==='undefined'||!SLOTS.open||!SLOTS.per||!(k in
   $$('#svcOpts label').forEach(l=>{const inp=document.getElementById(l.htmlFor),t=inp&&slotTxt(inp.value),sm=l.querySelector('small');if(t&&sm)sm.textContent+=' · '+t;});
 })();
 
+{const c=$$('#services .card').find(x=>((x.querySelector('h3')||{}).textContent||'').trim()==='VTuber Packages');const m=Math.max(0,...[0,1,2].map(pkgSaving));
+  if(c&&m){const pr=c.querySelector('.price'),s=document.createElement('span');s.className='psave';s.textContent=`Debut packages save up to $${m} vs buying separately`;pr&&pr.appendChild(s);}}
 // buyer helpers: installments on the cards, "start small", which-package quiz, work in progress (real numbers from the orders)
 (function(){
   const fromMove=k=>{const sv=SERVICES[k];if(!sv)return 0;const mv=sv.packages.filter(p=>/Art \+ Rig/.test(p[0])).map(p=>p[1]);return mv.length?Math.min(...mv):sv.from;};
