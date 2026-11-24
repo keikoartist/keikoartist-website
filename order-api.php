@@ -504,7 +504,7 @@ if (($_GET['a'] ?? '') === 'submit') {
   if ($kind === 'custom') $lines = array_merge([['Custom commission (' . ($fields['Usage'] ?? 'Personal') . ' use)', $price]], $com > 0 ? [['Commercial / merch rights', $com]] : [], [['Tax (13%)', $tax]]);
   else {
     $lj = json_decode((string)($_POST['_lines'] ?? ''), true);
-    if (is_array($lj)) foreach (array_slice($lj, 0, 20) as $l)
+    if (is_array($lj)) foreach (array_slice($lj, 0, 60) as $l)
       if (is_array($l) && count($l) >= 2 && is_string($l[0]) && is_numeric($l[1])) $lines[] = [clean($l[0], 120), round(min(100000, max(0, (float)$l[1])), 2)];
     if (!$lines || abs(array_sum(array_column($lines, 1)) - $total) > 0.05) $lines = [[trim($service . ' - ' . ($fields['Package'] ?? ''), ' -'), $total]];
     // 13% tax on every order: the order form sends it as its own line; add it here when it is missing (e.g. an old cached page)

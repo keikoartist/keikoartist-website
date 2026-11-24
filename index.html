@@ -1641,6 +1641,28 @@ body.xmas header:not(.kc-head)::after{background:linear-gradient(90deg,#f2628f,#
 .tags .add-w input[name=add]:checked~input.add-q{display:inline-block!important;position:static!important;opacity:1!important;pointer-events:auto!important;width:58px!important;height:auto!important}
 .kc-auto p{white-space:pre-line;background:#f6f0ff!important;color:#4a2a63!important;border:1px dashed #d4bdf3}.kc-autolbl{display:block;margin-top:4px;font-size:11.5px;color:var(--muted)}
 @media (min-width:821px) and (max-width:1050px){.works.fw .work.fw-wide{grid-column:span 3}}
+
+/* cart (Etsy-style: add several services, check them, then one order and one invoice) */
+.nav-cart{position:relative;background:#fff6f9;border:1.5px solid var(--line);color:var(--ink);cursor:pointer;width:40px;height:40px;border-radius:50%;display:grid;place-items:center;flex:none;padding:0}
+.nav-cart:hover{border-color:var(--pink)}
+.nc-n{position:absolute;top:-5px;right:-5px;min-width:19px;height:19px;padding:0 5px;border-radius:999px;background:var(--btn-pink);color:#fff;font:600 11px/19px Poppins,sans-serif;text-align:center}
+.nav-cart[hidden],.cart-mini[hidden],.cart-foot[hidden],.cart-empty[hidden],#addCartBtn[hidden],#cartCheckout[hidden]{display:none!important}
+.cart-list{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+.ci{display:grid;grid-template-columns:56px minmax(0,1fr) auto auto;gap:4px 12px;align-items:center;padding:12px;border:1px solid var(--line);border-radius:16px;background:#fff}
+.ci-th{width:56px;height:56px;border-radius:12px;background:#fde8ef center/cover}
+.ci-t{min-width:0;display:grid;gap:2px}.ci-t b{font-size:15px}.ci-t small{color:var(--muted);font-size:13px;line-height:1.4}
+.ci-t em{font-size:13px;color:var(--muted);font-style:normal;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ci-p{font-size:15px;white-space:nowrap}
+.ci-x{border:0;background:none;color:var(--muted);cursor:pointer;width:34px;height:34px;border-radius:50%;font-size:15px}.ci-x:hover{background:#fff0f5;color:var(--pink-text)}
+.cart-tot{display:grid;grid-template-columns:1fr auto;gap:6px 0;margin:0;padding:14px 16px;border-radius:14px;background:#fff6f9;font-size:14px}
+.cart-tot dt{margin:0}.cart-tot dd{margin:0;text-align:right;padding-left:12px}.cart-tot .grand{font-weight:700;font-size:17px;border-top:1px solid var(--line);padding-top:8px}
+.cart-note{font-size:13px;color:var(--muted);margin:8px 0 0;line-height:1.5}
+.cart-empty{text-align:center;color:var(--muted);padding:18px 0;margin:0}
+.cart-btns{display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap}
+.cart-mini{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 10px 10px 14px;border-radius:14px;background:#fff6f9;border:1px solid var(--line);font-size:14px}
+.cart-mini .btn{padding:9px 16px;font-size:13.5px}
+#addCartBtn{display:inline-flex;align-items:center;gap:6px}
+@media (max-width:560px){.ci{grid-template-columns:48px minmax(0,1fr) auto}.ci-th{width:48px;height:48px;grid-row:1/3}.ci-t{grid-column:2}.ci-p{grid-column:2;grid-row:2}.ci-x{grid-column:3;grid-row:1}.cart-btns .btn{flex:1}#addCartBtn .acl{display:none}#addCartBtn{padding:11px 12px!important}}
 </style>
 </head>
 <body>
@@ -1669,6 +1691,7 @@ body.xmas header:not(.kc-head)::after{background:linear-gradient(90deg,#f2628f,#
       <a href="https://discord.gg/FbgWxMPjf" target="_blank" rel="noopener" class="nav-2nd menu-dc"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M20.32 4.37A19.8 19.8 0 0 0 15.4 2.85a13.7 13.7 0 0 0-.63 1.29 18.4 18.4 0 0 0-5.5 0 13 13 0 0 0-.64-1.29 19.7 19.7 0 0 0-4.92 1.52C.6 9.05-.24 13.6.18 18.1a19.9 19.9 0 0 0 6.03 3.05c.49-.66.92-1.36 1.29-2.1a12.9 12.9 0 0 1-2.03-.97l.5-.39a14.2 14.2 0 0 0 12.06 0l.5.39c-.65.38-1.33.71-2.04.98.37.73.8 1.43 1.29 2.09a19.8 19.8 0 0 0 6.04-3.05c.5-5.22-.84-9.73-3.5-13.73ZM8.02 15.33c-1.18 0-2.15-1.08-2.15-2.42 0-1.33.95-2.42 2.15-2.42 1.2 0 2.17 1.1 2.15 2.42 0 1.34-.95 2.42-2.15 2.42Zm7.96 0c-1.18 0-2.15-1.08-2.15-2.42 0-1.33.95-2.42 2.15-2.42 1.2 0 2.17 1.1 2.15 2.42 0 1.34-.94 2.42-2.15 2.42Z"/></svg> Join our Discord server</a>
     </nav>
     <button type="button" class="nav-search" id="navSearch" aria-label="Search services"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2"/><path d="m20 20-4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><span class="ns-txt">Search services…</span></button>
+    <button type="button" class="nav-cart" id="navCart" hidden aria-label="Your cart"><svg class="ic" viewBox="0 0 24 24" width="19" height="19" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8h14l-1.2 11.2a1.5 1.5 0 0 1-1.5 1.3H7.7a1.5 1.5 0 0 1-1.5-1.3Z"/><path d="M9 10V7a3 3 0 0 1 6 0v3"/></svg><span class="nc-n" id="navCartN">0</span></button>
     <a href="admin/" class="admin-pill" id="adminPill" hidden aria-label="Admin inbox"><svg class="ic" viewBox="0 0 24 24" width="17" height="17" aria-hidden="true"><path d="M4 5h16v11H9l-5 4V5Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg><span class="ap-l">Inbox</span> <b id="adminCount" hidden></b></a>
     <a href="https://discord.gg/FbgWxMPjf" target="_blank" rel="noopener" class="nav-dc" aria-label="Join the KeikoArts Discord server"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M20.32 4.37A19.8 19.8 0 0 0 15.4 2.85a13.7 13.7 0 0 0-.63 1.29 18.4 18.4 0 0 0-5.5 0 13 13 0 0 0-.64-1.29 19.7 19.7 0 0 0-4.92 1.52C.6 9.05-.24 13.6.18 18.1a19.9 19.9 0 0 0 6.03 3.05c.49-.66.92-1.36 1.29-2.1a12.9 12.9 0 0 1-2.03-.97l.5-.39a14.2 14.2 0 0 0 12.06 0l.5.39c-.65.38-1.33.71-2.04.98.37.73.8 1.43 1.29 2.09a19.8 19.8 0 0 0 6.04-3.05c.5-5.22-.84-9.73-3.5-13.73ZM8.02 15.33c-1.18 0-2.15-1.08-2.15-2.42 0-1.33.95-2.42 2.15-2.42 1.2 0 2.17 1.1 2.15 2.42 0 1.34-.95 2.42-2.15 2.42Zm7.96 0c-1.18 0-2.15-1.08-2.15-2.42 0-1.33.95-2.42 2.15-2.42 1.2 0 2.17 1.1 2.15 2.42 0 1.34-.94 2.42-2.15 2.42Z"/></svg><span>Discord</span></a>
     <a href="#order" data-order class="btn btn-pink nav-cta arrow">Start a Project</a>
@@ -1776,7 +1799,7 @@ body.xmas header:not(.kc-head)::after{background:linear-gradient(90deg,#f2628f,#
 <!-- REVIEWS (real client reviews; add new ones by copying a <figure>) -->
 <section id="reviews" class="tint-pink">
   <div class="wrap">
-    <div class="sec-head"><h2 class="serif">Kind words from clients</h2><p class="rv-score"><span aria-hidden="true">★★★★★</span> 5.0 from 18 client reviews · <b class="rv-count">200+ commissions completed</b></p></div>
+    <div class="sec-head"><h2 class="serif">Kind words from clients</h2><p class="rv-score"><span aria-hidden="true">★★★★★</span> 4.96 from 24 client reviews · <b class="rv-count">200+ commissions completed</b></p></div>
     <div class="rv-grid">
       <figure class="rv-card">
         <div class="rv-stars" role="img" aria-label="5 out of 5 stars">★★★★★</div>
@@ -1843,6 +1866,36 @@ body.xmas header:not(.kc-head)::after{background:linear-gradient(90deg,#f2628f,#
       <figure class="rv-card rv-tagsonly">
         <figcaption><span class="rv-av" aria-hidden="true">L</span><span><b>Lucky_Clover24</b><small>Mar 2025</small></span><span class="rv-stars" role="img" aria-label="5 out of 5 stars">★★★★★</span></figcaption>
         <ul class="rv-tags"><li>Amazing skills</li><li>Clear communication</li><li>Proactive updates</li></ul>
+      </figure>
+      <figure class="rv-card rv-tagsonly">
+        <figcaption><span class="rv-av" aria-hidden="true">T</span><span><b>thedragonashie</b><small>Aug 2025</small></span><span class="rv-stars" role="img" aria-label="5 out of 5 stars">★★★★★</span></figcaption>
+        <ul class="rv-tags"><li>Great value</li><li>Professional</li><li>Receptive to feedback</li></ul>
+      </figure>
+      <figure class="rv-card">
+        <div class="rv-stars" role="img" aria-label="5 out of 5 stars">★★★★★</div>
+        <blockquote>“Keiko is very understanding, communicative and will do her best to make sure you get the product you desire. Even if the buyer starts with little to no idea what they wish or ask for a lot of revisions she will do her best to work it out.<br><br>This is coming from a very indecisive client.”</blockquote>
+        <ul class="rv-tags"><li>On time delivery</li><li>Clear communication</li><li>Proactive updates</li><li>Very responsive</li><li>Great value</li><li>Receptive to feedback</li></ul>
+        <figcaption><span class="rv-av" aria-hidden="true">A</span><span><b>AuraStargazer</b><small>Jul 2025</small></span></figcaption>
+      </figure>
+      <figure class="rv-card">
+        <div class="rv-stars" role="img" aria-label="5 out of 5 stars">★★★★★</div>
+        <blockquote>“Fantastic work, very satisfied!!”</blockquote>
+        <ul class="rv-tags"><li>On time delivery</li><li>Professional</li><li>Proactive updates</li><li>Clear communication</li><li>Receptive to feedback</li></ul>
+        <figcaption><span class="rv-av" aria-hidden="true">C</span><span><b>corrosioncorvid</b><small>Jul 2025</small></span></figcaption>
+      </figure>
+      <figure class="rv-card rv-tagsonly">
+        <figcaption><span class="rv-av" aria-hidden="true">L</span><span><b>Luna77</b><small>Jul 2025</small></span><span class="rv-stars" role="img" aria-label="4 out of 5 stars">★★★★☆</span></figcaption>
+        <ul class="rv-tags"><li>On time delivery</li><li>Professional</li><li>Amazing skills</li><li>Clear communication</li><li>Very responsive</li><li>Attentive to details</li></ul>
+      </figure>
+      <figure class="rv-card">
+        <div class="rv-stars" role="img" aria-label="5 out of 5 stars">★★★★★</div>
+        <blockquote>“The artist did an incredible job on my logo. They were receptive every step of the way and got it done in record time.”</blockquote>
+        <ul class="rv-tags"><li>On time delivery</li><li>Amazing skills</li><li>Great value</li><li>Very responsive</li><li>Proactive updates</li><li>Professional</li><li>Attentive to details</li><li>Receptive to feedback</li><li>Clear communication</li><li>Above and beyond</li></ul>
+        <figcaption><span class="rv-av" aria-hidden="true">M</span><span><b>MiaM</b><small>Jun 2025</small></span></figcaption>
+      </figure>
+      <figure class="rv-card rv-tagsonly">
+        <figcaption><span class="rv-av" aria-hidden="true">B</span><span><b>BJPeter</b><small>Apr 2025</small></span><span class="rv-stars" role="img" aria-label="5 out of 5 stars">★★★★★</span></figcaption>
+        <ul class="rv-tags"><li>Professional</li><li>On time delivery</li><li>Clear communication</li><li>Attentive to details</li><li>Receptive to feedback</li><li>Proactive updates</li><li>Very responsive</li><li>Amazing skills</li><li>Great value</li><li>Above and beyond</li></ul>
       </figure>
       <figure class="rv-card">
         <div class="rv-stars" role="img" aria-label="5 out of 5 stars">★★★★★</div>
@@ -2066,6 +2119,7 @@ body.xmas header:not(.kc-head)::after{background:linear-gradient(90deg,#f2628f,#
         <input type="hidden" name="Amount due now (USD)" id="fDue">
 
         <div class="ostep on" data-s="1">
+          <div class="cart-mini" id="cartMini" hidden><span>In your cart: <b id="cmN"></b> · <b id="cmT"></b></span><button type="button" class="btn btn-pink" id="cmGo">View cart</button></div>
           <p class="c-intro">What would you like to order? Pick one to see its options ♡<span class="c-start" id="cStart" hidden></span></p>
           <div class="opts" id="svcOpts"></div>
         </div>
@@ -2144,10 +2198,22 @@ body.xmas header:not(.kc-head)::after{background:linear-gradient(90deg,#f2628f,#
           <label class="check" id="agreeRow"><input type="checkbox" id="agree"><span>I have read and agree to the <a href="#tos" data-close style="color:var(--pink-text);font-weight:600">Terms of Service and Privacy</a>.</span></label>
         </div>
 
+        <div class="ostep" data-s="3" id="cartView">
+          <p class="c-intro">Check everything before you order. Nothing is paid yet ♡</p>
+          <p class="cart-empty" id="cartEmpty">Your cart is empty.</p>
+          <ul class="cart-list" id="cartList"></ul>
+          <div class="cart-foot" id="cartFoot">
+            <dl class="cart-tot" id="cartTot"></dl>
+            <p class="cart-note">One order and one invoice for everything. Every commission takes 3 weeks at most. At checkout you can pay in full, 50% now, or in 3 payments (orders above $150).</p>
+          </div>
+          <div class="cart-btns"><button type="button" class="btn btn-ghost" id="cartMore">Add another service</button><button type="button" class="btn btn-pink" id="cartCheckout">Checkout</button></div>
+        </div>
+
         <p class="err" id="err"></p>
         <div class="mnav" id="mnav">
           <button type="button" class="btn btn-ghost" id="prevBtn" aria-label="Back to the service list">Back</button>
           <div class="mtot" id="navTot"><small id="navLbl">Total (incl. 13% tax)</small><b id="navTotal">$0</b></div>
+          <button type="button" class="btn btn-ghost" id="addCartBtn" aria-label="Add to cart"><svg class="ic" viewBox="0 0 24 24" width="19" height="19" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8h14l-1.2 11.2a1.5 1.5 0 0 1-1.5 1.3H7.7a1.5 1.5 0 0 1-1.5-1.3Z"/><path d="M9 10V7a3 3 0 0 1 6 0v3"/></svg><span class="acl">Add to cart</span></button>
           <button type="submit" class="btn btn-pink" id="sendBtn">Send Order <svg class="ic" viewBox="0 0 24 24" width="17" height="17" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10Z" fill="none" stroke="currentColor" stroke-width="2"/></svg></button>
         </div>
       </form>
@@ -2435,6 +2501,47 @@ function attachRefsToForm(){
 // ===== order modal: service list (step 1) + one order page per service (step 2) =====
 const modal=$('#orderModal'), form=$('#orderForm'); let step=1, svc=null, svcName='', cmOn=false, sheetStart=0;
 let ORDER={lines:[],total:0,due:0,plan:'Full payment',custom:false};
+// ===== cart: several services, one order and one invoice (kept on this device for 30 days) =====
+const CART_KEY='ka_cart', CART_MAX=6, CART_SVC={packages:[['Cart',0,'']],addons:[],eta:'3 weeks at most',from:0};
+let CART_MODE=false;
+function readCart(){try{const c=JSON.parse(localStorage.getItem(CART_KEY)||'[]');return Array.isArray(c)?c.filter(x=>x&&SERVICES[x.svc]&&Array.isArray(x.lines)&&Date.now()-(x.t||0)<30*864e5).slice(0,CART_MAX):[];}catch(_){return [];}}
+function writeCart(c){try{c.length?localStorage.setItem(CART_KEY,JSON.stringify(c)):localStorage.removeItem(CART_KEY);}catch(_){}cartUI();}
+function cartSum(c){const sub=r2(c.reduce((a,x)=>a+(+x.sub||0),0)),tax=r2(sub*TAX);return {sub,tax,total:r2(sub+tax)};}
+function cartUI(){
+  const c=readCart(),n=c.length,sm=cartSum(c);
+  $('#navCart').hidden=!n;$('#navCartN').textContent=n;$('#navCart').setAttribute('aria-label',`Your cart, ${n} item${n===1?'':'s'}`);
+  $('#cartMini').hidden=!n;$('#cmN').textContent=n+' service'+(n===1?'':'s');$('#cmT').textContent=money2(sm.total);
+  if(step===3)renderCart();
+}
+function renderCart(){
+  const c=readCart(),sm=cartSum(c);
+  $('#cartEmpty').hidden=!!c.length;$('#cartFoot').hidden=!c.length;$('#cartCheckout').hidden=!c.length;
+  $('#cartList').innerHTML=c.map(x=>{const opts=x.lines.map(l=>l[0].replace(/^\+ /,'')).join(' · ').replace(x.svc+' · ','');
+    return `<li class="ci"><span class="ci-th" style="background-image:url('${svcThumb(x.svc)}')"></span><div class="ci-t"><b>${esc(x.svc)}</b><small>${esc(opts)}</small>${x.details?`<em>“${esc(x.details)}”</em>`:''}</div><b class="ci-p">${money2(x.sub)}</b><button type="button" class="ci-x" data-rm="${esc(x.id)}" aria-label="Remove ${esc(x.svc)}">✕</button></li>`;}).join('');
+  $('#cartTot').innerHTML=`<dt>Subtotal</dt><dd>${money2(sm.sub)}</dd><dt>Tax (13%)</dt><dd>${money2(sm.tax)}</dd><dt class="grand">Total (USD)</dt><dd class="grand">${money2(sm.total)}</dd>`;
+}
+function addToCart(){
+  if(!svc||cmOn||CART_MODE)return;
+  calc();
+  const c=readCart();if(c.length>=CART_MAX){err(`Your cart is full (${CART_MAX} services). Please check out first.`);return;}
+  const ls=ORDER.lines.filter(l=>!/^Tax \(13%\)/.test(l[0])).map((l,i)=>[i?'+ '+l[0]:l[0],l[1]]);
+  c.push({id:Date.now().toString(36)+Math.random().toString(36).slice(2,5),t:Date.now(),svc:svcName,pkg:$('#fPackage').value,qty:+$('#fQty').value||1,addons:$('#fAddons').value,lines:ls,sub:r2(ls.reduce((a,l)=>a+l[1],0)),details:$('#fDetails').value.trim().slice(0,1500)});
+  writeCart(c);
+  $('#fDetails').value='';clearDraft();go(3);
+}
+function openCart(){openOrder();go(3);}
+function openCheckout(){
+  const c=readCart();if(!c.length){go(3);return;}
+  CART_MODE=true;svc=CART_SVC;svcName='Cart';cmOn=false;
+  $('#shName').textContent='Your cart';$('#shMeta').textContent=`${c.length} service${c.length>1?'s':''} · + 13% tax · 3 weeks at most`;
+  $('#shThumb').style.backgroundImage=`url("${svcThumb(c[0].svc)}")`;
+  $('#shIntro').textContent='One order and one invoice for everything in your cart ♡';
+  $('#secPkg').hidden=true;$('#secAdd').hidden=true;$('#secBudget').hidden=true;$('#useBox').hidden=true;$('#secPay').hidden=false;
+  $$('input[name=Usage]').forEach(x=>x.disabled=true);$('#budget').required=false;$('#budget').value='';$('#rush').checked=false;
+  if(!$('#fDetails').value.trim())$('#fDetails').value=c.filter(x=>x.details).map(x=>`[${x.svc}] ${x.details}`).join('\n\n');
+  $('#fDetails').placeholder='Tell me about your character and anything I should know for each service ♡';
+  $('#draftNote').hidden=true;go(2);
+}
 $('#svcOpts').innerHTML=Object.entries(SERVICES).map(([k,v],i)=>`<div class="opt"><input type="radio" name="svc" id="s${i}" value="${k}"><label for="s${i}">${k}<small>${v.quote?'Name your price':'From '+money(v.from)}</small></label></div>`).join('');
 function openOrder(service){
   try{if(!sessionStorage.getItem('ka_oo')){sessionStorage.setItem('ka_oo','1');KA_STAT('order_open');}}catch(_){KA_STAT('order_open');}   // once per visit
@@ -2465,7 +2572,7 @@ const DETAILS_PH={
 const svcThumb=k=>{const g=(typeof GALLERY!=='undefined'&&GALLERY[k])||[];return g.length?`images/${g[0]}.webp`:'images/keikoarts-logo.webp';};
 const sizeName=c=>c==='Half'?'Half body':c==='Full'?'Full body':c;
 function pickService(k){
-  svc=SERVICES[k]; svcName=k; cmOn=!!svc.quote;
+  CART_MODE=false;svc=SERVICES[k]; svcName=k; cmOn=!!svc.quote;
   $('#shName').textContent=k;
   $('#shMeta').textContent=cmOn?'You name the price · 13% tax added':`From ${money(svc.from)} + 13% tax · ${svc.eta}`;
   $('#shThumb').style.backgroundImage=`url("${svcThumb(k)}")`;
@@ -2498,7 +2605,7 @@ if(matchMedia('(hover:none)').matches){const dh=document.getElementById('dropHin
 const DRAFT_KEY='ka_draft', DRAFT_IDS=['fDetails','fName','fEmail','fDiscord','fDeadline','budget'];
 let draftTimer=0;
 function saveDraft(){
-  if(step!==2||!svc)return;
+  if(step!==2||!svc||CART_MODE)return;
   try{const old=readDraft(),d={t:Date.now(),start:(old&&old.start)||sheetStart||Date.now(),svc:svcName,v:{},sel:[],qty:$('#qty').value,links:form['Reference links'].value};
     const done=refFiles.filter(f=>(upState.get(f)||{}).status==='done');
     d.up={token:upToken,at:Date.now(),total:refFiles.length,files:done.map(f=>{const st=upState.get(f);return {fid:st.fid,name:f.name,size:f.size,type:f.type,thumb:st.thumb||''};})};
@@ -2536,6 +2643,15 @@ const radioVal=n=>+(($(`input[name="${n}"]:checked`)||{}).value||0);
 function selIndex(){return svc.table?svc.table.rows[radioVal('mxType')][1][radioVal('mxSize')]:radioVal('pkg');}
 function calc(){
   if(!svc)return 0;
+  if(CART_MODE){
+    const c=readCart(),sm=cartSum(c),p3=$('#pp3');p3.disabled=sm.sub<150;if(p3.disabled&&p3.checked)$('#pp1').checked=true;
+    const plan=$('input[name="Payment plan"]:checked').value,due=dueNow(sm.total,plan);
+    $('#fService').value=c.map(x=>x.svc).join(' + ');$('#fPackage').value=c.map(x=>x.pkg+(x.qty>1?' × '+x.qty:'')).join('; ');$('#fQty').value=c.length;
+    $('#fAddons').value=c.map(x=>x.addons&&x.addons!=='-'?x.svc+': '+x.addons:'').filter(Boolean).join('; ')||'-';
+    $('#fTotal').value=money2(sm.total)+' (incl. 13% tax)';$('#fSubject').value=`New cart order: ${$('#fService').value} — ${money2(sm.total)}`;
+    ORDER={lines:[...c.flatMap(x=>x.lines),['Tax (13%)',sm.tax]],total:sm.total,due,plan,custom:false,rush:false};
+    renderInv();return sm.total;
+  }
   if(cmOn){
     const iv=invoice(), bud=iv.sub;
     $('#fService').value=svcName;$('#fPackage').value=svc.packages[0][0];$('#fQty').value=1;$('#fAddons').value='-';
@@ -2590,7 +2706,7 @@ function invoice(){const sub=budget(),com=sub&&usageVal()==='Commercial'?COMMERC
 const usageVal=()=>($('input[name=Usage]:checked')||{value:'Personal'}).value;
 function orderRows(){
   const refs=(refFiles.length?refFiles.length+' file(s)':'')+(form['Reference links'].value?(refFiles.length?' + links':'Links'):'')||'-';
-  return [['Service',svcName],...(cmOn?[['Usage',usageVal()+' use']]:[['Package',$('#fPackage').value],['Add-ons',$('#fAddons').value],['Payment plan',$('input[name="Payment plan"]:checked').value]]),
+  return [['Service',CART_MODE?$('#fService').value:svcName],...(cmOn?[['Usage',usageVal()+' use']]:[['Package',$('#fPackage').value],['Add-ons',$('#fAddons').value],['Payment plan',$('input[name="Payment plan"]:checked').value]]),
     ['Deadline',$('#fDeadline').value||'-'],['Name',$('#fName').value],['Email',$('#fEmail').value||'-'],['Discord',$('#fDiscord').value||'-'],['References',refs],
     ['Total',ORDER.total?money2(ORDER.total)+' incl. 13% tax':'-']];
 }
@@ -2608,11 +2724,17 @@ function valid(n){
 function go(n){
   step=n; $$('.ostep').forEach(s=>s.classList.toggle('on',+s.dataset.s===n));
   $('#mnav').hidden=n!==2;
-  $('#mTitle').textContent=n===1?'Start an Order':cmOn?'Custom Order':'Order Form';
+  $('#mTitle').textContent=n===1?'Start an Order':n===3?'Your Cart':CART_MODE?'Checkout':cmOn?'Custom Order':'Order Form';
+  $('#addCartBtn').hidden=cmOn||CART_MODE;if(n===3)renderCart();
   if(n===2){calc();if(!sheetStart)sheetStart=Date.now();}
-  err('');try{modal.scrollTop=0;sessionStorage.setItem('ka_open',n===2?svcName:'__list');sessionStorage.removeItem('ka_open_y');}catch(_){}
+  err('');try{modal.scrollTop=0;sessionStorage.setItem('ka_open',n===2&&!CART_MODE?svcName:'__list');sessionStorage.removeItem('ka_open_y');}catch(_){}
 }
-$('#prevBtn').onclick=()=>go(1);
+$('#prevBtn').onclick=()=>go(CART_MODE?3:1);
+$('#addCartBtn').onclick=addToCart;$('#navCart').onclick=openCart;$('#cmGo').onclick=()=>go(3);
+$('#cartMore').onclick=()=>go(1);$('#cartCheckout').onclick=openCheckout;
+$('#cartList').addEventListener('click',e=>{const b=e.target.closest('[data-rm]');if(!b)return;writeCart(readCart().filter(x=>x.id!==b.dataset.rm));renderCart();});
+addEventListener('storage',e=>{if(e.key===CART_KEY)cartUI();});
+cartUI();
 form.setAttribute('novalidate','');
 // ===== the client's latest invoice is kept on their device until it is paid =====
 const INV_KEY='ka_inv';
@@ -2664,7 +2786,7 @@ form.addEventListener('submit',async e=>{
   const rows=orderRows();
   const ctx={name,usage:usageVal(),deadline:$('#fDeadline').value,brief:$('#fDetails').value.trim().slice(0,140),contact:$('#fEmail').value+($('#fDiscord').value?' · Discord '+$('#fDiscord').value:'')};
   const mkInv=(dateStr,emailed,tot,dueAmt)=>({date:dateStr,name,contact:ctx.contact,deadline:ctx.deadline,brief:ctx.brief,usage:cmOn?ctx.usage:'',custom:cmOn,service:svcName,lines,total:tot,due:dueAmt,plan,emailed});
-  const done=last=>{clearTimeout(slow);KA_STAT('order_sent');try{sessionStorage.setItem('ka_last',JSON.stringify(last));}catch(_){}resetOrderForm();closeOrder();showThanks(last);};
+  const done=last=>{clearTimeout(slow);KA_STAT('order_sent');if(CART_MODE){writeCart([]);CART_MODE=false;}try{sessionStorage.setItem('ka_last',JSON.stringify(last));}catch(_){}resetOrderForm();closeOrder();showThanks(last);};
   const restore=()=>{clearTimeout(slow);$('#fEmail').disabled=false;$('#fAuto').disabled=false;setBusy(false);};
   const stamp=()=>{const d=new Date(),pad=n=>String(n).padStart(2,'0');return {md:pad(d.getMonth()+1)+pad(d.getDate()),date:d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})};};
   // email copy through FormSubmit (used when the hosting can't send email, and as the backup path)
@@ -3353,11 +3475,6 @@ if(!/[?&](sent|paid)=1/.test(location.search)){
         if(r.status===404||(r.status===200&&j&&j.ok&&(j.paid>0||['paid','in_progress','done','cancelled'].includes(j.status))))dropInvoice(v.id);else showBar();});}
     else showBar();
   }}
-{const d=!reopened&&!/[?&](sent|paid)=1/.test(location.search)&&readDraft();
-  if(d&&Date.now()-d.t<864e5){const bar=document.createElement('div');bar.className='resume';bar.setAttribute('role','status');
-    bar.innerHTML=`<span>You have an unfinished order: <b>${esc(d.svc)}</b></span><button type="button" class="btn btn-pink">Continue</button><button type="button" class="x" aria-label="Dismiss">✕</button>`;
-    bar.querySelector('.btn').onclick=()=>{bar.remove();openOrder(d.svc);};bar.querySelector('.x').onclick=()=>bar.remove();
-    document.body.appendChild(bar);}}
 addEventListener('pageshow',()=>setBusy(false));
 {const d=new Date(),z=n=>String(n).padStart(2,'0');$('#fDeadline').min=d.getFullYear()+'-'+z(d.getMonth()+1)+'-'+z(d.getDate());}
 if(location.protocol.startsWith('http'))$('#fNext').value=location.origin+'/?sent=1';
