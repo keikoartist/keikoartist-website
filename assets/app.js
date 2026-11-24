@@ -949,6 +949,28 @@ const slotTxt=k=>{if(typeof SLOTS==='undefined'||!SLOTS.open||!SLOTS.per||!(k in
     const e=document.createElement('span');e.className='slot-left'+(/Fully/.test(t)?' full':'');e.innerHTML='<i aria-hidden="true"></i>'+t;h.after(e);});
   $$('#svcOpts label').forEach(l=>{const inp=document.getElementById(l.htmlFor),t=inp&&slotTxt(inp.value),sm=l.querySelector('small');if(t&&sm)sm.textContent+=' · '+t;});
 })();
+
+// buyer helpers: installments on the cards, "start small", which-package quiz, work in progress (real numbers from the orders)
+(function(){
+  const fromMove=k=>{const sv=SERVICES[k];if(!sv)return 0;const mv=sv.packages.filter(p=>/Art \+ Rig/.test(p[0])).map(p=>p[1]);return mv.length?Math.min(...mv):sv.from;};
+  $$('#services .card').forEach(c=>{const k=(c.querySelector('h3')||{}).textContent;if(!k||!SERVICES[k.trim()]||SERVICES[k.trim()].quote)return;const base=fromMove(k.trim());if(base<150)return;
+    const third=Math.ceil(base*(1+TAX)/3*100)/100,pr=c.querySelector('.price');if(!pr)return;const s=document.createElement('span');s.className='pinst';s.textContent=`or 3 payments of ${money2(third)} (incl. tax)`;pr.appendChild(s);});
+  const small=[['Emotes','emotes for your channel'],['PNGTuber','a simple talking avatar'],['Custom PFP','a profile picture of your character']].filter(([k])=>SERVICES[k]);
+  $('#startSmallList').innerHTML=small.map(([k,d])=>`<a href="#order" data-order="${esc(k)}"><span>${esc(k)}<small style="display:block;font-weight:400;color:var(--muted);font-size:12.5px">${esc(d)}</small></span><b>from ${money(SERVICES[k].from)}${SERVICES[k].qty?' each':''}</b></a>`).join('');
+  const ans={};
+  $('#fq').addEventListener('click',e=>{const b=e.target.closest('button[data-v]');if(!b)return;const g=b.parentNode;g.querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b));ans[g.dataset.q]=b.dataset.v;
+    if(!(ans.b&&ans.m&&ans.x))return;
+    const vp=n=>{const p=(SERVICES.VTuber.packages.find(x=>x[0]===n)||[])[1];return p?money(p):'';},pk=SERVICES['VTuber Packages'].packages;
+    let t,o;
+    if(ans.m==='no'){t=`<b>PNGTuber</b> from ${money(SERVICES.PNGTuber.from)}: a talking avatar that switches images when you speak. Easy to start, and you can move to Live2D later.`;o='PNGTuber';}
+    else if(ans.x==='yes'&&ans.b!=='low'){const p=ans.b==='high'?pk[pk.length-1]:pk[0];t=`<b>${esc(p[0])}</b> ${money(p[1])}: ${esc(p[2])}. Everything for your debut in one style.`;o='VTuber Packages';}
+    else if(ans.b==='low'){t=`<b>PNGTuber</b> from ${money(SERVICES.PNGTuber.from)} fits your budget now. A Live2D model starts at ${vp('Bust · Art + Rig')} (or 3 payments).`;o='PNGTuber';}
+    else if(ans.b==='mid'){t=`<b>Live2D VTuber model, bust</b> ${vp('Bust · Art + Rig')} or <b>half body</b> ${vp('Half body · Art + Rig')}: art + rig, ready for VTube Studio.`;o='VTuber';}
+    else{t=`<b>Live2D VTuber model, full body</b> ${vp('Full body · Art + Rig')}: art + rig with full-body movement. Add VBridger or extra toggles in the order form.`;o='VTuber';}
+    $('#fqRes').innerHTML=t+`<br><a href="#order" data-order="${esc(o)}" class="btn btn-pink">Order this</a>`;$('#fqRes').hidden=false;});
+  if(location.protocol.startsWith('http')&&!/[?&]dryrun=1/.test(location.search))fetch('order-api.php?a=queue').then(r=>r.json()).then(j=>{if(!j||!j.ok||!(j.working>0))return;
+    const w=$('#workNow');w.innerHTML=`<i aria-hidden="true"></i>Working on ${j.working} commission${j.working>1?'s':''} now`;w.hidden=false;}).catch(()=>{});
+})();
 // "Chat with us" in the phone menu opens the chat
 document.addEventListener('click',e=>{const a=e.target.closest('.menu-chat');if(!a)return;e.preventDefault();$('#menu').classList.remove('open');const b=$('#kcBubble');if(b)b.click();});
 // the floating "Order now" button appears once the hero buttons are scrolled away

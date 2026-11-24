@@ -189,3 +189,5 @@ body.xmas header .logo{position:relative}
 /* match the homepage design review (Nov 2026) */
 body.xmas header::after{height:2px!important;bottom:-2px!important}
 .xmas-pill{display:inline-flex;align-items:center;gap:7px}
+
+.wstyles{margin-top:8px;align-items:center}.wsl{font-size:13px;font-weight:600;color:var(--muted,#a8607a);margin-right:4px;white-space:nowrap}

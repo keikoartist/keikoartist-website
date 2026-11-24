@@ -50,7 +50,7 @@ function fail(int $code, string $msg): void {
   jout($code, ['error' => $msg]);
 }
 
-if ($_SERVER['REQUEST_METHOD'] !== 'POST' && !in_array($_GET['a'] ?? '', ['pdf', 'pay', 'track', 'cartget', 'cartremind'], true)) fail(405, 'POST only');   // GET only for the invoice PDF, pay and tracking links
+if ($_SERVER['REQUEST_METHOD'] !== 'POST' && !in_array($_GET['a'] ?? '', ['pdf', 'pay', 'track', 'cartget', 'cartremind', 'queue'], true)) fail(405, 'POST only');   // GET only for the invoice PDF, pay and tracking links
 $hostHdr = strtolower($_SERVER['HTTP_HOST'] ?? '');
 $host = preg_replace('/:\d+$/', '', $hostHdr);
 $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
@@ -537,6 +537,14 @@ if (($_GET['a'] ?? '') === 'cartremind') {   // run every 15 minutes by chat-rem
     if (send_mail((string)$c['email'], $subj, $html, $text, OWNER_EMAIL)) $n++;
   }
   jout(200, ['reminded' => $n]);
+}
+
+/* =================== public: how many commissions are being worked on (a count only, no names or details) =================== */
+if (($_GET['a'] ?? '') === 'queue') {
+  header('Cache-Control: public, max-age=600');
+  rate_limit('queue:' . client_ip(), 120, 3600);
+  $n = (int)db()->query("SELECT COUNT(*) FROM orders WHERE status IN ('paid', 'in_progress')")->fetchColumn();
+  jout(200, ['working' => $n]);
 }
 
 /* =================== public: the client follows their order (like VGen's progress view) =================== */

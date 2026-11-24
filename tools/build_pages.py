@@ -569,6 +569,18 @@ def emotes():
                 body, faq, hero, 'Emotes', service_ld('Custom Twitch emotes', SITE + 'custom-twitch-emotes/', desc, E['from']))
 
 # ---------------------------------------------------------------- 4. portfolio
+# style tags for the portfolio's "By style" filter (chosen by looking at each piece)
+STYLES = [('cute', 'Cute'), ('gothic', 'Gothic'), ('fantasy', 'Animal ears & fantasy'), ('boys', 'Boys')]
+STYLE_OF = {
+    'chibi-vtuber-model-witch': 'cute gothic', 'custom-vtuber-model-witch': 'cute gothic', 'custom-vtuber-model-dragon': 'cute gothic fantasy',
+    'custom-vtuber-model-maid': 'cute gothic fantasy', 'custom-vtuber-model-rocker': 'gothic', 'custom-vtuber-model-kitsune-gown': 'gothic fantasy',
+    'custom-pngtuber-model-violet': 'gothic', 'custom-pngtuber-model-cat-mask': 'gothic fantasy', 'custom-vtuber-pfp-wolf': 'gothic fantasy',
+    'custom-vtuber-pfp-glasses': 'boys', 'custom-vtuber-pfp-leaf': 'boys fantasy', 'custom-illustration-couple-selfie': 'boys cute',
+    'vtuber-debut-package-keikomi': 'cute gothic', 'custom-twitch-emotes-witch': 'cute', 'animated-twitch-emotes-witch': 'cute', 'custom-twitch-emote-witch': 'cute',
+    'vtuber-twitch-banner-eyes-sakura': 'cute', 'vtuber-twitch-banner-eyes-fire': 'fantasy', 'vtuber-twitch-banner-eyes-blue': 'fantasy',
+    'custom-illustration-calico-cat': 'cute', 'custom-illustration-tabby-kitten': 'cute',
+    'video:hoodie': 'boys', 'video:red-dress': 'gothic fantasy', 'video:rigging': 'cute',
+}
 def portfolio():
     cats = [('vtuber-models', 'VTuber models', 'VTuber', '/custom-vtuber-model/', 'Custom VTuber model', 'VTuber model'),
             ('vtuber-packages', 'VTuber debut packages', 'VTuber Packages', '/vtuber-pricing/#vtuber-packages', 'VTuber packages', 'Debut package'),
@@ -613,10 +625,18 @@ def portfolio():
                          f'<div class="wbody"><div class="wtags"><span class="wtag">{e(short[cid])}</span>{sub}</div><h3>{e(parts[0])}</h3><a class="wgo" rel="nofollow" href="{go}">Order similar →</a></div></article>')
         counts.append((cid, title, n_here))
     total = sum(c for _, _, c in counts)
+    def tag(c):   # add data-style to a card from its image or video name
+        m = re.search(r'href="/images/([a-z0-9-]+)\.webp"', c) or re.search(r'live2d-model-showcase-([a-z-]+)\.mp4', c)
+        k = (m.group(1) if 'href=' in m.group(0) else 'video:' + m.group(1)) if m else ('video:rigging' if 'live2d-rigging-showcase' in c else '')
+        if k.startswith('vtuber-pet-mascot'): st = 'cute fantasy'
+        else: st = STYLE_OF.get(k, '')
+        return c.replace('<article ', f'<article data-style="{st}" ', 1) if st else c
+    cards = [tag(c) for c in cards]
+    scount = {s: sum(1 for c in cards if re.search(r'data-style="[^"]*\b' + s + r'\b', c)) for s, _ in STYLES}
     chips = f'<button type="button" class="wf on" data-f="all" aria-pressed="true">All <b>{total}</b></button>' + ''.join(
         f'<button type="button" class="wf" data-f="{cid}" aria-pressed="false">{e(title)} <b>{c}</b></button>' for cid, title, c in counts)
     filter_js = ("(function(){var g=document.getElementById('wgrid'),cs=[].slice.call(g.children),bs=[].slice.call(document.querySelectorAll('.wf')),out=document.getElementById('wcount');"
-                 "function set(f){var n=0;cs.forEach(function(c){var on=f==='all'||c.getAttribute('data-cat')===f;c.hidden=!on;if(on)n++;});"
+                 "function set(f){var n=0;cs.forEach(function(c){var on=f==='all'||c.getAttribute('data-cat')===f||(f.indexOf('s-')===0&&(' '+(c.getAttribute('data-style')||'')+' ').indexOf(' '+f.slice(2)+' ')>=0);c.hidden=!on;if(on)n++;});"
                  "bs.forEach(function(b){var on=b.getAttribute('data-f')===f;b.classList.toggle('on',on);b.setAttribute('aria-pressed',on);});out.textContent='Showing '+n+(n===1?' work':' works');}"
                  "bs.forEach(function(b){b.addEventListener('click',function(){var f=b.getAttribute('data-f');set(f);history.replaceState(null,'',f==='all'?location.pathname:'#'+f);});});"
                  "var h=location.hash.slice(1);if(h&&bs.some(function(b){return b.getAttribute('data-f')===h;})){set(h);setTimeout(function(){document.getElementById('works').scrollIntoView();var o=document.querySelector('.wf.on'),w=o&&o.parentNode;if(w)w.scrollLeft=o.offsetLeft-(w.clientWidth-o.offsetWidth)/2;},50);}})();")
@@ -628,6 +648,7 @@ def portfolio():
             f'    </div>\n    <figure>{hero_img}</figure>\n  </section>\n\n'
             '  <section class="sec" id="works"><div class="wrap">\n    <h2>All works</h2>\n'
             f'    <div class="wfilters" role="toolbar" aria-label="Filter works">{chips}</div>\n'
+            f'    <div class="wfilters wstyles" role="toolbar" aria-label="Filter by style"><span class="wsl">By style</span>{"".join(f'<button type="button" class="wf" data-f="s-{s}" aria-pressed="false">{e(n)} <b>{scount[s]}</b></button>' for s, n in STYLES if scount[s])}</div>\n'
             f'    <p class="wcount" id="wcount" aria-live="polite">Showing {total} works</p>\n'
             f'    <div class="wgrid" id="wgrid">{"".join(cards)}</div>\n  </div></section>\n'
             f'  <script>{filter_js}</script>\n'
