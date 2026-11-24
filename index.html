@@ -1728,6 +1728,19 @@ body.xmas header:not(.kc-head)::after{background:linear-gradient(90deg,#f2628f,#
 .psave{display:block;font-size:13px;font-weight:600;color:#1d7a43;margin-top:2px}
 .sec-sub{flex-basis:100%;margin:4px 0 0;font-size:14px;color:var(--muted)}
 .ty-where{font-size:13.5px;color:var(--muted);margin:8px 0 0;line-height:1.5}
+
+/* phones: the two helper cards fold into tappable rows, so the services section stays short */
+.bh-tg{border:0;background:none;padding:0;margin:0;font:inherit;color:inherit;text-align:left;display:block;width:100%;cursor:default}
+@media (max-width:767px){
+  .buy-help{gap:10px;margin-top:16px}
+  .bh-card{padding:14px 16px}
+  .bh-card h3{margin:0}
+  .bh-tg{cursor:pointer;position:relative;padding-right:28px}
+  .bh-tg::after{content:"+";position:absolute;right:0;top:50%;transform:translateY(-50%);font:600 20px/1 Poppins,sans-serif;color:var(--pink)}
+  .bh-card.open .bh-tg::after{content:"–"}
+  .bh-card:not(.open)>:not(h3){display:none}
+  .bh-card.open>p{margin-top:6px}
+}
 </style>
 </head>
 <body>
@@ -1853,12 +1866,12 @@ body.xmas header:not(.kc-head)::after{background:linear-gradient(90deg,#f2628f,#
     <div class="sec-more"><button type="button" class="btn btn-ghost" id="svcAll" aria-expanded="false">View all services (12)</button><a href="/vtuber-pricing/" class="link arrow">Compare all prices </a></div>
     <div class="buy-help">
       <div class="bh-card" id="startSmall">
-        <h3>New here? Start small</h3>
+        <h3><button type="button" class="bh-tg" aria-expanded="false">New here? Start small</button></h3>
         <p>Try my work on something small first, then come back for your model.</p>
         <div class="bh-list" id="startSmallList"></div>
       </div>
       <div class="bh-card" id="fitQuiz">
-        <h3>Not sure what you need?</h3>
+        <h3><button type="button" class="bh-tg" aria-expanded="false">Not sure what you need?</button></h3>
         <p>Three quick questions and I suggest a package.</p>
         <div class="fq" id="fq">
           <div class="fq-q"><span>Your budget (before the PayPal fee)</span><div class="chips" data-q="b"><button type="button" data-v="low">Under $100</button><button type="button" data-v="mid">$100–300</button><button type="button" data-v="high">$300+</button></div></div>
@@ -2507,6 +2520,6 @@ const SERVICES = {
 };
 /* ========================================================== */
 </script>
-<script src="assets/app.js?v=61526466" defer></script>
+<script src="assets/app.js?v=685af2e1" defer></script>
 </body>
 </html>

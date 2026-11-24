@@ -990,6 +990,7 @@ const slotTxt=k=>{if(typeof SLOTS==='undefined'||!SLOTS.open||!SLOTS.per||!(k in
   const small=[['Emotes','emotes for your channel'],['PNGTuber','a simple talking avatar'],['Custom PFP','a profile picture of your character']].filter(([k])=>SERVICES[k]);
   $('#startSmallList').innerHTML=small.map(([k,d])=>`<a href="#order" data-order="${esc(k)}"><span>${esc(k)}<small style="display:block;font-weight:400;color:var(--muted);font-size:12.5px">${esc(d)}</small></span><b>from ${money(SERVICES[k].from)}${SERVICES[k].qty?' each':''}</b></a>`).join('');
   const ans={};
+  $$('.bh-tg').forEach(b=>b.addEventListener('click',()=>{if(!matchMedia('(max-width:767px)').matches)return;const c=b.closest('.bh-card'),o=c.classList.toggle('open');b.setAttribute('aria-expanded',String(o));}));
   $('#fq').addEventListener('click',e=>{const b=e.target.closest('button[data-v]');if(!b)return;const g=b.parentNode;g.querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b));ans[g.dataset.q]=b.dataset.v;
     if(!(ans.b&&ans.m&&ans.x))return;
     const vp=n=>{const p=(SERVICES.VTuber.packages.find(x=>x[0]===n)||[])[1];return p?money(p):'';},pk=SERVICES['VTuber Packages'].packages;
