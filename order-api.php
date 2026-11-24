@@ -759,8 +759,8 @@ if (($_GET['a'] ?? '') === 'submit') {
       $txt = "Hi " . (no_links($name) ?: 'there') . ", thank you for your custom request at KeikoArts!\nI check your idea and the price you suggested, and reply within 6 hours (WIB). Once we agree on the price, I email your invoice with a one-click PayPal link.\n\nREQUEST $id · $dateStr\nCustom commission: " . money2($price) . ($com > 0 ? "\nCommercial / merch rights: " . money2($com) : '') . "\nPayPal fee (13%): " . money2($tax) . "\nSUGGESTED TOTAL: " . money2($total) . " USD\n\n";
     } else {
       $subj = "Your KeikoArts request $id";
-      $body = "<p>Hi $cn, thank you for your commission request at KeikoArts! ♡</p><p>Request ID: <b style=\"color:#f2628f\">" . h($id) . '</b><br>Service: ' . h($service . ' (' . $o['package'] . ')') . '<br>Estimated total: ' . money2($total) . '<br>Payment plan: ' . h($plan) . '</p>';
-      $txt = "Hi " . (no_links($name) ?: 'there') . ", thank you for your commission request at KeikoArts!\n\nRequest ID: $id\nService: $service ({$o['package']})\nEstimated total: " . money2($total) . "\nPayment plan: $plan\n\n";
+      $body = "<p>Hi $cn, thank you for your commission request at KeikoArts! ♡</p><p>Order ID: <b style=\"color:#f2628f\">" . h($id) . '</b><br>Service: ' . h($service . ' (' . $o['package'] . ')') . '<br>Estimated total: ' . money2($total) . '<br>Payment plan: ' . h($plan) . '</p>';
+      $txt = "Hi " . (no_links($name) ?: 'there') . ", thank you for your commission request at KeikoArts!\n\nOrder ID: $id\nService: $service ({$o['package']})\nEstimated total: " . money2($total) . "\nPayment plan: $plan\n\n";
     }
     $pdfUrl = pdf_link(['id' => $id, 'view_key' => $vkey], $SITE); $trackUrl = track_link(['id' => $id, 'view_key' => $vkey], $SITE);
     if ($payUrl !== '') {

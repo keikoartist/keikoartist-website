@@ -688,7 +688,7 @@ $$('.services .card').forEach(c=>{const p=c.querySelector(':scope>.price'),b=c.q
   const closeBook=()=>{root.classList.remove('book-open');document.body.style.overflow='';stop();lastFocus&&lastFocus.focus();};
   x.onclick=closeBook;wrap.addEventListener('click',e=>{if(e.target===wrap)closeBook();});
   document.addEventListener('keydown',e=>{if(e.key==='Escape'&&root.classList.contains('book-open'))closeBook();});
-  const more=$('#portfolio .sec-more');if(more){const ob=document.createElement('button');ob.type='button';ob.className='btn btn-pink bk-open';ob.innerHTML='✦ Open the spellbook';ob.onclick=()=>openBook('works');more.prepend(ob);}
+  const more=$('#portfolio .sec-more');if(more){const ob=document.createElement('button');ob.type='button';ob.className='btn btn-pink bk-open';ob.innerHTML='✦ Open the spellbook <small style="font-weight:400;opacity:.85">· portfolio, how to order, FAQ</small>';ob.onclick=()=>openBook('works');more.prepend(ob);}
   // works inside the book open full size like the grid
   stage.addEventListener('click',e=>{const w=e.target.closest('.work.in-book:not(.rig)');if(!w||dragged)return;e.preventDefault();const all=[...stage.querySelectorAll('.work.in-book:not(.rig)')];
     if(window.openLB)openLB(all.map(z=>({src:z.getAttribute('href'),cap:(z.querySelector('.tag')||{}).textContent||''})),all.indexOf(w),null);});
@@ -1128,11 +1128,11 @@ function showThanks(last){
     const amt=a=>a?money2(a):'Free';
     $('#tyTitle').textContent='Your invoice ♡';
     $('#tyLead').textContent=payNow?(partial?`Thank you for your order! Pay ${money2(due)} now (${planLabel(inv.plan||last.plan)}) with PayPal to secure your slot ♡`:'Thank you for your order! Pay your invoice with PayPal to confirm it ♡')
-      :"Thank you for your order! Here's your invoice. Message me on Discord with your invoice number and I'll send you a PayPal link ♡";
+      :"Thank you for your order! Here's your invoice. Message me on Discord with your Order ID and I'll send you a PayPal link ♡";
     $('#tyRef').hidden=true;$('#tySummary').hidden=true;
     $('#tyInv').innerHTML=`<div class="inv">
       <div class="inv-head"><div><b>KeikoArts</b><small>Illustration &amp; Live2D Studio<br>keikoartist.com</small></div><span class="inv-tag">INVOICE</span></div>
-      <div class="inv-meta"><div><small>Invoice no.</small><b>${esc(last.id)}</b></div><div><small>Date</small><b>${esc(inv.date)}</b></div><div><small>Billed to</small><b>${esc(inv.name)}</b>${inv.contact?`<span>${esc(inv.contact)}</span>`:''}</div></div>
+      <div class="inv-meta"><div><small>Order ID</small><b>${esc(last.id)}</b></div><div><small>Date</small><b>${esc(inv.date)}</b></div><div><small>Billed to</small><b>${esc(inv.name)}</b>${inv.contact?`<span>${esc(inv.contact)}</span>`:''}</div></div>
       <table class="inv-t"><thead><tr><th>Description</th><th>Amount</th></tr></thead>
       <tbody><tr><td>${esc(first[0])}${meta?`<small>${esc(meta)}</small>`:''}${inv.brief?`<small>“${esc(inv.brief)}${inv.brief.length>=140?'…':''}”</small>`:''}</td><td>${amt(first[1])}</td></tr>${rest.map(([l,a])=>`<tr><td>${esc(l)}</td><td>${amt(a)}</td></tr>`).join('')}</tbody>
       <tfoot>${custom?`<tr><td>Subtotal</td><td>${money2(lines[0][1])}</td></tr><tr><td>PayPal fee (13%)</td><td>${money2(lines[1]?lines[1][1]:0)}</td></tr><tr class="grand"><td>Total due (USD)</td><td>${money2(total)}</td></tr>`
@@ -1141,14 +1141,14 @@ function showThanks(last){
       ${last.payUrl&&due>0?`<p class="print-only pay-link">Pay ${money2(due)} online with PayPal: <a href="${esc(last.payUrl)}">${esc(last.payUrl)}</a></p>`:''}
     </div>`;$('#tyInv').hidden=false;
     if(payNow){$('#tyPayT').textContent=partial?'Pay now to secure your slot':'Pay your invoice';$('#tyPayInfo').textContent=(custom?'Total incl. 13% PayPal fee':partial?planLabel(inv.plan||last.plan):'Full payment')+' · '+last.id;$('#tyPayAmt').textContent=money2(due);$('#tyPayLabel').textContent='Pay '+money2(due)+' with PayPal';
-      $('#tyPaySm').textContent="Secure checkout on PayPal (card or PayPal balance). Your slot is secured as soon as you pay. Full refund if I can't take your order.";$('#tyKofiRef').textContent='invoice number';
-      $('#tyDcT').textContent='Questions about your order?';$('#tyDcS').textContent='Message me on Discord with your invoice number.';}
-    else{$('#tyDcS').textContent='Send me your invoice number so I can send your PayPal link.';}
+      $('#tyPaySm').textContent="Secure checkout on PayPal (card or PayPal balance). Your slot is secured as soon as you pay. Full refund if I can't take your order.";$('#tyKofiRef').textContent='Order ID';
+      $('#tyDcT').textContent='Questions about your order?';$('#tyDcS').textContent='Message me on Discord with your Order ID.';}
+    else{$('#tyDcS').textContent='Send me your Order ID so I can send your PayPal link.';}
     $('#tyNote').textContent=inv.emailed?'A copy of this invoice was sent to your email (check Spam). Other ways to reach me:':'Other ways to reach me:';
   }
   const steps=inv?(payNow?[['Pay with PayPal','PayPal emails you a receipt.'],['I review your order',"I confirm within 6 hours. Full refund if I can't take it."],['Work starts',inv.custom===false&&last.due<inv.total?'I send progress updates; the rest is paid later as agreed ♡':'I send progress updates until your art is done ♡']]
-      :[['Message me on Discord','Send your invoice number. I reply within 6 hours.'],['Pay your invoice','I send you a PayPal link for '+money2(inv.total)+'.'],['Work starts','I send progress updates until your art is done ♡']])
-    :payNow?[['Pay with PayPal','Secure your slot now. PayPal emails you a receipt.'],['Work starts','Done within 3 weeks. Follow every stage with the tracking link in your email.'],['Questions?','Message me on Discord with your Request ID.']]
+      :[['Message me on Discord','Send your Order ID. I reply within 6 hours.'],['Pay your invoice','I send you a PayPal link for '+money2(inv.total)+'.'],['Work starts','I send progress updates until your art is done ♡']])
+    :payNow?[['Pay with PayPal','Secure your slot now. PayPal emails you a receipt.'],['Work starts','Done within 3 weeks. Follow every stage with the tracking link in your email.'],['Questions?','Message me on Discord with your Order ID.']]
     :[['I check your idea & price','Within 6 hours (WIB). If I have questions, I email you.'],['Get your invoice','Once we agree on the price, I email your invoice with a one-click PayPal link. Please check Spam too.'],['Pay & start','Your slot is secured and I start working ♡']];
   $('#tySteps').innerHTML=steps.map(([a,b])=>`<li><b>${a}</b><span>${b}</span></li>`).join('');
   ty.classList.add('show');ty.setAttribute('aria-hidden','false');document.body.style.overflow='hidden';ty.scrollTop=0;
@@ -1159,10 +1159,10 @@ if(/[?&]paid=1/.test(location.search)){
   const ty=$('#tyModal'),rid=(location.search.match(/[?&]rid=([\w-]+)/)||[])[1]||'';
   $('#tyTitle').textContent='Payment sent! ♡';
   $('#tyLead').textContent="Thank you! PayPal will email you a receipt. I'll confirm your payment and slot on Discord within 6 hours.";
-  if(rid){$('#tyRefId').textContent=rid;$('#tyRef').hidden=false;if(/^INV-/.test(rid))$('#tyRefLbl').textContent='Invoice no.';}
+  if(rid){$('#tyRefId').textContent=rid;$('#tyRef').hidden=false;if(/^INV-/.test(rid))$('#tyRefLbl').textContent='Order ID';}
   try{const l=JSON.parse(sessionStorage.getItem('ka_last')||'null');if(l&&l.id===rid)sessionStorage.removeItem('ka_last');}catch(_){}
   dropInvoice(rid);
-  $('#tySteps').innerHTML=[['Chat on Discord','Send me your Request ID so I can match your payment.'],['Work starts','I start working and send progress updates on Discord.']].map(([a,b])=>`<li><b>${a}</b><span>${b}</span></li>`).join('');
+  $('#tySteps').innerHTML=[['Chat on Discord','Send me your Order ID so I can match your payment.'],['Work starts','I start working and send progress updates on Discord.']].map(([a,b])=>`<li><b>${a}</b><span>${b}</span></li>`).join('');
   ty.classList.add('show');ty.setAttribute('aria-hidden','false');document.body.style.overflow='hidden';
   $('#tyDiscord').onclick=async()=>{if(rid){try{await navigator.clipboard.writeText(rid)}catch(_){}}window.open('https://discord.gg/FbgWxMPjf','_blank','noopener');};
 }

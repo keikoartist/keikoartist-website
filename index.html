@@ -1725,6 +1725,8 @@ body.xmas header:not(.kc-head)::after{background:linear-gradient(90deg,#f2628f,#
 .add-note{display:block;font-size:12.5px;color:var(--muted);font-weight:400;margin-top:2px}
 .ask-first{margin:-4px 0 0;font-size:13.5px;color:var(--muted)}.ask-first a{color:var(--pink-text);font-weight:600}
 .psave{display:block;font-size:13px;font-weight:600;color:#1d7a43;margin-top:2px}
+.sec-sub{flex-basis:100%;margin:4px 0 0;font-size:14px;color:var(--muted)}
+.ty-where{font-size:13.5px;color:var(--muted);margin:8px 0 0;line-height:1.5}
 </style>
 </head>
 <body>
@@ -1872,7 +1874,7 @@ body.xmas header:not(.kc-head)::after{background:linear-gradient(90deg,#f2628f,#
 <!-- VTUBERS I'VE MADE -->
 <section id="clients">
   <div class="wrap">
-    <div class="sec-head"><h2 class="serif">Original VTuber Characters</h2></div>
+    <div class="sec-head"><h2 class="serif">Original VTuber Characters</h2><p class="sec-sub">Keiko's own characters, to show the style. Your model is designed only for you.</p></div>
     <div class="vt-marquee" aria-label="Original VTuber characters by KeikoArts"><div class="vt-track" id="vtTrack"></div></div>
   </div>
 </section>
@@ -2091,6 +2093,7 @@ body.xmas header:not(.kc-head)::after{background:linear-gradient(90deg,#f2628f,#
       <details><summary>How long does a commission take?</summary><p>VTuber models take 2–3 weeks (3 weeks at most), depending on complexity and the queue. Smaller pieces like PFPs, emotes and banners take about 3–7 days. Each service shows its estimate in the order form.</p></details>
       <details><summary>How do I pay?</summary><p>Choose your options, see your total and send the order form, then pay right away with the PayPal button: card or PayPal balance, in USD. For a Custom Inquiry I confirm the price with you first and then email your invoice. Larger projects can be split into installments (50% upfront, 50% before delivery).</p></details>
       <details><summary>Can I use the art commercially?</summary><p>Yes — streaming, monetized videos and social media are included. Merch / commercial rights are a $30 add-on for any service.</p></details>
+      <details><summary>What do I need to use my model?</summary><p>For a Live2D model: VTube Studio on a PC or Mac, with a webcam or an iPhone for face tracking. A PNGTuber only needs a microphone (for example PNGTuber Plus or Veadotube). Then add it to OBS or Streamlabs and go live.</p></details>
       <details><summary>Will my model work in VTube Studio?</summary><p>Yes. Art + Rig and Rig only orders include a VTube Studio file, ready to stream with webcam or iPhone tracking. Art only orders get a layered PSD that's ready to rig. Extra expressions and toggles are $20 each, hand toggles $30 each, and VBridger setup is $200.</p></details>
       <details><summary>What's the difference between bust, half body and full body?</summary><p>Bust shows your character up to the chest, half body up to the waist, and full body from head to toe. Art starts at $100 (bust), $150 (half body) and $250 (full body). See <a href="/vtuber-pricing/" style="color:var(--pink);font-weight:600">VTuber prices</a> for each size.</p></details>
       <details><summary>Can I order only the art, or only the rigging?</summary><p>Yes. Order the art only (a layered PSD ready to rig), art + rig ($150 to $400), or rig only for art you already have. Rigging covers head turns, blinking, lip-sync and hair &amp; clothing physics. <a href="/live2d-rigging/" style="color:var(--pink);font-weight:600">About rigging</a></p></details>
@@ -2342,11 +2345,12 @@ body.xmas header:not(.kc-head)::after{background:linear-gradient(90deg,#f2628f,#
         <div class="ty-pay-top"><div><b id="tyPayT">Pay now to secure your slot</b><span id="tyPayInfo"></span></div><strong id="tyPayAmt"></strong></div>
         <a class="btn btn-paypal" id="tyPayBtn" href="#" target="_blank" rel="noopener"><span id="tyPayLabel">Pay with PayPal</span></a>
         <small id="tyPaySm">Secure checkout on PayPal (card or PayPal balance). Your slot is secured as soon as you pay. Full refund if I can't take your order.</small>
-        <small class="ty-kofi" hidden>Questions about paying? Email me at keikoarts22@gmail.com with your <span id="tyKofiRef">Request ID</span>.</small>
+        <small class="ty-kofi" hidden>Questions about paying? Email me at keikoarts22@gmail.com with your <span id="tyKofiRef">Order ID</span>.</small>
       </div>
       <div class="inv-actions" id="invActions" hidden><button type="button" class="btn btn-ghost" id="invSave">💾 Save invoice (PDF)</button><button type="button" class="btn btn-ghost" id="invCopy">🔗 Copy payment link</button></div>
       <h4 class="ty-h">What happens next</h4>
       <ol class="ty-steps" id="tySteps"></ol>
+      <p class="ty-where">Updates come by email and on your tracking page. For quick questions, message me on Discord or in the chat.</p>
       <div class="ty-dc">
         <div><b id="tyDcT">Join Keiko's Discord (optional)</b><span id="tyDcS">Join the server, then message me with your order ID. No friend request needed. Everything else happens by email.</span></div>
         <button class="btn btn-pink" type="button" id="tyDiscord">Copy ID &amp; join Discord</button>
@@ -2499,6 +2503,6 @@ const SERVICES = {
 };
 /* ========================================================== */
 </script>
-<script src="assets/app.js?v=7e93e51c" defer></script>
+<script src="assets/app.js?v=82f3c257" defer></script>
 </body>
 </html>
