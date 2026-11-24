@@ -242,7 +242,7 @@ switch ($action) {
     $email = clean((string)($in['email'] ?? ''), 120);
     $text = clean((string)($in['message'] ?? ''), MAX_MSG);
     if ($text === '') fail(400, 'Please type a message.');
-    if ($name === '') $name = 'Visitor ' . strtoupper(substr(bin2hex(random_bytes(2)), 0, 4));
+    if (mb_strlen($name) < 2) fail(400, 'Please add your name or VTuber name.');   // owner, 24 Nov 2026: no more "Visitor 84D5"
     if ($email !== '' && !filter_var($email, FILTER_VALIDATE_EMAIL)) fail(400, 'Please check your email address.');
     $dc = clean_discord((string)($in['discord'] ?? ''));
     if ($email === '' && $dc === '') fail(400, 'Please add your email or your Discord username so I can reply even after you leave.');   // also blocks old cached pages without the contact fields

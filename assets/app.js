@@ -860,7 +860,8 @@ let tabVisitorN=0,tabAdminN=0;const tabSync=()=>tabDot(tabVisitorN+tabAdminN);
   input.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey&&!e.isComposing){e.preventDefault();$('#kcSend').requestSubmit();}});
   $('#kcSend').addEventListener('submit',async e=>{
     e.preventDefault();const text=input.value.trim();if(!text||busy)return;errEl.textContent='';
-    if(!sess){const fe=$('#kcFEmail').value.trim(),fd=$('#kcFDc').value.trim();
+    if(!sess){const fe=$('#kcFEmail').value.trim(),fd=$('#kcFDc').value.trim(),fn=$('#kcFName').value.trim();
+      if(fn.length<2){errEl.textContent='Please add your name or VTuber name.';$('#kcFName').focus();return;}
       if(!fe&&!fd){errEl.textContent='Please add your email or your Discord username so I can reply even after you leave.';$('#kcFEmail').focus();return;}
       if(fe&&!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(fe)){errEl.textContent='Please check your email address.';$('#kcFEmail').focus();return;}
       if(fd&&!/^@?[a-zA-Z0-9_.]{2,32}(#\d{4})?$/.test(fd)){errEl.textContent='Please check your Discord username (letters, numbers, _ and . only).';$('#kcFDc').focus();return;}}
@@ -868,7 +869,7 @@ let tabVisitorN=0,tabAdminN=0;const tabSync=()=>tabDot(tabVisitorN+tabAdminN);
     const tmp=document.createElement('div');tmp.className='kc-msg visitor pending';const p=document.createElement('p');p.textContent=text;tmp.appendChild(p);body.appendChild(tmp);scroll();
     input.value='';input.style.height='auto';
     try{
-      if(!sess){const j=await api({action:'start',message:text,page:location.pathname,_honey:e.target._honey.value,email:$('#kcFEmail').value.trim(),discord:$('#kcFDc').value.trim()});
+      if(!sess){const j=await api({action:'start',message:text,page:location.pathname,_honey:e.target._honey.value,email:$('#kcFEmail').value.trim(),discord:$('#kcFDc').value.trim(),name:$('#kcFName').value.trim()});
         sess={id:j.id,token:j.token};save(sess);tmp.remove();j.messages.forEach(add);
         sess.hasContact=true;save(sess);firstUI();ctUI();scroll();schedule();}
       else{const j=await api({action:'send',id:sess.id,token:sess.token,message:text,since:last});tmp.remove();j.messages.forEach(add);scroll();}
