@@ -122,6 +122,14 @@ RIG_VIDEO = ('<figure class="wide"><video src="/images/live2d-rigging-showcase.m
 
 SHOWCASES = [('hoodie', 'Long-haired boy in a hoodie · Live2D model', 'Live2D model of a long-haired boy in a grey hoodie: head turns, blinking, expressions and toggles'),
              ('red-dress', 'Wolf girl in red · Live2D model', 'Live2D model of a silver-haired wolf girl in a red dress: blinking, expressions and toggles')]
+VIDEOS = [  # for VideoObject structured data and the video sitemap (Google video results)
+    ('live2d-rigging-showcase', 'Live2D rigging showcase', 'Live2D rigging by KeikoArts: head turns, blinking and hair physics on a white-haired VTuber model.', 'PT11S', '2026-11-21'),
+    ('live2d-model-showcase-hoodie', 'Live2D VTuber model: long-haired boy in a hoodie', 'Moving Live2D VTuber model by KeikoArts: head turns, blinking, expressions and toggles, ready for VTube Studio.', 'PT58S', '2026-11-24'),
+    ('live2d-model-showcase-red-dress', 'Live2D VTuber model: wolf girl in a red dress', 'Moving Live2D VTuber model by KeikoArts: blinking, expressions and toggles, ready for VTube Studio.', 'PT70S', '2026-11-24')]
+def video_ld():
+    return [{"@context": "https://schema.org", "@type": "VideoObject", "name": n, "description": d, "thumbnailUrl": f"{SITE}images/{k}-poster.webp",
+             "contentUrl": f"{SITE}images/{k}.mp4", "uploadDate": f"{dt}T08:00:00+07:00", "duration": dur, "creator": {"@type": "Organization", "name": "KeikoArts", "url": SITE}}
+            for k, n, d, dur, dt in VIDEOS]
 SHOW_VIDEOS = ''.join(f'<figure class="wide"><video src="/images/live2d-model-showcase-{k}.mp4" poster="/images/live2d-model-showcase-{k}-poster.webp" controls muted loop playsinline preload="none" width="960" height="540" aria-label="{e(al)}"></video><figcaption>{e(cap)}</figcaption></figure>' for k, cap, al in SHOWCASES)
 
 def svc_table(name, show_includes=True):
@@ -168,7 +176,7 @@ def page(path, title, desc, h1, crumb, body, faq, og_image, order='', extra_ld=N
               {"@type": "ListItem", "position": 2, "name": crumb, "item": url}]},
           {"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [
               {"@type": "Question", "name": q, "acceptedAnswer": {"@type": "Answer", "text": re.sub(r'<[^>]+>', '', a)}} for q, a in faq]}]
-    if extra_ld: ld.append(extra_ld)
+    if extra_ld: ld.extend(extra_ld if isinstance(extra_ld, list) else [extra_ld])
     lds = ''.join(f'<script type="application/ld+json">{json.dumps(x, ensure_ascii=False, separators=(",", ":"))}</script>\n' for x in ld)
     w, h = img_size(og_image)
     return f'''<!doctype html>
@@ -422,7 +430,7 @@ def rigging():
     ]
     desc = f'Live2D rigging for your VTuber art: head turns, blinking, lip-sync and hair & clothing physics, delivered with a VTube Studio file. Rig only from {money(vp["Bust · Rig only"])}.'
     return page('live2d-rigging', 'Live2D Rigging Commission for VTuber Models | KeikoArtist', desc, 'Live2D Rigging for VTuber Models', 'Live2D Rigging',
-                body, faq, 'live2d-rigging-showcase-poster', 'VTuber', service_ld('Live2D rigging', SITE + 'live2d-rigging/', desc, vp["Bust · Rig only"]))
+                body, faq, 'live2d-rigging-showcase-poster', 'VTuber', [service_ld('Live2D rigging', SITE + 'live2d-rigging/', desc, vp["Bust · Rig only"])] + video_ld())
 
 # ---------------------------------------------------------------- 3. PNGTuber
 def pngtuber():
@@ -942,9 +950,10 @@ def page_images(u):   # artwork shown on a page, for the image sitemap (Google I
     return out
 def sm_url(u, p):
     ims = ''.join(f'<image:image><image:loc>{SITE}images/{n}.webp</image:loc></image:image>' for n in page_images(u))
-    return f'  <url><loc>{SITE}{u}</loc><lastmod>{TODAY}</lastmod><priority>{p}</priority>{ims}</url>\n'
+    vids = ''.join(f'<video:video><video:thumbnail_loc>{SITE}images/{k}-poster.webp</video:thumbnail_loc><video:title>{e(n)}</video:title><video:description>{e(d)}</video:description><video:content_loc>{SITE}images/{k}.mp4</video:content_loc><video:duration>{int(dur[2:-1])}</video:duration></video:video>' for k, n, d, dur, dt in VIDEOS) if u == 'live2d-rigging/' else ''
+    return f'  <url><loc>{SITE}{u}</loc><lastmod>{TODAY}</lastmod><priority>{p}</priority>{ims}{vids}</url>\n'
 sm = ('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" '
-      'xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">\n' + ''.join(sm_url(u, p) for u, p in urls) + '</urlset>\n')
+      'xmlns:image="http://www.google.com/schemas/sitemap-image/1.1" xmlns:video="http://www.google.com/schemas/sitemap-video/1.1">\n' + ''.join(sm_url(u, p) for u, p in urls) + '</urlset>\n')
 open(os.path.join(ROOT, 'sitemap.xml'), 'w', encoding='utf-8').write(sm)
 # prices for the chat's automatic reply (chat-api.php reads this; same data as the order form)
 open(os.path.join(ROOT, 'prices.json'), 'w', encoding='utf-8').write(json.dumps({n: {'from': s['from'], 'eta': s.get('eta', ''), 'qty': bool(s.get('qty')), 'packages': s['packages'], 'addons': s['addons']} for n, s in SERVICES.items()}, ensure_ascii=False, indent=1))
