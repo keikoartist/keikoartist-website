@@ -268,6 +268,14 @@ select{padding:7px 10px;border:1px solid var(--line);border-radius:999px;backgro
     <div class="set-btns"><button class="btn" type="button" id="hookSave">Save</button><button class="btn ghost" type="button" id="hookTest">Send test</button><button class="btn ghost" type="button" id="hookDel" hidden>Remove</button></div>
     <div class="set-msg" id="setMsg" role="status"></div>
     <hr class="set-hr">
+    <h3>📣 Automatic posts in your Discord server</h3>
+    <p class="muted">Every 2 days at 19:00 WIB a short post goes to a channel in <b>your own</b> server (for example #announcements): open slots, Christmas deadline, start small, debut packages, with real prices and a link counted as "discord" in your stats. Only your own server: posting ads in other people's servers is against Discord's rules.</p>
+    <div class="set-status" id="promoStatus">Checking…</div>
+    <ol class="set-steps"><li>In Discord: <b>Server Settings</b> → <b>Integrations</b> → <b>Webhooks</b> → <b>New Webhook</b>, choose your announcements channel, <b>Copy Webhook URL</b>.</li><li>Paste it below and tap <b>Save</b>. <b>Post one now</b> sends the next post right away.</li></ol>
+    <input id="promoUrl" placeholder="https://discord.com/api/webhooks/…" autocomplete="off" spellcheck="false">
+    <div class="set-btns"><button class="btn" type="button" id="promoSave">Save</button><button class="btn ghost" type="button" id="promoNow" hidden>Post one now</button><button class="btn ghost" type="button" id="promoDel" hidden>Turn off</button></div>
+    <div class="set-msg" id="promoMsg" role="status"></div>
+    <hr class="set-hr">
     <h3>✉️ Emails to clients (from your Gmail)</h3>
     <p class="muted">Order confirmations and invoices are sent from your own Gmail, so they reach the client's inbox instead of spam.</p>
     <div class="set-status" id="mailStatus">Checking…</div>
@@ -666,6 +674,7 @@ async function loadSettings(){
     $('#hookDel').hidden=!j.discord_set||j.from_config;$('#hookTest').hidden=!j.discord_set;
     const ms=$('#mailStatus');ms.className='set-status'+(j.mail_set?' on':'');ms.textContent=j.mail_set?'✅ Sending from '+j.mail_user:'⚪ Not set up yet (emails go through a backup service and may land in spam)';
     $('#mailTest').hidden=$('#mailDel').hidden=!j.mail_set;if(j.mail_user)$('#mailUser').value=j.mail_user;
+    const ps=$('#promoStatus');ps.className='set-status'+(j.promo_set?' on':'');ps.textContent=j.promo_set?'✅ On'+(j.promo_last?' · last post '+fmt(j.promo_last):' · first post at the next 19:00 WIB'):'⚪ Off';$('#promoNow').hidden=$('#promoDel').hidden=!j.promo_set;
   }catch(e){if(e.message!=='login')st.textContent=e.message;}
 }
 $('#setBtn').onclick=()=>{$('#setPanel').hidden=false;setMsg('');loadSettings();};
@@ -676,6 +685,11 @@ $('#hookSave').onclick=async()=>{const v=$('#hookUrl').value.trim();if(!v){setMs
 $('#hookTest').onclick=async()=>{setMsg('Sending a test message…',true);try{await oapi({action:'settings_test'});setMsg('Test message sent ✓ Check your Discord channel.',true);}catch(e){if(e.message!=='login')setMsg(e.message);}};
 $('#hookDel').onclick=async()=>{try{await oapi({action:'settings_set',discord_webhook:''});setMsg('Removed.',true);loadSettings();}catch(e){if(e.message!=='login')setMsg(e.message);}};
 
+function promoMsg(t,ok){const m=$('#promoMsg');m.textContent=t||'';m.classList.toggle('ok',!!ok);}
+$('#promoSave').onclick=async()=>{const v=$('#promoUrl').value.trim();if(!v){promoMsg('Paste the webhook link first.');return;}
+  promoMsg('Saving…',true);try{await oapi({action:'promo_set',promo_webhook:v});$('#promoUrl').value='';promoMsg('Saved ✓ Tap "Post one now" to see the first post.',true);loadSettings();}catch(e){if(e.message!=='login')promoMsg(e.message);}};
+$('#promoNow').onclick=async()=>{promoMsg('Posting…',true);try{const r=await oapi({action:'promo_now'});promoMsg('Posted ✓ '+(r.title||''),true);loadSettings();}catch(e){if(e.message!=='login')promoMsg(e.message);}};
+$('#promoDel').onclick=async()=>{try{await oapi({action:'promo_set',promo_webhook:''});promoMsg('Turned off.',true);loadSettings();}catch(e){if(e.message!=='login')promoMsg(e.message);}};
 function mailMsg(t,ok){const m=$('#mailMsg');m.textContent=t||'';m.classList.toggle('ok',!!ok);}
 $('#mailSave').onclick=async()=>{const u=$('#mailUser').value.trim(),pw=$('#mailPass').value.trim();if(!u||!pw){mailMsg('Enter your Gmail address and the 16-letter App Password.');return;}
   mailMsg('Checking with Gmail…',true);try{await oapi({action:'mail_set',gmail_user:u,gmail_pass:pw});$('#mailPass').value='';mailMsg('Saved ✓ Now tap "Send test".',true);loadSettings();}catch(e){if(e.message!=='login')mailMsg(e.message);}};

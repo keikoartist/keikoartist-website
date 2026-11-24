@@ -1120,6 +1120,8 @@ _prices = {n: {'from': s['from'], 'eta': s.get('eta', ''), 'qty': bool(s.get('qt
 _m = re.search(r'const SLOTS = \{ open: (true|false)', SRC)
 _prices['_status'] = {'open': bool(_m and _m.group(1) == 'true')}
 _ps = re.search(r'per: (\{[^}]*\})', SRC[SRC.index('const SLOTS'):SRC.index('const SLOTS') + 900])
-_prices['_status']['slots'] = json.loads(_ps.group(1)) if _ps else {}   # commissions open/closed, for the chat's automatic answer
+_prices['_status']['slots'] = json.loads(_ps.group(1)) if _ps else {}
+_sx = re.search(r'const SEASON = \{ christmas: (true|false), until: "([\d-]+)", orderBy: "([\d-]+)"', SRC)
+_prices['_status']['xmas'] = {'on': _sx.group(1) == 'true', 'until': _sx.group(2), 'orderBy': _sx.group(3)} if _sx else {'on': False}   # commissions open/closed, for the chat's automatic answer
 open(os.path.join(ROOT, 'prices.json'), 'w', encoding='utf-8').write(json.dumps(_prices, ensure_ascii=False, indent=1))
 print('built', ', '.join(PAGES), '+ 404.html + sitemap.xml + prices.json + llms.txt')

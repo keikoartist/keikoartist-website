@@ -50,7 +50,7 @@ function fail(int $code, string $msg): void {
   jout($code, ['error' => $msg]);
 }
 
-if ($_SERVER['REQUEST_METHOD'] !== 'POST' && !in_array($_GET['a'] ?? '', ['pdf', 'pay', 'track', 'cartget', 'cartremind', 'queue', 'coupon'], true)) fail(405, 'POST only');   // GET only for the invoice PDF, pay and tracking links
+if ($_SERVER['REQUEST_METHOD'] !== 'POST' && !in_array($_GET['a'] ?? '', ['pdf', 'pay', 'track', 'cartget', 'cartremind', 'queue', 'coupon', 'promo'], true)) fail(405, 'POST only');   // GET only for the invoice PDF, pay and tracking links
 $hostHdr = strtolower($_SERVER['HTTP_HOST'] ?? '');
 $host = preg_replace('/:\d+$/', '', $hostHdr);
 $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
@@ -551,6 +551,40 @@ if (($_GET['a'] ?? '') === 'cartremind') {   // run every 15 minutes by chat-rem
   jout(200, ['reminded' => $n]);
 }
 
+/* =================== automatic posts in Keiko's OWN Discord server (announcements channel) =================== */
+// Every 2 days at about 19:00 WIB (called by chat-reminders.yml every 15 min; the time and gap checks make extra calls do nothing).
+// Facts only from prices.json (prices, slots, Christmas dates); links use ?ref=discord so the daily stats show the visits.
+function promo_post(bool $force): array {
+  $s = settings(); $hook = (string)($s['promo_webhook'] ?? '');
+  if (!preg_match(HOOK_RE, $hook)) return ['posted' => false, 'why' => 'no promo webhook'];
+  $now = time(); $h = (int)(new DateTime('now', new DateTimeZone('Asia/Jakarta')))->format('G');
+  if (!$force && ($h !== 19 || $now - (int)($s['promo_last'] ?? 0) < 44 * 3600)) return ['posted' => false, 'why' => 'not time yet'];
+  $P = json_decode((string)@file_get_contents(__DIR__ . '/prices.json'), true) ?: [];
+  $st = $P['_status'] ?? []; if (isset($st['open']) && !$st['open']) return ['posted' => false, 'why' => 'commissions closed'];
+  $g = function ($k, $n) use ($P) { foreach ($P[$k]['packages'] ?? [] as $p) if ($p[0] === $n) return (float)$p[1]; return 0.0; };
+  $m = function ($v) { return '$' . (floor($v) == $v ? number_format($v) : number_format($v, 2)); };
+  $site = 'https://keikoartist.com/'; $ref = '?ref=discord';
+  $posts = [];
+  $sl = $st['slots']['VTuber'] ?? null;
+  $posts[] = ['🎨 Commissions are open!', 'Original Live2D VTuber models, drawn from scratch and rigged, ready for VTube Studio.' . "\n\n" . '• Art + rig: bust ' . $m($g('VTuber', 'Bust · Art + Rig')) . ', half body ' . $m($g('VTuber', 'Half body · Art + Rig')) . ', full body ' . $m($g('VTuber', 'Full body · Art + Rig')) . "\n• Done within 3 weeks, updates at every stage" . ($sl !== null ? "\n• VTuber slots left: " . (int)$sl : ''), $site . $ref, 'custom-vtuber-model-keikoarts-1200'];
+  $x = $st['xmas'] ?? [];
+  if (!empty($x['on']) && date('Y-m-d') <= (string)$x['orderBy']) {
+    $ob = date('F j', strtotime((string)$x['orderBy']));
+    $posts[] = ['🎄 Christmas commissions', "Order by $ob and your model is ready before Christmas.\nEvery visitor can also spin the Christmas wheel once for a free extra (10% off codes come off your total right away).", $site . 'christmas/' . $ref, 'custom-vtuber-model-witch'];
+  }
+  $posts[] = ['✨ New to VTubing? Start small', 'Emotes from ' . $m($g('Emotes', 'Static emote')) . ' each, PNGTuber from ' . $m((float)($P['PNGTuber']['from'] ?? 0)) . ', profile pictures from ' . $m((float)($P['Custom PFP']['from'] ?? 0)) . ".\nSee the total before you pay, pay in full, 50% now or in 3 payments.", $site . $ref . '#services', 'custom-twitch-emotes-witch'];
+  $full = $g('VTuber', 'Full body · Art + Rig') + 6 * $g('Emotes', 'Static emote') + $g('Background', 'Static') + $g('Stream Overlay', 'Screens set') + $g('Custom PFP', 'Headshot') + $g('VTuber Logo', 'Custom logo');
+  $fd = $g('VTuber Packages', 'Full Debut · Full body'); $save = $full > $fd && $fd > 0 ? ' (save ' . $m(round($full - $fd)) . ' vs buying separately)' : '';
+  $posts[] = ['💖 Debut packages', 'Everything for your debut in one style: model + rig, emotes, background, overlay and more.' . "\n• Starter · Bust up " . $m($g('VTuber Packages', 'Starter · Bust up')) . "\n• Debut · Half body " . $m($g('VTuber Packages', 'Debut · Half body')) . "\n• Full Debut · Full body " . $m($fd) . $save, $site . $ref . '#services', 'vtuber-debut-package-keikomi'];
+  $i = ((int)($s['promo_i'] ?? 0)) % count($posts); [$title, $desc, $url, $img] = $posts[$i];
+  $code = discord_post($hook, ['username' => 'KeikoArts', 'allowed_mentions' => ['parse' => []], 'embeds' => [[
+    'title' => $title, 'description' => $desc . "\n\n👉 " . $url, 'url' => $url, 'color' => 0xF2628F,
+    'image' => ['url' => $site . 'images/' . $img . '.webp'], 'footer' => ['text' => 'keikoartist.com · prices in USD + 13% PayPal fee']]]]);
+  if ($code >= 200 && $code < 300) { $s['promo_last'] = $now; $s['promo_i'] = $i + 1; save_settings($s); return ['posted' => true, 'title' => $title]; }
+  return ['posted' => false, 'why' => "discord error $code"];
+}
+if (($_GET['a'] ?? '') === 'promo') { rate_limit('promo:' . client_ip(), 12, 3600); jout(200, promo_post(false)); }
+
 /* =================== public: check a Christmas wheel code from the order form =================== */
 if (($_GET['a'] ?? '') === 'coupon') {
   rate_limit('coupon:' . client_ip(), 30, 3600);
@@ -979,7 +1013,8 @@ switch ($action) {
     $h = discord_hook($cfg);
     $mc = smtp_cfg();
     jout(200, ['discord_set' => $h !== '', 'discord_hint' => $h ? substr($h, 0, 40) . '…' . substr($h, -4) : '', 'from_config' => preg_match(HOOK_RE, (string)($cfg['discord_webhook'] ?? '')) === 1,
-               'mail_set' => (bool)$mc, 'mail_user' => $mc ? $mc[0] : '']);   // the App Password itself is never sent back
+               'mail_set' => (bool)$mc, 'mail_user' => $mc ? $mc[0] : '',
+               'promo_set' => preg_match(HOOK_RE, (string)(settings()['promo_webhook'] ?? '')) === 1, 'promo_last' => (int)(settings()['promo_last'] ?? 0)]);   // the App Password itself is never sent back
   }
   case 'settings_set': {
     $h = trim((string)($in['discord_webhook'] ?? ''));
@@ -1017,6 +1052,14 @@ switch ($action) {
     if ($ok) { db()->prepare('UPDATE orders SET approved = 1, updated = ? WHERE id = ?')->execute([time(), $o['id']]); jout(200, ['sent' => true, 'to' => $o['email']]); }
     fail(502, 'The email could not be sent: ' . ($GLOBALS['mail_err'] ?? 'unknown error'));
   }
+  case 'promo_set': {   // webhook of a channel in Keiko's own server for the automatic posts
+    $h = trim((string)($in['promo_webhook'] ?? ''));
+    if ($h !== '' && !preg_match(HOOK_RE, $h)) fail(400, 'That is not a Discord webhook link. It should start with https://discord.com/api/webhooks/');
+    $s = settings(); if ($h === '') unset($s['promo_webhook']); else $s['promo_webhook'] = $h;
+    if (!save_settings($s)) fail(500, 'Could not save the setting on the server.');
+    jout(200, ['promo_set' => $h !== '']);
+  }
+  case 'promo_now': { $r = promo_post(true); if (!$r['posted']) fail(400, 'Not posted: ' . $r['why']); jout(200, $r); }
   case 'settings_test': {
     $h = discord_hook($cfg); if ($h === '') fail(400, 'No Discord webhook saved yet.');
     $code = discord_post($h, ['username' => 'KeikoArts Orders', 'allowed_mentions' => ['parse' => []], 'embeds' => [['title' => '✅ Notifications are working!', 'description' => 'You will get a message here for every new order and website chat.', 'color' => 0xF2628F]]]);

@@ -455,6 +455,11 @@
    "VTuber Logo": 6,
    "Stream Overlay": 4,
    "Background": 4
+  },
+  "xmas": {
+   "on": true,
+   "until": "2027-01-07",
+   "orderBy": "2026-12-04"
   }
  }
 }
