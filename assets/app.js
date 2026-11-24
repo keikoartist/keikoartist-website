@@ -324,7 +324,8 @@ function renderInv(){
   $('#invLines').innerHTML=o.lines.map(([l,a])=>`<dt>${esc(l)}</dt><dd>${empty?'—':a?money2(a):'Free'}</dd>`).join('')
     +`<dt class="grand">Total</dt><dd class="grand">${empty?'—':money2(o.total)}</dd>`
     +(partial?`<dt class="now">First payment · ${esc(planLabel(o.plan))}</dt><dd class="now">${money2(o.due)}</dd>`:'');
-  $('#invEta').textContent=`USD · ready by ${readyBy(o.rush)}`;fxLine(o.custom&&!o.total?0:o.total);
+  $('#invEta').textContent=`USD · ready by ${readyBy(o.rush)}`;
+  $('#invNote').textContent=o.custom?"I check your idea and price first (within 6 hours, WIB). Once we agree, I email your invoice with a one-click PayPal link. Nothing is charged now.":"Instant order: pay with PayPal right after sending to secure your slot. Full refund if I can't take your order.";fxLine(o.custom&&!o.total?0:o.total);
   $('#navLbl').textContent=partial?'1st payment (incl. tax)':'Total (incl. 13% tax)';
   $('#navTotal').textContent=empty?'—':money2(partial?o.due:o.total);
 }
@@ -592,7 +593,7 @@ $$('.services .card').forEach(c=>{const p=c.querySelector(':scope>.price'),b=c.q
   // book 2: how to order (same facts as the order form, TOS and FAQ)
   const f2=[cover('How to Order','Five steps · no account needed'),
     txt([['1 · Pick a service','<p>Choose a service in <a href="#services">Our Services</a> and press Order now. The form shows every option and your total before you send it.</p>'],['2 · Send the form','<p>Tell me about your character: a description, a character sheet or a few references. Only your email is required to reach you.</p>']]),
-    txt([['3 · Get your invoice','<p>I check your order and email your invoice (PDF), usually within 6 hours (WIB, GMT+7). 13% tax is added on every invoice.</p>'],['4 · Pay with PayPal','<p>Card or PayPal balance, in USD. Pay in full, 50/50, or in 3 parts for orders above $150. Your slot is secured once payment is received.</p>']]),
+    txt([['3 · Order instantly','<p>Your total, incl. 13% tax, is shown before you send. Custom Inquiry: I agree the price with you first and email your invoice (within 6 hours, WIB).</p>'],['4 · Pay with PayPal','<p>Card or PayPal balance, in USD, right after sending. Pay in full, 50/50, or in 3 parts for orders above $150. Your slot is secured once payment is received.</p>']]),
     txt([['5 · I make your art','<p>Sketch → lineart → coloring → (rigging). You get progress updates at every stage. Every commission takes 3 weeks at most.</p>'],['6 · Delivery','<p>You get your final files, ready to stream. Questions any time on <a href="https://discord.gg/FbgWxMPjf" target="_blank" rel="noopener">Discord</a>.</p>']]),
     endpg];
   // book 3: FAQ + terms
@@ -1086,15 +1087,15 @@ function showThanks(last){
       ${last.payUrl&&due>0?`<p class="print-only pay-link">Pay ${money2(due)} online with PayPal: <a href="${esc(last.payUrl)}">${esc(last.payUrl)}</a></p>`:''}
     </div>`;$('#tyInv').hidden=false;
     if(payNow){$('#tyPayT').textContent=partial?'Pay now to secure your slot':'Pay your invoice';$('#tyPayInfo').textContent=(custom?'Total incl. 13% tax':partial?planLabel(inv.plan||last.plan):'Full payment')+' · '+last.id;$('#tyPayAmt').textContent=money2(due);$('#tyPayLabel').textContent='Pay '+money2(due)+' with PayPal';
-      $('#tyPaySm').textContent="Secure checkout on PayPal (card or PayPal balance). Full refund if I can't take your order. Rather wait for my reply? The same link is in your email, so you can pay after I confirm (usually within 6 hours, WIB).";$('#tyKofiRef').textContent='invoice number';
+      $('#tyPaySm').textContent="Secure checkout on PayPal (card or PayPal balance). Your slot is secured as soon as you pay. Full refund if I can't take your order.";$('#tyKofiRef').textContent='invoice number';
       $('#tyDcT').textContent='Questions about your order?';$('#tyDcS').textContent='Message me on Discord with your invoice number.';}
     else{$('#tyDcS').textContent='Send me your invoice number so I can send your PayPal link.';}
     $('#tyNote').textContent=inv.emailed?'A copy of this invoice was sent to your email (check Spam). Other ways to reach me:':'Other ways to reach me:';
   }
   const steps=inv?(payNow?[['Pay with PayPal','PayPal emails you a receipt.'],['I review your order',"I confirm within 6 hours. Full refund if I can't take it."],['Work starts',inv.custom===false&&last.due<inv.total?'I send progress updates; the rest is paid later as agreed ♡':'I send progress updates until your art is done ♡']]
       :[['Message me on Discord','Send your invoice number. I reply within 6 hours.'],['Pay your invoice','I send you a PayPal link for '+money2(inv.total)+'.'],['Work starts','I send progress updates until your art is done ♡']])
-    :payNow?[['Pay with PayPal','Secure your slot now. PayPal emails you a receipt.'],['Chat on Discord','Send me your Request ID. I reply within 6 hours.'],['Work starts','I start working and send progress updates on Discord.']]
-    :[['I review your order','Within 6 hours. If I have questions, I email you.'],['Get your invoice','I email you your invoice (PDF). Please check your Spam folder too.'],['Pay & start','Pay with the one-click PayPal link. Your slot is secured and I start working ♡']];
+    :payNow?[['Pay with PayPal','Secure your slot now. PayPal emails you a receipt.'],['Work starts','Done within 3 weeks. Follow every stage with the tracking link in your email.'],['Questions?','Message me on Discord with your Request ID.']]
+    :[['I check your idea & price','Within 6 hours (WIB). If I have questions, I email you.'],['Get your invoice','Once we agree on the price, I email your invoice with a one-click PayPal link. Please check Spam too.'],['Pay & start','Your slot is secured and I start working ♡']];
   $('#tySteps').innerHTML=steps.map(([a,b])=>`<li><b>${a}</b><span>${b}</span></li>`).join('');
   ty.classList.add('show');ty.setAttribute('aria-hidden','false');document.body.style.overflow='hidden';ty.scrollTop=0;
   $('#tyDiscord').onclick=async()=>{const id=last&&last.id;if(id){try{await navigator.clipboard.writeText(id);$('#tyDiscord').textContent='Copied '+id+' ✓ Opening…';}catch(_){}}window.open('https://discord.gg/FbgWxMPjf','_blank','noopener');};

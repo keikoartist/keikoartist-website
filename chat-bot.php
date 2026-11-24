@@ -22,7 +22,7 @@ function bot_reply(string $msg, bool $first): string {
     $info[] = $openNow ? 'Yes, commissions are open right now and Keiko can start soon.' . $slTxt : 'Commissions are closed at the moment. Join the Discord server to hear when they open: discord.gg/FbgWxMPjf';
   }
   if (preg_match('/how long|turnaround|deadline|when.*(done|ready|finish)|lama|berapa minggu/', $q)) $info[] = 'Every commission is done within 3 weeks at most, with updates at every stage. Rush delivery (+25%) takes about half the time.';
-  if (preg_match('/how (do|can) i (order|commission|pay|start)|payment|paypal|pay with|cara (order|bayar)/', $q)) $info[] = 'To order: pick your options in the order form (keikoartist.com/?order=VTuber), or add several services to the cart. You get an invoice right away and pay with PayPal (card or PayPal balance): in full, 50% now, or in 3 payments for orders above $150. Full refund before work starts.';
+  if (preg_match('/how (do|can) i (order|commission|pay|start)|payment|paypal|pay with|cara (order|bayar)/', $q)) $info[] = 'To order: pick your options in the order form (keikoartist.com/?order=VTuber), or add several services to the cart. Your total is shown before you send, and you pay right away with PayPal (card or PayPal balance): in full, 50% now, or in 3 payments for orders above $150. Full refund before work starts.';
   if (preg_match('/revision|revisi/', $q)) $info[] = 'Revisions: unlimited at the sketch stage, and 2 minor revisions after coloring.';
   if ($info) $out[] = implode("\n", $info);
   $priceAsk = preg_match('/price|how much|cost|rate|quote|budget|\$|harga|berapa|total/', $q);

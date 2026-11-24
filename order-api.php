@@ -82,7 +82,7 @@ function db(): PDO {
   $pdo->exec('CREATE INDEX IF NOT EXISTS idx_orders_created ON orders(created)');
   $pdo->exec('CREATE TABLE IF NOT EXISTS hits(k TEXT, t INTEGER)');
   $cols = array_column($pdo->query('PRAGMA table_info(orders)')->fetchAll(), 'name');
-  foreach (['paid' => 'REAL DEFAULT 0', 'view_key' => 'TEXT', 'files_removed' => 'INTEGER DEFAULT 0', 'lines' => 'TEXT', 'stage' => "TEXT DEFAULT ''", 'stage_note' => "TEXT DEFAULT ''", 'stage_at' => 'INTEGER DEFAULT 0'] as $c => $t) if (!in_array($c, $cols, true)) $pdo->exec("ALTER TABLE orders ADD COLUMN $c $t");
+  foreach (['approved' => 'INTEGER DEFAULT 0', 'paid' => 'REAL DEFAULT 0', 'view_key' => 'TEXT', 'files_removed' => 'INTEGER DEFAULT 0', 'lines' => 'TEXT', 'stage' => "TEXT DEFAULT ''", 'stage_note' => "TEXT DEFAULT ''", 'stage_at' => 'INTEGER DEFAULT 0'] as $c => $t) if (!in_array($c, $cols, true)) $pdo->exec("ALTER TABLE orders ADD COLUMN $c $t");
   $pdo->exec('CREATE TABLE IF NOT EXISTS payments(txn_id TEXT PRIMARY KEY, order_id TEXT, amount REAL, currency TEXT, payer TEXT, status TEXT, created INTEGER)');
   $pdo->exec('CREATE INDEX IF NOT EXISTS idx_pay_order ON payments(order_id)');
   $pdo->exec('CREATE TABLE IF NOT EXISTS ipn_log(id INTEGER PRIMARY KEY AUTOINCREMENT, created INTEGER, ok INTEGER, note TEXT)');
@@ -477,8 +477,9 @@ if (($_GET['a'] ?? '') === 'track') {
   $paid = (float)$o['paid']; $total = (float)$o['total']; $done = $o['status'] === 'done';
   $stage = (string)($o['stage'] ?? ''); $si = array_search($stage, STAGES, true);
   $started = $done || $o['status'] === 'in_progress' || $si !== false;
+  $waitPrice = $o['kind'] === 'custom' && empty($o['approved']) && $paid <= 0;
   $steps = [['Order received', date('M j, Y', (int)$o['created']), true],
-            ['Payment', $paid >= $total - 0.01 && $total > 0 ? 'Paid in full' : ($paid > 0 ? money2($paid) . ' of ' . money2($total) . ' paid' : 'Waiting for payment'), $paid > 0 || $done]];
+            ['Payment', $waitPrice ? 'Keiko is checking your idea and price; your invoice comes by email' : ($paid >= $total - 0.01 && $total > 0 ? 'Paid in full' : ($paid > 0 ? money2($paid) . ' of ' . money2($total) . ' paid' : 'Waiting for payment')), $paid > 0 || $done]];
   foreach (STAGES as $i => $nm) $steps[] = [$nm, '', $done || ($si !== false && $i <= $si)];
   $steps[] = ['Delivered', $done ? 'Enjoy your art! ♡' : '', $done];
   $cur = -1; foreach ($steps as $i => $x) if ($x[2]) $cur = $i;
@@ -489,7 +490,7 @@ if (($_GET['a'] ?? '') === 'track') {
   }
   $note = trim((string)($o['stage_note'] ?? ''));
   $ready = date('M j, Y', (int)$o['created'] + 21 * 86400);
-  $pay = !$done && pay_amount($o) > 0 ? '<a class="pp" href="' . h(pay_link($o, $SITE)) . '">Pay ' . money2(pay_amount($o)) . ' with PayPal</a>' : '';
+  $pay = !$done && !$waitPrice && pay_amount($o) > 0 ? '<a class="pp" href="' . h(pay_link($o, $SITE)) . '">Pay ' . money2(pay_amount($o)) . ' with PayPal</a>' : '';
   page('Order ' . $id,
     '<style>.tl{list-style:none;margin:18px 0;padding:0}.tl li{position:relative;padding:0 0 18px 30px}.tl li::before{content:"";position:absolute;left:0;top:2px;width:16px;height:16px;border-radius:50%;border:2px solid #fbd3e0;background:#fff;box-sizing:border-box}'
     . '.tl li::after{content:"";position:absolute;left:7px;top:20px;bottom:0;width:2px;background:#fbd3e0}.tl li:last-child::after{display:none}.tl li.ok::before{background:#f2628f;border-color:#f2628f}.tl li.now::before{border-color:#f2628f;box-shadow:0 0 0 4px #ffe1ec}'
@@ -621,7 +622,7 @@ if (($_GET['a'] ?? '') === 'submit') {
             'fields' => json_encode($fields, JSON_UNESCAPED_UNICODE), 'files' => json_encode($files), 'lines' => json_encode($lines, JSON_UNESCAPED_UNICODE)])); }
     catch (Throwable $e) { $pdfInfo = 'error: ' . $e->getMessage(); }
     jout(200, ['id' => $id, 'kind' => $kind, 'price' => $price, 'tax' => $tax, 'total' => $total, 'due' => $due, 'plan' => $plan,
-               'pay_url' => $total > 0 ? $SITE . 'order-api.php?a=pay&id=' . $id . '&k=dryrun0000000000' : '', 'date' => date('M j, Y'), 'emailed' => false, 'notified' => false, 'pdf' => $pdfInfo,
+               'pay_url' => ($total > 0 && $kind !== 'custom') ? $SITE . 'order-api.php?a=pay&id=' . $id . '&k=dryrun0000000000' : '', 'date' => date('M j, Y'), 'emailed' => false, 'notified' => false, 'pdf' => $pdfInfo,
                'files' => count($files), 'skipped_files' => $skipped, 'skipped_names' => $skippedNames, 'dry_run' => true, 'file_report' => $report]);
   }
 
@@ -634,7 +635,7 @@ if (($_GET['a'] ?? '') === 'submit') {
      ->execute([$id, $kind, $name, $email, $o['discord'], $service, $o['package'], $plan, $price, $tax, $total, $due, $o['fields'], $o['files'], $now, $now, $vkey, json_encode($lines, JSON_UNESCAPED_UNICODE)]);
 
   // the client can pay right away with PayPal (amount filled in); Keiko refunds in full if she cannot take the order
-  $payUrl = $total > 0 ? pay_link(['id' => $id, 'view_key' => $vkey], $SITE) : '';   // every order (Custom Inquiry too) can be paid right after it is sent
+  $payUrl = ($total > 0 && $kind !== 'custom') ? pay_link(['id' => $id, 'view_key' => $vkey], $SITE) : '';   // instant order like Etsy; a Custom Inquiry waits until Keiko agrees the price and sends the invoice (owner, 24 Nov 2026)
   $dateStr = date('M j, Y');
 
   // ---- email to Keiko ----
@@ -664,15 +665,15 @@ if (($_GET['a'] ?? '') === 'submit') {
   if ($email !== '') {
     $cn = h(no_links($name) ?: 'there');
     if ($kind === 'custom') {
-      $subj = "Your KeikoArts invoice $id";
-      $body = "<p>Hi $cn, thank you for your custom order at KeikoArts! ♡</p>"
+      $subj = "Your KeikoArts custom request $id";
+      $body = "<p>Hi $cn, thank you for your custom request at KeikoArts! ♡ I check your idea and the price you suggested, and reply within 6 hours (WIB). Once we agree on the price, I email your invoice with a one-click PayPal link.</p>"
             . '<table cellspacing="0" style="border-collapse:collapse;font-size:14px;min-width:280px">'
             . '<tr><td colspan="2" style="padding:0 0 8px;color:#a8607a">Order <b style="color:#f2628f">' . h($id) . '</b> · ' . h($dateStr) . '</td></tr>'
             . '<tr><td style="padding:4px 16px 4px 0">Custom commission (' . h($fields['Usage'] ?? 'Personal') . ' use)</td><td align="right">' . money2($price) . '</td></tr>'
             . ($com > 0 ? '<tr><td style="padding:4px 16px 4px 0">Commercial / merch rights</td><td align="right">' . money2($com) . '</td></tr>' : '')
             . '<tr><td style="padding:4px 16px 4px 0">Tax (13%)</td><td align="right">' . money2($tax) . '</td></tr>'
-            . '<tr><td style="padding:8px 16px 4px 0;border-top:1px solid #fbd3e0"><b>Total due (USD)</b></td><td align="right" style="border-top:1px solid #fbd3e0;padding-top:8px"><b>' . money2($total) . '</b></td></tr></table>';
-      $txt = "Hi " . (no_links($name) ?: 'there') . ", thank you for your custom order at KeikoArts!\n\nINVOICE $id · $dateStr\nCustom commission: " . money2($price) . ($com > 0 ? "\nCommercial / merch rights: " . money2($com) : '') . "\nTax (13%): " . money2($tax) . "\nTOTAL DUE: " . money2($total) . " USD\n\n";
+            . '<tr><td style="padding:8px 16px 4px 0;border-top:1px solid #fbd3e0"><b>Suggested total (USD)</b></td><td align="right" style="border-top:1px solid #fbd3e0;padding-top:8px"><b>' . money2($total) . '</b></td></tr></table>';
+      $txt = "Hi " . (no_links($name) ?: 'there') . ", thank you for your custom request at KeikoArts!\nI check your idea and the price you suggested, and reply within 6 hours (WIB). Once we agree on the price, I email your invoice with a one-click PayPal link.\n\nREQUEST $id · $dateStr\nCustom commission: " . money2($price) . ($com > 0 ? "\nCommercial / merch rights: " . money2($com) : '') . "\nTax (13%): " . money2($tax) . "\nSUGGESTED TOTAL: " . money2($total) . " USD\n\n";
     } else {
       $subj = "Your KeikoArts request $id";
       $body = "<p>Hi $cn, thank you for your commission request at KeikoArts! ♡</p><p>Request ID: <b style=\"color:#f2628f\">" . h($id) . '</b><br>Service: ' . h($service . ' (' . $o['package'] . ')') . '<br>Estimated total: ' . money2($total) . '<br>Payment plan: ' . h($plan) . '</p>';
@@ -687,8 +688,8 @@ if (($_GET['a'] ?? '') === 'submit') {
     }
     $body .= '<p>Follow your order (progress at every stage): <a href="' . h($trackUrl) . '">track your order</a></p>';
     $txt .= "Follow your order: $trackUrl\n\n";
-    $body .= '<p>' . ($payUrl !== '' ? 'I start as soon as the payment comes in.' : 'I review your order and email you your invoice (PDF) within 6 hours. You pay securely with PayPal (one click, card or PayPal balance).') . '</p><p>Want to chat on Discord? <a href="' . DISCORD_USER . '">Join my server</a> and send your order ID <b>' . h($id) . '</b>.</p><p>— Keiko, KeikoArts</p>';
-    $txt .= ($payUrl !== '' ? "I start as soon as the payment comes in." : "I review your order and email you your invoice (PDF) within 6 hours. You pay securely with PayPal (one click, card or PayPal balance).") . "\nWant to chat on Discord? Join my server and send your order ID $id:\n" . DISCORD_USER . "\n\n— Keiko, KeikoArts";
+    $body .= '<p>' . ($payUrl !== '' ? 'Your slot is secured as soon as the payment comes in, and I start working.' : 'Once we agree on the price, you get your invoice with a one-click PayPal link (card or PayPal balance).') . '</p><p>Want to chat on Discord? <a href="' . DISCORD_USER . '">Join my server</a> and send your order ID <b>' . h($id) . '</b>.</p><p>— Keiko, KeikoArts</p>';
+    $txt .= ($payUrl !== '' ? "Your slot is secured as soon as the payment comes in, and I start working." : "Once we agree on the price, you get your invoice with a one-click PayPal link (card or PayPal balance).") . "\nWant to chat on Discord? Join my server and send your order ID $id:\n" . DISCORD_USER . "\n\n— Keiko, KeikoArts";
     $clientMailed = send_mail($email, $subj, '<div style="font-family:Arial,sans-serif;color:#7a2846;font-size:14px">' . $body . '</div>', $txt, OWNER_EMAIL);
   }
   $db->prepare('UPDATE orders SET mailed = ? WHERE id = ?')->execute([$mailed ? 1 : 0, $id]);
@@ -704,7 +705,7 @@ if (($_GET['a'] ?? '') === 'submit') {
     page('Order sent',
       '<h1>Order sent! ♡</h1><p class="muted">Order ID <b>' . h($id) . '</b> · ' . h($dateStr) . '</p><p>Name <b>' . h($name) . '</b></p>'
       . '<table>' . $rowsH . '</table>'
-      . '<p><b>Next step:</b> I review your order and email you your invoice (PDF) within 6 hours. You pay securely with PayPal (one click, card or PayPal balance).</p><p class="muted">Want to chat on Discord? <a class="back" href="' . DISCORD_USER . '">Join my Discord server</a> and send your order ID.</p>', true);
+      . '<p><b>Next step:</b> ' . ($kind === 'custom' ? 'I check your idea and price within 6 hours (WIB). Once we agree, I email your invoice with a one-click PayPal link.' : 'Pay with the PayPal link in your email to secure your slot (card or PayPal balance).') . '</p><p class="muted">Want to chat on Discord? <a class="back" href="' . DISCORD_USER . '">Join my Discord server</a> and send your order ID.</p>', true);
   }
   jout(200, ['id' => $id, 'kind' => $kind, 'price' => $price, 'tax' => $tax, 'total' => $total, 'due' => $due, 'plan' => $plan,
              'pay_url' => $payUrl, 'pdf_url' => pdf_link(['id' => $id, 'view_key' => $vkey], $SITE), 'track_url' => track_link(['id' => $id, 'view_key' => $vkey], $SITE), 'date' => $dateStr, 'emailed' => $clientMailed, 'notified' => $mailed, 'files' => count($files), 'skipped_files' => $skipped, 'skipped_names' => $skippedNames, 'key' => $vkey]);
@@ -893,7 +894,7 @@ switch ($action) {
     $msg = mb_substr((string)($in['body'] ?? ''), 0, 6000); if (trim($msg) === '') fail(400, 'The message is empty.');
     $html = preg_replace('#(https?://[^\s<]+)#', '<a href="$1">$1</a>', nl2br(h($msg)));
     $ok = send_mail((string)$o['email'], $subj, '<div style="font-family:Arial,sans-serif;color:#7a2846;font-size:14px;line-height:1.55">' . $html . '</div>', $msg, OWNER_EMAIL);
-    if ($ok) jout(200, ['sent' => true, 'to' => $o['email']]);
+    if ($ok) { db()->prepare('UPDATE orders SET approved = 1, updated = ? WHERE id = ?')->execute([time(), $o['id']]); jout(200, ['sent' => true, 'to' => $o['email']]); }
     fail(502, 'The email could not be sent: ' . ($GLOBALS['mail_err'] ?? 'unknown error'));
   }
   case 'settings_test': {

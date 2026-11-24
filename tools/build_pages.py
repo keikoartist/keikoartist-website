@@ -316,7 +316,7 @@ def custom_vtuber():
       <div class="box"><h3>Art + Rig</h3><p>The complete package: art, Live2D rigging and a VTube Studio file, ready to stream.</p></div>
       <div class="box"><h3>Rig only</h3><p>Send me your layered PSD and I rig it. More on the <a href="/live2d-rigging/">Live2D rigging page</a>.</p></div>
     </div>
-    <p class="note">{e(DETAILS["VTuber"]["notes"])} The final price is confirmed on your invoice before you pay.</p>
+    <p class="note">{e(DETAILS["VTuber"]["notes"])} Your total, incl. 13% tax, is shown in the order form before you pay.</p>
   </div></section>
 
   <section class="sec"><div class="wrap">
@@ -345,7 +345,7 @@ def custom_vtuber():
     <h2>How ordering works</h2>
     <ol class="steps">
       <li><b>Send the order form</b><span>Pick the size and option, describe your character and attach references.</span></li>
-      <li><b>Get your invoice</b><span>I review your request and email you an invoice (PDF), usually within 6 hours (WIB, GMT+7). {e(PAY)}</span></li>
+      <li><b>Order and pay</b><span>Your total is shown before you send. Pay right away with the PayPal button. {e(PAY)}</span></li>
       <li><b>Sketch to rig</b><span>Sketch, lineart, coloring and rigging, with progress updates at every stage.</span></li>
       <li><b>Go live</b><span>You receive your files and VTube Studio model. Estimated time: {e(V["eta"])}; rush delivery (+25%) is available.</span></li>
     </ol>
@@ -358,14 +358,14 @@ def custom_vtuber():
   </div></section>
 {guides_block("")}
 {related("/custom-vtuber-model/")}
-{cta("Got a VTuber in mind?", "Send me your idea and I'll email your invoice. You only pay after you've checked it.", "VTuber", "Start your VTuber model")}'''
+{cta("Got a VTuber in mind?", "Choose your options, see your total and order instantly with PayPal.", "VTuber", "Start your VTuber model")}'''
     faq = [
         ('How much does a custom VTuber model cost?', f'Art only costs {money(vp["Bust · Art only"])} (bust), {money(vp["Half body · Art only"])} (half body) or {money(vp["Full body · Art only"])} (full body). Art + rig costs {money(vp["Bust · Art + Rig"])}, {money(vp["Half body · Art + Rig"])} or {money(vp["Full body · Art + Rig"])}. Complex designs with wings or many accessories may cost a bit more; the final price is on your invoice. See <a href="/vtuber-pricing/">all prices</a>.'),
         ('How long does a VTuber model take?', f'About {e(V["eta"])}, depending on the complexity of the design and the queue. Rush delivery (+25%) is available in the order form.'),
         ('Does the model work with VTube Studio?', 'Yes. Art + Rig and Rig only orders include a VTube Studio file, ready to stream with webcam or iPhone face tracking. Art only orders get a layered PSD that is ready to rig.'),
         ('Can I use my model on monetized streams?', f'Yes. Streaming, monetized videos and social media are included. Merch and other commercial rights are an add-on (+{money(vadd["Commercial / merch rights"])}).'),
         ('I already have VTuber art. Can you just rig it?', f'Yes, rig only starts at {money(vp["Bust · Rig only"])}. Send your layered PSD with the order form. See <a href="/live2d-rigging/">Live2D rigging</a>.'),
-        ('How do I pay?', 'After you send the order form, I email you an invoice as a PDF. ' + e(PAY)),
+        ('How do I pay?', 'Right after you send the order form, with the PayPal button (the same link is in your email). ' + e(PAY)),
     ]
     desc = f'Commission a custom Live2D VTuber model: original character art, bust to full body, rigged for VTube Studio. Art from {money(vp["Bust · Art only"])}, art + rig from {money(vp["Bust · Art + Rig"])}.'
     return page('custom-vtuber-model', 'Custom VTuber Model Commission | KeikoArtist', desc, 'Custom VTuber Model Commission', 'Custom VTuber Model',
@@ -415,7 +415,7 @@ def rigging():
     <h2>How it works</h2>
     <ol class="steps">
       <li><b>Send the order form</b><span>Choose VTuber, pick "Rig only" (or "Art + Rig") and attach your files.</span></li>
-      <li><b>Get your invoice</b><span>I check your request and email you an invoice (PDF). {e(PAY)}</span></li>
+      <li><b>Order and pay</b><span>Send the order form and pay right away with PayPal. {e(PAY)}</span></li>
       <li><b>Rigging</b><span>Your model is rigged with progress updates along the way.</span></li>
       <li><b>Delivery</b><span>You receive the Live2D model and VTube Studio file. VTuber models take about {e(V["eta"])}.</span></li>
     </ol>
@@ -484,7 +484,7 @@ def pngtuber():
     <h2>How ordering works</h2>
     <ol class="steps">
       <li><b>Send the order form</b><span>Choose bust-up or thigh-up / full body and describe your character.</span></li>
-      <li><b>Get your invoice</b><span>I email you an invoice (PDF). {e(PAY)}</span></li>
+      <li><b>Order and pay</b><span>Send the order form and pay right away with PayPal. {e(PAY)}</span></li>
       <li><b>Drawing</b><span>Sketch, lineart and coloring, with updates along the way.</span></li>
       <li><b>Start streaming</b><span>You receive transparent PNGs for each state, ready for your PNGTuber app.</span></li>
     </ol>
@@ -549,7 +549,7 @@ def emotes():
     <h2>How ordering works</h2>
     <ol class="steps">
       <li><b>Send the order form</b><span>Choose static or animated, set how many, and list the expressions you want (for example love, cry, hype, sleepy). Attach a reference of your character.</span></li>
-      <li><b>Get your invoice</b><span>I email you an invoice (PDF). {e(PAY)}</span></li>
+      <li><b>Order and pay</b><span>Send the order form and pay right away with PayPal. {e(PAY)}</span></li>
       <li><b>Drawing</b><span>Sketch first, then lineart and coloring, with updates along the way.</span></li>
       <li><b>Upload and use</b><span>You receive transparent PNG or GIF files in 112, 56 and 28 px, ready to upload to Twitch or Discord.</span></li>
     </ol>
@@ -637,7 +637,7 @@ def portfolio():
         ('Who made these artworks?', 'Team Keiko: Keiko (artist), Zhopio (illustrator) and Tomy (rigger). Every piece here is original work, drawn from scratch.'),
         ('Can I order something in a similar style?', 'Yes. Mention the piece you like in the order form, and attach it as a reference if you want.'),
         ('Will my commission be shown in the portfolio?', 'Finished work may be shared on the portfolio and socials, unless you ask for a private or delayed reveal.'),
-        ('How do I order?', 'Click "Start a project", choose a service, describe your idea and send the form. I email you your invoice (PDF) with a one-click PayPal link.'),
+        ('How do I order?', 'Click "Start a project", choose a service, describe your idea and send the form, then pay right away with the PayPal button.'),
     ]
     desc = 'VTuber models, Live2D rigging, PNGTubers, chibi models, pets, emotes, banners, logos and illustrations made by KeikoArts for streamers.'
     gallery_ld = {"@context": "https://schema.org", "@type": "CollectionPage", "name": "VTuber & Live2D Art Portfolio", "url": SITE + 'vtuber-portfolio/',
@@ -711,7 +711,7 @@ def pricing():
   <section class="sec"><div class="wrap">
     <h2>Payment and rules</h2>
     <div class="grid">
-      <div class="box"><h3>How you pay</h3><p>After you send the order form, I email you an invoice (PDF). {e(PAY)}</p></div>
+      <div class="box"><h3>How you pay</h3><p>Right after you send the order form, with the PayPal button. {e(PAY)}</p></div>
       <div class="box"><h3>Custom requests</h3><p>Have an idea that isn't listed? With a <a rel="nofollow" href="/?order=Custom%20Inquiry">custom inquiry</a> you name your price; 13% tax is added on the invoice and it's paid upfront.</p></div>
       <div class="box"><h3>Rush and complex designs</h3><p>Rush delivery is +25%. Very complex designs (for example wings or many accessories) may cost a bit more; the final price is always on your invoice before you pay.</p></div>
       <div class="box"><h3>Revisions</h3><p>Unlimited small revisions during the sketch. Up to 2 minor revisions after coloring; major changes after approval may have extra fees.</p></div>
@@ -725,7 +725,7 @@ def pricing():
         ('How much does a custom VTuber model cost?', f'Art only starts at {money(vp["Bust · Art only"])} (bust); art + rig at {money(vp["Bust · Art + Rig"])}. A full-body model with rigging is {money(vp["Full body · Art + Rig"])}. See <a href="/custom-vtuber-model/">custom VTuber models</a>.'),
         ('Can I pay in installments?', 'Yes: 50/50 (half upfront, half before final files), or 3 installments for orders above $150.'),
         ('Which currency do you use?', 'All prices are in US dollars (USD), before 13% tax, which is added on the invoice. You pay with a one-click PayPal link (card or PayPal balance).'),
-        ('Why do some prices say "from"?', 'It is the starting price of the smallest package. The final price depends on the options and add-ons you choose, and is confirmed on your invoice.'),
+        ('Why do some prices say "from"?', 'It is the starting price of the smallest package. The final price depends on the options and add-ons you choose; the order form shows your total before you pay.'),
         ('What does a VTuber debut package include?', '; '.join(f'{e(p[0])} ({money(p[1])}): {e(p[2])}' for p in SERVICES["VTuber Packages"]["packages"]) + '.'),
     ]
     desc = 'Prices for custom VTuber models, Live2D rigging, PNGTubers, emotes, overlays, banners and logos in USD, with add-ons, timelines and payment plans.'
@@ -789,7 +789,7 @@ def guide_cost():
       <tr><td>Art + Rig (Live2D model + VTube Studio file)</td>{row("Art + Rig")}</tr>
       <tr><td>Rig only (you send the PSD)</td>{row("Rig only")}</tr>
     </tbody></table></div>
-    <p class="note">Prices in USD. 13% tax is added on every invoice. The final price is confirmed on your invoice before you pay.</p>
+    <p class="note">Prices in USD. 13% tax is added on every invoice. Your total is shown in the order form before you pay.</p>
   </div></section>
 
   <section class="sec"><div class="wrap">
@@ -825,10 +825,10 @@ def guide_cost():
 
   <section class="sec"><div class="wrap">
     <h2>How payment works</h2>
-    <p>{e(PAY)} Nothing is charged until you pay the invoice.</p>
+    <p>{e(PAY)} Nothing is charged until you pay.</p>
   </div></section>
 {guides_block("/vtuber-model-cost/")}
-{cta("Want your exact price?", "Send your idea with the order form and get your invoice by email, usually within 6 hours (WIB, GMT+7).", "VTuber", "Get your price")}'''
+{cta("Want your exact price?", "Choose your options in the order form: your exact total is shown before you pay.", "VTuber", "Get your price")}'''
     faq = [
         ('How much is a cheap VTuber model?', f'The lowest-cost option here is a PNGTuber from {money(P["from"])}. For a Live2D model, a bust with art and rigging starts at {money(vp["Bust · Art + Rig"])}.'),
         ('How much does a full-body Live2D VTuber model cost?', f'{money(vp["Full body · Art only"])} for the art only, or {money(vp["Full body · Art + Rig"])} with rigging and a VTube Studio file, plus 13% tax.'),
@@ -859,7 +859,7 @@ def guide_howto():
       <li><b>Decide what you need</b><span>Art only (a layered PSD), Art + Rig (a model ready to stream) or Rig only (for art you already have). Then pick bust, half body or full body.</span></li>
       <li><b>Prepare your character</b><span>A character sheet helps, but it is not required. A description, a few reference pictures and the mood you want are enough to start.</span></li>
       <li><b>Send the order form</b><span>Choose the options and extras, describe your character and attach your references. The total updates as you choose.</span></li>
-      <li><b>Get your invoice</b><span>I review your request and email an invoice (PDF), usually within 6 hours (WIB, GMT+7). Your slot is secured once payment is received.</span></li>
+      <li><b>Order and pay</b><span>Your total is shown before you send; pay right away with PayPal. Your slot is secured once payment is received.</span></li>
       <li><b>Sketch and revisions</b><span>Small revisions are unlimited during the sketch, so the design can settle. Up to 2 minor revisions after coloring.</span></li>
       <li><b>Lineart, coloring and rigging</b><span>Progress updates at every stage. For Art + Rig I set up head turns, blinking, lip-sync and hair and clothing physics.</span></li>
       <li><b>Go live</b><span>You receive your files and a VTube Studio model. Every commission takes 3 weeks at most; rush delivery (+25%) is available.</span></li>
@@ -880,11 +880,11 @@ def guide_howto():
     <p>Streaming, monetized videos and social media use are included. Merch and other commercial rights are +{money(vadd["Commercial / merch rights"])}. Read the full <a href="/#tos">Terms of Service</a>.</p>
   </div></section>
 {guides_block("/how-to-commission-a-vtuber-model/")}
-{cta("Want to start?", "Send me your idea and I'll email your invoice. You only pay after you've checked it.", "VTuber", "Start your commission")}'''
+{cta("Want to start?", "Choose your options, see your total and order instantly with PayPal.", "VTuber", "Start your commission")}'''
     faq = [
         ('Do I need a finished character design?', 'No. A description and a few references are enough. The design is worked out together during the sketch stage.'),
         ('How long does a VTuber commission take?', f'VTuber models take about {e(V["eta"])}, and every commission takes 3 weeks at most. Rush delivery (+25%) is available.'),
-        ('When do I pay?', 'After you send the order form you get an invoice. You can pay in full, 50/50, or in 3 installments for orders above $150. Your slot is secured once payment is received.'),
+        ('When do I pay?', 'Right after you send the order form (Custom Inquiry: after we agree on the price). You can pay in full, 50/50, or in 3 installments for orders above $150. Your slot is secured once payment is received.'),
         ('Can I ask for changes?', 'Yes. Small revisions are unlimited during the sketch. After coloring, up to 2 minor revisions are included; major changes after approval may have extra fees.'),
         ('What software do I need to stream?', 'VTube Studio. It tracks your face with a webcam or an iPhone. Art + Rig orders include a VTube Studio file, ready to stream.'),
     ]
