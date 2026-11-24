@@ -50,7 +50,7 @@ jobs:
       - name: Playwright ready
         timeout-minutes: 5
         run: |
-          python3 -c "import playwright" 2>/dev/null || pip install -q playwright==1.48.0
+          python3 -c "import playwright" 2>/dev/null || pip install -q --break-system-packages playwright==1.48.0 || pip install -q playwright==1.48.0
           python3 -c "import playwright; print('playwright ok')"
       - name: Order flows on keikoartist.com
         run: |

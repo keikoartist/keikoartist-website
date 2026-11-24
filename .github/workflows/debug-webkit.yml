@@ -36,4 +36,5 @@ jobs:
                   await go(p, 'Mac', None)
           asyncio.run(main())
           PY
+          python3 -c 'import playwright' 2>/dev/null || pip install -q --break-system-packages playwright==1.48.0 || pip install -q playwright==1.48.0
           python3 d.py
