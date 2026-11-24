@@ -502,7 +502,7 @@ https://discord.gg/FbgWxMPjf
     const r=await fetch('https://formsubmit.co/ajax/keikoarts22@gmail.com',{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify(data),signal:ctl.signal});clearTimeout(to);
     const jj=await r.json().catch(()=>null);return !!(r.ok&&jj&&String(jj.success)==='true');}catch(_){return false;}};
   const sendCopy=async data=>(await sendOnce(data))||(await new Promise(z=>setTimeout(z,2000)),await sendOnce(data));
-  if(!LIVE_SITE){   // preview copy (e.g. inside the Claude app): show the invoice, nothing is sent
+  if(!LIVE_SITE){   // preview copy (not on keikoartist.com): show the invoice, nothing is sent
     const t=stamp(), id=(cmOn?'INV-':'REQ-')+t.md+'-PREVIEW';
     done({id,due,plan,payUrl:'',rows,emailed:false,warn:'PREVIEW ONLY: this order was not sent. Real orders work on keikoartist.com.'});
     return;}
