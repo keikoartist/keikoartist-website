@@ -583,13 +583,13 @@ $$('.services .card').forEach(c=>{const p=c.querySelector(':scope>.price'),b=c.q
   const prev=$('#bkPrev'),next=$('#bkNext'),count=$('#bkCount');
   const moon='<svg class="cv-moon" viewBox="0 0 64 64" aria-hidden="true"><defs><radialGradient id="cvg" cx=".35" cy=".3"><stop offset="0" stop-color="#fff"/><stop offset=".45" stop-color="#ffd1e6"/><stop offset="1" stop-color="#f2628f"/></radialGradient></defs><path d="M40 6a26 26 0 1 0 18 44A22 22 0 0 1 40 6Z" fill="url(#cvg)"/><path d="M50 10l1.6 3.6L55 15l-3.4 1.4L50 20l-1.6-3.6L45 15l3.4-1.4z" fill="#fff"/></svg>';
   const cover=(t,sub)=>'<div class="face-in cover-in">'+moon+'<h3>'+t+'</h3><p>'+sub+'</p><span class="cv-hint">Open the book ›</span></div>';
-  const endpg='<div class="face-in"><h3>Your character next?</h3><p>Tell me your idea in the order form and get your invoice by email.</p><a href="#order" data-order class="btn btn-pink arrow">Start a Project</a></div>';
+  const endpg='<div class="face-in"><h3>Your character next?</h3><p>Pick your options in the order form, see your total and order instantly.</p><a href="#order" data-order class="btn btn-pink arrow">Start a Project</a></div>';
   const txt=(items)=>({text:items.map(([h,body])=>'<h4>'+h+'</h4>'+body).join('')});
   // book 1: portfolio
   const works=[...grid.children];
   const f1=[cover('Featured Works','KeikoArts · spellbook')];
   works.forEach((w,i)=>f1.push({el:(c=>{c.querySelectorAll('[id]').forEach(x=>x.removeAttribute('id'));c.classList.add('in-book');const v=c.querySelector('video');if(v){v.controls=true;v.removeAttribute('autoplay');}return c})(w.cloneNode(true)),cap:(w.querySelector('.tag')||{}).textContent||'',n:i+1,of:works.length}));
-  f1.push('<div class="face-in"><h3>Your character next?</h3><p>Every piece here was drawn from scratch. Tell me your idea and get your invoice by email.</p><a href="#order" data-order class="btn btn-pink arrow">Start a Project</a><a href="/vtuber-portfolio/" class="btn btn-ghost">Full portfolio</a></div>');
+  f1.push('<div class="face-in"><h3>Your character next?</h3><p>Every piece here was drawn from scratch. Pick your options, see your total and order instantly.</p><a href="#order" data-order class="btn btn-pink arrow">Start a Project</a><a href="/vtuber-portfolio/" class="btn btn-ghost">Full portfolio</a></div>');
   // book 2: how to order (same facts as the order form, TOS and FAQ)
   const f2=[cover('How to Order','Five steps · no account needed'),
     txt([['1 · Pick a service','<p>Choose a service in <a href="#services">Our Services</a> and press Order now. The form shows every option and your total before you send it.</p>'],['2 · Send the form','<p>Tell me about your character: a description, a character sheet or a few references. Only your email is required to reach you.</p>']]),
