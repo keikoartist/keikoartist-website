@@ -1679,7 +1679,7 @@ body.xmas header:not(.kc-head)::after{background:linear-gradient(90deg,#f2628f,#
 .rv-ctr{min-width:64px;text-align:center;font:600 14px Poppins,sans-serif;color:var(--muted)}
 
 /* Etsy / VGen-style trust details */
-.coupon{margin-top:12px;display:grid;gap:4px}.coupon small{font-size:13px;color:var(--muted)}
+.coupon{margin-top:12px;display:grid;gap:4px}.cp-row{display:flex;gap:8px}.cp-row input{flex:1;min-width:0}.cp-row .btn{padding:10px 16px;font-size:13.5px}#cpMsg.ok{color:#1d7a43;font-weight:600}#cpMsg.bad{color:#c22b52}.coupon small{font-size:13px;color:var(--muted)}
 .inv-fx{margin:6px 0 0;font-size:13px;color:var(--muted);text-align:right}
 .inv-inc{list-style:none;margin:10px 0 0;padding:10px 0 0;border-top:1px dashed var(--line);display:grid;gap:6px;font-size:13px;color:var(--muted);line-height:1.45}
 .inv-inc li{padding-left:18px;position:relative}.inv-inc li::before{content:"✓";position:absolute;left:0;color:#1d9a55;font-weight:700}
@@ -2281,7 +2281,7 @@ body.xmas header:not(.kc-head)::after{background:linear-gradient(90deg,#f2628f,#
             <h4>Your info</h4>
             <div class="row"><input name="Name" id="fName" aria-label="Your name (required)" placeholder="Your name / VTuber name *" required autocomplete="name"><input type="email" name="email" id="fEmail" aria-label="Email (required)" placeholder="Email (I send your invoice here) *" required autocomplete="email" inputmode="email"></div>
             <input name="Discord" id="fDiscord" aria-label="Discord username (optional)" placeholder="Discord username (optional)" autocomplete="off" style="margin-top:12px">
-            <div class="coupon"><input name="Coupon code" id="fCoupon" maxlength="24" aria-label="Coupon or prize code (optional)" placeholder="Coupon or prize code (optional)" autocomplete="off" autocapitalize="characters"><small>Got a code from the Christmas wheel? Add it here and I apply it to your final invoice.</small></div>
+            <div class="coupon"><div class="cp-row"><input name="Coupon code" id="fCoupon" maxlength="24" aria-label="Coupon or prize code (optional)" placeholder="Prize code, e.g. XMAS-AB2CD (optional)" autocomplete="off" autocapitalize="characters"><button type="button" class="btn btn-ghost" id="cpApply">Apply</button></div><small id="cpMsg">Got a code from the Christmas wheel? "10% off" codes come off your total right away; other prizes I add by hand.</small></div>
           </div>
 
           <div class="sec" id="secPay">
@@ -2506,6 +2506,6 @@ const SERVICES = {
 };
 /* ========================================================== */
 </script>
-<script src="assets/app.js?v=30274abb" defer></script>
+<script src="assets/app.js?v=32d176fc" defer></script>
 </body>
 </html>

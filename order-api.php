@@ -50,7 +50,7 @@ function fail(int $code, string $msg): void {
   jout($code, ['error' => $msg]);
 }
 
-if ($_SERVER['REQUEST_METHOD'] !== 'POST' && !in_array($_GET['a'] ?? '', ['pdf', 'pay', 'track', 'cartget', 'cartremind', 'queue'], true)) fail(405, 'POST only');   // GET only for the invoice PDF, pay and tracking links
+if ($_SERVER['REQUEST_METHOD'] !== 'POST' && !in_array($_GET['a'] ?? '', ['pdf', 'pay', 'track', 'cartget', 'cartremind', 'queue', 'coupon'], true)) fail(405, 'POST only');   // GET only for the invoice PDF, pay and tracking links
 $hostHdr = strtolower($_SERVER['HTTP_HOST'] ?? '');
 $host = preg_replace('/:\d+$/', '', $hostHdr);
 $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
@@ -227,6 +227,18 @@ function pdf_link(array $o, string $site, $total = null): string {
   return $site . 'order-api.php?' . http_build_query($q);
 }
 /* short, safe "pay this invoice" link (keikoartist.com/order-api.php?a=pay...) that opens PayPal with the amount filled in */
+/* Christmas wheel codes: "10% off" codes take 10% off automatically (owner, 24 Nov 2026); other prizes are freebies Keiko adds by hand. One use per code. */
+function coupon_lookup(string $code): array {
+  $code = strtoupper(trim($code));
+  if (!preg_match('/^XMAS-[A-Z2-9]{5}$/', $code)) return ['valid' => false, 'code' => $code];
+  $prize = '';
+  foreach (@file(data_dir() . '/spins.csv', FILE_IGNORE_NEW_LINES) ?: [] as $row) { $c = str_getcsv($row); if (($c[1] ?? '') === $code) { $prize = (string)($c[2] ?? ''); break; } }
+  if ($prize === '') return ['valid' => false, 'code' => $code];
+  $db = db(); $db->exec('CREATE TABLE IF NOT EXISTS coupons_used(code TEXT PRIMARY KEY, order_id TEXT, used INTEGER)');
+  $st = $db->prepare('SELECT order_id FROM coupons_used WHERE code = ?'); $st->execute([$code]); $used = (string)($st->fetchColumn() ?: '');
+  $pct = preg_match('/^(\d+)% off/', $prize, $m) ? (int)$m[1] : 0;
+  return ['valid' => true, 'code' => $code, 'prize' => $prize, 'percent' => $pct, 'used' => $used !== ''];
+}
 function track_link(array $o, string $site): string { return preg_match('/^[a-f0-9]{16}$/', (string)($o['view_key'] ?? '')) ? $site . 'order-api.php?a=track&id=' . rawurlencode((string)$o['id']) . '&k=' . $o['view_key'] : ''; }
 function pay_link(array $o, string $site, $total = null): string {
   $l = pdf_link($o, $site, $total);
@@ -539,6 +551,16 @@ if (($_GET['a'] ?? '') === 'cartremind') {   // run every 15 minutes by chat-rem
   jout(200, ['reminded' => $n]);
 }
 
+/* =================== public: check a Christmas wheel code from the order form =================== */
+if (($_GET['a'] ?? '') === 'coupon') {
+  rate_limit('coupon:' . client_ip(), 30, 3600);
+  $c = coupon_lookup((string)($_GET['code'] ?? ''));
+  if (!$c['valid']) jout(200, ['valid' => false, 'message' => 'This code was not found. Please check it (XMAS-…).']);
+  if ($c['used']) jout(200, ['valid' => false, 'message' => 'This code was already used.']);
+  jout(200, ['valid' => true, 'code' => $c['code'], 'prize' => $c['prize'], 'percent' => $c['percent'],
+             'message' => $c['percent'] ? $c['percent'] . '% off is applied to your total.' : $c['prize'] . ': I add it to your order by hand.']);
+}
+
 /* =================== public: how many commissions are being worked on (a count only, no names or details) =================== */
 if (($_GET['a'] ?? '') === 'queue') {
   header('Cache-Control: public, max-age=600');
@@ -628,7 +650,7 @@ if (($_GET['a'] ?? '') === 'submit') {
   else {
     $lj = json_decode((string)($_POST['_lines'] ?? ''), true);
     if (is_array($lj)) foreach (array_slice($lj, 0, 60) as $l)
-      if (is_array($l) && count($l) >= 2 && is_string($l[0]) && is_numeric($l[1])) $lines[] = [clean($l[0], 120), round(min(100000, max(0, (float)$l[1])), 2)];
+      if (is_array($l) && count($l) >= 2 && is_string($l[0]) && is_numeric($l[1])) $lines[] = [clean($l[0], 120), preg_match('/^Christmas code/', $l[0]) ? round(max(-100000, min(0, (float)$l[1])), 2) : round(min(100000, max(0, (float)$l[1])), 2)];
     if (!$lines || abs(array_sum(array_column($lines, 1)) - $total) > 0.05) $lines = [[trim($service . ' - ' . ($fields['Package'] ?? ''), ' -'), $total]];
     // 13% PayPal fee on every order: the order form sends it as its own line; add it here when it is missing (e.g. an old cached page)
     $ti = -1; foreach ($lines as $i => $l) if (preg_match('/^(PayPal fee|Tax) \(13%\)/', $l[0])) { $ti = $i; $lines[$i][0] = 'PayPal fee (13%)'; }   // pages cached before 24 Nov 2026 still send "Tax (13%)"
@@ -638,6 +660,20 @@ if (($_GET['a'] ?? '') === 'submit') {
       $sub = 0.0; foreach ($lines as $i => $l) if ($i !== $ti) $sub += $l[1];
       $tax = round($sub * TAX_RATE, 2); $lines[$ti][1] = $tax; $total = round($sub + $tax, 2);
     }
+    // Christmas code: the server always recomputes the discount (never trusts the browser's line)
+    $coupon = isset($fields['Coupon code']) && $fields['Coupon code'] !== '' ? coupon_lookup($fields['Coupon code']) : null;
+    $lines = array_values(array_filter($lines, function ($l) { return !preg_match('/^Christmas code/', $l[0]); }));
+    $fi = -1; foreach ($lines as $i => $l) if (preg_match('/^PayPal fee \(13%\)/', $l[0])) $fi = $i;
+    if ($fi >= 0 && $total > 0) {
+      $sub = 0.0; foreach ($lines as $i => $l) if ($i !== $fi) $sub += $l[1];
+      $disc = ($coupon && $coupon['valid'] && !$coupon['used'] && $coupon['percent'] > 0) ? round($sub * $coupon['percent'] / 100, 2) : 0.0;
+      if ($disc > 0) array_splice($lines, $fi, 0, [['Christmas code ' . $coupon['code'] . ' (' . $coupon['percent'] . '% off)', -$disc]]);
+      $fi = -1; foreach ($lines as $i => $l) if (preg_match('/^PayPal fee \(13%\)/', $l[0])) $fi = $i;
+      $tax = round(($sub - $disc) * TAX_RATE, 2); $lines[$fi][1] = $tax; $total = round($sub - $disc + $tax, 2);
+      $due = $total > 0 ? ceil(round($total * $k * 100, 6)) / 100 : 0.0;
+    }
+    if ($coupon && $coupon['valid'] && !$coupon['used']) $fields['Coupon code'] = $coupon['code'] . ' · ' . $coupon['prize'] . ($coupon['percent'] ? ' (applied)' : ' (add by hand)');
+    elseif ($coupon) $fields['Coupon code'] = $coupon['code'] . ($coupon['valid'] ? ' · already used, not applied' : ' · not found, not applied');
     $price = round($total - $tax, 2);
     $due = $total > 0 ? ceil(round($total * $k * 100, 6)) / 100 : 0.0;
   }
@@ -712,6 +748,7 @@ if (($_GET['a'] ?? '') === 'submit') {
         'service' => $service, 'package' => $fields['Package'] ?? '', 'plan' => $plan, 'price' => $price, 'tax' => $tax,
         'total' => $total, 'due' => $due, 'fields' => json_encode($fields, JSON_UNESCAPED_UNICODE), 'files' => json_encode($files)];
   $now = time(); $vkey = bin2hex(random_bytes(8));
+  if (!empty($coupon) && $coupon['valid'] && !$coupon['used']) { try { $db->prepare('INSERT OR IGNORE INTO coupons_used(code, order_id, used) VALUES(?,?,?)')->execute([$coupon['code'], $id, time()]); } catch (Throwable $e) {} }
   if ($email !== '') { try { $db->prepare('UPDATE carts SET done = 1 WHERE email = ?')->execute([$email]); } catch (Throwable $e) {} }   // they ordered: no cart reminder
   $db->prepare('INSERT INTO orders(id,kind,status,name,email,discord,service,package,plan,price,tax,total,due,fields,files,created,updated,paid,view_key,lines)
                 VALUES(?,?,\'new\',?,?,?,?,?,?,?,?,?,?,?,?,?,?,0,?,?)')

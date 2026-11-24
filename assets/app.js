@@ -208,6 +208,15 @@ const svcThumb=k=>{const g=(typeof GALLERY!=='undefined'&&GALLERY[k])||[];return
 const sizeName=c=>c==='Half'?'Half body':c==='Full'?'Full body':c;
 
 // real savings of the debut packages vs buying the same things one by one (cheapest single items; expressions not counted, so it never overstates)
+// Christmas wheel code: "10% off" codes take the discount off the total (the server checks and recomputes it)
+let COUPON=null;
+function withCoupon(o){
+  if(!COUPON||!COUPON.percent||o.custom||!(o.total>0))return o;
+  const fi=o.lines.findIndex(l=>/^PayPal fee/.test(l[0]));if(fi<0)return o;
+  const sub=r2(o.lines.reduce((a,l,i)=>i===fi?a:a+l[1],0)),disc=r2(sub*COUPON.percent/100),fee=r2((sub-disc)*TAX),total=r2(sub-disc+fee);
+  const lines=o.lines.slice();lines.splice(fi,0,[`Christmas code ${COUPON.code} (${COUPON.percent}% off)`,-disc]);lines[fi+1]=[lines[fi+1][0],fee];
+  return Object.assign({},o,{lines,total,due:dueNow(total,o.plan)});
+}
 function pkgSaving(i){
   const g=(k,n)=>{const s=SERVICES[k];if(!s)return NaN;const p=s.packages.find(x=>x[0]===n);return p?p[1]:NaN;};
   const parts=[[g('VTuber','Bust · Art + Rig')],
@@ -295,8 +304,8 @@ function calc(){
     $('#fService').value=c.map(x=>x.svc).join(' + ');$('#fPackage').value=c.map(x=>x.pkg+(x.qty>1?' × '+x.qty:'')).join('; ');$('#fQty').value=c.length;
     $('#fAddons').value=c.map(x=>x.addons&&x.addons!=='-'?x.svc+': '+x.addons:'').filter(Boolean).join('; ')||'-';
     $('#fTotal').value=money2(sm.total)+' (incl. 13% PayPal fee)';$('#fSubject').value=`New cart order: ${$('#fService').value} — ${money2(sm.total)}`;
-    ORDER={lines:[...c.flatMap(x=>x.lines),['PayPal fee (13%)',sm.tax]],total:sm.total,due,plan,custom:false,rush:false};
-    renderInv();return sm.total;
+    ORDER=withCoupon({lines:[...c.flatMap(x=>x.lines),['PayPal fee (13%)',sm.tax]],total:sm.total,due,plan,custom:false,rush:false});
+    renderInv();return ORDER.total;
   }
   if(cmOn){
     const iv=invoice(), bud=iv.sub;
@@ -317,8 +326,8 @@ function calc(){
   $('#fService').value=svcName;$('#fPackage').value=pk[0];$('#fQty').value=qty;
   $('#fAddons').value=[...adds.map(a=>a[0]),rush?'Rush delivery (+25%)':''].filter(Boolean).join(', ')||'-';
   $('#fTotal').value=money2(t)+' (incl. 13% PayPal fee)';$('#fSubject').value=`New request: ${svcName} (${pk[0]}${svc.qty?' × '+qty:''}) — ${money2(t)}`;
-  ORDER={lines:[[`${svcName} · ${pk[0]}${svc.qty?' × '+qty:''}`,base],...adds.map(a=>[a[0],a[1]]),...(rush?[['Rush delivery (+25%)',rushAmt]]:[]),['PayPal fee (13%)',taxAmt]],total:t,due,plan,custom:false,rush};
-  renderInv();return t;
+  ORDER=withCoupon({lines:[[`${svcName} · ${pk[0]}${svc.qty?' × '+qty:''}`,base],...adds.map(a=>[a[0],a[1]]),...(rush?[['Rush delivery (+25%)',rushAmt]]:[]),['PayPal fee (13%)',taxAmt]],total:t,due,plan,custom:false,rush});
+  renderInv();return ORDER.total;
 }
 const readyBy=rush=>new Date(Date.now()+(rush?11:21)*864e5).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});   // every commission: 3 weeks at most
 // approximate price in the visitor's own currency (rates fetched and cached by fx-api.php; the invoice is always in USD)
@@ -332,13 +341,13 @@ function fxText(usd){if(!FX||!(usd>0))return '';try{return '≈ '+new Intl.Numbe
 function fxLine(usd,el){el=el||$('#invFx');if(!el)return;const t=fxText(usd);el.textContent=t;el.hidden=!t;if(!FX&&usd>0)fxLoad(()=>fxLine(usd,el));}
 function renderInv(){
   const o=ORDER, empty=o.custom&&!o.total, partial=!o.custom&&o.due<o.total;
-  $('#invLines').innerHTML=o.lines.map(([l,a])=>`<dt>${esc(l)}</dt><dd>${empty?'—':a?money2(a):'Free'}</dd>`).join('')
+  $('#invLines').innerHTML=o.lines.map(([l,a])=>`<dt>${esc(l)}</dt><dd>${empty?'—':a<0?'−'+money2(-a):a?money2(a):'Free'}</dd>`).join('')
     +`<dt class="grand">Total</dt><dd class="grand">${empty?'—':money2(o.total)}</dd>`
     +(partial?`<dt class="now">First payment · ${esc(planLabel(o.plan))}</dt><dd class="now">${money2(o.due)}</dd>`:'');
   $('#invEta').textContent=`USD · ready by ${readyBy(o.rush)}`;
   $('#invHead').textContent=o.custom?'Your suggested price':'Price estimate';{const sl=$('#sendBtn .so-l');if(sl&&!$('#sendBtn').dataset.busy)sl.textContent=o.custom?' Request':' Order';}   // a Custom Inquiry is paid only after Keiko agrees the price
   $('#invNote').textContent=o.custom?"I check your idea and price first (within 6 hours, WIB). Once we agree, I email your invoice with a one-click PayPal link. Nothing is charged now.":"Instant order: pay with PayPal right after sending to secure your slot. Full refund if I can't take your order.";fxLine(o.custom&&!o.total?0:o.total);
-  $('#navLbl').textContent=partial?'1st payment (incl. fee)':'Total (incl. 13% fee)';
+  $('#navLbl').textContent=partial?'1st payment (incl. fee)':'Total (incl. fee)';
   $('#navTotal').textContent=empty?'—':money2(partial?o.due:o.total);
 }
 
@@ -390,6 +399,15 @@ function go(n){
 $('#prevBtn').onclick=()=>{const back=CART_MODE||EDIT_ID?3:1;EDIT_ID=null;go(back);};
 $('#addCartBtn').onclick=addToCart;$('#navCart').onclick=openCart;$('#cmGo').onclick=()=>go(3);
 $('#cartMore').onclick=()=>go(1);
+$('#cpApply').onclick=async()=>{const v=$('#fCoupon').value.trim().toUpperCase(),m=$('#cpMsg');$('#fCoupon').value=v;m.className='';
+  if(!v){COUPON=null;calc();m.textContent='Please type your code.';return;}
+  if(!location.protocol.startsWith('http')){m.textContent='Codes can be checked on keikoartist.com.';return;}
+  try{const r=await fetch('order-api.php?a=coupon&code='+encodeURIComponent(v));const j=await r.json();
+    if(j&&j.valid){COUPON={code:j.code,percent:j.percent||0,prize:j.prize};m.className='ok';m.textContent='✓ '+j.message;}
+    else{COUPON=null;m.className='bad';m.textContent=(j&&j.message)||'This code was not found.';}}
+  catch(_){m.className='bad';m.textContent='Could not check the code right now. You can still send it with your order.';}
+  calc();};
+$('#fCoupon').addEventListener('input',()=>{if(COUPON&&$('#fCoupon').value.trim().toUpperCase()!==COUPON.code){COUPON=null;$('#cpMsg').className='';$('#cpMsg').textContent='Press Apply to check your code.';calc();}});
 // "Email me my cart": the cart by email now + one reminder tomorrow (order-api.php cartsave)
 $('#cartMail').onclick=async()=>{
   const em=$('#cartEmail').value.trim(),msg=$('#cartMailMsg'),b=$('#cartMail');
