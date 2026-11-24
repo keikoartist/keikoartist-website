@@ -1713,11 +1713,11 @@ body.xmas header:not(.kc-head)::after{background:linear-gradient(90deg,#f2628f,#
     </div>
     <div class="works fw">
       <div class="work rig fw-wide">
-        <video id="rigVid" src="images/live2d-rigging-showcase.mp4" poster="images/live2d-rigging-showcase-poster.webp" muted loop playsinline preload="none" aria-label="Live2D rigging showcase"></video>
+        <video id="rigVid" src="images/live2d-rigging-showcase.mp4" data-poster="images/live2d-rigging-showcase-poster.webp" muted loop playsinline preload="none" aria-label="Live2D rigging showcase"></video>
         <span class="tag">Live2D Rigging</span>
       </div>
       <div class="work rig fw-wide">
-        <video class="fw-vid" src="images/live2d-model-hoodie-loop.mp4" poster="images/live2d-model-showcase-hoodie-poster.webp" muted loop playsinline preload="none" aria-label="Live2D model of a long-haired boy in a grey hoodie: head turns, blinking, expressions and toggles"></video>
+        <video class="fw-vid" src="images/live2d-model-hoodie-loop.mp4" data-poster="images/live2d-model-showcase-hoodie-poster.webp" muted loop playsinline preload="none" aria-label="Live2D model of a long-haired boy in a grey hoodie: head turns, blinking, expressions and toggles"></video>
         <span class="tag">Hoodie boy · Live2D model</span>
       </div>
       <a href="images/custom-vtuber-model-kitsune-gown.webp" class="work"><img src="images/custom-vtuber-model-kitsune-gown.webp" srcset="images/s/custom-vtuber-model-kitsune-gown.webp 360w, images/t/custom-vtuber-model-kitsune-gown.webp 520w, images/custom-vtuber-model-kitsune-gown.webp 814w" sizes="(max-width:700px) 46vw, (max-width:1050px) 31vw, 290px" alt="Full-body VTuber model art of a fox-eared girl in a pink and black layered gown" width="814" height="1000" loading="lazy" decoding="async"><span class="tag">Kitsune gown · VTuber model</span></a>
@@ -1725,7 +1725,7 @@ body.xmas header:not(.kc-head)::after{background:linear-gradient(90deg,#f2628f,#
       <a href="images/custom-vtuber-model-dragon.webp" class="work"><img src="images/custom-vtuber-model-dragon.webp" srcset="images/s/custom-vtuber-model-dragon.webp 360w, images/t/custom-vtuber-model-dragon.webp 520w, images/custom-vtuber-model-dragon.webp 920w" sizes="(max-width:700px) 46vw, (max-width:1050px) 31vw, 290px" alt="Full-body VTuber model art of a dragon girl in a pink and black frilled dress" width="920" height="1000" loading="lazy" decoding="async"><span class="tag">Dragon girl · VTuber model</span></a>
       <a href="images/custom-vtuber-model-maid.webp" class="work"><img src="images/custom-vtuber-model-maid.webp" srcset="images/s/custom-vtuber-model-maid.webp 360w, images/t/custom-vtuber-model-maid.webp 520w, images/custom-vtuber-model-maid.webp 1000w" sizes="(max-width:700px) 46vw, (max-width:1050px) 31vw, 290px" alt="Full-body VTuber model art of a pink-haired maid with cat ears and playing cards" width="1000" height="1000" loading="lazy" decoding="async"><span class="tag">Cat-eared maid · VTuber model</span></a>
       <div class="work rig fw-wide">
-        <video class="fw-vid" src="images/live2d-model-red-dress-loop.mp4" poster="images/live2d-model-showcase-red-dress-poster.webp" muted loop playsinline preload="none" aria-label="Live2D model of a silver-haired wolf girl in a red dress: blinking, expressions and toggles"></video>
+        <video class="fw-vid" src="images/live2d-model-red-dress-loop.mp4" data-poster="images/live2d-model-showcase-red-dress-poster.webp" muted loop playsinline preload="none" aria-label="Live2D model of a silver-haired wolf girl in a red dress: blinking, expressions and toggles"></video>
         <span class="tag">Wolf girl in red · Live2D model</span>
       </div>
       <a href="images/vtuber-pet-mascot-anglercat.webp" class="work"><img src="images/vtuber-pet-mascot-anglercat.webp" srcset="images/s/vtuber-pet-mascot-anglercat.webp 360w, images/t/vtuber-pet-mascot-anglercat.webp 520w, images/vtuber-pet-mascot-anglercat.webp 1000w" sizes="(max-width:700px) 46vw, (max-width:1050px) 31vw, 290px" alt="VTuber pet: fluffy blue cat sitting on a glowing anglerfish" width="1000" height="1000" loading="lazy" decoding="async"><span class="tag">Anglerfish cat · VTuber pet</span></a>
@@ -2844,7 +2844,7 @@ $$('.services .card').forEach(c=>{const p=c.querySelector(':scope>.price'),b=c.q
   const wrap=$('#bookWrap'),root=document.documentElement;let lastFocus=null;
   const x=document.createElement('button');x.type='button';x.className='bk-close';x.setAttribute('aria-label','Close the book');x.textContent='✕';wrap.prepend(x);
   wrap.setAttribute('role','dialog');wrap.setAttribute('aria-modal','true');
-  const openBook=(id,page)=>{lastFocus=document.activeElement;root.classList.add('book-open');document.body.style.overflow='hidden';show(id||'works',page==null?(id&&id!=='works'?1:0):page);if((id||'works')==='works'&&B.cur===0)setTimeout(()=>go(1),450);setTimeout(()=>x.focus(),50);};
+  const openBook=(id,page)=>{stage.querySelectorAll('video[data-poster]').forEach(v=>{v.poster=v.dataset.poster;v.removeAttribute('data-poster');});lastFocus=document.activeElement;root.classList.add('book-open');document.body.style.overflow='hidden';show(id||'works',page==null?(id&&id!=='works'?1:0):page);if((id||'works')==='works'&&B.cur===0)setTimeout(()=>go(1),450);setTimeout(()=>x.focus(),50);};
   const closeBook=()=>{root.classList.remove('book-open');document.body.style.overflow='';stop();lastFocus&&lastFocus.focus();};
   x.onclick=closeBook;wrap.addEventListener('click',e=>{if(e.target===wrap)closeBook();});
   document.addEventListener('keydown',e=>{if(e.key==='Escape'&&root.classList.contains('book-open'))closeBook();});
@@ -2937,6 +2937,9 @@ $$('.services .card').forEach(c=>{const p=c.querySelector(':scope>.price'),b=c.q
     const tk=t.querySelector('.gal-track');if(tk)tk.addEventListener('scroll',rest,{once:true,passive:true});io.unobserve(t);}}),{rootMargin:'200px'});
   $$('.gal').forEach(g=>io.observe(g));
   const vids=[...document.querySelectorAll('.works.fw video')];if(!vids.length)return;
+  // posters load only when the videos come near (saves ~180 KB at page load)
+  const lp=v=>{if(v.dataset.poster){v.poster=v.dataset.poster;v.removeAttribute('data-poster');}};
+  if('IntersectionObserver' in window){const pio=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){lp(e.target);pio.unobserve(e.target);}}),{rootMargin:'600px'});vids.forEach(v=>pio.observe(v));}else vids.forEach(lp);
   if(matchMedia('(max-width:820px)').matches){vids.forEach(v=>v.controls=true);return;}   // phones: poster only, tap play (saves data)
   vids.forEach(v=>{
   const anyModal=()=>!!document.querySelector('.modal.show,.sd.show,.lb.show');
