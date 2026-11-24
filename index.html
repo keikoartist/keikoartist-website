@@ -1632,7 +1632,9 @@ body.xmas header:not(.kc-head)::after{background:linear-gradient(90deg,#f2628f,#
 .db-card{min-width:0}.db-date input{width:100%;min-width:0;max-width:100%;box-sizing:border-box;-webkit-appearance:none;appearance:none}
 @media (max-width:360px){.db-card{padding:16px}}
 .kc-send{flex-wrap:wrap}
-#kcFirst{flex:1 0 100%;font:inherit;font-size:16px;padding:9px 12px;border:1px solid #f6c3d4;border-radius:12px;background:#fff7fa;margin-bottom:6px;box-sizing:border-box;min-width:0}
+.kc-first{flex:1 0 100%;display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:6px}
+.kc-first input{font:inherit;font-size:16px;padding:9px 12px;border:1px solid #f6c3d4;border-radius:12px;background:#fff7fa;box-sizing:border-box;min-width:0;width:100%}
+@media (max-width:360px){.kc-first{grid-template-columns:1fr}}
 #kcFirst[hidden]{display:none}
 </style>
 </head>
@@ -1961,7 +1963,7 @@ body.xmas header:not(.kc-head)::after{background:linear-gradient(90deg,#f2628f,#
   <button type="button" class="kc-ct-open" id="kcCtOpen" hidden>📇 Leave contact</button>
   <form class="kc-send" id="kcSend">
     <input type="text" name="_honey" tabindex="-1" autocomplete="off" style="display:none">
-    <input type="text" id="kcFirst" placeholder="Your email or Discord username" autocomplete="email" maxlength="120" aria-label="Your email or Discord username, so I can reply">
+    <div class="kc-first" id="kcFirst"><input type="email" id="kcFEmail" placeholder="Your email" autocomplete="email" maxlength="120" aria-label="Your email (required)"><input type="text" id="kcFDc" placeholder="Discord username" autocomplete="off" maxlength="40" aria-label="Your Discord username (required)"></div>
     <textarea id="kcInput" placeholder="Type your question…" maxlength="2000" rows="1" aria-label="Message"></textarea>
     <button type="submit" aria-label="Send"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M3 20.5 21 12 3 3.5 3 10l12 2-12 2z"/></svg></button>
   </form>
@@ -3001,16 +3003,17 @@ let tabVisitorN=0,tabAdminN=0;const tabSync=()=>tabDot(tabVisitorN+tabAdminN);
   input.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey&&!e.isComposing){e.preventDefault();$('#kcSend').requestSubmit();}});
   $('#kcSend').addEventListener('submit',async e=>{
     e.preventDefault();const text=input.value.trim();if(!text||busy)return;errEl.textContent='';
-    if(!sess){const fc=$('#kcFirst').value.trim();if(!fc){errEl.textContent='Please add your email or Discord username so I can reply even after you leave.';$('#kcFirst').focus();return;}
-      if(!/@.+\./.test(fc)&&!/^@?[a-zA-Z0-9_.]{2,32}(#\d{4})?$/.test(fc)){errEl.textContent='Please check your email or Discord username.';$('#kcFirst').focus();return;}}
+    if(!sess){const fe=$('#kcFEmail').value.trim(),fd=$('#kcFDc').value.trim();
+      if(!fe||!fd){errEl.textContent='Please add your email and your Discord username so I can reply even after you leave.';(fe?$('#kcFDc'):$('#kcFEmail')).focus();return;}
+      if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(fe)){errEl.textContent='Please check your email address.';$('#kcFEmail').focus();return;}
+      if(!/^@?[a-zA-Z0-9_.]{2,32}(#\d{4})?$/.test(fd)){errEl.textContent='Please check your Discord username (letters, numbers, _ and . only).';$('#kcFDc').focus();return;}}
     busy=true;
     const tmp=document.createElement('div');tmp.className='kc-msg visitor pending';const p=document.createElement('p');p.textContent=text;tmp.appendChild(p);body.appendChild(tmp);scroll();
     input.value='';input.style.height='auto';
     try{
-      if(!sess){const fc=$('#kcFirst').value.trim(),isMail=/@.+\./.test(fc);
-        const j=await api({action:'start',message:text,page:location.pathname,_honey:e.target._honey.value,email:isMail?fc:'',discord:isMail?'':fc});
+      if(!sess){const j=await api({action:'start',message:text,page:location.pathname,_honey:e.target._honey.value,email:$('#kcFEmail').value.trim(),discord:$('#kcFDc').value.trim()});
         sess={id:j.id,token:j.token};save(sess);tmp.remove();j.messages.forEach(add);
-        const sys=document.createElement('div');sys.className='kc-sys';sys.textContent=isMail?'Sent ♡ I\'ll reply here and by email.':'Sent ♡ I\'ll reply here and add you on Discord.';body.appendChild(sys);sess.hasContact=true;save(sess);firstUI();ctUI();scroll();schedule();}
+        const sys=document.createElement('div');sys.className='kc-sys';sys.textContent='Sent ♡ I\'ll reply here and by email, or add you on Discord.';body.appendChild(sys);sess.hasContact=true;save(sess);firstUI();ctUI();scroll();schedule();}
       else{const j=await api({action:'send',id:sess.id,token:sess.token,message:text,since:last});tmp.remove();j.messages.forEach(add);scroll();}
     }
     catch(err){tmp.remove();input.value=text;errEl.textContent=err.message;if(err.status===401){save(null);sess=null;}}
