@@ -15,6 +15,8 @@ header('Cache-Control: no-store');
 header('Referrer-Policy: same-origin');
 
 const SMTP_HOST = 'ssl://smtp.gmail.com:465';
+const KA_CHAT = 1;
+require_once __DIR__ . '/chat-bot.php';   // automatic answer from prices.json
 const MAX_MSG = 2000;
 const MAX_NAME = 60;
 
@@ -107,6 +109,20 @@ function clean_discord(string $v): string {   // a Discord username: letters, nu
   $v = trim(ltrim(trim($v), '@'));
   return preg_match('/^[a-zA-Z0-9_.]{2,32}(#\d{4})?$/', $v) ? $v : '';
 }
+function bot_answer(string $convId, string $text, bool $first, string $email, string $name): void {   // stored as sender 'bot'; emailed only for the first message
+  try { $ans = bot_reply($text, $first); } catch (\Throwable $e) { return; }
+  if ($ans === '') return;
+  $db = db(); $now = time();
+  $db->prepare('INSERT INTO messages(conv_id, sender, agent, body, created) VALUES(?,?,?,?,?)')->execute([$convId, 'bot', 'Automatic reply', $ans, $now]);
+  if ($first && $email !== '') {
+    $nm = preg_match('/^Visitor [0-9A-F]{4}$/', $name) ? 'there' : $name; $link = 'https://keikoartist.com/#chat';
+    @chat_mail($email, 'KeikoArts got your message',
+      "Hi $nm,\n\nThanks for writing to KeikoArts! Here is an automatic answer while Keiko is away:\n\n$ans\n\nKeiko will reply personally, usually within 6 hours (WIB). Just reply to this email, or continue the chat on the website (same device): $link\n\nKeikoArts",
+      '<div style="font-family:Arial,sans-serif;color:#7a2846;font-size:14px;line-height:1.55"><p>Hi ' . htmlspecialchars($nm) . ',</p><p>Thanks for writing to KeikoArts! Here is an automatic answer while Keiko is away:</p>'
+      . '<blockquote style="margin:12px 0;padding:10px 14px;background:#fff0f5;border-left:3px solid #f2628f;border-radius:6px">' . nl2br(htmlspecialchars($ans)) . '</blockquote>'
+      . '<p>Keiko will reply personally, usually within 6 hours (WIB). Just reply to this email, or <a href="' . $link . '">continue the chat on the website</a>.</p><p>KeikoArts</p></div>');
+  }
+}
 function discord_ping(array $cfg, array $c, string $text, bool $isNew): void {
   $hook = (string)($cfg['discord_webhook'] ?? '');
   if (!preg_match('#^https://(?:ptb\.|canary\.)?(?:discord|discordapp)\.com/api/webhooks/\d+/[\w-]+$#', $hook)) { $st = json_decode((string)@file_get_contents(data_dir() . '/settings.json'), true); $hook = is_array($st) ? (string)($st['discord_webhook'] ?? '') : ''; }
@@ -187,6 +203,7 @@ switch ($action) {
     $db->commit();
     $st = $db->prepare('SELECT * FROM conversations WHERE id = ?'); $st->execute([$id]);
     discord_ping($cfg, $st->fetch(), $text, true);
+    bot_answer($id, $text, true, $email, $name);
     out(200, ['id' => $id, 'token' => $tok, 'messages' => msgs($id, 0)]);
   }
   case 'send': {
@@ -198,6 +215,8 @@ switch ($action) {
     $db->prepare('INSERT INTO messages(conv_id, sender, body, created) VALUES(?,?,?,?)')->execute([$c['id'], 'visitor', $text, $now]);
     $db->prepare('UPDATE conversations SET updated = ?, unread_admin = unread_admin + 1, status = \'open\' WHERE id = ?')->execute([$now, $c['id']]);
     discord_ping($cfg, $c, $text, false);
+    $st = $db->prepare("SELECT COUNT(*) FROM messages WHERE conv_id = ? AND sender = 'admin'"); $st->execute([$c['id']]);
+    if ((int)$st->fetchColumn() === 0) bot_answer($c['id'], $text, false, '', '');   // until Keiko has replied herself, price questions get an automatic answer
     out(200, ['messages' => msgs($c['id'], (int)($in['since'] ?? 0))]);
   }
   case 'contact': {   // visitor leaves (or changes) an email / Discord username so Keiko can reach them outside the website

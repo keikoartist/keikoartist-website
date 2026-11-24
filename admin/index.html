@@ -79,6 +79,7 @@ input:focus,textarea:focus{border-color:var(--pink-2);box-shadow:0 0 0 3px rgba(
 .m small{font-size:10.5px;color:var(--muted);padding:0 6px}
 .m.visitor{align-self:flex-start}.m.visitor p{background:#fff;border:1px solid var(--line);border-bottom-left-radius:4px}
 .m.admin{align-self:flex-end;align-items:flex-end}.m.admin p{background:var(--pink);color:#fff;border-bottom-right-radius:4px}
+.m.bot{align-self:flex-end;align-items:flex-end}.m.bot p{background:#f3ecff;color:#4a2a63;border:1px dashed #c9a7ff;border-bottom-right-radius:4px;white-space:pre-line}
 .canned{display:flex;gap:6px;overflow-x:auto;padding:8px 12px 0;background:#fff;border-top:1px solid var(--line)}
 .canned button{flex:none;border:1px solid var(--line);background:var(--soft);border-radius:999px;padding:5px 11px;font-size:12px;cursor:pointer;color:var(--ink)}
 .compose{display:flex;gap:8px;align-items:flex-end;padding:10px 12px;background:#fff}
@@ -364,7 +365,7 @@ async function loadList(){
     const un=Number(c.unread_admin)||0;
     const b=el('button','item'+(un?' unread':'')+(cur===c.id?' on':''));b.type='button';
     b.appendChild(el('b',null,c.name||'Visitor'));b.appendChild(el('time',null,fmt(c.updated)));
-    b.appendChild(el('span',null,(c.last_sender==='admin'?'You: ':'')+(c.last||'')));
+    b.appendChild(el('span',null,(c.last_sender==='admin'?'You: ':c.last_sender==='bot'?'Auto: ':'')+(c.last||'')));
     if(un){const d=el('i','dot',String(un));b.appendChild(d);}
     if(selMode){const k=el('span','chk',sel.has(c.id)?'✓':'');b.querySelector('b').prepend(k);if(sel.has(c.id))b.classList.add('sel');}
     b.onclick=()=>{if(selMode){sel.has(c.id)?sel.delete(c.id):sel.add(c.id);updSel();loadList();}else openThread(c.id);};box.appendChild(b);
@@ -386,7 +387,7 @@ $('#selDel').onclick=async()=>{const d=$('#selDel');if(!sel.size)return;
 function addMsg(m){
   if($(`.m[data-id="${m.id}"]`))return;
   const d=el('div','m '+m.sender);d.dataset.id=m.id;d.appendChild(el('p',null,m.body));
-  d.appendChild(el('small',null,(m.sender==='admin'?(m.agent||'Keiko')+' · ':'')+fmt(m.created)));
+  d.appendChild(el('small',null,(m.sender==='bot'?'Automatic reply · ':m.sender==='admin'?(m.agent||'Keiko')+' · ':'')+fmt(m.created)));
   $('#msgs').appendChild(d);last=Math.max(last,m.id);
 }
 async function openThread(id){

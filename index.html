@@ -1639,7 +1639,7 @@ body.xmas header:not(.kc-head)::after{background:linear-gradient(90deg,#f2628f,#
 .add-w{display:inline-flex;align-items:center;gap:6px}
 .add-q{display:none;width:58px;font:600 15px Poppins,sans-serif;padding:7px 6px;border:1.5px solid var(--pink-2);border-radius:10px;text-align:center;color:var(--ink);background:#fff}
 .tags .add-w input[name=add]:checked~input.add-q{display:inline-block!important;position:static!important;opacity:1!important;pointer-events:auto!important;width:58px!important;height:auto!important}
-.kc-auto p{white-space:pre-line}.kc-autolbl{display:block;margin-top:4px;font-size:11.5px;color:var(--muted)}
+.kc-auto p{white-space:pre-line;background:#f6f0ff!important;color:#4a2a63!important;border:1px dashed #d4bdf3}.kc-autolbl{display:block;margin-top:4px;font-size:11.5px;color:var(--muted)}
 @media (min-width:821px) and (max-width:1050px){.works.fw .work.fw-wide{grid-column:span 3}}
 </style>
 </head>
@@ -2979,18 +2979,12 @@ let tabVisitorN=0,tabAdminN=0;const tabSync=()=>tabDot(tabVisitorN+tabAdminN);
   }
   function add(m){
     if(m.id&&body.querySelector(`[data-id="${m.id}"]`))return;
-    const d=document.createElement('div');d.className='kc-msg '+(m.sender==='admin'?'admin':'visitor');if(m.id)d.dataset.id=m.id;
+    const bot=m.sender==='bot';const d=document.createElement('div');d.className='kc-msg '+(m.sender==='admin'||bot?'admin':'visitor')+(bot?' kc-auto':'');if(m.id)d.dataset.id=m.id;
     const p=document.createElement('p');p.textContent=m.body;d.appendChild(p);
-    const sm=document.createElement('small');sm.textContent=(m.sender==='admin'?(m.agent||'KeikoArts')+' · ':'')+t(m.created);d.appendChild(sm);
+    const sm=document.createElement('small');sm.textContent=(bot?'Automatic reply · ':m.sender==='admin'?(m.agent||'KeikoArts')+' · ':'')+t(m.created);d.appendChild(sm);
     body.appendChild(d);if(m.id)last=Math.max(last,m.id);
   }
   const scroll=()=>{body.scrollTop=body.scrollHeight};
-  // automatic first reply (shown on this device only, labelled as automatic; prices come from SERVICES so they always match the order form)
-  function autoReply(q){const V=SERVICES.VTuber,P=n=>money((V.packages.find(x=>x[0]===n)||[0,0])[1]),A=n=>money((V.addons.find(x=>x[0]===n)||[0,0])[1]);
-    let t='Thanks for your message! Keiko will reply here and by email, usually within 6 hours (WIB).';
-    if(/price|how much|cost|rate|\$|quote|budget|harga/i.test(q))t+='\n\nQuick prices (USD, + 13% tax): Live2D VTuber Art + Rig: bust '+P('Bust · Art + Rig')+', half body '+P('Half body · Art + Rig')+', full body '+P('Full body · Art + Rig')+'. Add-ons: VBridger +'+A('VBridger')+', hand toggle +'+A('Hand toggle')+' each, extra expression / toggle +'+A('Extra expression / toggle')+' each.';
-    t+='\n\nFull price list: keikoartist.com/vtuber-pricing · The order form shows your exact total before you send it.';
-    const d=document.createElement('div');d.className='kc-msg admin kc-auto';const p=document.createElement('p');p.textContent=t;const sm=document.createElement('small');sm.className='kc-autolbl';sm.textContent='Automatic reply';d.append(p,sm);body.appendChild(d);}
   function firstUI(){const f=$('#kcFirst');if(f)f.hidden=!!sess;}
   function mode(){firstUI();ctUI();}
   // contact details: so Keiko can reply by email / Discord after the visitor leaves
@@ -3033,7 +3027,7 @@ let tabVisitorN=0,tabAdminN=0;const tabSync=()=>tabDot(tabVisitorN+tabAdminN);
     try{
       if(!sess){const j=await api({action:'start',message:text,page:location.pathname,_honey:e.target._honey.value,email:$('#kcFEmail').value.trim(),discord:$('#kcFDc').value.trim()});
         sess={id:j.id,token:j.token};save(sess);tmp.remove();j.messages.forEach(add);
-        const sys=document.createElement('div');sys.className='kc-sys';sys.textContent='Sent ♡ I\'ll reply here and by email, or add you on Discord.';body.appendChild(sys);sess.hasContact=true;save(sess);firstUI();ctUI();autoReply(text);scroll();schedule();}
+        sess.hasContact=true;save(sess);firstUI();ctUI();scroll();schedule();}
       else{const j=await api({action:'send',id:sess.id,token:sess.token,message:text,since:last});tmp.remove();j.messages.forEach(add);scroll();}
     }
     catch(err){tmp.remove();input.value=text;errEl.textContent=err.message;if(err.status===401){save(null);sess=null;}}

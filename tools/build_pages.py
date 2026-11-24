@@ -946,4 +946,6 @@ def sm_url(u, p):
 sm = ('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" '
       'xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">\n' + ''.join(sm_url(u, p) for u, p in urls) + '</urlset>\n')
 open(os.path.join(ROOT, 'sitemap.xml'), 'w', encoding='utf-8').write(sm)
-print('built', ', '.join(PAGES), '+ 404.html + sitemap.xml')
+# prices for the chat's automatic reply (chat-api.php reads this; same data as the order form)
+open(os.path.join(ROOT, 'prices.json'), 'w', encoding='utf-8').write(json.dumps({n: {'from': s['from'], 'eta': s.get('eta', ''), 'qty': bool(s.get('qty')), 'packages': s['packages'], 'addons': s['addons']} for n, s in SERVICES.items()}, ensure_ascii=False, indent=1))
+print('built', ', '.join(PAGES), '+ 404.html + sitemap.xml + prices.json')

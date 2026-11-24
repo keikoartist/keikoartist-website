@@ -1,0 +1,444 @@
+{
+ "VTuber": {
+  "from": 100,
+  "eta": "2–3 weeks",
+  "qty": false,
+  "packages": [
+   [
+    "Bust · Art only",
+    100,
+    "Ready-to-rig PSD"
+   ],
+   [
+    "Half body · Art only",
+    150,
+    "Ready-to-rig PSD"
+   ],
+   [
+    "Full body · Art only",
+    250,
+    "Ready-to-rig PSD"
+   ],
+   [
+    "Bust · Art + Rig",
+    150,
+    "Live2D model + VTS file"
+   ],
+   [
+    "Half body · Art + Rig",
+    250,
+    "Live2D model + VTS file"
+   ],
+   [
+    "Full body · Art + Rig",
+    400,
+    "Live2D model + VTS file"
+   ],
+   [
+    "Bust · Rig only",
+    100,
+    "Send me your PSD"
+   ],
+   [
+    "Half body · Rig only",
+    150,
+    "Send me your PSD"
+   ],
+   [
+    "Full body · Rig only",
+    250,
+    "Send me your PSD"
+   ]
+  ],
+  "addons": [
+   [
+    "Extra expression / toggle",
+    20
+   ],
+   [
+    "Hand toggle",
+    30
+   ],
+   [
+    "VBridger",
+    200
+   ],
+   [
+    "Extra outfit",
+    100
+   ],
+   [
+    "Extra hairstyle",
+    100
+   ],
+   [
+    "Commercial / merch rights",
+    30
+   ]
+  ]
+ },
+ "VTuber Packages": {
+  "from": 250,
+  "eta": "2–3 weeks",
+  "qty": false,
+  "packages": [
+   [
+    "Starter",
+    250,
+    "Model art + Live2D rig + 3 expressions"
+   ],
+   [
+    "Debut",
+    380,
+    "Starter + 6 emotes + 1 background + overlay"
+   ],
+   [
+    "Full Debut",
+    520,
+    "Debut + PFP + VTuber logo + stream screens"
+   ]
+  ],
+  "addons": [
+   [
+    "Extra emote",
+    5
+   ],
+   [
+    "Extra outfit",
+    40
+   ],
+   [
+    "VTuber pet",
+    55
+   ],
+   [
+    "Commercial / merch rights",
+    30
+   ]
+  ]
+ },
+ "Background": {
+  "from": 100,
+  "eta": "7–10 days",
+  "qty": false,
+  "packages": [
+   [
+    "Static",
+    100,
+    "1 scene, 1920×1080"
+   ],
+   [
+    "Animated",
+    130,
+    "Looping MP4/WebM"
+   ]
+  ],
+  "addons": [
+   [
+    "Day / night variant",
+    40
+   ],
+   [
+    "Blurred & clean versions",
+    10
+   ],
+   [
+    "Commercial / merch rights",
+    30
+   ]
+  ]
+ },
+ "Stream Overlay": {
+  "from": 45,
+  "eta": "10–14 days",
+  "qty": false,
+  "packages": [
+   [
+    "Screens set",
+    45,
+    "Starting Soon, BRB and Ending screens"
+   ],
+   [
+    "Full overlay pack",
+    150,
+    "Screens + game screen + talking/chatting screen + 6 panels"
+   ]
+  ],
+  "addons": [
+   [
+    "Simple loop animation",
+    30
+   ],
+   [
+    "Advanced loop animation",
+    50
+   ],
+   [
+    "Extra text screen",
+    20
+   ],
+   [
+    "Custom chibi doll",
+    15
+   ],
+   [
+    "Pet",
+    20
+   ],
+   [
+    "PSD file",
+    50
+   ],
+   [
+    "Commercial / merch rights",
+    30
+   ]
+  ]
+ },
+ "Custom PFP": {
+  "from": 36,
+  "eta": "3–5 days",
+  "qty": false,
+  "packages": [
+   [
+    "Headshot",
+    36,
+    "Simple background"
+   ],
+   [
+    "Bust",
+    41,
+    "Up to chest"
+   ],
+   [
+    "Half body",
+    46,
+    "Up to waist"
+   ]
+  ],
+  "addons": [
+   [
+    "Extra character",
+    20
+   ],
+   [
+    "Detailed background",
+    30
+   ],
+   [
+    "Commercial / merch rights",
+    30
+   ]
+  ]
+ },
+ "Banner": {
+  "from": 45,
+  "eta": "5–7 days",
+  "qty": false,
+  "packages": [
+   [
+    "Eye banner",
+    45,
+    "Static, 3:1"
+   ],
+   [
+    "Mouth banner",
+    45,
+    "Static, 3:1"
+   ]
+  ],
+  "addons": [
+   [
+    "Asymmetry banner",
+    15
+   ],
+   [
+    "Night lighting",
+    20
+   ],
+   [
+    "Day + night versions",
+    40
+   ],
+   [
+    "Simple animation",
+    30
+   ],
+   [
+    "Advanced animation",
+    50
+   ],
+   [
+    "PSD file",
+    50
+   ],
+   [
+    "Commercial / merch rights",
+    30
+   ]
+  ]
+ },
+ "VTuber Logo": {
+  "from": 30,
+  "eta": "5–7 days",
+  "qty": false,
+  "packages": [
+   [
+    "Custom logo",
+    30,
+    "Stylized name lettering, PNG"
+   ],
+   [
+    "Logo + icon",
+    40,
+    "Logo plus small icon / emblem"
+   ]
+  ],
+  "addons": [
+   [
+    "Logo animation",
+    20
+   ],
+   [
+    "Commercial / merch rights",
+    30
+   ]
+  ]
+ },
+ "PNGTuber": {
+  "from": 60,
+  "eta": "7–10 days",
+  "qty": false,
+  "packages": [
+   [
+    "Bust-up",
+    60,
+    "Idle + talking, blinking"
+   ],
+   [
+    "Thigh-up / full body",
+    100,
+    "Idle + talking, blinking"
+   ]
+  ],
+  "addons": [
+   [
+    "Extra expression",
+    20
+   ],
+   [
+    "Props / accessories",
+    0
+   ],
+   [
+    "Commercial / merch rights",
+    30
+   ]
+  ]
+ },
+ "Emotes": {
+  "from": 5,
+  "eta": "5–7 days",
+  "qty": true,
+  "packages": [
+   [
+    "Static emote",
+    5,
+    "Price per emote"
+   ],
+   [
+    "Animated emote",
+    15,
+    "Price per emote"
+   ]
+  ],
+  "addons": [
+   [
+    "Sub badge set (3)",
+    15
+   ],
+   [
+    "Twitch-ready resizing",
+    0
+   ],
+   [
+    "Commercial / merch rights",
+    30
+   ]
+  ]
+ },
+ "VTuber Pet": {
+  "from": 63,
+  "eta": "10–14 days",
+  "qty": false,
+  "packages": [
+   [
+    "Pet art",
+    63,
+    "Layered, ready to rig"
+   ],
+   [
+    "Pet art + rig",
+    110,
+    "Rigged for VTS"
+   ]
+  ],
+  "addons": [
+   [
+    "Extra expression",
+    10
+   ],
+   [
+    "Accessory",
+    15
+   ],
+   [
+    "Commercial / merch rights",
+    30
+   ]
+  ]
+ },
+ "Chibi VTuber": {
+  "from": 45,
+  "eta": "10–14 days",
+  "qty": false,
+  "packages": [
+   [
+    "Chibi model art",
+    45,
+    "Full body + 3 expressions, ready to rig"
+   ]
+  ],
+  "addons": [
+   [
+    "Extra toggle",
+    5
+   ],
+   [
+    "Extra hairstyle",
+    10
+   ],
+   [
+    "Extra outfit",
+    20
+   ],
+   [
+    "Commercial / merch rights",
+    30
+   ]
+  ]
+ },
+ "Custom Inquiry": {
+  "from": 0,
+  "eta": "Ask",
+  "qty": false,
+  "packages": [
+   [
+    "Custom commission",
+    0,
+    "Describe it below"
+   ]
+  ],
+  "addons": []
+ }
+}
