@@ -563,7 +563,7 @@ if (($_GET['a'] ?? '') === 'track') {
   $steps = [['Order received', date('M j, Y', (int)$o['created']), true],
             ['Payment', $waitPrice ? 'Keiko is checking your idea and price; your invoice comes by email' : ($paid >= $total - 0.01 && $total > 0 ? 'Paid in full' : ($paid > 0 ? money2($paid) . ' of ' . money2($total) . ' paid' : 'Waiting for payment')), $paid > 0 || $done]];
   foreach (STAGES as $i => $nm) $steps[] = [$nm, '', $done || ($si !== false && $i <= $si)];
-  $steps[] = ['Delivered', $done ? 'Enjoy your art! ♡' : '', $done];
+  $steps[] = ['Delivered', $done ? 'Your files were sent by email. Enjoy your art! ♡' : 'Final files come by email', $done];
   $cur = -1; foreach ($steps as $i => $x) if ($x[2]) $cur = $i;
   $li = '';
   foreach ($steps as $i => $x) {
