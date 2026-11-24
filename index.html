@@ -1669,6 +1669,13 @@ body.xmas header:not(.kc-head)::after{background:linear-gradient(90deg,#f2628f,#
 .cart-mini .btn{padding:9px 16px;font-size:13.5px}
 #addCartBtn{display:inline-flex;align-items:center;gap:6px}
 @media (max-width:560px){.ci{grid-template-columns:48px minmax(0,1fr) auto}.ci-th{width:48px;height:48px;grid-row:1/3}.ci-t{grid-column:2}.ci-p{grid-column:2;grid-row:2}.ci-a{grid-column:3;grid-row:1/3;flex-direction:column}.cart-btns .btn{flex:1}#addCartBtn .acl{display:none}#addCartBtn{padding:11px 12px!important}}
+
+@media (max-width:560px){#prevBtn{width:44px;height:44px;min-width:44px;padding:0 0 3px!important;display:grid;place-items:center;flex:none;font-size:0!important}#prevBtn .pbl{display:none}#prevBtn::before{content:"‹";font-size:24px;line-height:1}
+  #addCartBtn{width:44px;height:44px;padding:0!important;justify-content:center;flex:none}#addCartBtn .ic{margin:0}
+  #orderModal .mnav{gap:8px}.mtot{flex:1;text-align:center}.mtot small{font-size:10.5px}.mtot b{font-size:18px!important;text-overflow:clip}.mtot small{white-space:nowrap}}
+@media (max-width:380px){.so-l{display:none}.mtot small{font-size:9.5px!important}}
+@media (max-width:360px){.mtot b{font-size:15.5px!important}#orderModal .mnav{gap:6px!important}#orderModal .mnav{padding-left:12px!important;padding-right:12px!important}#sendBtn{padding-left:12px!important;padding-right:12px!important}}
+.rv-ctr{min-width:64px;text-align:center;font:600 14px Poppins,sans-serif;color:var(--muted)}
 </style>
 </head>
 <body>
@@ -2229,10 +2236,10 @@ body.xmas header:not(.kc-head)::after{background:linear-gradient(90deg,#f2628f,#
 
         <p class="err" id="err"></p>
         <div class="mnav" id="mnav">
-          <button type="button" class="btn btn-ghost" id="prevBtn" aria-label="Back to the service list">Back</button>
+          <button type="button" class="btn btn-ghost" id="prevBtn" aria-label="Back"><span class="pbl">Back</span></button>
           <div class="mtot" id="navTot"><small id="navLbl">Total (incl. 13% tax)</small><b id="navTotal">$0</b></div>
           <button type="button" class="btn btn-ghost" id="addCartBtn" aria-label="Add to cart"><svg class="ic" viewBox="0 0 24 24" width="21" height="21" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M7.2 10a4.8 4.8 0 0 1 9.6 0"/><path d="M3.5 10h17l-1.6 8.3a2 2 0 0 1-2 1.7H7.1a2 2 0 0 1-2-1.7Z"/><path d="M12 17.4s-2.7-1.5-2.7-3.4a1.35 1.35 0 0 1 2.7-.5 1.35 1.35 0 0 1 2.7.5c0 1.9-2.7 3.4-2.7 3.4Z" fill="#f2628f" stroke="none"/></svg><span class="acl">Add to cart</span></button>
-          <button type="submit" class="btn btn-pink" id="sendBtn">Send Order <svg class="ic" viewBox="0 0 24 24" width="17" height="17" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10Z" fill="none" stroke="currentColor" stroke-width="2"/></svg></button>
+          <button type="submit" class="btn btn-pink" id="sendBtn">Send<span class="so-l"> Order</span> <svg class="ic" viewBox="0 0 24 24" width="17" height="17" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10Z" fill="none" stroke="currentColor" stroke-width="2"/></svg></button>
         </div>
       </form>
     </div>
@@ -2544,7 +2551,7 @@ function addToCart(){
   const c=readCart(),ei=EDIT_ID?c.findIndex(x=>x.id===EDIT_ID):-1;if(ei<0&&c.length>=CART_MAX){err(`Your cart is full (${CART_MAX} services). Please check out first.`);return;}
   const ls=ORDER.lines.filter(l=>!/^Tax \(13%\)/.test(l[0])).map((l,i)=>[i?'+ '+l[0]:l[0],l[1]]);
   const sel=[...$$('#sheet input[type=radio]:checked'),...$$('#sheet input[type=checkbox]:checked')].map(x=>x.id).filter(id=>id&&id!=='agree'&&!/^pp\d/.test(id)),aq={};$$('#addOpts .add-q').forEach(x=>aq[x.id]=x.value);
-  const item={id:ei>=0?EDIT_ID:Date.now().toString(36)+Math.random().toString(36).slice(2,5),t:Date.now(),sel,aq,svc:svcName,pkg:$('#fPackage').value,qty:+$('#fQty').value||1,addons:$('#fAddons').value,lines:ls,sub:r2(ls.reduce((a,l)=>a+l[1],0)),details:$('#fDetails').value.trim().slice(0,1500)};
+  const item={id:ei>=0?EDIT_ID:Date.now().toString(36)+Math.random().toString(36).slice(2,5),t:Date.now(),sel,aq,svc:svcName,pkg:$('#fPackage').value,qty:+$('#fQty').value||1,addons:$('#fAddons').value,lines:ls,sub:r2(ls.reduce((a,l)=>a+l[1],0)),details:$('#fDetails').value.split('\n').filter(l=>!/^\s*[^:\n]{1,60}:\s*$/.test(l)).join('\n').replace(/\n{3,}/g,'\n\n').trim().slice(0,1500)};
   if(ei>=0)c[ei]=item;else c.push(item);EDIT_ID=null;
   writeCart(c);
   $('#fDetails').value='';clearDraft();go(3);
@@ -2773,7 +2780,7 @@ function saveInvoice(last){try{if(last&&last.id&&last.payUrl&&!/PREVIEW|0000-000
 function readInvoice(){try{const v=JSON.parse(localStorage.getItem(INV_KEY)||'null');return v&&v.id&&Date.now()-v.savedAt<45*864e5?v:null;}catch(_){return null;}}
 function dropInvoice(id){try{const v=readInvoice();if(!v||!id||v.id===id)localStorage.removeItem(INV_KEY);}catch(_){}}
 function setBusy(on,label){const sb=$('#sendBtn');if(on){sb.dataset.busy='1';sb.textContent=label;sb.style.opacity='.75';$('#prevBtn').style.visibility='hidden';}
-  else{delete sb.dataset.busy;sb.innerHTML='Send Order <svg class="ic" viewBox="0 0 24 24" width="17" height="17" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10Z" fill="none" stroke="currentColor" stroke-width="2"/></svg>';sb.style.opacity='';$('#prevBtn').style.visibility='visible';}}
+  else{delete sb.dataset.busy;sb.innerHTML='Send<span class="so-l"> Order</span> <svg class="ic" viewBox="0 0 24 24" width="17" height="17" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10Z" fill="none" stroke="currentColor" stroke-width="2"/></svg>';sb.style.opacity='';$('#prevBtn').style.visibility='visible';}}
 function resetOrderForm(){form.reset();$('#fEmail').disabled=false;$('#fAuto').disabled=false;upState.forEach(s=>{if(s.url&&s.url.startsWith('blob:'))URL.revokeObjectURL(s.url);});upState.clear();upToken=hex(32);refFiles=[];renderRefs();clearDraft();$('#draftNote').hidden=true;sheetStart=0;$('#refSlots').innerHTML='';const m=$('#refMsg');if(m)m.textContent='';setBusy(false);err('');}
 const LIVE_SITE=/(^|\.)keikoartist\.com$/i.test(location.hostname)||/^(localhost|127\.0\.0\.1)$/.test(location.hostname);
 function postOrder(fd,onProgress){
@@ -3284,16 +3291,15 @@ let tabVisitorN=0,tabAdminN=0;const tabSync=()=>tabDot(tabVisitorN+tabAdminN);
 (function(){
   const g=$('.rv-grid'),nav=$('.rv-nav');if(!g||!nav)return;
   const cards=[...g.querySelectorAll('.rv-card')],dots=nav.querySelector('.rv-dots'),prev=nav.querySelector('.rv-prev'),next=nav.querySelector('.rv-next');
-  dots.innerHTML=cards.map((_,i)=>`<button type="button" aria-label="Review ${i+1} of ${cards.length}"></button>`).join('');
-  const db=[...dots.children];
+  dots.innerHTML='<span class="rv-ctr" aria-live="polite"></span>';const ctr=dots.firstChild;
   const step=()=>cards.length>1?(cards[1].offsetLeft-cards[0].offsetLeft)||g.clientWidth:g.clientWidth;
   const cur=()=>Math.max(0,Math.min(cards.length-1,Math.round(g.scrollLeft/step())));
   const go=i=>{i=Math.max(0,Math.min(cards.length-1,i));g.scrollTo({left:cards[i].offsetLeft-cards[0].offsetLeft,behavior:'smooth'});};
   const fit=i=>{g.style.height=getComputedStyle(nav).display==='none'?'':(cards[i].offsetHeight+6)+'px';};   // phones: carousel as tall as the card shown
-  const upd=()=>{const i=cur();db.forEach((d,k)=>d.setAttribute('aria-current',String(k===i)));prev.disabled=i===0;next.disabled=i===cards.length-1;fit(i);};
+  const upd=()=>{const i=cur();ctr.textContent=(i+1)+' / '+cards.length;prev.disabled=i===0;next.disabled=i===cards.length-1;fit(i);};
   addEventListener('resize',()=>fit(cur()),{passive:true});
   let raf=0;g.addEventListener('scroll',()=>{cancelAnimationFrame(raf);raf=requestAnimationFrame(upd);},{passive:true});
-  db.forEach((d,k)=>d.onclick=()=>go(k));prev.onclick=()=>go(cur()-1);next.onclick=()=>go(cur()+1);
+  prev.onclick=()=>go(cur()-1);next.onclick=()=>go(cur()+1);
   if('IntersectionObserver' in window){const io=new IntersectionObserver(es=>{if(es[0].isIntersecting){io.disconnect();upd();}},{rootMargin:'400px'});io.observe(g);}else upd();   // measure only when the reviews come near (saves layout work at load)
   if('IntersectionObserver' in window)new IntersectionObserver(es=>es.forEach(e=>document.body.classList.toggle('in-reviews',e.isIntersecting)),{rootMargin:'-85% 0px 0px 0px'}).observe($('#reviews'));
 })();
