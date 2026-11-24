@@ -1,0 +1,39 @@
+name: Debug iPhone Safari errors (manual)
+# Opens keikoartist.com in WebKit with iPhone emulation and prints every JavaScript error with its location.
+on:
+  workflow_dispatch:
+permissions: {}
+jobs:
+  webkit:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    container:
+      image: mcr.microsoft.com/playwright/python:v1.48.0-noble
+      options: --ipc=host
+    env:
+      HOME: /root
+    steps:
+      - name: Load the homepage as iPhone Safari and Mac Safari
+        run: |
+          cat > d.py <<'PY'
+          import asyncio
+          from playwright.async_api import async_playwright
+          async def go(p, label, dev):
+              br = await p.webkit.launch()
+              ctx = await br.new_context(**(p.devices[dev] if dev else {}))
+              pg = await ctx.new_page()
+              pg.on('pageerror', lambda e: print(f'::notice::[{label}] pageerror: {e.message} | stack: {(e.stack or "")[:400]}'))
+              pg.on('console', lambda m: m.type == 'error' and print(f'::notice::[{label}] console: {m.text[:300]} @ {m.location}'))
+              await pg.goto('https://keikoartist.com/?dryrun=1', wait_until='load')
+              await pg.wait_for_timeout(3000)
+              ua = await pg.evaluate('navigator.userAgent')
+              ok = await pg.evaluate('typeof openOrder')
+              print(f'::notice::[{label}] UA {ua} | openOrder: {ok}')
+              await br.close()
+          async def main():
+              async with async_playwright() as p:
+                  await go(p, 'iPhone', 'iPhone 13')
+                  await go(p, 'Mac', None)
+          asyncio.run(main())
+          PY
+          python3 d.py
