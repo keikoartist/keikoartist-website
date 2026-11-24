@@ -68,5 +68,16 @@ function bot_reply(string $msg, bool $first): string {
     $g = function ($n) use ($vt) { foreach ($vt['packages'] as $p) if ($p[0] === $n) return bot_money($p[1]); return '?'; };
     $out[] = "Live2D VTuber prices (USD, + 13% tax): Art + Rig bust " . $g('Bust · Art + Rig') . ", half body " . $g('Half body · Art + Rig') . ", full body " . $g('Full body · Art + Rig') . ". Art only from " . $g('Bust · Art only') . ".\nFull list: keikoartist.com/vtuber-pricing";
   }
+  // nothing specific matched: the first message still gets a useful overview (prices, slots, how to order)
+  if ($first && count($out) === 1 && $vt) {
+    $g = function ($n) use ($vt) { foreach ($vt['packages'] as $p) if ($p[0] === $n) return bot_money($p[1]); return '?'; };
+    $sl = $P['_status']['slots']['VTuber'] ?? null; $open = !isset($P['_status']['open']) || $P['_status']['open'];
+    $out[] = "While you wait, the basics:\n- Live2D VTuber model (art + rig): bust " . $g('Bust · Art + Rig') . ", half body " . $g('Half body · Art + Rig') . ", full body " . $g('Full body · Art + Rig') . " (+ 13% tax)"
+      . "\n- PNGTuber, emotes, overlays, logos and more: keikoartist.com/vtuber-pricing"
+      . "\n- " . ($open ? 'Commissions are open' . ($sl !== null ? ' (' . (int)$sl . ' VTuber slots left)' : '') . ', every commission done within 3 weeks' : 'Commissions are closed right now')
+      . "\n- Order form: keikoartist.com/?order=VTuber";
+  }
+  // later messages before Keiko replies: a short "got it" when nothing matched (the chat API sends it at most once an hour)
+  if (!$first && !$out) $out[] = "Got it! Keiko has your message and will reply here soon. For a faster reply, message Keiko on Discord: discord.gg/FbgWxMPjf";
   return implode("\n\n", $out);
 }

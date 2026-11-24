@@ -116,6 +116,10 @@ function bot_answer(string $convId, string $text, bool $first, string $email, st
   try { $ans = bot_reply($text, $first); } catch (\Throwable $e) { return; }
   if ($ans === '') return;
   $db = db(); $now = time();
+  if (!$first && strpos($ans, 'Got it! Keiko has your message') === 0) {   // the short "got it" at most once an hour per chat
+    $st = $db->prepare("SELECT MAX(created) FROM messages WHERE conv_id = ? AND sender = 'bot'"); $st->execute([$convId]);
+    if ($now - (int)$st->fetchColumn() < 3600) return;
+  }
   $db->prepare('INSERT INTO messages(conv_id, sender, agent, body, created) VALUES(?,?,?,?,?)')->execute([$convId, 'bot', 'Automatic reply', $ans, $now]);
   if ($first && $email !== '') {
     $nm = preg_match('/^Visitor [0-9A-F]{4}$/', $name) ? 'there' : $name; $link = 'https://keikoartist.com/#chat';
@@ -263,7 +267,7 @@ switch ($action) {
     $db->prepare('UPDATE conversations SET updated = ?, unread_admin = unread_admin + 1, status = \'open\' WHERE id = ?')->execute([$now, $c['id']]);
     discord_ping($cfg, $c, $text, false);
     $st = $db->prepare("SELECT COUNT(*) FROM messages WHERE conv_id = ? AND sender = 'admin'"); $st->execute([$c['id']]);
-    if ((int)$st->fetchColumn() === 0) bot_answer($c['id'], $text, false, '', '');   // until Keiko has replied herself, price questions get an automatic answer
+    if ((int)$st->fetchColumn() === 0) bot_answer($c['id'], $text, false, '', '');   // until Keiko has replied herself, every message gets an automatic answer (short "got it" at most once an hour)
     out(200, ['messages' => msgs($c['id'], (int)($in['since'] ?? 0))]);
   }
   case 'contact': {   // visitor leaves (or changes) an email / Discord username so Keiko can reach them outside the website
