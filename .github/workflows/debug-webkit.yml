@@ -26,6 +26,15 @@ jobs:
               pg.on('console', lambda m: m.type == 'error' and print(f'::notice::[{label}] console: {m.text[:300]} @ {m.location}'))
               await pg.goto('https://keikoartist.com/?dryrun=1', wait_until='load')
               await pg.wait_for_timeout(3000)
+              try:
+                  await pg.locator('#svcAll').scroll_into_view_if_needed(timeout=10000); await pg.click('#svcAll', timeout=10000)
+                  print(f'::notice::[{label}] svcAll clicked')
+              except Exception as e: print(f'::notice::[{label}] svcAll FAIL {str(e)[:200]}')
+              await pg.wait_for_timeout(1500)
+              info = await pg.evaluate('''() => { const h=[...document.querySelectorAll('.card h3')].find(x=>x.textContent.trim()==='Custom Inquiry'); if(!h) return 'no custom card';
+                const c=h.closest('.card'), b=c.querySelector('[data-order]'), r=c.getBoundingClientRect(), cs=getComputedStyle(c);
+                return 'card display '+cs.display+' vis '+cs.visibility+' h '+Math.round(r.height)+' btn '+(b?getComputedStyle(b).display:'none')+' | svcAll text '+((document.querySelector('#svcAll')||{}).textContent||'').trim()+' | grid class '+(c.parentElement.className); }''')
+              print(f'::notice::[{label}] {info}')
               ua = await pg.evaluate('navigator.userAgent')
               ok = await pg.evaluate('typeof openOrder')
               print(f'::notice::[{label}] UA {ua} | openOrder: {ok}')
