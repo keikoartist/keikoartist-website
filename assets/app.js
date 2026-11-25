@@ -981,12 +981,12 @@ const slotTxt=k=>{if(typeof SLOTS==='undefined'||!SLOTS.open||!SLOTS.per||!(k in
 })();
 
 {const c=$$('#services .card').find(x=>((x.querySelector('h3')||{}).textContent||'').trim()==='VTuber Packages');const m=Math.max(0,...[0,1,2].map(pkgSaving));
-  if(c&&m){const pr=c.querySelector('.price'),s=document.createElement('span');s.className='psave';s.textContent=`Debut packages save up to $${m} vs buying separately`;pr&&pr.appendChild(s);}}
+  if(c&&m){const pr=c.querySelector('.price'),s=document.createElement('span');s.className='psave';s.textContent=`Save up to $${m} vs buying separately`;pr&&pr.appendChild(s);}}
 // buyer helpers: installments on the cards, "start small", which-package quiz, work in progress (real numbers from the orders)
 (function(){
   const fromMove=k=>{const sv=SERVICES[k];if(!sv)return 0;const mv=sv.packages.filter(p=>/Art \+ Rig/.test(p[0])).map(p=>p[1]);return mv.length?Math.min(...mv):sv.from;};
   $$('#services .card').forEach(c=>{const k=(c.querySelector('h3')||{}).textContent;if(!k||!SERVICES[k.trim()]||SERVICES[k.trim()].quote)return;const base=fromMove(k.trim());if(base<150)return;
-    const third=Math.ceil(base*(1+TAX)/3*100)/100,pr=c.querySelector('.price');if(!pr)return;const s=document.createElement('span');s.className='pinst';s.textContent=`or 3 payments of ${money2(third)} (incl. PayPal fee)`;pr.appendChild(s);});
+    const third=Math.ceil(base*(1+TAX)/3*100)/100,pr=c.querySelector('.price');if(!pr)return;const s=document.createElement('span');s.className='pinst';s.textContent=`or 3 × ${money2(third)} (incl. fee)`;pr.appendChild(s);});
   const small=[['Emotes','emotes for your channel'],['PNGTuber','a simple talking avatar'],['Custom PFP','a profile picture of your character']].filter(([k])=>SERVICES[k]);
   $('#startSmallList').innerHTML=small.map(([k,d])=>`<a href="#order" data-order="${esc(k)}"><span>${esc(k)}<small style="display:block;font-weight:400;color:var(--muted);font-size:12.5px">${esc(d)}</small></span><b>from ${money(SERVICES[k].from)}${SERVICES[k].qty?' each':''}</b></a>`).join('');
   const ans={};

@@ -1741,6 +1741,15 @@ body.xmas header:not(.kc-head)::after{background:linear-gradient(90deg,#f2628f,#
   .bh-card:not(.open)>:not(h3){display:none}
   .bh-card.open>p{margin-top:6px}
 }
+
+/* card price block: price line, then the notes (art only, savings, installments) each on its own line */
+#services .card .card-foot{flex-wrap:wrap;row-gap:10px}
+#services .card .price{flex-wrap:wrap;justify-content:flex-start;align-items:baseline;column-gap:6px;min-width:0;flex:1 1 220px}
+#services .card .card-foot .req{margin-left:auto!important}
+@media (max-width:767px){#services .card .price{flex:none}#services .card .price>b{flex:0 1 auto;min-width:0;white-space:normal}#services .card .price .ptax{display:block;margin-top:2px}#services .card .card-foot .req{margin-left:0!important}}
+#services .card .price>b{flex:none}
+.price .psave,.price .pinst{display:block;flex-basis:100%;line-height:1.35}
+.price .psave{margin-top:4px}
 </style>
 </head>
 <body>
@@ -2520,6 +2529,6 @@ const SERVICES = {
 };
 /* ========================================================== */
 </script>
-<script src="assets/app.js?v=3e9e1de9" defer></script>
+<script src="assets/app.js?v=f112de74" defer></script>
 </body>
 </html>
