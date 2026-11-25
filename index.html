@@ -1688,7 +1688,6 @@ body.xmas header:not(.kc-head)::after{background:linear-gradient(90deg,#f2628f,#
 .ci-save{justify-self:start;border:0;background:none;padding:2px 0;margin-top:2px;color:#6b3a8f;font:500 13px Poppins,sans-serif;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
 .saved{margin-top:6px}.saved h4{font-size:14px;margin:0 0 8px;color:var(--muted)}.saved[hidden]{display:none}.saved .ci{opacity:.85;background:#fffafc}
 .rv-more{text-align:center;margin-top:20px}
-@media (min-width:768px){.rv-grid:not(.all) .rv-card:nth-child(n+9){display:none}}
 @media (max-width:767px){.rv-more{display:none}}
 .kc-dc{color:inherit;font-weight:600;text-decoration:underline;text-underline-offset:2px}
 
@@ -1750,6 +1749,19 @@ body.xmas header:not(.kc-head)::after{background:linear-gradient(90deg,#f2628f,#
 #services .card .price>b{flex:none}
 .price .psave,.price .pinst{display:block;flex-basis:100%;line-height:1.35}
 .price .psave{margin-top:4px}
+
+/* reviews slide sideways on every screen (owner, 25 Nov 2026): 4 cards on wide screens, 3 on laptops, 2 on tablets, 1 on phones */
+@media (min-width:768px){
+  .rv-grid{columns:auto!important;display:flex;align-items:flex-start;gap:16px;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;overscroll-behavior-x:contain;padding:4px 2px 8px;scrollbar-width:none}
+  .rv-grid::-webkit-scrollbar{display:none}
+  .rv-card{flex:0 0 calc((100% - 48px)/4);margin:0!important;scroll-snap-align:start}
+  .rv-nav{display:flex;align-items:center;justify-content:center;gap:12px;margin-top:16px}
+  .rv-prev,.rv-next{width:40px;height:40px;border-radius:50%;border:1px solid var(--line);background:#fff;color:var(--pink);font-size:22px;line-height:1;display:grid;place-items:center;cursor:pointer;padding:0 0 3px}
+  .rv-prev:disabled,.rv-next:disabled{opacity:.35;cursor:default}
+}
+@media (min-width:768px) and (max-width:1099px){.rv-card{flex-basis:calc((100% - 32px)/3)}}
+@media (min-width:768px){.rv-grid{transition:height .3s ease}}
+@media (min-width:768px) and (max-width:899px){.rv-card{flex-basis:calc((100% - 16px)/2)}}
 </style>
 </head>
 <body>
@@ -2049,7 +2061,6 @@ body.xmas header:not(.kc-head)::after{background:linear-gradient(90deg,#f2628f,#
         <ul class="rv-tags"><li>On time delivery</li><li>Amazing skills</li><li>Attentive to details</li></ul>
       </figure>
     </div>
-    <div class="rv-more" id="rvMore"><button type="button" class="btn btn-ghost" id="rvMoreBtn"></button></div>
     <div class="rv-nav" aria-label="More reviews"><button type="button" class="rv-prev" aria-label="Previous review">‹</button><div class="rv-dots"></div><button type="button" class="rv-next" aria-label="Next review">›</button></div>
   </div>
 </section>
@@ -2529,6 +2540,6 @@ const SERVICES = {
 };
 /* ========================================================== */
 </script>
-<script src="assets/app.js?v=f112de74" defer></script>
+<script src="assets/app.js?v=7a510f14" defer></script>
 </body>
 </html>

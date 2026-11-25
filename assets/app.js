@@ -959,50 +959,13 @@ let tabVisitorN=0,tabAdminN=0;const tabSync=()=>tabDot(tabVisitorN+tabAdminN);
   const step=()=>cards.length>1?(cards[1].offsetLeft-cards[0].offsetLeft)||g.clientWidth:g.clientWidth;
   const cur=()=>Math.max(0,Math.min(cards.length-1,Math.round(g.scrollLeft/step())));
   const go=i=>{i=Math.max(0,Math.min(cards.length-1,i));g.scrollTo({left:cards[i].offsetLeft-cards[0].offsetLeft,behavior:'smooth'});};
-  const fit=i=>{g.style.height=getComputedStyle(nav).display==='none'?'':(cards[i].offsetHeight+6)+'px';};   // phones: carousel as tall as the card shown
-  const upd=()=>{const i=cur();ctr.textContent=(i+1)+' / '+cards.length;prev.disabled=i===0;next.disabled=i===cards.length-1;fit(i);};
+  const fit=i=>{if(getComputedStyle(nav).display==='none'){g.style.height='';return;}const vis=Math.max(1,Math.round(g.clientWidth/step()));let h=0;for(let k=i;k<Math.min(cards.length,i+vis);k++)h=Math.max(h,cards[k].offsetHeight);g.style.height=(h+(innerWidth>=768?12:6))+'px';};   // the strip is as tall as the cards in view   // phones: carousel as tall as the card shown
+  const upd=()=>{const i=cur(),vis=Math.max(1,Math.round(g.clientWidth/step()));const last=Math.min(cards.length,i+vis);ctr.textContent=(vis>1?(i+1)+'–'+last:(i+1))+' / '+cards.length;prev.disabled=i===0;next.disabled=i+Math.max(1,Math.round(g.clientWidth/step()))>=cards.length;fit(i);};
   addEventListener('resize',()=>fit(cur()),{passive:true});
   let raf=0;g.addEventListener('scroll',()=>{cancelAnimationFrame(raf);raf=requestAnimationFrame(upd);},{passive:true});
   prev.onclick=()=>go(cur()-1);next.onclick=()=>go(cur()+1);
   if('IntersectionObserver' in window){const io=new IntersectionObserver(es=>{if(es[0].isIntersecting){io.disconnect();upd();}},{rootMargin:'400px'});io.observe(g);}else upd();   // measure only when the reviews come near (saves layout work at load)
   if('IntersectionObserver' in window)new IntersectionObserver(es=>es.forEach(e=>document.body.classList.toggle('in-reviews',e.isIntersecting)),{rootMargin:'-85% 0px 0px 0px'}).observe($('#reviews'));
-})();
-// reviews on wider screens: 8 first, the rest behind "Show all"
-(function(){const g=$('.rv-grid'),b=$('#rvMoreBtn');if(!g||!b)return;const n=g.querySelectorAll('.rv-card').length;
-  if(n<=8){$('#rvMore').remove();return;}
-  b.textContent=`Show all ${n} reviews`;b.onclick=()=>{g.classList.add('all');$('#rvMore').remove();};})();
-
-// slots left per service (SLOTS.per): on the service cards, in the service list and in the order form
-const slotTxt=k=>{if(typeof SLOTS==='undefined'||!SLOTS.open||!SLOTS.per||!(k in SLOTS.per))return '';const n=SLOTS.per[k];return n>0?`${n} slot${n===1?'':'s'} left`:'Fully booked';};
-(function(){
-  $$('.card').forEach(c=>{const h=c.querySelector('h3'),t=h&&slotTxt(h.textContent.trim());if(!t)return;
-    const e=document.createElement('span');e.className='slot-left'+(/Fully/.test(t)?' full':'');e.innerHTML='<i aria-hidden="true"></i>'+t;h.after(e);});
-  $$('#svcOpts label').forEach(l=>{const inp=document.getElementById(l.htmlFor),t=inp&&slotTxt(inp.value),sm=l.querySelector('small');if(t&&sm)sm.textContent+=' · '+t;});
-})();
-
-{const c=$$('#services .card').find(x=>((x.querySelector('h3')||{}).textContent||'').trim()==='VTuber Packages');const m=Math.max(0,...[0,1,2].map(pkgSaving));
-  if(c&&m){const pr=c.querySelector('.price'),s=document.createElement('span');s.className='psave';s.textContent=`Save up to $${m} vs buying separately`;pr&&pr.appendChild(s);}}
-// buyer helpers: installments on the cards, "start small", which-package quiz, work in progress (real numbers from the orders)
-(function(){
-  const fromMove=k=>{const sv=SERVICES[k];if(!sv)return 0;const mv=sv.packages.filter(p=>/Art \+ Rig/.test(p[0])).map(p=>p[1]);return mv.length?Math.min(...mv):sv.from;};
-  $$('#services .card').forEach(c=>{const k=(c.querySelector('h3')||{}).textContent;if(!k||!SERVICES[k.trim()]||SERVICES[k.trim()].quote)return;const base=fromMove(k.trim());if(base<150)return;
-    const third=Math.ceil(base*(1+TAX)/3*100)/100,pr=c.querySelector('.price');if(!pr)return;const s=document.createElement('span');s.className='pinst';s.textContent=`or 3 × ${money2(third)} (incl. fee)`;pr.appendChild(s);});
-  const small=[['Emotes','emotes for your channel'],['PNGTuber','a simple talking avatar'],['Custom PFP','a profile picture of your character']].filter(([k])=>SERVICES[k]);
-  $('#startSmallList').innerHTML=small.map(([k,d])=>`<a href="#order" data-order="${esc(k)}"><span>${esc(k)}<small style="display:block;font-weight:400;color:var(--muted);font-size:12.5px">${esc(d)}</small></span><b>from ${money(SERVICES[k].from)}${SERVICES[k].qty?' each':''}</b></a>`).join('');
-  const ans={};
-  $$('.bh-tg').forEach(b=>b.addEventListener('click',()=>{if(!matchMedia('(max-width:767px)').matches)return;const c=b.closest('.bh-card'),o=c.classList.toggle('open');b.setAttribute('aria-expanded',String(o));}));
-  $('#fq').addEventListener('click',e=>{const b=e.target.closest('button[data-v]');if(!b)return;const g=b.parentNode;g.querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b));ans[g.dataset.q]=b.dataset.v;
-    if(!(ans.b&&ans.m&&ans.x))return;
-    const vp=n=>{const p=(SERVICES.VTuber.packages.find(x=>x[0]===n)||[])[1];return p?money(p):'';},pk=SERVICES['VTuber Packages'].packages;
-    let t,o;
-    if(ans.m==='no'){t=`<b>PNGTuber</b> from ${money(SERVICES.PNGTuber.from)}: a talking avatar that switches images when you speak. Easy to start, and you can move to Live2D later.`;o='PNGTuber';}
-    else if(ans.x==='yes'&&ans.b!=='low'){const p=ans.b==='high'?pk[pk.length-1]:pk[0];t=`<b>${esc(p[0])}</b> ${money(p[1])}: ${esc(p[2])}. Everything for your debut in one style.`;o='VTuber Packages';}
-    else if(ans.b==='low'){t=`<b>PNGTuber</b> from ${money(SERVICES.PNGTuber.from)} fits your budget now. A Live2D model starts at ${vp('Bust · Art + Rig')} (or 3 payments).`;o='PNGTuber';}
-    else if(ans.b==='mid'){t=`<b>Live2D VTuber model, bust</b> ${vp('Bust · Art + Rig')} or <b>half body</b> ${vp('Half body · Art + Rig')}: art + rig, ready for VTube Studio.`;o='VTuber';}
-    else{t=`<b>Live2D VTuber model, full body</b> ${vp('Full body · Art + Rig')}: art + rig with full-body movement. Add VBridger or extra toggles in the order form.`;o='VTuber';}
-    $('#fqRes').innerHTML=t+`<br><a href="#order" data-order="${esc(o)}" class="btn btn-pink">Order this</a>`;$('#fqRes').hidden=false;});
-  if(location.protocol.startsWith('http')&&!/[?&]dryrun=1/.test(location.search))fetch('order-api.php?a=queue').then(r=>r.json()).then(j=>{if(!j||!j.ok||!(j.working>0))return;
-    const w=$('#workNow');w.innerHTML=`<i aria-hidden="true"></i>Working on ${j.working} commission${j.working>1?'s':''} now`;w.hidden=false;}).catch(()=>{});
 })();
 // "Chat with us" in the phone menu opens the chat
 document.addEventListener('click',e=>{const a=e.target.closest('.menu-chat');if(!a)return;e.preventDefault();$('#menu').classList.remove('open');const b=$('#kcBubble');if(b)b.click();});
